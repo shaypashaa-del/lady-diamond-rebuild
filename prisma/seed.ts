@@ -1,5 +1,6 @@
 import { PrismaClient, ProductStatus } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import bcrypt from "bcryptjs";
 import "dotenv/config";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
@@ -288,6 +289,23 @@ async function main() {
   }
 
   console.log(`Seeded ${categories.length} categories and ${products.length} products.`);
+
+  console.log("Seeding super admin user...");
+  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "admin@ladydiamondjewels.com";
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "ChangeMe123!";
+  await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {},
+    create: {
+      email: adminEmail,
+      name: "Super Admin",
+      passwordHash: await bcrypt.hash(adminPassword, 12),
+      role: "SUPER_ADMIN",
+      emailVerified: true,
+    },
+  });
+  console.log(`Super admin ready — email: ${adminEmail} / password: ${adminPassword}`);
+  console.log("Change this password immediately in a real deployment.");
 }
 
 main()

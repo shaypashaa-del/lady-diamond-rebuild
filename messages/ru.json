@@ -113,5 +113,33 @@
     "free": "Бесплатно",
     "estimatedTotal": "Итого",
     "proceedToCheckout": "Перейти к оформлению"
+  },
+  "AuthLogin": {
+    "title": "Вход",
+    "email": "Email",
+    "password": "Пароль",
+    "submit": "Войти",
+    "submitting": "Вход...",
+    "noAccount": "Ещё нет аккаунта?",
+    "register": "Регистрация",
+    "forgot": "Забыли пароль?"
+  },
+  "AuthRegister": {
+    "title": "Создать аккаунт",
+    "name": "Полное имя",
+    "email": "Email",
+    "phone": "Телефон (необязательно)",
+    "password": "Пароль",
+    "submit": "Создать аккаунт",
+    "submitting": "Создание...",
+    "haveAccount": "Уже есть аккаунт?",
+    "login": "Войти"
+  },
+  "Account": {
+    "title": "Мой аккаунт",
+    "loggedInAs": "Вы вошли как",
+    "orders": "История заказов",
+    "noOrders": "Заказов пока нет.",
+    "logout": "Выйти"
   }
 }

@@ -113,5 +113,33 @@
     "free": "Free",
     "estimatedTotal": "Estimated Total",
     "proceedToCheckout": "Proceed to Checkout"
+  },
+  "AuthLogin": {
+    "title": "Log In",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Log In",
+    "submitting": "Logging in...",
+    "noAccount": "No account yet?",
+    "register": "Register",
+    "forgot": "Forgot your password?"
+  },
+  "AuthRegister": {
+    "title": "Create Account",
+    "name": "Full Name",
+    "email": "Email",
+    "phone": "Phone (optional)",
+    "password": "Password",
+    "submit": "Create Account",
+    "submitting": "Creating...",
+    "haveAccount": "Already have an account?",
+    "login": "Log In"
+  },
+  "Account": {
+    "title": "My Account",
+    "loggedInAs": "Logged in as",
+    "orders": "Order History",
+    "noOrders": "No orders yet.",
+    "logout": "Log Out"
   }
 }

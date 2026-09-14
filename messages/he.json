@@ -113,5 +113,33 @@
     "free": "חינם",
     "estimatedTotal": "סה\"כ משוער",
     "proceedToCheckout": "המשך לתשלום"
+  },
+  "AuthLogin": {
+    "title": "התחברות",
+    "email": "אימייל",
+    "password": "סיסמה",
+    "submit": "התחברות",
+    "submitting": "מתחבר...",
+    "noAccount": "עדיין אין לך חשבון?",
+    "register": "הרשמה",
+    "forgot": "שכחת סיסמה?"
+  },
+  "AuthRegister": {
+    "title": "יצירת חשבון",
+    "name": "שם מלא",
+    "email": "אימייל",
+    "phone": "טלפון (אופציונלי)",
+    "password": "סיסמה",
+    "submit": "יצירת חשבון",
+    "submitting": "יוצר חשבון...",
+    "haveAccount": "כבר יש לך חשבון?",
+    "login": "התחברות"
+  },
+  "Account": {
+    "title": "החשבון שלי",
+    "loggedInAs": "מחובר/ת בתור",
+    "orders": "היסטוריית הזמנות",
+    "noOrders": "אין עדיין הזמנות.",
+    "logout": "התנתקות"
   }
 }

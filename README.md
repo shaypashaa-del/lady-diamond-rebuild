@@ -81,6 +81,7 @@ scripts/                one-off tooling (WooCommerce importer)
   (Organization/WebSite/Product/BreadcrumbList), sitemap.xml, robots.txt
 - ✅ Legal/policy pages (draft content, editable in admin)
 - ✅ Cookie consent banner
+- ✅ Password reset (token-based, no email provider wired up yet — see gaps below)
 
 ## Known gaps / what still needs a decision or access
 
@@ -99,8 +100,11 @@ scripts/                one-off tooling (WooCommerce importer)
   original interpretation, not a pixel-match, because the live site's own
   hero/banner images never rendered during the audit (still theme-demo
   content) — see AUDIT.md's "Needs original WordPress access" section.
-- **Password reset flow** (`/reset-password`, `/affiliate-reset-password`)
-  is linked from the login pages but not implemented yet.
+- **Password reset works but has no real email delivery** — `/reset-password`
+  generates a valid, single-use, 1-hour token, but since no mail provider is
+  configured yet the link is shown directly on-screen in non-production
+  environments instead of being emailed. Wire up a provider (Resend,
+  SendGrid, etc.) and gate that on-screen fallback to dev-only before launch.
 - **Legal page content is a first draft**, explicitly not legal advice —
   needs lawyer review before launch.
 - **No analytics/marketing scripts are wired in** (the cookie consent

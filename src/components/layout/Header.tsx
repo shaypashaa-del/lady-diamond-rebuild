@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Menu, Search, ShoppingBag, User, X } from "lucide-react";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { primaryNav } from "@/lib/nav-data";
 import { useCartStore } from "@/lib/cart-store";
 import { useMounted } from "@/lib/use-mounted";
@@ -12,9 +12,20 @@ import { LocaleSwitcher } from "./LocaleSwitcher";
 export function Header() {
   const t = useTranslations("Header");
   const tNav = useTranslations("Nav");
+  const tSearch = useTranslations("Search");
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const mounted = useMounted();
   const itemCount = useCartStore((s) => s.totalItems());
+
+  function submitSearch(e: React.FormEvent) {
+    e.preventDefault();
+    if (!query.trim()) return;
+    setSearchOpen(false);
+    router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+  }
 
   return (
     <header className="relative z-40 border-b border-neutral-200 bg-white">
@@ -25,7 +36,11 @@ export function Header() {
         </Link>
 
         <div className="flex items-center gap-4">
-          <button aria-label={t("search")} className="hidden sm:inline-flex text-neutral-700 hover:text-black">
+          <button
+            aria-label={t("search")}
+            onClick={() => setSearchOpen((v) => !v)}
+            className="hidden sm:inline-flex text-neutral-700 hover:text-black"
+          >
             <Search size={18} />
           </button>
           <Link href="/account" aria-label={t("account")} className="hidden sm:inline-flex text-neutral-700 hover:text-black">
@@ -48,6 +63,23 @@ export function Header() {
           </button>
         </div>
       </div>
+
+      {searchOpen && (
+        <div className="border-t border-neutral-200 bg-white px-4 py-3 sm:px-8">
+          <form onSubmit={submitSearch} className="mx-auto flex max-w-7xl gap-2">
+            <input
+              autoFocus
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={tSearch("placeholder")}
+              className="flex-1 border border-neutral-300 px-3 py-2 text-sm"
+            />
+            <button type="submit" className="border border-neutral-900 px-4 py-2 text-xs font-semibold uppercase tracking-wide hover:bg-neutral-900 hover:text-white">
+              {t("search")}
+            </button>
+          </form>
+        </div>
+      )}
 
       {open && (
         <div className="fixed inset-0 z-50 flex justify-end rtl:justify-start">
@@ -93,7 +125,25 @@ export function Header() {
               ))}
             </ul>
 
-            <div className="mt-auto flex items-center gap-4 border-t border-neutral-200 pt-6 sm:hidden">
+            <form
+              onSubmit={(e) => {
+                submitSearch(e);
+                setOpen(false);
+              }}
+              className="mt-auto flex gap-2 border-t border-neutral-200 pt-6 sm:hidden"
+            >
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={tSearch("placeholder")}
+                className="flex-1 border border-neutral-300 px-3 py-2 text-sm"
+              />
+              <button type="submit" aria-label={t("search")} className="border border-neutral-900 px-3">
+                <Search size={16} />
+              </button>
+            </form>
+
+            <div className="flex items-center gap-4 border-t border-neutral-200 pt-6 sm:hidden">
               <Link href="/account" onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm">
                 <User size={16} /> {tNav("account")}
               </Link>

@@ -236,5 +236,10 @@
     "saveSubmit": "שמירת סיסמה חדשה",
     "saving": "שומר...",
     "backToLogin": "חזרה להתחברות"
+  },
+  "Search": {
+    "placeholder": "חיפוש מוצרים...",
+    "resultsFor": "תוצאות חיפוש עבור",
+    "noResults": "לא נמצאו מוצרים."
   }
 }

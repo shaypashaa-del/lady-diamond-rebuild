@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { updateProduct } from "@/server/actions/products";
 import { ProductForm } from "@/components/admin/ProductForm";
+import { VariantManager } from "@/components/admin/VariantManager";
 import type { LocalizedText } from "@/lib/i18n-content";
 
 export default async function EditProductPage({
@@ -11,7 +12,7 @@ export default async function EditProductPage({
 }) {
   const { id } = await params;
   const [product, categories] = await Promise.all([
-    prisma.product.findUnique({ where: { id }, include: { categories: true } }),
+    prisma.product.findUnique({ where: { id }, include: { categories: true, variants: true } }),
     prisma.category.findMany({ orderBy: { sortOrder: "asc" } }),
   ]);
 
@@ -38,6 +39,7 @@ export default async function EditProductPage({
           categoryId: product.categories[0]?.categoryId,
         }}
       />
+      <VariantManager productId={product.id} variants={product.variants} />
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
 const statusLabels: Record<string, string> = {
@@ -41,7 +42,11 @@ export default async function AdminOrdersPage() {
           <tbody>
             {orders.map((o) => (
               <tr key={o.id} className="border-b border-neutral-100 last:border-0">
-                <td className="px-4 py-3 font-medium">{o.orderNumber}</td>
+                <td className="px-4 py-3 font-medium">
+                  <Link href={`/admin/orders/${o.id}`} className="hover:underline">
+                    {o.orderNumber}
+                  </Link>
+                </td>
                 <td className="px-4 py-3">{o.email}</td>
                 <td className="px-4 py-3">{Number(o.total).toFixed(2)} ₪</td>
                 <td className="px-4 py-3">{o.affiliate?.code ?? "—"}</td>

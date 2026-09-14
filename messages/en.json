@@ -236,5 +236,10 @@
     "saveSubmit": "Save New Password",
     "saving": "Saving...",
     "backToLogin": "Back to Login"
+  },
+  "Search": {
+    "placeholder": "Search products...",
+    "resultsFor": "Search results for",
+    "noResults": "No products found."
   }
 }

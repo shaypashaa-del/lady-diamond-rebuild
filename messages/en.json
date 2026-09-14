@@ -177,5 +177,41 @@
     "recentSales": "Recent Sales",
     "noSales": "No sales yet.",
     "logout": "Log Out"
+  },
+  "Checkout": {
+    "title": "Checkout",
+    "haveCoupon": "Have a coupon? Click here to enter your code",
+    "couponCode": "Coupon code",
+    "apply": "Apply",
+    "billingDetails": "Billing Details",
+    "fullName": "Full Name",
+    "phone": "Phone",
+    "country": "Country",
+    "city": "Town / City",
+    "street": "Street Address",
+    "apartment": "Apartment, suite, unit (optional)",
+    "zip": "Postcode / ZIP",
+    "email": "Email Address",
+    "orderNotes": "Order Notes (optional)",
+    "yourOrder": "Your Order",
+    "product": "Product",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "free": "Free",
+    "total": "Total",
+    "paymentMethod": "Payment Method",
+    "bankTransfer": "Direct Bank Transfer",
+    "cod": "Cash on Delivery",
+    "placeOrder": "Place Order",
+    "placing": "Placing order...",
+    "emptyCart": "Your cart is empty.",
+    "continueShopping": "Continue Shopping"
+  },
+  "OrderConfirmation": {
+    "title": "Thank you for your order!",
+    "orderNumber": "Order Number",
+    "total": "Total",
+    "instructions": "Payment Instructions",
+    "continueShopping": "Continue Shopping"
   }
 }

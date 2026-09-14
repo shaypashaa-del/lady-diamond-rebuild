@@ -264,6 +264,8 @@ model Order {
   email          String
   status         OrderStatus   @default(PENDING)
   paymentStatus  PaymentStatus @default(PENDING)
+  paymentMethod  String?
+  paymentInstructions String?
   subtotal       Decimal       @db.Decimal(10, 2)
   discountTotal  Decimal       @db.Decimal(10, 2) @default(0)
   shippingTotal  Decimal       @db.Decimal(10, 2) @default(0)

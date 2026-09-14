@@ -177,5 +177,41 @@
     "recentSales": "Последние продажи",
     "noSales": "Продаж пока нет.",
     "logout": "Выйти"
+  },
+  "Checkout": {
+    "title": "Оформление заказа",
+    "haveCoupon": "Есть купон? Нажмите здесь, чтобы ввести код",
+    "couponCode": "Код купона",
+    "apply": "Применить",
+    "billingDetails": "Платёжные данные",
+    "fullName": "Полное имя",
+    "phone": "Телефон",
+    "country": "Страна",
+    "city": "Город",
+    "street": "Адрес",
+    "apartment": "Квартира (необязательно)",
+    "zip": "Индекс",
+    "email": "Email",
+    "orderNotes": "Примечания к заказу (необязательно)",
+    "yourOrder": "Ваш заказ",
+    "product": "Товар",
+    "subtotal": "Промежуточный итог",
+    "shipping": "Доставка",
+    "free": "Бесплатно",
+    "total": "Итого",
+    "paymentMethod": "Способ оплаты",
+    "bankTransfer": "Банковский перевод",
+    "cod": "Наложенный платёж",
+    "placeOrder": "Оформить заказ",
+    "placing": "Оформление...",
+    "emptyCart": "Ваша корзина пуста.",
+    "continueShopping": "Продолжить покупки"
+  },
+  "OrderConfirmation": {
+    "title": "Спасибо за заказ!",
+    "orderNumber": "Номер заказа",
+    "total": "Итого",
+    "instructions": "Инструкции по оплате",
+    "continueShopping": "Продолжить покупки"
   }
 }

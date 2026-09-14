@@ -177,5 +177,41 @@
     "recentSales": "מכירות אחרונות",
     "noSales": "אין עדיין מכירות.",
     "logout": "התנתקות"
+  },
+  "Checkout": {
+    "title": "תשלום",
+    "haveCoupon": "יש לך קופון? לחצו כאן להזנת הקוד",
+    "couponCode": "קוד קופון",
+    "apply": "החלה",
+    "billingDetails": "פרטי חיוב",
+    "fullName": "שם מלא",
+    "phone": "טלפון",
+    "country": "מדינה",
+    "city": "עיר",
+    "street": "כתובת",
+    "apartment": "דירה / קומה (אופציונלי)",
+    "zip": "מיקוד",
+    "email": "כתובת אימייל",
+    "orderNotes": "הערות להזמנה (אופציונלי)",
+    "yourOrder": "ההזמנה שלך",
+    "product": "מוצר",
+    "subtotal": "סכום ביניים",
+    "shipping": "משלוח",
+    "free": "חינם",
+    "total": "סה\"כ",
+    "paymentMethod": "אמצעי תשלום",
+    "bankTransfer": "העברה בנקאית",
+    "cod": "תשלום במזומן בעת המסירה",
+    "placeOrder": "ביצוע הזמנה",
+    "placing": "מבצע הזמנה...",
+    "emptyCart": "העגלה שלך ריקה.",
+    "continueShopping": "המשך בקנייה"
+  },
+  "OrderConfirmation": {
+    "title": "תודה על ההזמנה!",
+    "orderNumber": "מספר הזמנה",
+    "total": "סה\"כ",
+    "instructions": "הוראות תשלום",
+    "continueShopping": "המשך בקנייה"
   }
 }

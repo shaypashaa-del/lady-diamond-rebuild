@@ -213,5 +213,15 @@
     "total": "Total",
     "instructions": "Payment Instructions",
     "continueShopping": "Continue Shopping"
+  },
+  "Cookies": {
+    "message": "We use cookies to run the store and, with your consent, for analytics and marketing.",
+    "necessary": "Necessary",
+    "analytics": "Analytics",
+    "marketing": "Marketing",
+    "acceptAll": "Accept All",
+    "rejectNonEssential": "Reject Non-Essential",
+    "save": "Save Preferences",
+    "settings": "Cookie Settings"
   }
 }

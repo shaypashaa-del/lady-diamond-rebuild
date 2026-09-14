@@ -9,6 +9,7 @@ import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ReferralCapture } from "@/components/ReferralCapture";
+import { CookieConsentBanner } from "@/components/layout/CookieConsentBanner";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { organizationSchema, websiteSchema } from "@/lib/schema";
 import { SITE_URL } from "@/lib/site-config";
@@ -91,6 +92,7 @@ export default async function LocaleLayout({
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
+          <CookieConsentBanner />
         </NextIntlClientProvider>
       </body>
     </html>

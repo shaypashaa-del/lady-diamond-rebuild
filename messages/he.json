@@ -213,5 +213,15 @@
     "total": "סה\"כ",
     "instructions": "הוראות תשלום",
     "continueShopping": "המשך בקנייה"
+  },
+  "Cookies": {
+    "message": "אנו משתמשים בעוגיות להפעלת החנות, ובכפוף להסכמתך גם לצורכי אנליטיקס ושיווק.",
+    "necessary": "הכרחיות",
+    "analytics": "אנליטיקס",
+    "marketing": "שיווק",
+    "acceptAll": "אישור הכל",
+    "rejectNonEssential": "דחיית לא הכרחי",
+    "save": "שמירת העדפות",
+    "settings": "הגדרות עוגיות"
   }
 }

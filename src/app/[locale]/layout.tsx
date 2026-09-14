@@ -8,6 +8,7 @@ import { routing, rtlLocales, type Locale } from "@/i18n/routing";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { ReferralCapture } from "@/components/ReferralCapture";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -59,6 +60,7 @@ export default async function LocaleLayout({
     >
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider>
+          <ReferralCapture />
           <AnnouncementBar />
           <Header />
           <main className="flex-1">{children}</main>

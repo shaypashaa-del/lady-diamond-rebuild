@@ -19,3 +19,11 @@ export async function requireCustomerSession() {
   }
   return session;
 }
+
+export async function requireAffiliateSession() {
+  const session = await getSession();
+  if (!session || session.role !== "AFFILIATE") {
+    redirect("/affiliate/login");
+  }
+  return session;
+}

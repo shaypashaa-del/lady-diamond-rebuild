@@ -28,6 +28,9 @@ export default function AffiliateLoginPage() {
           <label className="mb-1 block text-xs font-medium text-neutral-500">{t("password")}</label>
           <input name="password" type="password" required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
         </div>
+        <Link href="/reset-password" className="mb-6 block text-end text-xs text-neutral-400 underline">
+          {tLogin("forgot")}
+        </Link>
         <button
           type="submit"
           disabled={pending}

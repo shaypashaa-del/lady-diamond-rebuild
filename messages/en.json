@@ -223,5 +223,18 @@
     "rejectNonEssential": "Reject Non-Essential",
     "save": "Save Preferences",
     "settings": "Cookie Settings"
+  },
+  "PasswordReset": {
+    "title": "Reset Password",
+    "email": "Email",
+    "submit": "Send Reset Link",
+    "submitting": "Sending...",
+    "sent": "If that email is registered, a reset link has been sent.",
+    "devLinkNote": "Dev mode — no email provider configured yet, here is your link:",
+    "newPasswordTitle": "Set a New Password",
+    "newPassword": "New Password",
+    "saveSubmit": "Save New Password",
+    "saving": "Saving...",
+    "backToLogin": "Back to Login"
   }
 }

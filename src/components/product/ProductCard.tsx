@@ -1,12 +1,26 @@
+"use client";
+
 import { useTranslations } from "next-intl";
 import { Eye, Heart } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { SampleProduct } from "@/lib/products-data";
 import { cn } from "@/lib/cn";
+import { useCartStore } from "@/lib/cart-store";
 
 export function ProductCard({ product }: { product: SampleProduct }) {
   const t = useTranslations("Product");
+  const addLine = useCartStore((s) => s.addLine);
   const isSold = product.badge === "Sold";
+
+  function handleAddToCart() {
+    addLine({
+      key: `${product.slug}:default`,
+      productId: product.slug,
+      slug: product.slug,
+      name: product.name,
+      price: product.price,
+    });
+  }
 
   return (
     <div className="group relative flex flex-col">
@@ -51,12 +65,28 @@ export function ProductCard({ product }: { product: SampleProduct }) {
             <span className="font-semibold">{product.price.toFixed(2)} ₪</span>
           )}
         </div>
-        <button
-          disabled={isSold}
-          className="mt-3 w-full border border-neutral-900 py-2 text-xs font-semibold uppercase tracking-wide text-neutral-900 transition-colors hover:bg-neutral-900 hover:text-white disabled:cursor-not-allowed disabled:border-neutral-300 disabled:text-neutral-400 disabled:hover:bg-transparent"
-        >
-          {isSold ? t("readMore") : product.hasVariants ? t("selectOptions") : t("addToCart")}
-        </button>
+        {isSold ? (
+          <button
+            disabled
+            className="mt-3 w-full border border-neutral-300 py-2 text-xs font-semibold uppercase tracking-wide text-neutral-400"
+          >
+            {t("readMore")}
+          </button>
+        ) : product.hasVariants ? (
+          <Link
+            href={`/product/${product.slug}`}
+            className="mt-3 block w-full border border-neutral-900 py-2 text-center text-xs font-semibold uppercase tracking-wide text-neutral-900 transition-colors hover:bg-neutral-900 hover:text-white"
+          >
+            {t("selectOptions")}
+          </Link>
+        ) : (
+          <button
+            onClick={handleAddToCart}
+            className="mt-3 w-full border border-neutral-900 py-2 text-xs font-semibold uppercase tracking-wide text-neutral-900 transition-colors hover:bg-neutral-900 hover:text-white"
+          >
+            {t("addToCart")}
+          </button>
+        )}
       </div>
     </div>
   );

@@ -93,6 +93,25 @@
     "sale": "Sale",
     "sold": "Sold",
     "quickView": "Quick view",
-    "wishlist": "Wishlist"
+    "wishlist": "Wishlist",
+    "options": "Options",
+    "chooseOption": "Choose an option…",
+    "description": "Description",
+    "sku": "SKU"
+  },
+  "Category": {
+    "items": "items",
+    "item": "item",
+    "noProducts": "No products yet."
+  },
+  "Cart": {
+    "title": "Cart",
+    "empty": "Your cart is currently empty.",
+    "continueShopping": "Continue Shopping",
+    "cartTotals": "Cart Totals",
+    "shipping": "Shipping",
+    "free": "Free",
+    "estimatedTotal": "Estimated Total",
+    "proceedToCheckout": "Proceed to Checkout"
   }
 }

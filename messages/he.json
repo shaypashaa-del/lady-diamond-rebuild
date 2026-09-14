@@ -93,6 +93,25 @@
     "sale": "מבצע",
     "sold": "אזל",
     "quickView": "צפייה מהירה",
-    "wishlist": "מועדפים"
+    "wishlist": "מועדפים",
+    "options": "אפשרויות",
+    "chooseOption": "בחר אפשרות...",
+    "description": "תיאור",
+    "sku": "מק\"ט"
+  },
+  "Category": {
+    "items": "פריטים",
+    "item": "פריט",
+    "noProducts": "אין עדיין מוצרים."
+  },
+  "Cart": {
+    "title": "עגלה",
+    "empty": "העגלה שלך ריקה כרגע.",
+    "continueShopping": "המשך בקנייה",
+    "cartTotals": "סיכום עגלה",
+    "shipping": "משלוח",
+    "free": "חינם",
+    "estimatedTotal": "סה\"כ משוער",
+    "proceedToCheckout": "המשך לתשלום"
   }
 }

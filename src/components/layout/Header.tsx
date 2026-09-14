@@ -5,12 +5,16 @@ import { useTranslations } from "next-intl";
 import { Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { primaryNav } from "@/lib/nav-data";
+import { useCartStore } from "@/lib/cart-store";
+import { useMounted } from "@/lib/use-mounted";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 
 export function Header() {
   const t = useTranslations("Header");
   const tNav = useTranslations("Nav");
   const [open, setOpen] = useState(false);
+  const mounted = useMounted();
+  const itemCount = useCartStore((s) => s.totalItems());
 
   return (
     <header className="relative z-40 border-b border-neutral-200 bg-white">
@@ -27,8 +31,13 @@ export function Header() {
           <Link href="/account" aria-label={t("account")} className="hidden sm:inline-flex text-neutral-700 hover:text-black">
             <User size={18} />
           </Link>
-          <Link href="/cart" aria-label={t("cart")} className="hidden sm:inline-flex text-neutral-700 hover:text-black">
+          <Link href="/cart" aria-label={t("cart")} className="relative hidden sm:inline-flex text-neutral-700 hover:text-black">
             <ShoppingBag size={18} />
+            {mounted && itemCount > 0 && (
+              <span className="absolute -end-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-neutral-900 text-[10px] text-white">
+                {itemCount}
+              </span>
+            )}
           </Link>
           <button
             aria-label={t("openMenu")}

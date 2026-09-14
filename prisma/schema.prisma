@@ -75,19 +75,23 @@ enum ProductStatus {
   ARCHIVED
 }
 
+// Translatable text fields are stored as JSON objects, e.g. { "he": "...", "en": "...", "ru": "..." }.
+// Hebrew ("he") is the required/default key; "en" and "ru" may be partial and fall back to "he"
+// at render time (see src/lib/i18n-content.ts).
+
 model Category {
   id              String     @id @default(cuid())
-  name            String
+  name            Json
   slug            String     @unique
-  description     String?
+  description     Json?
   imageId         String?
   image           MediaAsset? @relation(fields: [imageId], references: [id])
   parentId        String?
   parent          Category?  @relation("CategoryToParent", fields: [parentId], references: [id])
   children        Category[] @relation("CategoryToParent")
   sortOrder       Int        @default(0)
-  seoTitle        String?
-  seoDescription  String?
+  seoTitle        Json?
+  seoDescription  Json?
   products        ProductCategory[]
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
@@ -97,17 +101,17 @@ model Category {
 
 model Tag {
   id       String            @id @default(cuid())
-  name     String            @unique
+  name     Json
   slug     String            @unique
   products ProductTag[]
 }
 
 model Product {
   id              String   @id @default(cuid())
-  name            String
+  name            Json
   slug            String   @unique
-  description     String?
-  shortDescription String?
+  description     Json?
+  shortDescription Json?
   basePrice       Decimal  @db.Decimal(10, 2)
   salePrice       Decimal? @db.Decimal(10, 2)
   sku             String?  @unique
@@ -115,8 +119,8 @@ model Product {
   trackInventory  Boolean  @default(true)
   status          ProductStatus @default(DRAFT)
   isFeatured      Boolean  @default(false)
-  seoTitle        String?
-  seoDescription  String?
+  seoTitle        Json?
+  seoDescription  Json?
   weightGrams     Int?
 
   categories      ProductCategory[]
@@ -222,10 +226,10 @@ model Page {
   // Static/legal pages: privacy-policy, terms, shipping-policy, returns-policy, affiliate-terms
   id        String   @id @default(cuid())
   slug      String   @unique
-  title     String
-  body      String
-  seoTitle  String?
-  seoDescription String?
+  title     Json
+  body      Json
+  seoTitle  Json?
+  seoDescription Json?
   updatedAt DateTime @updatedAt
 }
 

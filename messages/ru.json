@@ -93,6 +93,25 @@
     "sale": "Скидка",
     "sold": "Распродано",
     "quickView": "Быстрый просмотр",
-    "wishlist": "Избранное"
+    "wishlist": "Избранное",
+    "options": "Опции",
+    "chooseOption": "Выберите опцию...",
+    "description": "Описание",
+    "sku": "Артикул"
+  },
+  "Category": {
+    "items": "товаров",
+    "item": "товар",
+    "noProducts": "Пока нет товаров."
+  },
+  "Cart": {
+    "title": "Корзина",
+    "empty": "Ваша корзина пуста.",
+    "continueShopping": "Продолжить покупки",
+    "cartTotals": "Итоги корзины",
+    "shipping": "Доставка",
+    "free": "Бесплатно",
+    "estimatedTotal": "Итого",
+    "proceedToCheckout": "Перейти к оформлению"
   }
 }

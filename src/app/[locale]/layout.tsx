@@ -9,6 +9,9 @@ import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ReferralCapture } from "@/components/ReferralCapture";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { organizationSchema, websiteSchema } from "@/lib/schema";
+import { SITE_URL } from "@/lib/site-config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,9 +34,31 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Meta" });
+  const path = locale === routing.defaultLocale ? "/" : `/${locale}`;
+
   return {
-    title: t("title"),
+    metadataBase: new URL(SITE_URL),
+    title: { default: t("title"), template: `%s — ${t("title")}` },
     description: t("description"),
+    alternates: {
+      canonical: path,
+      languages: Object.fromEntries(
+        routing.locales.map((l) => [l, l === routing.defaultLocale ? "/" : `/${l}`])
+      ),
+    },
+    openGraph: {
+      title: t("title"),
+      description: t("description"),
+      url: path,
+      siteName: t("title"),
+      locale,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t("title"),
+      description: t("description"),
+    },
   };
 }
 
@@ -59,6 +84,7 @@ export default async function LocaleLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <JsonLd data={[organizationSchema(), websiteSchema()]} />
         <NextIntlClientProvider>
           <ReferralCapture />
           <AnnouncementBar />

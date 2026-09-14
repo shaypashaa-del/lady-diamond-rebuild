@@ -1,9 +1,11 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Eye, Heart } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import type { SampleProduct } from "@/lib/products-data";
 import { cn } from "@/lib/cn";
 
 export function ProductCard({ product }: { product: SampleProduct }) {
+  const t = useTranslations("Product");
   const isSold = product.badge === "Sold";
 
   return (
@@ -12,20 +14,20 @@ export function ProductCard({ product }: { product: SampleProduct }) {
         {product.badge && (
           <span
             className={cn(
-              "absolute left-2 top-2 z-10 rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white",
+              "absolute start-2 top-2 z-10 rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white",
               product.badge === "Sale" && "bg-rose-600",
               product.badge === "New" && "bg-neutral-900",
               product.badge === "Sold" && "bg-neutral-400"
             )}
           >
-            {product.badge}
+            {t(product.badge.toLowerCase() as "sale" | "new" | "sold")}
           </span>
         )}
-        <div className="absolute right-2 top-2 z-10 flex flex-col gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-          <button aria-label="Quick view" className="rounded-full bg-white p-2 shadow hover:bg-neutral-900 hover:text-white">
+        <div className="absolute end-2 top-2 z-10 flex flex-col gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+          <button aria-label={t("quickView")} className="rounded-full bg-white p-2 shadow hover:bg-neutral-900 hover:text-white">
             <Eye size={14} />
           </button>
-          <button aria-label="Wishlist" className="rounded-full bg-white p-2 shadow hover:bg-neutral-900 hover:text-white">
+          <button aria-label={t("wishlist")} className="rounded-full bg-white p-2 shadow hover:bg-neutral-900 hover:text-white">
             <Heart size={14} />
           </button>
         </div>
@@ -53,7 +55,7 @@ export function ProductCard({ product }: { product: SampleProduct }) {
           disabled={isSold}
           className="mt-3 w-full border border-neutral-900 py-2 text-xs font-semibold uppercase tracking-wide text-neutral-900 transition-colors hover:bg-neutral-900 hover:text-white disabled:cursor-not-allowed disabled:border-neutral-300 disabled:text-neutral-400 disabled:hover:bg-transparent"
         >
-          {isSold ? "Read More" : product.hasVariants ? "Select Options" : "Add to Cart"}
+          {isSold ? t("readMore") : product.hasVariants ? t("selectOptions") : t("addToCart")}
         </button>
       </div>
     </div>

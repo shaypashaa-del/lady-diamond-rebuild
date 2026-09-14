@@ -1,0 +1,98 @@
+{
+  "Meta": {
+    "title": "Lady Diamond Jewels — Fine Jewelry Since 2010",
+    "description": "Gold and silver fine jewelry designed for everyday wear — necklaces, rings, earrings and bracelets, since 2010."
+  },
+  "Announcement": {
+    "text": "Free express worldwide shipping.",
+    "subscribe": "Subscribe to discover"
+  },
+  "Nav": {
+    "home": "Home",
+    "shop": "Shop",
+    "aboutUs": "About Us",
+    "contactUs": "Contact Us",
+    "earrings": "Earrings",
+    "rings": "Rings",
+    "bracelets": "Bracelets",
+    "necklaces": "Necklaces",
+    "account": "Account",
+    "cart": "Cart"
+  },
+  "Header": {
+    "brand": "Lady Diamond",
+    "since": "Since 2010",
+    "search": "Search",
+    "account": "Account",
+    "cart": "Cart",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "Footer": {
+    "brand": "Lady Diamond",
+    "tagline": "Fine jewelry in gold and silver, designed for everyday wear since 2010.",
+    "general": "General",
+    "about": "About",
+    "categories": "Categories",
+    "home": "Home",
+    "shop": "Shop",
+    "contactUs": "Contact Us",
+    "trackOrder": "Track Your Order",
+    "ourStory": "Our Story",
+    "becomeAffiliate": "Become an Affiliate",
+    "shipping": "Shipping & Returns",
+    "privacy": "Privacy Policy",
+    "earrings": "Earrings",
+    "rings": "Rings",
+    "bracelets": "Bracelets",
+    "necklaces": "Necklaces",
+    "rights": "© Since 2010 Lady Diamond Jewels, All Rights Reserved"
+  },
+  "Home": {
+    "heroKicker": "Since 2010",
+    "heroTitle": "Fine Jewelry, Made for Everyday",
+    "heroSubtitle": "Gold and silver pieces designed in-house, crafted to be worn every day and passed on.",
+    "heroCta": "Shop the Collection",
+    "latestBeauty": "Latest Beauty",
+    "newEarrings": "New Earrings",
+    "sophisticatedTitle": "Sophisticated",
+    "sophisticatedCopy": "Fine chains and pendants built for layering, in gold and silver.",
+    "beautyBraceletsTitle": "Beauty Bracelets",
+    "beautyBraceletsCopy": "Delicate bracelets that stack well and wear every day.",
+    "findMore": "Find More",
+    "newCollectionTitle": "New Collection",
+    "newCollectionSubtitle": "Elsa Paretty Jewelry",
+    "newCollectionCopy": "A capsule of rounded, sculptural pieces cast in recycled gold — designed to be worn together or alone.",
+    "shopNow": "Shop Now",
+    "euphoriaTitle": "Euphoria",
+    "euphoriaCopy": "Our warmest edit yet — brushed gold rings and hoops made for everyday stacking.",
+    "shopMore": "Shop More",
+    "asSeenIn": "As Seen In",
+    "kindWords": "Kind Words",
+    "instagram": "Instagram",
+    "testimonials": [
+      {
+        "name": "Noa L.",
+        "quote": "The circle necklace is so light I forget I'm wearing it — exactly what I wanted."
+      },
+      {
+        "name": "Maya K.",
+        "quote": "Ordered the simple ring in silver, sizing was spot on and it arrived beautifully packed."
+      },
+      {
+        "name": "Dana R.",
+        "quote": "Bought the heart bracelet as a gift — the quality feels much higher than the price."
+      }
+    ]
+  },
+  "Product": {
+    "selectOptions": "Select Options",
+    "addToCart": "Add to Cart",
+    "readMore": "Read More",
+    "new": "New",
+    "sale": "Sale",
+    "sold": "Sold",
+    "quickView": "Quick view",
+    "wishlist": "Wishlist"
+  }
+}

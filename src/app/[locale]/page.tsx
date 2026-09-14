@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Hero } from "@/components/home/Hero";
 import { ProductSection } from "@/components/home/ProductSection";
 import { CategoryBanners } from "@/components/home/CategoryBanners";
@@ -8,12 +9,14 @@ import { InstagramSection } from "@/components/home/InstagramSection";
 import { featuredProducts, newArrivals } from "@/lib/products-data";
 
 export default function Home() {
+  const t = useTranslations("Home");
+
   return (
     <>
       <Hero />
-      <ProductSection title="Latest Beauty" products={featuredProducts} />
+      <ProductSection title={t("latestBeauty")} products={featuredProducts} />
       <CategoryBanners />
-      <ProductSection title="New Earrings" products={newArrivals} />
+      <ProductSection title={t("newEarrings")} products={newArrivals} />
       <NewCollection />
       <EuphoriaSpotlight />
       <PartnersStrip />

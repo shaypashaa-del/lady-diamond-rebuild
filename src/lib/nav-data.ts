@@ -1,83 +1,51 @@
-export type NavChild = { name: string; href: string };
-export type NavCategory = { name: string; href: string; children: NavChild[] };
+export type NavCategory = { key: string; href: string };
 
 // Clean category taxonomy replacing the messy tag soup found on the live site
 // (Accessories / Beauty bracelests / 925 Silver / Gold Plating were attribute-like
 // tags, not a real category tree — see AUDIT.md section 2).
+// Labels are resolved via the Nav.* translation namespace at render time.
+// Per-product child links (as seen on the live site's mega-menu) will be
+// generated from the real catalog once Phase 3 wires this to the database.
 export const shopMegaMenu: NavCategory[] = [
-  {
-    name: "Earrings",
-    href: "/category/earrings",
-    children: [
-      { name: "Pearl Earrings", href: "/product/pearl-earrings" },
-      { name: "Line Earrings", href: "/product/line-earrings" },
-      { name: "Elegant Earrings", href: "/product/elegant-earrings" },
-      { name: "Nouvates Earrings", href: "/product/nouvates-earrings" },
-    ],
-  },
-  {
-    name: "Rings",
-    href: "/category/rings",
-    children: [
-      { name: "Simple Ring", href: "/product/simple-ring" },
-      { name: "Wedding Ring", href: "/product/wedding-ring" },
-      { name: "Circle Ring", href: "/product/circle-ring" },
-      { name: "Spiral Ring", href: "/product/spiral-ring" },
-    ],
-  },
-  {
-    name: "Bracelets",
-    href: "/category/bracelets",
-    children: [
-      { name: "Heart Bracelet", href: "/product/heart-bracelet" },
-      { name: "Small Bracelet", href: "/product/small-bracelet" },
-      { name: "Big Bracelet", href: "/product/big-bracelet" },
-    ],
-  },
-  {
-    name: "Necklaces",
-    href: "/category/necklaces",
-    children: [
-      { name: "Necklace Pearl", href: "/product/necklace-pearl" },
-      { name: "Circle Necklace", href: "/product/circle-necklace" },
-      { name: "Mix Necklaces", href: "/product/mix-necklaces" },
-    ],
-  },
+  { key: "earrings", href: "/category/earrings" },
+  { key: "rings", href: "/category/rings" },
+  { key: "bracelets", href: "/category/bracelets" },
+  { key: "necklaces", href: "/category/necklaces" },
 ];
 
 export const primaryNav = [
-  { name: "Home", href: "/" },
-  { name: "Shop", href: "/category/all", mega: shopMegaMenu },
-  { name: "About Us", href: "/about-us" },
-  { name: "Contact Us", href: "/contact-us" },
-];
+  { key: "home", href: "/" },
+  { key: "shop", href: "/category/all", mega: shopMegaMenu },
+  { key: "aboutUs", href: "/about-us" },
+  { key: "contactUs", href: "/contact-us" },
+] as const;
 
 export const footerColumns = [
   {
-    title: "General",
+    titleKey: "general",
     links: [
-      { name: "Home", href: "/" },
-      { name: "Shop", href: "/category/all" },
-      { name: "Contact Us", href: "/contact-us" },
-      { name: "Track Your Order", href: "/account/orders" },
+      { key: "home", href: "/" },
+      { key: "shop", href: "/category/all" },
+      { key: "contactUs", href: "/contact-us" },
+      { key: "trackOrder", href: "/account/orders" },
     ],
   },
   {
-    title: "About",
+    titleKey: "about",
     links: [
-      { name: "Our Story", href: "/about-us" },
-      { name: "Become an Affiliate", href: "/affiliate" },
-      { name: "Shipping & Returns", href: "/policies/shipping" },
-      { name: "Privacy Policy", href: "/policies/privacy" },
+      { key: "ourStory", href: "/about-us" },
+      { key: "becomeAffiliate", href: "/affiliate" },
+      { key: "shipping", href: "/policies/shipping" },
+      { key: "privacy", href: "/policies/privacy" },
     ],
   },
   {
-    title: "Categories",
+    titleKey: "categories",
     links: [
-      { name: "Earrings", href: "/category/earrings" },
-      { name: "Rings", href: "/category/rings" },
-      { name: "Bracelets", href: "/category/bracelets" },
-      { name: "Necklaces", href: "/category/necklaces" },
+      { key: "earrings", href: "/category/earrings" },
+      { key: "rings", href: "/category/rings" },
+      { key: "bracelets", href: "/category/bracelets" },
+      { key: "necklaces", href: "/category/necklaces" },
     ],
   },
-];
+] as const;

@@ -98,7 +98,8 @@
     "options": "Опции",
     "chooseOption": "Выберите опцию...",
     "description": "Описание",
-    "sku": "Артикул"
+    "sku": "Артикул",
+    "weight": "Вес"
   },
   "Category": {
     "items": "товаров",

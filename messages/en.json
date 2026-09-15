@@ -98,7 +98,8 @@
     "options": "Options",
     "chooseOption": "Choose an option…",
     "description": "Description",
-    "sku": "SKU"
+    "sku": "SKU",
+    "weight": "Weight"
   },
   "Category": {
     "items": "items",

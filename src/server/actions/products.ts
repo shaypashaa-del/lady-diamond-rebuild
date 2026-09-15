@@ -23,6 +23,8 @@ function readProductForm(formData: FormData) {
   const salePriceRaw = formData.get("salePrice");
   const salePrice = salePriceRaw ? Number(salePriceRaw) : null;
   const inventory = Number(formData.get("inventory") ?? 0);
+  const weightGramsRaw = formData.get("weightGrams");
+  const weightGrams = weightGramsRaw ? Number(weightGramsRaw) : null;
   const status = String(formData.get("status")) as ProductStatus;
   const isFeatured = formData.get("isFeatured") === "on";
   const sku = String(formData.get("sku") ?? "") || null;
@@ -42,6 +44,7 @@ function readProductForm(formData: FormData) {
     salePrice,
     sku,
     inventory,
+    weightGrams,
     status,
     isFeatured,
     categoryId,
@@ -81,6 +84,7 @@ export async function createProduct(formData: FormData) {
       salePrice: data.salePrice,
       sku: data.sku,
       inventory: data.inventory,
+      weightGrams: data.weightGrams,
       status: data.status,
       isFeatured: data.isFeatured,
     },
@@ -114,6 +118,7 @@ export async function updateProduct(id: string, formData: FormData) {
       salePrice: data.salePrice,
       sku: data.sku,
       inventory: data.inventory,
+      weightGrams: data.weightGrams,
       status: data.status,
       isFeatured: data.isFeatured,
     },

@@ -16,6 +16,7 @@ export function ProductDetail({
   price,
   salePrice,
   sku,
+  weightGrams,
   categoryName,
   variants,
   images = [],
@@ -27,6 +28,7 @@ export function ProductDetail({
   price: number;
   salePrice?: number;
   sku?: string;
+  weightGrams?: number | null;
   categoryName: string;
   variants: VariantView[];
   images?: ProductImageView[];
@@ -159,7 +161,12 @@ export function ProductDetail({
           </button>
         </div>
 
-        {sku && <p className="mt-6 text-xs text-neutral-400">{t("sku")}: {sku}</p>}
+        {(sku || weightGrams) && (
+          <div className="mt-6 flex gap-3 text-xs text-neutral-400">
+            {sku && <span>{t("sku")}: {sku}</span>}
+            {weightGrams != null && <span>{t("weight")}: {weightGrams}g</span>}
+          </div>
+        )}
 
         {description && (
           <div className="mt-10 border-t border-neutral-200 pt-6">

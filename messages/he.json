@@ -98,7 +98,8 @@
     "options": "אפשרויות",
     "chooseOption": "בחר אפשרות...",
     "description": "תיאור",
-    "sku": "מק\"ט"
+    "sku": "מק\"ט",
+    "weight": "משקל"
   },
   "Category": {
     "items": "פריטים",

@@ -15,6 +15,7 @@ type ProductFormValues = {
   salePrice?: number | null;
   sku?: string | null;
   inventory?: number;
+  weightGrams?: number | null;
   status?: string;
   isFeatured?: boolean;
   categoryId?: string;
@@ -144,6 +145,15 @@ export function ProductForm({
             name="inventory"
             type="number"
             defaultValue={initial?.inventory ?? 0}
+            className="w-full rounded border border-neutral-300 px-3 py-2 text-sm"
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-neutral-500">משקל (גרם)</label>
+          <input
+            name="weightGrams"
+            type="number"
+            defaultValue={initial?.weightGrams ?? undefined}
             className="w-full rounded border border-neutral-300 px-3 py-2 text-sm"
           />
         </div>

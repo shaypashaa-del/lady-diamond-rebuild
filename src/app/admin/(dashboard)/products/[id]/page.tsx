@@ -58,6 +58,7 @@ export default async function EditProductPage({
           salePrice: product.salePrice != null ? Number(product.salePrice) : null,
           sku: product.sku,
           inventory: product.inventory,
+          weightGrams: product.weightGrams,
           status: product.status,
           isFeatured: product.isFeatured,
           categoryId: product.categories[0]?.categoryId,

@@ -109,6 +109,7 @@ export default async function ProductPage({
         price={Number(product.basePrice)}
         salePrice={product.salePrice != null ? Number(product.salePrice) : undefined}
         sku={product.sku ?? undefined}
+        weightGrams={product.weightGrams}
         categoryName={categoryName}
         variants={variants}
         images={product.images.map((img) => ({ url: img.media.url, alt: img.media.altText ?? undefined }))}

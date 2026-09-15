@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { getTranslations, getLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/product/ProductCard";
@@ -65,6 +66,7 @@ export default async function CategoryPage({
 
   let title: string;
   let products;
+  let imageUrl: string | undefined;
 
   if (slug === "all") {
     title = tNav("shop");
@@ -74,6 +76,7 @@ export default async function CategoryPage({
     if (!category) notFound();
     title = localize(category.name as LocalizedText, locale);
     products = await getProductsByCategorySlug(slug);
+    imageUrl = category.image?.url;
   }
 
   const cards = products.map((p) => toCardProduct(p, locale));
@@ -86,6 +89,11 @@ export default async function CategoryPage({
           { name: title, url: `${SITE_URL}${pathFor(locale, `/category/${slug}`)}` },
         ])}
       />
+      {imageUrl && (
+        <div className="relative mb-8 aspect-[3/1] w-full overflow-hidden bg-neutral-100">
+          <Image src={imageUrl} alt={title} fill sizes="100vw" className="object-cover" />
+        </div>
+      )}
       <h1 className="mb-2 text-center text-2xl font-semibold uppercase tracking-[0.2em]">{title}</h1>
       <p className="mb-10 text-center text-sm text-neutral-400">
         {cards.length} {cards.length === 1 ? tCat("item") : tCat("items")}

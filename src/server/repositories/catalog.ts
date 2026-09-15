@@ -22,7 +22,7 @@ export function getAllPublishedProducts() {
 }
 
 export function getCategoryBySlug(slug: string) {
-  return prisma.category.findUnique({ where: { slug } });
+  return prisma.category.findUnique({ where: { slug }, include: { image: true } });
 }
 
 export function getProductsByCategorySlug(slug: string) {

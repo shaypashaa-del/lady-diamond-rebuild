@@ -10,7 +10,10 @@ export default async function EditCategoryPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const category = await prisma.category.findUnique({ where: { id } });
+  const [category, media] = await Promise.all([
+    prisma.category.findUnique({ where: { id } }),
+    prisma.mediaAsset.findMany({ orderBy: { createdAt: "desc" } }),
+  ]);
   if (!category) notFound();
 
   return (
@@ -19,11 +22,13 @@ export default async function EditCategoryPage({
       <CategoryForm
         action={updateCategory.bind(null, category.id)}
         submitLabel="שמירת שינויים"
+        media={media}
         initial={{
           slug: category.slug,
           name: category.name as LocalizedText,
           description: category.description as LocalizedText | null,
           sortOrder: category.sortOrder,
+          imageId: category.imageId,
         }}
       />
     </div>

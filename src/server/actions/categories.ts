@@ -17,9 +17,10 @@ export async function createCategory(formData: FormData) {
   const name = localizedFromForm(formData, "name");
   const description = localizedFromForm(formData, "description");
   const sortOrder = Number(formData.get("sortOrder") ?? 0);
+  const imageId = String(formData.get("imageId") ?? "") || null;
 
   await prisma.category.create({
-    data: { slug, name, description, sortOrder },
+    data: { slug, name, description, sortOrder, imageId },
   });
 
   revalidatePath("/admin/categories");
@@ -31,10 +32,11 @@ export async function updateCategory(id: string, formData: FormData) {
   const name = localizedFromForm(formData, "name");
   const description = localizedFromForm(formData, "description");
   const sortOrder = Number(formData.get("sortOrder") ?? 0);
+  const imageId = String(formData.get("imageId") ?? "") || null;
 
   await prisma.category.update({
     where: { id },
-    data: { slug, name, description, sortOrder },
+    data: { slug, name, description, sortOrder, imageId },
   });
 
   revalidatePath("/admin/categories");

@@ -251,5 +251,17 @@
     "title": "Wishlist",
     "empty": "Your wishlist is empty.",
     "continueShopping": "Continue Shopping"
+  },
+  "ContactPage": {
+    "title": "Contact Us",
+    "name": "Full Name",
+    "email": "Email",
+    "phone": "Phone (optional)",
+    "subject": "Subject",
+    "message": "Message",
+    "submit": "Send Message",
+    "submitting": "Sending...",
+    "sent": "Thanks — we'll get back to you soon.",
+    "info": "Contact Information"
   }
 }

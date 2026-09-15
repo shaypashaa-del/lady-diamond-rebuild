@@ -236,7 +236,7 @@ model ContentBlock {
 }
 
 model Page {
-  // Static/legal pages: privacy-policy, terms, shipping-policy, returns-policy, affiliate-terms
+  // Static pages: about-us, contact-us, privacy-policy, terms, shipping-policy, returns-policy, affiliate-terms
   id        String   @id @default(cuid())
   slug      String   @unique
   title     Json
@@ -244,6 +244,23 @@ model Page {
   seoTitle  Json?
   seoDescription Json?
   updatedAt DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
 }
 
 model Setting {

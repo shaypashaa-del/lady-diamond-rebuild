@@ -11,6 +11,7 @@ const navItems = [
   { href: "/admin/shipping", label: "משלוחים" },
   { href: "/admin/customers", label: "לקוחות" },
   { href: "/admin/affiliates", label: "שותפים" },
+  { href: "/admin/messages", label: "הודעות" },
   { href: "/admin/content", label: "תוכן ועיצוב" },
   { href: "/admin/media", label: "מדיה" },
 ];

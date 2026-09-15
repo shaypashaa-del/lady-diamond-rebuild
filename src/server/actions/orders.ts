@@ -94,6 +94,15 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
     : null;
   let validAffiliate = affiliate && affiliate.status === "APPROVED" ? affiliate : null;
 
+  // A personal coupon also attributes the sale to its affiliate, even
+  // without a ?ref= link — matches spec: "המערכת משייכת את ההזמנה ל-Affiliate".
+  if (!validAffiliate && coupon?.affiliateId) {
+    const couponAffiliate = await prisma.affiliate.findUnique({ where: { id: coupon.affiliateId } });
+    if (couponAffiliate?.status === "APPROVED") {
+      validAffiliate = couponAffiliate;
+    }
+  }
+
   // Fraud prevention: don't attribute (and don't pay commission on) an
   // affiliate referring their own purchase, when the admin setting is on.
   if (validAffiliate && session?.userId === validAffiliate.userId) {

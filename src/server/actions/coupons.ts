@@ -10,6 +10,7 @@ export async function createCoupon(formData: FormData) {
   const discountValue = Number(formData.get("discountValue"));
   const usageLimitRaw = formData.get("usageLimit");
   const expiresAtRaw = formData.get("expiresAt");
+  const affiliateId = String(formData.get("affiliateId") ?? "") || null;
 
   await prisma.coupon.create({
     data: {
@@ -18,6 +19,7 @@ export async function createCoupon(formData: FormData) {
       discountValue,
       usageLimit: usageLimitRaw ? Number(usageLimitRaw) : null,
       expiresAt: expiresAtRaw ? new Date(String(expiresAtRaw)) : null,
+      affiliateId,
     },
   });
   revalidatePath("/admin/coupons");

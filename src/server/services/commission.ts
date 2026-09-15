@@ -1,14 +1,15 @@
 import { prisma } from "@/lib/prisma";
+import type { AffiliateTierName } from "@/generated/prisma/enums";
 
 const DEFAULT_COMMISSION_PERCENT = 10;
 
 // Precedence: affiliate-specific fixed amount > affiliate-specific percentage
-// override > global default percentage (Setting "global_commission_percent").
-// Product/category-specific overrides are not implemented yet — the schema
-// only carries per-affiliate rates today (Affiliate.commissionOverride /
-// fixedCommission); extending this to product/category rules is future work.
+// override > the affiliate's tier rule (see AffiliateTierRule, configured at
+// /admin/affiliate-tiers) > global default percentage (Setting
+// "global_commission_percent"). Product/category-specific overrides are not
+// implemented yet — extending this further is future work.
 export async function calculateCommission(
-  affiliate: { commissionOverride: unknown; fixedCommission: unknown },
+  affiliate: { commissionOverride: unknown; fixedCommission: unknown; tier: AffiliateTierName },
   orderSubtotal: number
 ): Promise<number> {
   if (affiliate.fixedCommission != null) {
@@ -17,6 +18,13 @@ export async function calculateCommission(
 
   if (affiliate.commissionOverride != null) {
     return round2(orderSubtotal * (Number(affiliate.commissionOverride) / 100));
+  }
+
+  const tierRule = await prisma.affiliateTierRule.findUnique({
+    where: { tier: affiliate.tier },
+  });
+  if (tierRule?.isActive) {
+    return round2(orderSubtotal * (Number(tierRule.commissionPercent) / 100));
   }
 
   const setting = await prisma.setting.findUnique({ where: { key: "global_commission_percent" } });

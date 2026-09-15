@@ -13,6 +13,7 @@ const navItems = [
   { href: "/admin/customers", label: "לקוחות" },
   { href: "/admin/affiliates", label: "שותפים" },
   { href: "/admin/commissions", label: "עמלות ותשלומים" },
+  { href: "/admin/affiliate-tiers", label: "רמות שותפים" },
   { href: "/admin/messages", label: "הודעות" },
   { href: "/admin/content", label: "תוכן ועיצוב" },
   { href: "/admin/settings", label: "הגדרות" },

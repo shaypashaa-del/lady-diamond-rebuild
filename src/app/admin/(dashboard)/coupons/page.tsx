@@ -2,10 +2,13 @@ import { prisma } from "@/lib/prisma";
 import { createCoupon, toggleCoupon, deleteCoupon } from "@/server/actions/coupons";
 
 export default async function AdminCouponsPage() {
-  const coupons = await prisma.coupon.findMany({
-    include: { affiliate: { include: { user: true } } },
-    orderBy: { createdAt: "desc" },
-  });
+  const [coupons, affiliates] = await Promise.all([
+    prisma.coupon.findMany({
+      include: { affiliate: { include: { user: true } } },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.affiliate.findMany({ where: { status: "APPROVED" }, include: { user: true } }),
+  ]);
 
   return (
     <div>
@@ -71,6 +74,14 @@ export default async function AdminCouponsPage() {
         </select>
         <input name="discountValue" type="number" step="0.01" placeholder="ערך" required className="border border-neutral-300 px-3 py-2 text-sm" />
         <input name="usageLimit" type="number" placeholder="מגבלת שימושים" className="border border-neutral-300 px-3 py-2 text-sm" />
+        <select name="affiliateId" className="border border-neutral-300 px-3 py-2 text-sm">
+          <option value="">— ללא שיוך לשותף —</option>
+          {affiliates.map((a) => (
+            <option key={a.id} value={a.id}>
+              {a.user.name} ({a.code})
+            </option>
+          ))}
+        </select>
         <input name="expiresAt" type="date" className="col-span-2 border border-neutral-300 px-3 py-2 text-sm" />
         <button type="submit" className="col-span-2 rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800">
           יצירת קופון

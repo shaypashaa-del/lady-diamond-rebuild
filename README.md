@@ -82,6 +82,7 @@ scripts/                one-off tooling (WooCommerce importer)
 - ✅ Legal/policy pages (draft content, editable in admin)
 - ✅ Cookie consent banner
 - ✅ Password reset (token-based, no email provider wired up yet — see gaps below)
+- ✅ Media library (upload, assign to products), Quick View, wishlist, related products, site search, admin order fulfillment, admin variant management
 
 ## Known gaps / what still needs a decision or access
 
@@ -109,9 +110,11 @@ scripts/                one-off tooling (WooCommerce importer)
   needs lawyer review before launch.
 - **No analytics/marketing scripts are wired in** (the cookie consent
   banner exists and gates future ones, but nothing currently listens to it).
-- **Admin has no image upload / media library UI yet** — the `MediaAsset`
-  model exists and the importer already populates it, but there's no
-  admin screen to upload/manage images directly.
+- **Media library uses local disk storage** (`public/uploads`) — fine for
+  this single-instance dev setup, but a real deployment (serverless or
+  multi-instance) needs real object storage (S3, Cloudinary, etc.) instead;
+  swap the body of `uploadMedia` in `src/server/actions/media.ts` for that
+  provider's upload call, nothing else needs to change.
 
 ## Deployment
 

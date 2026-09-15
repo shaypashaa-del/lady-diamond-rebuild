@@ -3,7 +3,11 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { Heart } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
+import { useWishlistStore } from "@/lib/wishlist-store";
+import { useMounted } from "@/lib/use-mounted";
+import { cn } from "@/lib/cn";
 
 export type VariantView = { id: string; label: string; price: number; inventory: number };
 export type ProductImageView = { url: string; alt?: string };
@@ -35,6 +39,9 @@ export function ProductDetail({
 }) {
   const t = useTranslations("Product");
   const addLine = useCartStore((s) => s.addLine);
+  const toggleWishlist = useWishlistStore((s) => s.toggle);
+  const isWishlisted = useWishlistStore((s) => s.has(slug));
+  const mounted = useMounted();
   const [variantId, setVariantId] = useState<string | "">(variants.length ? "" : "default");
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
@@ -158,6 +165,16 @@ export function ProductDetail({
             className="flex-1 border border-neutral-900 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-900 transition-colors hover:bg-neutral-900 hover:text-white disabled:cursor-not-allowed disabled:border-neutral-300 disabled:text-neutral-400"
           >
             {added ? "✓" : t("addToCart")}
+          </button>
+          <button
+            onClick={() => toggleWishlist(slug)}
+            aria-label={t("wishlist")}
+            className={cn(
+              "flex items-center justify-center border border-neutral-300 px-3 py-3 hover:border-neutral-900",
+              mounted && isWishlisted && "border-rose-600 text-rose-600"
+            )}
+          >
+            <Heart size={16} fill={mounted && isWishlisted ? "currentColor" : "none"} />
           </button>
         </div>
 

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { useCartStore } from "@/lib/cart-store";
 import { useMounted } from "@/lib/use-mounted";
 import { createOrder } from "@/server/actions/orders";
+import { getMyAddress, type AddressData } from "@/server/actions/address";
 import type { PaymentMethodId } from "@/server/payments/types";
 
 export default function CheckoutPage() {
@@ -21,10 +22,18 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodId>("bank_transfer");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [savedAddress, setSavedAddress] = useState<AddressData | null>(null);
+  const [addressLoaded, setAddressLoaded] = useState(false);
+
+  useEffect(() => {
+    getMyAddress()
+      .then(setSavedAddress)
+      .finally(() => setAddressLoaded(true));
+  }, []);
 
   const subtotal = lines.reduce((sum, l) => sum + l.price * l.quantity, 0);
 
-  if (!mounted) return null;
+  if (!mounted || !addressLoaded) return null;
 
   if (lines.length === 0) {
     return (
@@ -104,14 +113,14 @@ export default function CheckoutPage() {
         <div>
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide">{t("billingDetails")}</h2>
           <div className="space-y-4">
-            <input name="fullName" placeholder={t("fullName")} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+            <input name="fullName" placeholder={t("fullName")} defaultValue={savedAddress?.fullName} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
             <input name="email" type="email" placeholder={t("email")} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
-            <input name="phone" placeholder={t("phone")} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
-            <input name="country" placeholder={t("country")} required defaultValue="Israel" className="w-full border border-neutral-300 px-3 py-2 text-sm" />
-            <input name="city" placeholder={t("city")} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
-            <input name="street" placeholder={t("street")} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
-            <input name="apartment" placeholder={t("apartment")} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
-            <input name="zip" placeholder={t("zip")} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+            <input name="phone" placeholder={t("phone")} defaultValue={savedAddress?.phone} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+            <input name="country" placeholder={t("country")} required defaultValue={savedAddress?.country ?? "Israel"} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+            <input name="city" placeholder={t("city")} defaultValue={savedAddress?.city} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+            <input name="street" placeholder={t("street")} defaultValue={savedAddress?.street} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+            <input name="apartment" placeholder={t("apartment")} defaultValue={savedAddress?.apartment} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+            <input name="zip" placeholder={t("zip")} defaultValue={savedAddress?.zip} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
             <textarea name="orderNotes" placeholder={t("orderNotes")} rows={3} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
           </div>
         </div>

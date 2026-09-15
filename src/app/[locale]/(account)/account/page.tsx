@@ -1,16 +1,17 @@
 import { getTranslations } from "next-intl/server";
 import { requireCustomerSession } from "@/lib/auth/guards";
 import { logout } from "@/server/actions/auth";
+import { updateMyAddressAction } from "@/server/actions/address";
 import { prisma } from "@/lib/prisma";
 
 export default async function AccountPage() {
   const session = await requireCustomerSession();
   const t = await getTranslations("Account");
 
-  const orders = await prisma.order.findMany({
-    where: { userId: session.userId },
-    orderBy: { createdAt: "desc" },
-  });
+  const [orders, address] = await Promise.all([
+    prisma.order.findMany({ where: { userId: session.userId }, orderBy: { createdAt: "desc" } }),
+    prisma.address.findFirst({ where: { userId: session.userId, isDefault: true } }),
+  ]);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-8">
@@ -35,6 +36,25 @@ export default async function AccountPage() {
           ))}
         </ul>
       )}
+
+      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-700">
+        {t("address")}
+      </h2>
+      <form action={updateMyAddressAction} className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <input name="fullName" placeholder={t("fullName")} defaultValue={address?.fullName} className="border border-neutral-300 px-3 py-2 text-sm" />
+        <input name="phone" placeholder={t("phone")} defaultValue={address?.phone} className="border border-neutral-300 px-3 py-2 text-sm" />
+        <input name="country" placeholder={t("country")} defaultValue={address?.country ?? "Israel"} className="border border-neutral-300 px-3 py-2 text-sm" />
+        <input name="city" placeholder={t("city")} defaultValue={address?.city} className="border border-neutral-300 px-3 py-2 text-sm" />
+        <input name="street" placeholder={t("street")} defaultValue={address?.street} className="border border-neutral-300 px-3 py-2 text-sm" />
+        <input name="apartment" placeholder={t("apartment")} defaultValue={address?.apartment ?? undefined} className="border border-neutral-300 px-3 py-2 text-sm" />
+        <input name="zip" placeholder={t("zip")} defaultValue={address?.zip ?? undefined} className="border border-neutral-300 px-3 py-2 text-sm" />
+        <button
+          type="submit"
+          className="border border-neutral-900 py-2 text-xs font-semibold uppercase tracking-wide hover:bg-neutral-900 hover:text-white sm:col-span-2"
+        >
+          {t("save")}
+        </button>
+      </form>
 
       <form action={logout}>
         <button

@@ -141,7 +141,17 @@
     "loggedInAs": "Logged in as",
     "orders": "Order History",
     "noOrders": "No orders yet.",
-    "logout": "Log Out"
+    "logout": "Log Out",
+    "address": "Saved Address",
+    "noAddress": "No saved address yet.",
+    "fullName": "Full Name",
+    "phone": "Phone",
+    "country": "Country",
+    "city": "City",
+    "street": "Street",
+    "apartment": "Apartment",
+    "zip": "ZIP",
+    "save": "Save Address"
   },
   "Affiliate": {
     "heroTitle": "Become a Lady Diamond Affiliate",

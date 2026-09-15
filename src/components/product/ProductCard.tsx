@@ -1,15 +1,23 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Eye, Heart } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { SampleProduct } from "@/lib/products-data";
 import { cn } from "@/lib/cn";
 import { useCartStore } from "@/lib/cart-store";
+import { useWishlistStore } from "@/lib/wishlist-store";
+import { useMounted } from "@/lib/use-mounted";
+import { QuickViewModal } from "./QuickViewModal";
 
 export function ProductCard({ product }: { product: SampleProduct }) {
   const t = useTranslations("Product");
   const addLine = useCartStore((s) => s.addLine);
+  const toggleWishlist = useWishlistStore((s) => s.toggle);
+  const isWishlisted = useWishlistStore((s) => s.has(product.slug));
+  const mounted = useMounted();
+  const [quickViewOpen, setQuickViewOpen] = useState(false);
   const isSold = product.badge === "Sold";
 
   function handleAddToCart() {
@@ -38,11 +46,22 @@ export function ProductCard({ product }: { product: SampleProduct }) {
           </span>
         )}
         <div className="absolute end-2 top-2 z-10 flex flex-col gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-          <button aria-label={t("quickView")} className="rounded-full bg-white p-2 shadow hover:bg-neutral-900 hover:text-white">
+          <button
+            aria-label={t("quickView")}
+            onClick={() => setQuickViewOpen(true)}
+            className="rounded-full bg-white p-2 shadow hover:bg-neutral-900 hover:text-white"
+          >
             <Eye size={14} />
           </button>
-          <button aria-label={t("wishlist")} className="rounded-full bg-white p-2 shadow hover:bg-neutral-900 hover:text-white">
-            <Heart size={14} />
+          <button
+            aria-label={t("wishlist")}
+            onClick={() => toggleWishlist(product.slug)}
+            className={cn(
+              "rounded-full bg-white p-2 shadow hover:bg-neutral-900 hover:text-white",
+              mounted && isWishlisted && "bg-rose-600 text-white"
+            )}
+          >
+            <Heart size={14} fill={mounted && isWishlisted ? "currentColor" : "none"} />
           </button>
         </div>
         <Link href={`/product/${product.slug}`} className="flex h-full w-full items-center justify-center text-neutral-300">
@@ -88,6 +107,8 @@ export function ProductCard({ product }: { product: SampleProduct }) {
           </button>
         )}
       </div>
+
+      {quickViewOpen && <QuickViewModal product={product} onClose={() => setQuickViewOpen(false)} />}
     </div>
   );
 }

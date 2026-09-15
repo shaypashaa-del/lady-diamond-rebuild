@@ -83,7 +83,8 @@
         "name": "Dana R.",
         "quote": "Bought the heart bracelet as a gift — the quality feels much higher than the price."
       }
-    ]
+    ],
+    "relatedProducts": "You May Also Like"
   },
   "Product": {
     "selectOptions": "Select Options",
@@ -241,5 +242,14 @@
     "placeholder": "Search products...",
     "resultsFor": "Search results for",
     "noResults": "No products found."
+  },
+  "QuickView": {
+    "viewDetails": "View Details",
+    "close": "Close"
+  },
+  "Wishlist": {
+    "title": "Wishlist",
+    "empty": "Your wishlist is empty.",
+    "continueShopping": "Continue Shopping"
   }
 }

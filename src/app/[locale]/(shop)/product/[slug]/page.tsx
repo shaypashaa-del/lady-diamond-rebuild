@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { getProductBySlug } from "@/server/repositories/catalog";
+import { getTranslations } from "next-intl/server";
+import { getProductBySlug, getRelatedProducts } from "@/server/repositories/catalog";
 import { t as localize, type LocalizedText } from "@/lib/i18n-content";
+import { toCardProduct } from "@/lib/catalog-view";
 import { ProductDetail, type VariantView } from "@/components/product/ProductDetail";
+import { ProductSection } from "@/components/home/ProductSection";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { productSchema, breadcrumbSchema } from "@/lib/schema";
 import { SITE_URL } from "@/lib/site-config";
@@ -75,6 +78,10 @@ export default async function ProductPage({
   const price = Number(product.salePrice ?? product.basePrice);
   const productUrl = `${SITE_URL}${pathFor(locale, `/product/${slug}`)}`;
 
+  const relatedRaw = await getRelatedProducts(product.categories[0]?.category.slug, product.id);
+  const related = relatedRaw.map((p) => toCardProduct(p, locale));
+  const tHome = await getTranslations("Home");
+
   return (
     <>
       <JsonLd
@@ -105,6 +112,9 @@ export default async function ProductPage({
         categoryName={categoryName}
         variants={variants}
       />
+      {related.length > 0 && (
+        <ProductSection title={tHome("relatedProducts")} products={related} />
+      )}
     </>
   );
 }

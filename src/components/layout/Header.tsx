@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Menu, Search, ShoppingBag, User, X } from "lucide-react";
+import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { primaryNav } from "@/lib/nav-data";
 import { useCartStore } from "@/lib/cart-store";
+import { useWishlistStore } from "@/lib/wishlist-store";
 import { useMounted } from "@/lib/use-mounted";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 
@@ -13,12 +14,14 @@ export function Header() {
   const t = useTranslations("Header");
   const tNav = useTranslations("Nav");
   const tSearch = useTranslations("Search");
+  const tProduct = useTranslations("Product");
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const mounted = useMounted();
   const itemCount = useCartStore((s) => s.totalItems());
+  const wishlistCount = useWishlistStore((s) => s.slugs.length);
 
   function submitSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -45,6 +48,14 @@ export function Header() {
           </button>
           <Link href="/account" aria-label={t("account")} className="hidden sm:inline-flex text-neutral-700 hover:text-black">
             <User size={18} />
+          </Link>
+          <Link href="/wishlist" aria-label={tProduct("wishlist")} className="relative hidden sm:inline-flex text-neutral-700 hover:text-black">
+            <Heart size={18} />
+            {mounted && wishlistCount > 0 && (
+              <span className="absolute -end-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-neutral-900 text-[10px] text-white">
+                {wishlistCount}
+              </span>
+            )}
           </Link>
           <Link href="/cart" aria-label={t("cart")} className="relative hidden sm:inline-flex text-neutral-700 hover:text-black">
             <ShoppingBag size={18} />
@@ -146,6 +157,9 @@ export function Header() {
             <div className="flex items-center gap-4 border-t border-neutral-200 pt-6 sm:hidden">
               <Link href="/account" onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm">
                 <User size={16} /> {tNav("account")}
+              </Link>
+              <Link href="/wishlist" onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm">
+                <Heart size={16} /> {tProduct("wishlist")}
               </Link>
               <Link href="/cart" onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm">
                 <ShoppingBag size={16} /> {tNav("cart")}

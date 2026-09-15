@@ -6,6 +6,7 @@ import type { SampleProduct } from "@/lib/products-data";
 type ProductWithRelations = {
   slug: string;
   name: unknown;
+  shortDescription?: unknown;
   basePrice: { toString(): string } | number;
   salePrice: ({ toString(): string } | number) | null;
   inventory: number;
@@ -32,6 +33,6 @@ export function toCardProduct(product: ProductWithRelations, locale: Locale): Sa
     salePrice: salePrice ? price : undefined,
     hasVariants: product.variants.length > 0,
     badge,
-    blurb: "",
+    blurb: product.shortDescription ? t(product.shortDescription as LocalizedText, locale) : "",
   };
 }

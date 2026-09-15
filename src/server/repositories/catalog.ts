@@ -36,6 +36,20 @@ export function getAllCategories() {
   return prisma.category.findMany({ orderBy: { sortOrder: "asc" } });
 }
 
+export function getRelatedProducts(categorySlug: string | undefined, excludeProductId: string, take = 4) {
+  if (!categorySlug) return Promise.resolve([]);
+  return prisma.product.findMany({
+    where: {
+      status: "PUBLISHED",
+      id: { not: excludeProductId },
+      categories: { some: { category: { slug: categorySlug } } },
+    },
+    include: { variants: true, categories: { include: { category: true } } },
+    take,
+    orderBy: { createdAt: "desc" },
+  });
+}
+
 export function getProductBySlug(slug: string) {
   return prisma.product.findUnique({
     where: { slug },

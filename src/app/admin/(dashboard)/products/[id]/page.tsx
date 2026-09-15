@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { updateProduct } from "@/server/actions/products";
 import { ProductForm } from "@/components/admin/ProductForm";
 import { VariantManager } from "@/components/admin/VariantManager";
+import { ProductImagesManager } from "@/components/admin/ProductImagesManager";
 import type { LocalizedText } from "@/lib/i18n-content";
 
 export default async function EditProductPage({
@@ -11,12 +12,23 @@ export default async function EditProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [product, categories] = await Promise.all([
-    prisma.product.findUnique({ where: { id }, include: { categories: true, variants: true } }),
+  const [product, categories, allMedia] = await Promise.all([
+    prisma.product.findUnique({
+      where: { id },
+      include: {
+        categories: true,
+        variants: true,
+        images: { include: { media: true }, orderBy: { sortOrder: "asc" } },
+      },
+    }),
     prisma.category.findMany({ orderBy: { sortOrder: "asc" } }),
+    prisma.mediaAsset.findMany({ orderBy: { createdAt: "desc" } }),
   ]);
 
   if (!product) notFound();
+
+  const usedMediaIds = new Set(product.images.map((img) => img.mediaId));
+  const availableMedia = allMedia.filter((m) => !usedMediaIds.has(m.id));
 
   return (
     <div>
@@ -38,6 +50,14 @@ export default async function EditProductPage({
           isFeatured: product.isFeatured,
           categoryId: product.categories[0]?.categoryId,
         }}
+      />
+      <ProductImagesManager
+        productId={product.id}
+        images={product.images.map((img) => ({
+          id: img.id,
+          media: { id: img.media.id, url: img.media.url, filename: img.media.filename },
+        }))}
+        availableMedia={availableMedia.map((m) => ({ id: m.id, filename: m.filename }))}
       />
       <VariantManager productId={product.id} variants={product.variants} />
     </div>

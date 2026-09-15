@@ -1,10 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useCartStore } from "@/lib/cart-store";
 
 export type VariantView = { id: string; label: string; price: number; inventory: number };
+export type ProductImageView = { url: string; alt?: string };
 
 export function ProductDetail({
   slug,
@@ -16,6 +18,7 @@ export function ProductDetail({
   sku,
   categoryName,
   variants,
+  images = [],
 }: {
   slug: string;
   name: string;
@@ -26,12 +29,14 @@ export function ProductDetail({
   sku?: string;
   categoryName: string;
   variants: VariantView[];
+  images?: ProductImageView[];
 }) {
   const t = useTranslations("Product");
   const addLine = useCartStore((s) => s.addLine);
   const [variantId, setVariantId] = useState<string | "">(variants.length ? "" : "default");
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const [activeImage, setActiveImage] = useState(0);
 
   const selectedVariant = useMemo(
     () => variants.find((v) => v.id === variantId),
@@ -61,7 +66,35 @@ export function ProductDetail({
 
   return (
     <div className="mx-auto grid max-w-5xl grid-cols-1 gap-10 px-4 py-12 sm:grid-cols-2 sm:px-8">
-      <div className="aspect-square bg-neutral-100" />
+      <div>
+        <div className="relative aspect-square bg-neutral-100">
+          {images[activeImage] && (
+            <Image
+              src={images[activeImage].url}
+              alt={images[activeImage].alt ?? name}
+              fill
+              sizes="(min-width: 640px) 40vw, 90vw"
+              priority
+              className="object-cover"
+            />
+          )}
+        </div>
+        {images.length > 1 && (
+          <div className="mt-3 flex gap-2">
+            {images.map((img, i) => (
+              <button
+                key={img.url}
+                onClick={() => setActiveImage(i)}
+                className={`relative h-16 w-16 overflow-hidden border ${
+                  i === activeImage ? "border-neutral-900" : "border-neutral-200"
+                }`}
+              >
+                <Image src={img.url} alt={img.alt ?? name} fill sizes="64px" className="object-cover" />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div>
         <p className="text-xs uppercase tracking-wide text-neutral-400">{categoryName}</p>

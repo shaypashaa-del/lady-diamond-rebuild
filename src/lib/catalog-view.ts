@@ -12,6 +12,7 @@ type ProductWithRelations = {
   inventory: number;
   variants: { id: string }[];
   categories: { category: { name: unknown } }[];
+  images?: { media: { url: string; altText: string | null } }[];
 };
 
 export function toCardProduct(product: ProductWithRelations, locale: Locale): SampleProduct {
@@ -25,6 +26,8 @@ export function toCardProduct(product: ProductWithRelations, locale: Locale): Sa
   if (product.inventory <= 0) badge = "Sold";
   else if (salePrice) badge = "Sale";
 
+  const firstImage = product.images?.[0]?.media;
+
   return {
     slug: product.slug,
     name: t(product.name as LocalizedText, locale),
@@ -34,5 +37,7 @@ export function toCardProduct(product: ProductWithRelations, locale: Locale): Sa
     hasVariants: product.variants.length > 0,
     badge,
     blurb: product.shortDescription ? t(product.shortDescription as LocalizedText, locale) : "",
+    imageUrl: firstImage?.url,
+    imageAlt: firstImage?.altText ?? undefined,
   };
 }

@@ -11,6 +11,8 @@ export type SampleProduct = {
   hasVariants?: boolean;
   badge?: "New" | "Sale" | "Sold";
   blurb: string;
+  imageUrl?: string;
+  imageAlt?: string;
 };
 
 export const featuredProducts: SampleProduct[] = [

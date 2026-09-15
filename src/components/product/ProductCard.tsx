@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Eye, Heart } from "lucide-react";
 import { Link } from "@/i18n/navigation";
@@ -65,7 +66,17 @@ export function ProductCard({ product }: { product: SampleProduct }) {
           </button>
         </div>
         <Link href={`/product/${product.slug}`} className="flex h-full w-full items-center justify-center text-neutral-300">
-          <span className="text-xs">{product.name}</span>
+          {product.imageUrl ? (
+            <Image
+              src={product.imageUrl}
+              alt={product.imageAlt ?? product.name}
+              fill
+              sizes="(min-width: 640px) 25vw, 50vw"
+              className="object-cover"
+            />
+          ) : (
+            <span className="text-xs">{product.name}</span>
+          )}
         </Link>
       </div>
 

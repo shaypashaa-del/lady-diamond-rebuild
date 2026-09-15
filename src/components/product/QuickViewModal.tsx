@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 import { Link } from "@/i18n/navigation";
@@ -35,7 +36,17 @@ export function QuickViewModal({ product, onClose }: { product: SampleProduct; o
           <X size={20} />
         </button>
 
-        <div className="aspect-square bg-neutral-100" />
+        <div className="relative aspect-square bg-neutral-100">
+          {product.imageUrl && (
+            <Image
+              src={product.imageUrl}
+              alt={product.imageAlt ?? product.name}
+              fill
+              sizes="(min-width: 640px) 40vw, 90vw"
+              className="object-cover"
+            />
+          )}
+        </div>
 
         <div>
           <p className="text-xs uppercase tracking-wide text-neutral-400">{product.category}</p>

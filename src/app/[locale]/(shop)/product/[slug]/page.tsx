@@ -111,6 +111,7 @@ export default async function ProductPage({
         sku={product.sku ?? undefined}
         categoryName={categoryName}
         variants={variants}
+        images={product.images.map((img) => ({ url: img.media.url, alt: img.media.altText ?? undefined }))}
       />
       {related.length > 0 && (
         <ProductSection title={tHome("relatedProducts")} products={related} />

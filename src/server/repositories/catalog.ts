@@ -1,9 +1,13 @@
 import { prisma } from "@/lib/prisma";
 
+const cardImageInclude = {
+  images: { include: { media: true }, orderBy: { sortOrder: "asc" as const }, take: 1 },
+};
+
 export function getFeaturedProducts() {
   return prisma.product.findMany({
     where: { status: "PUBLISHED", isFeatured: true },
-    include: { variants: true, categories: { include: { category: true } } },
+    include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },
     take: 8,
     orderBy: { createdAt: "desc" },
   });
@@ -12,7 +16,7 @@ export function getFeaturedProducts() {
 export function getAllPublishedProducts() {
   return prisma.product.findMany({
     where: { status: "PUBLISHED" },
-    include: { variants: true, categories: { include: { category: true } } },
+    include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },
     orderBy: { createdAt: "desc" },
   });
 }
@@ -27,7 +31,7 @@ export function getProductsByCategorySlug(slug: string) {
       status: "PUBLISHED",
       categories: { some: { category: { slug } } },
     },
-    include: { variants: true, categories: { include: { category: true } } },
+    include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },
     orderBy: { createdAt: "desc" },
   });
 }
@@ -44,7 +48,7 @@ export function getRelatedProducts(categorySlug: string | undefined, excludeProd
       id: { not: excludeProductId },
       categories: { some: { category: { slug: categorySlug } } },
     },
-    include: { variants: true, categories: { include: { category: true } } },
+    include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },
     take,
     orderBy: { createdAt: "desc" },
   });
@@ -56,7 +60,7 @@ export function getProductBySlug(slug: string) {
     include: {
       variants: true,
       categories: { include: { category: true } },
-      images: { include: { media: true } },
+      images: { include: { media: true }, orderBy: { sortOrder: "asc" } },
     },
   });
 }

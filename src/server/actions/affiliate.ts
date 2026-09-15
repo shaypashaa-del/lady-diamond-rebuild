@@ -47,6 +47,8 @@ export async function applyAsAffiliate(
   }
 
   const code = await generateAffiliateCode();
+  const autoApproveSetting = await prisma.setting.findUnique({ where: { key: "affiliate_auto_approve" } });
+  const autoApprove = autoApproveSetting?.value === true;
 
   const user = await prisma.user.create({
     data: {
@@ -64,6 +66,8 @@ export async function applyAsAffiliate(
           socialFacebook,
           socialYoutube,
           promotionMethod,
+          status: autoApprove ? "APPROVED" : "PENDING",
+          approvedAt: autoApprove ? new Date() : null,
         },
       },
     },

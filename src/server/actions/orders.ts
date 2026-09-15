@@ -92,7 +92,18 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
   const affiliate = refCode
     ? await prisma.affiliate.findUnique({ where: { code: refCode } })
     : null;
-  const validAffiliate = affiliate && affiliate.status === "APPROVED" ? affiliate : null;
+  let validAffiliate = affiliate && affiliate.status === "APPROVED" ? affiliate : null;
+
+  // Fraud prevention: don't attribute (and don't pay commission on) an
+  // affiliate referring their own purchase, when the admin setting is on.
+  if (validAffiliate && session?.userId === validAffiliate.userId) {
+    const preventSelfReferral = await prisma.setting.findUnique({
+      where: { key: "affiliate_prevent_self_referral" },
+    });
+    if (preventSelfReferral?.value !== false) {
+      validAffiliate = null;
+    }
+  }
 
   const order = await prisma.order.create({
     data: {

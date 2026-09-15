@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import type { OrderStatus, PaymentStatus, Prisma } from "@/generated/prisma/client";
 
 const statusLabels: Record<string, string> = {
   PENDING: "ממתינה",
@@ -17,8 +18,25 @@ const paymentLabels: Record<string, string> = {
   REFUNDED: "זוכה",
 };
 
-export default async function AdminOrdersPage() {
+export default async function AdminOrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; status?: string; payment?: string }>;
+}) {
+  const { q, status, payment } = await searchParams;
+
+  const where: Prisma.OrderWhereInput = {};
+  if (q) {
+    where.OR = [
+      { orderNumber: { contains: q, mode: "insensitive" } },
+      { email: { contains: q, mode: "insensitive" } },
+    ];
+  }
+  if (status) where.status = status as OrderStatus;
+  if (payment) where.paymentStatus = payment as PaymentStatus;
+
   const orders = await prisma.order.findMany({
+    where,
     include: { affiliate: true },
     orderBy: { createdAt: "desc" },
   });
@@ -26,6 +44,40 @@ export default async function AdminOrdersPage() {
   return (
     <div>
       <h1 className="mb-6 text-xl font-semibold">הזמנות</h1>
+
+      <form className="mb-4 flex flex-wrap gap-3" method="get">
+        <input
+          name="q"
+          defaultValue={q}
+          placeholder="חיפוש לפי מספר הזמנה או אימייל"
+          className="min-w-64 border border-neutral-300 px-3 py-2 text-sm"
+        />
+        <select name="status" defaultValue={status ?? ""} className="border border-neutral-300 px-3 py-2 text-sm">
+          <option value="">כל הסטטוסים</option>
+          {Object.entries(statusLabels).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
+        <select name="payment" defaultValue={payment ?? ""} className="border border-neutral-300 px-3 py-2 text-sm">
+          <option value="">כל סטטוסי התשלום</option>
+          {Object.entries(paymentLabels).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
+        <button type="submit" className="rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800">
+          סינון
+        </button>
+        {(q || status || payment) && (
+          <Link href="/admin/orders" className="px-2 py-2 text-sm text-neutral-500 underline">
+            איפוס
+          </Link>
+        )}
+      </form>
+
       <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white">
         <table className="w-full text-sm">
           <thead className="border-b border-neutral-200 bg-neutral-50 text-right text-xs text-neutral-500">
@@ -60,7 +112,7 @@ export default async function AdminOrdersPage() {
             {orders.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-4 py-8 text-center text-neutral-400">
-                  אין הזמנות עדיין. (ה-Checkout טרם חובר לתשלום אמיתי — Phase 7)
+                  {q || status || payment ? "לא נמצאו הזמנות תואמות." : "אין הזמנות עדיין."}
                 </td>
               </tr>
             )}

@@ -49,6 +49,8 @@ export function CategoryForm({
     description?: LocalizedText | null;
     sortOrder?: number;
     imageId?: string | null;
+    seoTitle?: LocalizedText | null;
+    seoDescription?: LocalizedText | null;
   };
   submitLabel: string;
   media?: MediaOption[];
@@ -100,6 +102,12 @@ export function CategoryForm({
         {media.length === 0 && (
           <p className="mt-1 text-xs text-neutral-400">אין תמונות בספריית המדיה — העלו בעמוד ניהול מדיה.</p>
         )}
+      </div>
+
+      <div className="border-t border-neutral-200 pt-4">
+        <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-neutral-500">SEO</h3>
+        <LocalizedInput label="SEO Title" name="seoTitle" value={initial?.seoTitle ?? undefined} />
+        <LocalizedInput label="Meta Description" name="seoDescription" value={initial?.seoDescription ?? undefined} textarea />
       </div>
 
       <button

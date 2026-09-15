@@ -12,15 +12,22 @@ function localizedFromForm(formData: FormData, prefix: string) {
   };
 }
 
+function optionalLocalizedFromForm(formData: FormData, prefix: string) {
+  const value = localizedFromForm(formData, prefix);
+  return value.he || value.en || value.ru ? value : undefined;
+}
+
 export async function createCategory(formData: FormData) {
   const slug = String(formData.get("slug"));
   const name = localizedFromForm(formData, "name");
   const description = localizedFromForm(formData, "description");
   const sortOrder = Number(formData.get("sortOrder") ?? 0);
   const imageId = String(formData.get("imageId") ?? "") || null;
+  const seoTitle = optionalLocalizedFromForm(formData, "seoTitle");
+  const seoDescription = optionalLocalizedFromForm(formData, "seoDescription");
 
   await prisma.category.create({
-    data: { slug, name, description, sortOrder, imageId },
+    data: { slug, name, description, sortOrder, imageId, seoTitle, seoDescription },
   });
 
   revalidatePath("/admin/categories");
@@ -33,10 +40,12 @@ export async function updateCategory(id: string, formData: FormData) {
   const description = localizedFromForm(formData, "description");
   const sortOrder = Number(formData.get("sortOrder") ?? 0);
   const imageId = String(formData.get("imageId") ?? "") || null;
+  const seoTitle = optionalLocalizedFromForm(formData, "seoTitle");
+  const seoDescription = optionalLocalizedFromForm(formData, "seoDescription");
 
   await prisma.category.update({
     where: { id },
-    data: { slug, name, description, sortOrder, imageId },
+    data: { slug, name, description, sortOrder, imageId, seoTitle, seoDescription },
   });
 
   revalidatePath("/admin/categories");

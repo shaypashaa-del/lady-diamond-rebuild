@@ -27,7 +27,7 @@ export const footerColumns = [
       { key: "home", href: "/" },
       { key: "shop", href: "/category/all" },
       { key: "contactUs", href: "/contact-us" },
-      { key: "trackOrder", href: "/account/orders" },
+      { key: "trackOrder", href: "/account" },
     ],
   },
   {

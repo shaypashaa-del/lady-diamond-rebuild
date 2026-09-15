@@ -29,6 +29,8 @@ export default async function EditCategoryPage({
           description: category.description as LocalizedText | null,
           sortOrder: category.sortOrder,
           imageId: category.imageId,
+          seoTitle: category.seoTitle as LocalizedText | null,
+          seoDescription: category.seoDescription as LocalizedText | null,
         }}
       />
     </div>

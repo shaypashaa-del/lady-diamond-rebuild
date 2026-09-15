@@ -37,10 +37,14 @@ export async function generateMetadata({
   } else {
     const category = await getCategoryBySlug(slug);
     if (!category) return {};
-    title = localize(category.name as LocalizedText, locale as Locale);
-    description = category.description
-      ? localize(category.description as LocalizedText, locale as Locale)
-      : undefined;
+    title = category.seoTitle
+      ? localize(category.seoTitle as LocalizedText, locale as Locale)
+      : localize(category.name as LocalizedText, locale as Locale);
+    description = category.seoDescription
+      ? localize(category.seoDescription as LocalizedText, locale as Locale)
+      : category.description
+        ? localize(category.description as LocalizedText, locale as Locale)
+        : undefined;
   }
 
   return {

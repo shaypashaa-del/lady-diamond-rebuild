@@ -13,6 +13,11 @@ function localizedFromForm(formData: FormData, prefix: string) {
   };
 }
 
+function optionalLocalizedFromForm(formData: FormData, prefix: string) {
+  const value = localizedFromForm(formData, prefix);
+  return value.he || value.en || value.ru ? value : undefined;
+}
+
 function readProductForm(formData: FormData) {
   const basePrice = Number(formData.get("basePrice"));
   const salePriceRaw = formData.get("salePrice");
@@ -23,12 +28,16 @@ function readProductForm(formData: FormData) {
   const sku = String(formData.get("sku") ?? "") || null;
   const categoryId = String(formData.get("categoryId") ?? "");
   const slug = String(formData.get("slug"));
+  const tagIds = formData.getAll("tagIds").map(String);
+  const relatedIds = formData.getAll("relatedIds").map(String);
 
   return {
     slug,
     name: localizedFromForm(formData, "name"),
     shortDescription: localizedFromForm(formData, "shortDescription"),
     description: localizedFromForm(formData, "description"),
+    seoTitle: optionalLocalizedFromForm(formData, "seoTitle"),
+    seoDescription: optionalLocalizedFromForm(formData, "seoDescription"),
     basePrice,
     salePrice,
     sku,
@@ -36,7 +45,25 @@ function readProductForm(formData: FormData) {
     status,
     isFeatured,
     categoryId,
+    tagIds,
+    relatedIds,
   };
+}
+
+async function syncTagsAndRelated(productId: string, tagIds: string[], relatedIds: string[]) {
+  await prisma.productTag.deleteMany({ where: { productId } });
+  if (tagIds.length > 0) {
+    await prisma.productTag.createMany({
+      data: tagIds.map((tagId) => ({ productId, tagId })),
+    });
+  }
+
+  await prisma.productRelation.deleteMany({ where: { productId } });
+  if (relatedIds.length > 0) {
+    await prisma.productRelation.createMany({
+      data: relatedIds.map((relatedId) => ({ productId, relatedId })),
+    });
+  }
 }
 
 export async function createProduct(formData: FormData) {
@@ -48,6 +75,8 @@ export async function createProduct(formData: FormData) {
       name: data.name,
       shortDescription: data.shortDescription,
       description: data.description,
+      seoTitle: data.seoTitle,
+      seoDescription: data.seoDescription,
       basePrice: data.basePrice,
       salePrice: data.salePrice,
       sku: data.sku,
@@ -63,6 +92,8 @@ export async function createProduct(formData: FormData) {
     });
   }
 
+  await syncTagsAndRelated(product.id, data.tagIds, data.relatedIds);
+
   revalidatePath("/admin/products");
   redirect("/admin/products");
 }
@@ -77,6 +108,8 @@ export async function updateProduct(id: string, formData: FormData) {
       name: data.name,
       shortDescription: data.shortDescription,
       description: data.description,
+      seoTitle: data.seoTitle,
+      seoDescription: data.seoDescription,
       basePrice: data.basePrice,
       salePrice: data.salePrice,
       sku: data.sku,
@@ -92,6 +125,8 @@ export async function updateProduct(id: string, formData: FormData) {
       data: { productId: id, categoryId: data.categoryId },
     });
   }
+
+  await syncTagsAndRelated(id, data.tagIds, data.relatedIds);
 
   revalidatePath("/admin/products");
   redirect("/admin/products");

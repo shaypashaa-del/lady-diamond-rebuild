@@ -1,12 +1,16 @@
 import type { LocalizedText } from "@/lib/i18n-content";
 
 type CategoryOption = { id: string; name: LocalizedText };
+type TagOption = { id: string; name: LocalizedText };
+type ProductOption = { id: string; name: LocalizedText };
 
 type ProductFormValues = {
   slug: string;
   name?: LocalizedText;
   shortDescription?: LocalizedText | null;
   description?: LocalizedText | null;
+  seoTitle?: LocalizedText | null;
+  seoDescription?: LocalizedText | null;
   basePrice?: number;
   salePrice?: number | null;
   sku?: string | null;
@@ -14,6 +18,8 @@ type ProductFormValues = {
   status?: string;
   isFeatured?: boolean;
   categoryId?: string;
+  tagIds?: string[];
+  relatedIds?: string[];
 };
 
 function LocalizedInput({
@@ -52,14 +58,21 @@ function LocalizedInput({
 export function ProductForm({
   action,
   categories,
+  tags,
+  relatedOptions,
   initial,
   submitLabel,
 }: {
   action: (formData: FormData) => void;
   categories: CategoryOption[];
+  tags: TagOption[];
+  relatedOptions: ProductOption[];
   initial?: ProductFormValues;
   submitLabel: string;
 }) {
+  const selectedTagIds = new Set(initial?.tagIds ?? []);
+  const selectedRelatedIds = new Set(initial?.relatedIds ?? []);
+
   return (
     <form action={action} className="max-w-3xl space-y-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -153,6 +166,50 @@ export function ProductForm({
           <input type="checkbox" name="isFeatured" defaultChecked={initial?.isFeatured} />
           מוצר מומלץ
         </label>
+      </div>
+
+      <div>
+        <label className="mb-2 block text-xs font-medium text-neutral-500">תגיות</label>
+        {tags.length === 0 ? (
+          <p className="text-sm text-neutral-400">אין תגיות עדיין — ניתן ליצור בעמוד ניהול התגיות.</p>
+        ) : (
+          <div className="flex flex-wrap gap-3">
+            {tags.map((tag) => (
+              <label key={tag.id} className="flex items-center gap-1 text-sm">
+                <input type="checkbox" name="tagIds" value={tag.id} defaultChecked={selectedTagIds.has(tag.id)} />
+                {tag.name.he}
+              </label>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div>
+        <label className="mb-2 block text-xs font-medium text-neutral-500">
+          מוצרים קשורים (מוצג בעמוד המוצר — ריק = בחירה אוטומטית לפי קטגוריה)
+        </label>
+        {relatedOptions.length === 0 ? (
+          <p className="text-sm text-neutral-400">אין מוצרים נוספים זמינים.</p>
+        ) : (
+          <select
+            name="relatedIds"
+            multiple
+            defaultValue={[...selectedRelatedIds]}
+            className="h-32 w-full rounded border border-neutral-300 px-3 py-2 text-sm"
+          >
+            {relatedOptions.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name.he}
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
+
+      <div className="border-t border-neutral-200 pt-4">
+        <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-neutral-500">SEO</h3>
+        <LocalizedInput label="SEO Title" name="seoTitle" value={initial?.seoTitle ?? undefined} />
+        <LocalizedInput label="Meta Description" name="seoDescription" value={initial?.seoDescription ?? undefined} textarea />
       </div>
 
       <button

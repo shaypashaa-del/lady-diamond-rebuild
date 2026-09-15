@@ -4,7 +4,11 @@ import { ProductForm } from "@/components/admin/ProductForm";
 import type { LocalizedText } from "@/lib/i18n-content";
 
 export default async function NewProductPage() {
-  const categories = await prisma.category.findMany({ orderBy: { sortOrder: "asc" } });
+  const [categories, tags, products] = await Promise.all([
+    prisma.category.findMany({ orderBy: { sortOrder: "asc" } }),
+    prisma.tag.findMany({ orderBy: { slug: "asc" } }),
+    prisma.product.findMany({ select: { id: true, name: true }, orderBy: { createdAt: "desc" } }),
+  ]);
 
   return (
     <div>
@@ -12,6 +16,8 @@ export default async function NewProductPage() {
       <ProductForm
         action={createProduct}
         categories={categories.map((c) => ({ id: c.id, name: c.name as LocalizedText }))}
+        tags={tags.map((t) => ({ id: t.id, name: t.name as LocalizedText }))}
+        relatedOptions={products.map((p) => ({ id: p.id, name: p.name as LocalizedText }))}
         submitLabel="יצירת מוצר"
       />
     </div>

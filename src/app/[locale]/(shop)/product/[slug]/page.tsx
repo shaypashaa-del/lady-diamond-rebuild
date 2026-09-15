@@ -78,7 +78,7 @@ export default async function ProductPage({
   const price = Number(product.salePrice ?? product.basePrice);
   const productUrl = `${SITE_URL}${pathFor(locale, `/product/${slug}`)}`;
 
-  const relatedRaw = await getRelatedProducts(product.categories[0]?.category.slug, product.id);
+  const relatedRaw = await getRelatedProducts(product.id, product.categories[0]?.category.slug);
   const related = relatedRaw.map((p) => toCardProduct(p, locale));
   const tHome = await getTranslations("Home");
 

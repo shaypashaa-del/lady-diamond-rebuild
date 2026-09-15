@@ -6,6 +6,7 @@ const navItems = [
   { href: "/admin", label: "לוח בקרה" },
   { href: "/admin/products", label: "מוצרים" },
   { href: "/admin/categories", label: "קטגוריות" },
+  { href: "/admin/tags", label: "תגיות" },
   { href: "/admin/orders", label: "הזמנות" },
   { href: "/admin/coupons", label: "קופונים" },
   { href: "/admin/shipping", label: "משלוחים" },

@@ -40,12 +40,30 @@ export function getAllCategories() {
   return prisma.category.findMany({ orderBy: { sortOrder: "asc" } });
 }
 
-export function getRelatedProducts(categorySlug: string | undefined, excludeProductId: string, take = 4) {
-  if (!categorySlug) return Promise.resolve([]);
+// Prefers manually-curated relations (set by admin on the product form);
+// falls back to same-category products when none are set.
+export async function getRelatedProducts(
+  productId: string,
+  categorySlug: string | undefined,
+  take = 4
+) {
+  const manual = await prisma.productRelation.findMany({
+    where: { productId, related: { status: "PUBLISHED" } },
+    include: {
+      related: {
+        include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },
+      },
+    },
+    take,
+  });
+
+  if (manual.length > 0) return manual.map((m) => m.related);
+  if (!categorySlug) return [];
+
   return prisma.product.findMany({
     where: {
       status: "PUBLISHED",
-      id: { not: excludeProductId },
+      id: { not: productId },
       categories: { some: { category: { slug: categorySlug } } },
     },
     include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },

@@ -12,6 +12,14 @@ export async function requireAdminSession() {
   return session;
 }
 
+export async function requireSuperAdminSession() {
+  const session = await getSession();
+  if (!session || session.role !== "SUPER_ADMIN") {
+    redirect("/admin");
+  }
+  return session;
+}
+
 export async function requireCustomerSession() {
   const session = await getSession();
   if (!session) {

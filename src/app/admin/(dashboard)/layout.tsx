@@ -17,6 +17,7 @@ const navItems = [
   { href: "/admin/messages", label: "הודעות" },
   { href: "/admin/content", label: "תוכן ועיצוב" },
   { href: "/admin/settings", label: "הגדרות" },
+  { href: "/admin/staff", label: "צוות" },
   { href: "/admin/media", label: "מדיה" },
 ];
 

@@ -82,6 +82,12 @@ export default async function ProductPage({
   const related = relatedRaw.map((p) => toCardProduct(p, locale));
   const tHome = await getTranslations("Home");
 
+  const totalInventory =
+    product.variants.length > 0
+      ? product.variants.reduce((sum, v) => sum + v.inventory, 0)
+      : product.inventory;
+  const firstImage = product.images[0]?.media.url;
+
   return (
     <>
       <JsonLd
@@ -92,7 +98,8 @@ export default async function ProductPage({
             sku: product.sku,
             price,
             url: productUrl,
-            availability: product.inventory > 0 ? "InStock" : "OutOfStock",
+            availability: totalInventory > 0 ? "InStock" : "OutOfStock",
+            image: firstImage ? `${SITE_URL}${firstImage}` : undefined,
           }),
           breadcrumbSchema([
             { name: "Home", url: SITE_URL },

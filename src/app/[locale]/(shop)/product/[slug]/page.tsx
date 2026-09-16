@@ -108,6 +108,7 @@ export default async function ProductPage({
         description={localize(product.description as LocalizedText | null, locale)}
         price={Number(product.basePrice)}
         salePrice={product.salePrice != null ? Number(product.salePrice) : undefined}
+        inventory={product.inventory}
         sku={product.sku ?? undefined}
         weightGrams={product.weightGrams}
         categoryName={categoryName}

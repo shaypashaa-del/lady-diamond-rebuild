@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/auth/session";
 
 export default async function OrderConfirmationPage({
   params,
@@ -12,6 +13,12 @@ export default async function OrderConfirmationPage({
   const t = await getTranslations("OrderConfirmation");
   const order = await prisma.order.findUnique({ where: { orderNumber } });
   if (!order) notFound();
+
+  // The order number is an unguessable bearer token for guest checkouts, but
+  // once an order is tied to an account it should only be viewable by that
+  // account — not by anyone who happens to have (or brute-forces) the link.
+  const session = await getSession();
+  if (order.userId && session?.userId !== order.userId) notFound();
 
   return (
     <div className="mx-auto max-w-md px-4 py-20 text-center sm:px-8">

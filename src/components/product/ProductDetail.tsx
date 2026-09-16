@@ -19,6 +19,7 @@ export function ProductDetail({
   description,
   price,
   salePrice,
+  inventory,
   sku,
   weightGrams,
   categoryName,
@@ -31,6 +32,7 @@ export function ProductDetail({
   description: string;
   price: number;
   salePrice?: number;
+  inventory: number;
   sku?: string;
   weightGrams?: number | null;
   categoryName: string;
@@ -53,7 +55,8 @@ export function ProductDetail({
   );
 
   const displayPrice = selectedVariant ? selectedVariant.price : salePrice ?? price;
-  const canAdd = variants.length === 0 || !!selectedVariant;
+  const availableInventory = selectedVariant ? selectedVariant.inventory : inventory;
+  const canAdd = (variants.length === 0 || !!selectedVariant) && availableInventory > 0;
 
   function handleAddToCart() {
     if (!canAdd) return;
@@ -131,7 +134,10 @@ export function ProductDetail({
             </label>
             <select
               value={variantId}
-              onChange={(e) => setVariantId(e.target.value)}
+              onChange={(e) => {
+                setVariantId(e.target.value);
+                setQuantity(1);
+              }}
               className="w-full border border-neutral-300 px-3 py-2 text-sm"
             >
               <option value="">{t("chooseOption")}</option>
@@ -155,8 +161,9 @@ export function ProductDetail({
             </button>
             <span className="w-8 text-center text-sm">{quantity}</span>
             <button
-              onClick={() => setQuantity((q) => q + 1)}
-              className="px-3 py-2 text-sm"
+              onClick={() => setQuantity((q) => Math.min(availableInventory, q + 1))}
+              disabled={quantity >= availableInventory}
+              className="px-3 py-2 text-sm disabled:cursor-not-allowed disabled:text-neutral-300"
               aria-label="Increase quantity"
             >
               +

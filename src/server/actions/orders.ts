@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import { calculateShipping } from "@/server/services/shipping";
@@ -39,7 +40,13 @@ export type CheckoutResult =
   | { orderNumber: string; total: number; instructions: string };
 
 function generateOrderNumber() {
-  return `LD-${Date.now().toString(36).toUpperCase()}`;
+  // The order number doubles as a bearer token for the guest order-confirmation
+  // page (no login is required to view it), so it must not be guessable — a
+  // pure timestamp encoding let anyone enumerate nearby orders. The random
+  // suffix adds ~40 bits of entropy on top of the human-readable date prefix.
+  const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+  const randomPart = randomBytes(5).toString("hex").toUpperCase();
+  return `LD-${datePart}-${randomPart}`;
 }
 
 export async function createOrder(input: CheckoutInput): Promise<CheckoutResult> {
@@ -50,12 +57,19 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
   // Resolve slugs -> real product ids (client cart lines key products by slug).
   const products = await prisma.product.findMany({
     where: { slug: { in: input.lines.map((l) => l.productId) } },
+    include: { variants: true },
   });
   const productBySlug = new Map(products.map((p) => [p.slug, p]));
 
   for (const line of input.lines) {
-    if (!productBySlug.has(line.productId)) {
+    const product = productBySlug.get(line.productId);
+    if (!product) {
       return { error: `מוצר לא נמצא: ${line.productId}` };
+    }
+    const variant = line.variantId ? product.variants.find((v) => v.id === line.variantId) : null;
+    const availableInventory = variant ? variant.inventory : product.inventory;
+    if (line.quantity > availableInventory) {
+      return { error: `אין מספיק מלאי עבור "${line.name}" (במלאי: ${availableInventory}).` };
     }
   }
 
@@ -116,41 +130,82 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
     }
   }
 
-  const order = await prisma.order.create({
-    data: {
-      orderNumber,
-      userId: session?.userId,
-      email: input.email,
-      status: "PENDING",
-      paymentStatus: paymentInit.immediatelyPaid ? "PAID" : "PENDING",
-      paymentMethod: input.paymentMethod,
-      paymentInstructions: paymentInit.instructions,
-      subtotal,
-      discountTotal: discount,
-      shippingTotal: shipping,
-      total,
-      couponId: coupon?.id,
-      affiliateId: validAffiliate?.id,
-      billingAddress: input.billingAddress,
-      shippingAddress: input.billingAddress,
-      items: {
-        create: input.lines.map((line) => {
-          const product = productBySlug.get(line.productId)!;
-          return {
-            productId: product.id,
-            variantId: line.variantId,
-            nameSnapshot: line.variantLabel ? `${line.name} — ${line.variantLabel}` : line.name,
-            unitPrice: line.price,
-            quantity: line.quantity,
-            lineTotal: line.price * line.quantity,
-          };
-        }),
-      },
-    },
-  });
+  let order;
+  try {
+    order = await prisma.$transaction(async (tx) => {
+      // Decrement inventory with a `gte` guard so concurrent checkouts for the
+      // same low-stock item can't both succeed — if another order already
+      // consumed the remaining stock, the guarded update matches zero rows
+      // and we abort the whole transaction instead of overselling.
+      for (const line of input.lines) {
+        const product = productBySlug.get(line.productId)!;
+        if (line.variantId) {
+          const result = await tx.productVariant.updateMany({
+            where: { id: line.variantId, inventory: { gte: line.quantity } },
+            data: { inventory: { decrement: line.quantity } },
+          });
+          if (result.count === 0) {
+            throw new Error(`אין מספיק מלאי עבור "${line.name}".`);
+          }
+        } else {
+          const result = await tx.product.updateMany({
+            where: { id: product.id, inventory: { gte: line.quantity } },
+            data: { inventory: { decrement: line.quantity } },
+          });
+          if (result.count === 0) {
+            throw new Error(`אין מספיק מלאי עבור "${line.name}".`);
+          }
+        }
+      }
 
-  if (coupon) {
-    await prisma.coupon.update({ where: { id: coupon.id }, data: { usageCount: { increment: 1 } } });
+      if (coupon) {
+        const couponResult = await tx.coupon.updateMany({
+          where: {
+            id: coupon.id,
+            OR: [{ usageLimit: null }, { usageCount: { lt: coupon.usageLimit ?? 0 } }],
+          },
+          data: { usageCount: { increment: 1 } },
+        });
+        if (couponResult.count === 0) {
+          throw new Error("הקופון מוצה.");
+        }
+      }
+
+      return tx.order.create({
+        data: {
+          orderNumber,
+          userId: session?.userId,
+          email: input.email,
+          status: "PENDING",
+          paymentStatus: paymentInit.immediatelyPaid ? "PAID" : "PENDING",
+          paymentMethod: input.paymentMethod,
+          paymentInstructions: paymentInit.instructions,
+          subtotal,
+          discountTotal: discount,
+          shippingTotal: shipping,
+          total,
+          couponId: coupon?.id,
+          affiliateId: validAffiliate?.id,
+          billingAddress: input.billingAddress,
+          shippingAddress: input.billingAddress,
+          items: {
+            create: input.lines.map((line) => {
+              const product = productBySlug.get(line.productId)!;
+              return {
+                productId: product.id,
+                variantId: line.variantId,
+                nameSnapshot: line.variantLabel ? `${line.name} — ${line.variantLabel}` : line.name,
+                unitPrice: line.price,
+                quantity: line.quantity,
+                lineTotal: line.price * line.quantity,
+              };
+            }),
+          },
+        },
+      });
+    });
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "אירעה שגיאה ביצירת ההזמנה." };
   }
 
   if (session?.userId) {

@@ -49,10 +49,24 @@ export async function uploadMedia(formData: FormData) {
   return { uploaded: true as const };
 }
 
-export async function deleteMedia(id: string) {
+export type DeleteMediaResult = { error: string } | undefined;
+
+export async function deleteMedia(id: string): Promise<DeleteMediaResult> {
   await requireAdminSession();
   const media = await prisma.mediaAsset.findUnique({ where: { id } });
   if (!media) return;
+
+  // ProductImage.mediaId is a required FK with no onDelete set (Prisma
+  // defaults to RESTRICT), so deleting a media asset still attached to a
+  // product photo would otherwise throw an unhandled foreign-key violation
+  // and crash the page for a non-technical admin. Check usage first and
+  // give a clear, actionable message instead.
+  const usageCount = await prisma.productImage.count({ where: { mediaId: id } });
+  if (usageCount > 0) {
+    return {
+      error: `אי אפשר למחוק — התמונה משויכת ל-${usageCount} מוצר/ים. יש להסיר אותה מהמוצרים קודם.`,
+    };
+  }
 
   await prisma.mediaAsset.delete({ where: { id } });
 

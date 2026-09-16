@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import { toggleCoupon, deleteCoupon } from "@/server/actions/coupons";
+import { toggleCoupon } from "@/server/actions/coupons";
 import { CreateCouponForm } from "@/components/admin/CreateCouponForm";
+import { DeleteCouponButton } from "@/components/admin/DeleteCouponButton";
 
 export default async function AdminCouponsPage() {
   const [coupons, affiliates] = await Promise.all([
@@ -47,11 +48,7 @@ export default async function AdminCouponsPage() {
                   </form>
                 </td>
                 <td className="px-4 py-3">
-                  <form action={deleteCoupon.bind(null, c.id)}>
-                    <button type="submit" className="text-xs text-rose-600 hover:underline">
-                      מחיקה
-                    </button>
-                  </form>
+                  <DeleteCouponButton id={c.id} />
                 </td>
               </tr>
             ))}

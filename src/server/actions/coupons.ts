@@ -46,8 +46,24 @@ export async function toggleCoupon(id: string, isActive: boolean) {
   revalidatePath("/admin/coupons");
 }
 
-export async function deleteCoupon(id: string) {
+export type DeleteCouponResult = { error: string } | undefined;
+
+export async function deleteCoupon(id: string): Promise<DeleteCouponResult> {
   await requireAdminSession();
+
+  // Order.couponId is a nullable FK with no onDelete set (defaults to
+  // SetNull) — deleting a coupon that's already attached to past orders
+  // would silently null out that reference, corrupting the historical
+  // "coupon used" record on those orders' detail/report pages with no
+  // warning. Deactivating (toggleCoupon) is the safe way to retire a used
+  // coupon; deletion is only for coupons that were never actually used.
+  const coupon = await prisma.coupon.findUnique({ where: { id }, select: { usageCount: true } });
+  if (coupon && coupon.usageCount > 0) {
+    return {
+      error: `אי אפשר למחוק קופון שכבר נעשה בו שימוש (${coupon.usageCount} פעמים) — יש לכבות אותו במקום.`,
+    };
+  }
+
   await prisma.coupon.delete({ where: { id } });
   revalidatePath("/admin/coupons");
 }

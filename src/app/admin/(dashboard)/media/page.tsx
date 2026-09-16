@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
-import { deleteMedia } from "@/server/actions/media";
 import { MediaUploadForm } from "@/components/admin/MediaUploadForm";
+import { DeleteMediaButton } from "@/components/admin/DeleteMediaButton";
 
 export default async function AdminMediaPage() {
   const media = await prisma.mediaAsset.findMany({ orderBy: { createdAt: "desc" } });
@@ -24,11 +24,7 @@ export default async function AdminMediaPage() {
             </div>
             <div className="p-2">
               <p className="truncate text-xs text-neutral-500">{m.filename}</p>
-              <form action={deleteMedia.bind(null, m.id)}>
-                <button type="submit" className="mt-1 text-xs text-rose-600 hover:underline">
-                  מחיקה
-                </button>
-              </form>
+              <DeleteMediaButton id={m.id} />
             </div>
           </div>
         ))}

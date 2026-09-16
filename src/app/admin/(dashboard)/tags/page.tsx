@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { deleteTag } from "@/server/actions/tags";
 import { t as localize, type LocalizedText } from "@/lib/i18n-content";
 import { CreateTagForm } from "@/components/admin/CreateTagForm";
+import { ConfirmDeleteForm } from "@/components/admin/ConfirmDeleteForm";
 
 export default async function AdminTagsPage() {
   const tags = await prisma.tag.findMany({
@@ -28,11 +29,15 @@ export default async function AdminTagsPage() {
                 <td className="px-4 py-3 font-medium">{localize(tag.name as LocalizedText, "he")}</td>
                 <td className="px-4 py-3">{tag._count.products}</td>
                 <td className="px-4 py-3">
-                  <form action={deleteTag.bind(null, tag.id)}>
-                    <button type="submit" className="text-xs text-rose-600 hover:underline">
-                      מחיקה
-                    </button>
-                  </form>
+                  <ConfirmDeleteForm
+                    action={deleteTag.bind(null, tag.id)}
+                    className="text-xs text-rose-600 hover:underline"
+                    confirmMessage={
+                      tag._count.products > 0
+                        ? `התגית "${localize(tag.name as LocalizedText, "he")}" משויכת ל-${tag._count.products} מוצר/ים. מחיקתה תסיר את השיוך מהמוצרים (הם לא יימחקו). להמשיך?`
+                        : `למחוק את התגית "${localize(tag.name as LocalizedText, "he")}"?`
+                    }
+                  />
                 </td>
               </tr>
             ))}

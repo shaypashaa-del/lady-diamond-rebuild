@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { deleteCategory } from "@/server/actions/categories";
 import { t as localize, type LocalizedText } from "@/lib/i18n-content";
+import { ConfirmDeleteForm } from "@/components/admin/ConfirmDeleteForm";
 
 export default async function AdminCategoriesPage() {
   const categories = await prisma.category.findMany({
@@ -50,11 +51,14 @@ export default async function AdminCategoriesPage() {
                     <Link href={`/admin/categories/${c.id}`} className="text-blue-600 hover:underline">
                       עריכה
                     </Link>
-                    <form action={deleteCategory.bind(null, c.id)}>
-                      <button type="submit" className="text-rose-600 hover:underline">
-                        מחיקה
-                      </button>
-                    </form>
+                    <ConfirmDeleteForm
+                      action={deleteCategory.bind(null, c.id)}
+                      confirmMessage={
+                        c._count.products > 0
+                          ? `הקטגוריה "${localize(c.name as LocalizedText, "he")}" משויכת ל-${c._count.products} מוצר/ים. מחיקתה תסיר את השיוך מהמוצרים (הם לא יימחקו). להמשיך?`
+                          : `למחוק את הקטגוריה "${localize(c.name as LocalizedText, "he")}"?`
+                      }
+                    />
                   </div>
                 </td>
               </tr>

@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 
 // Picks the best-matching active shipping rule for a given order, cheapest
-// wins on a tie. Admin manages rules at /admin/content (shipping settings) —
-// see ShippingRule in schema.prisma for the supported types.
+// wins on a tie. Admin manages rules at /admin/shipping — see ShippingRule
+// in schema.prisma for the supported types.
 export async function calculateShipping(subtotal: number, country: string): Promise<number> {
   const rules = await prisma.shippingRule.findMany({
     where: { isActive: true },

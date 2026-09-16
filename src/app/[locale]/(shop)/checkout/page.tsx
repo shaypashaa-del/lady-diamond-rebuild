@@ -8,6 +8,7 @@ import { useCartStore } from "@/lib/cart-store";
 import { useMounted } from "@/lib/use-mounted";
 import { createOrder } from "@/server/actions/orders";
 import { getMyAddress, type AddressData } from "@/server/actions/address";
+import { getCheckoutPreview, type CheckoutPreview } from "@/server/actions/checkout-preview";
 import type { PaymentMethodId } from "@/server/payments/types";
 
 export default function CheckoutPage() {
@@ -19,19 +20,33 @@ export default function CheckoutPage() {
 
   const [showCoupon, setShowCoupon] = useState(false);
   const [couponCode, setCouponCode] = useState("");
+  const [country, setCountry] = useState("Israel");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodId>("bank_transfer");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [savedAddress, setSavedAddress] = useState<AddressData | null>(null);
   const [addressLoaded, setAddressLoaded] = useState(false);
+  const [preview, setPreview] = useState<CheckoutPreview | null>(null);
 
   useEffect(() => {
-    getMyAddress()
-      .then(setSavedAddress)
-      .finally(() => setAddressLoaded(true));
+    getMyAddress().then((addr) => {
+      setSavedAddress(addr);
+      if (addr?.country) setCountry(addr.country);
+    }).finally(() => setAddressLoaded(true));
   }, []);
 
   const subtotal = lines.reduce((sum, l) => sum + l.price * l.quantity, 0);
+
+  // Live pricing preview — recomputed server-side whenever country or
+  // coupon changes, so the displayed total always matches what createOrder
+  // will actually charge (shipping cost previously wasn't shown at all here).
+  useEffect(() => {
+    if (!addressLoaded || lines.length === 0) return;
+    const handle = setTimeout(() => {
+      getCheckoutPreview(subtotal, country, couponCode || undefined).then(setPreview);
+    }, 300);
+    return () => clearTimeout(handle);
+  }, [subtotal, country, couponCode, addressLoaded, lines.length]);
 
   if (!mounted || !addressLoaded) return null;
 
@@ -45,6 +60,10 @@ export default function CheckoutPage() {
       </div>
     );
   }
+
+  const shippingCost = preview?.shipping ?? 0;
+  const discount = preview?.discount ?? 0;
+  const total = preview ? preview.total : subtotal;
 
   async function handleSubmit(formData: FormData) {
     setSubmitting(true);
@@ -96,7 +115,7 @@ export default function CheckoutPage() {
         {t("haveCoupon")}
       </button>
       {showCoupon && (
-        <div className="mb-8 flex max-w-sm gap-2">
+        <div className="mb-2 flex max-w-sm gap-2">
           <input
             value={couponCode}
             onChange={(e) => setCouponCode(e.target.value)}
@@ -105,6 +124,9 @@ export default function CheckoutPage() {
             dir="ltr"
           />
         </div>
+      )}
+      {preview?.couponError && (
+        <p className="mb-6 text-sm text-rose-600">{preview.couponError}</p>
       )}
 
       {error && <p className="mb-6 rounded bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p>}
@@ -116,7 +138,14 @@ export default function CheckoutPage() {
             <input name="fullName" placeholder={t("fullName")} defaultValue={savedAddress?.fullName} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
             <input name="email" type="email" placeholder={t("email")} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
             <input name="phone" placeholder={t("phone")} defaultValue={savedAddress?.phone} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
-            <input name="country" placeholder={t("country")} required defaultValue={savedAddress?.country ?? "Israel"} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+            <input
+              name="country"
+              placeholder={t("country")}
+              required
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              className="w-full border border-neutral-300 px-3 py-2 text-sm"
+            />
             <input name="city" placeholder={t("city")} defaultValue={savedAddress?.city} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
             <input name="street" placeholder={t("street")} defaultValue={savedAddress?.street} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
             <input name="apartment" placeholder={t("apartment")} defaultValue={savedAddress?.apartment} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
@@ -138,9 +167,19 @@ export default function CheckoutPage() {
               <span>{t("subtotal")}</span>
               <span>{subtotal.toFixed(2)} ₪</span>
             </div>
+            {discount > 0 && (
+              <div className="flex justify-between py-2 text-sm text-rose-600">
+                <span>הנחה</span>
+                <span>-{discount.toFixed(2)} ₪</span>
+              </div>
+            )}
+            <div className="flex justify-between py-2 text-sm">
+              <span>{t("shipping")}</span>
+              <span>{shippingCost > 0 ? `${shippingCost.toFixed(2)} ₪` : t("free")}</span>
+            </div>
             <div className="flex justify-between border-t border-neutral-200 py-2 text-sm font-semibold">
               <span>{t("total")}</span>
-              <span>{subtotal.toFixed(2)} ₪</span>
+              <span>{total.toFixed(2)} ₪</span>
             </div>
           </div>
 

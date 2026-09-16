@@ -61,7 +61,10 @@ export function ProductDetail({
       {
         key: `${slug}:${variantId || "default"}`,
         productId: slug,
-        variantId: variantId || undefined,
+        // `variantId` state doubles as a "default" sentinel for products with
+        // no real variants — never forward that literal string as a real
+        // variant id (it doesn't exist in the DB and fails the order's FK).
+        variantId: selectedVariant?.id,
         slug,
         name,
         variantLabel: selectedVariant?.label,

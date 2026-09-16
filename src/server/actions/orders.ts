@@ -9,6 +9,7 @@ import { calculateCommission } from "@/server/services/commission";
 import { getAttributionWindowDays } from "@/server/actions/affiliate";
 import { paymentProviders, type PaymentMethodId } from "@/server/payments/types";
 import { upsertAddress } from "@/lib/address-service";
+import { emailProvider } from "@/server/email/types";
 
 export type CheckoutLine = {
   productId: string; // product slug, resolved to a real id below
@@ -283,6 +284,12 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
       },
     });
   }
+
+  await emailProvider.send({
+    to: input.email,
+    subject: `אישור הזמנה ${orderNumber} — ליידי דיאמונד`,
+    text: `תודה על ההזמנה! מספר הזמנה: ${orderNumber}. סה"כ: ${total.toFixed(2)} ₪.\n\n${paymentInit.instructions}`,
+  });
 
   return { orderNumber, total, instructions: paymentInit.instructions };
 }

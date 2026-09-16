@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth/password";
 import { createSession } from "@/lib/auth/session";
+import { emailProvider } from "@/server/email/types";
+import { SITE_URL } from "@/lib/site-config";
 
 const TOKEN_TTL_MS = 1000 * 60 * 60; // 1 hour
 
@@ -35,7 +37,11 @@ export async function requestPasswordReset(
   });
 
   const resetLink = `/reset-password/${token}`;
-  console.log(`[password reset] ${email} -> ${resetLink} (would be emailed in production)`);
+  await emailProvider.send({
+    to: email,
+    subject: "איפוס סיסמה — ליידי דיאמונד",
+    text: `לחצו על הקישור הבא כדי לאפס את הסיסמה שלכם (בתוקף לשעה אחת): ${SITE_URL}${resetLink}`,
+  });
 
   return { sent: true, resetLink: process.env.NODE_ENV === "production" ? undefined : resetLink };
 }

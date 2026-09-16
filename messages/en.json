@@ -274,5 +274,16 @@
     "submitting": "Sending...",
     "sent": "Thanks — we'll get back to you soon.",
     "info": "Contact Information"
+  },
+  "OrderDetail": {
+    "title": "Order",
+    "items": "Items",
+    "shippingAddress": "Shipping Address",
+    "tracking": "Tracking Number",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "shipping": "Shipping",
+    "total": "Total",
+    "backToAccount": "Back to My Account"
   }
 }

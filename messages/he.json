@@ -274,5 +274,16 @@
     "submitting": "שולח...",
     "sent": "תודה — ניצור איתך קשר בהקדם.",
     "info": "פרטי התקשרות"
+  },
+  "OrderDetail": {
+    "title": "הזמנה",
+    "items": "פריטים",
+    "shippingAddress": "כתובת משלוח",
+    "tracking": "מספר מעקב",
+    "subtotal": "סכום ביניים",
+    "discount": "הנחה",
+    "shipping": "משלוח",
+    "total": "סה\"כ",
+    "backToAccount": "חזרה לחשבון שלי"
   }
 }

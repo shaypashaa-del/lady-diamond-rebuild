@@ -1,8 +1,18 @@
 import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { requireCustomerSession } from "@/lib/auth/guards";
 import { logout } from "@/server/actions/auth";
 import { updateMyAddressAction } from "@/server/actions/address";
 import { prisma } from "@/lib/prisma";
+
+const statusLabels: Record<string, string> = {
+  PENDING: "ממתינה",
+  PROCESSING: "בטיפול",
+  SHIPPED: "נשלחה",
+  COMPLETED: "הושלמה",
+  CANCELLED: "בוטלה",
+  REFUNDED: "זוכתה",
+};
 
 export default async function AccountPage() {
   const session = await requireCustomerSession();
@@ -29,8 +39,10 @@ export default async function AccountPage() {
         <ul className="mb-8 divide-y divide-neutral-200 border-y border-neutral-200">
           {orders.map((o) => (
             <li key={o.id} className="flex items-center justify-between py-3 text-sm">
-              <span className="font-medium">{o.orderNumber}</span>
-              <span className="text-neutral-500">{o.status}</span>
+              <Link href={`/account/orders/${o.id}`} className="font-medium underline">
+                {o.orderNumber}
+              </Link>
+              <span className="text-neutral-500">{statusLabels[o.status] ?? o.status}</span>
               <span>{Number(o.total).toFixed(2)} ₪</span>
             </li>
           ))}

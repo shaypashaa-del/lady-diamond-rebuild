@@ -93,7 +93,15 @@ export default async function AdminCommissionsPage() {
                 <td className="px-4 py-3">{c.affiliate.user.name}</td>
                 <td className="px-4 py-3">{c.order.orderNumber}</td>
                 <td className="px-4 py-3">{Number(c.amount).toFixed(2)} ₪</td>
-                <td className="px-4 py-3">{statusLabels[c.status]}</td>
+                <td className="px-4 py-3">
+                  {statusLabels[c.status]}
+                  {(c.order.status === "CANCELLED" || c.order.status === "REFUNDED") &&
+                    (c.status === "APPROVED" || c.status === "PAID") && (
+                      <span className="ms-2 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-800">
+                        ⚠ ההזמנה {c.order.status === "CANCELLED" ? "בוטלה" : "זוכתה"}
+                      </span>
+                    )}
+                </td>
                 <td className="px-4 py-3">
                   {c.status === "PENDING" && (
                     <div className="flex gap-2 text-xs">

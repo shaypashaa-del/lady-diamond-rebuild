@@ -87,6 +87,7 @@ export default function CheckoutPage() {
         productId: l.productId,
         variantId: l.variantId,
         name: l.name,
+        variantLabel: l.variantLabel,
         price: l.price,
         quantity: l.quantity,
       })),
@@ -159,7 +160,7 @@ export default function CheckoutPage() {
           <div className="border border-neutral-200 p-5">
             {lines.map((l) => (
               <div key={l.key} className="flex justify-between py-2 text-sm">
-                <span>{l.name} × {l.quantity}</span>
+                <span>{l.name}{l.variantLabel ? ` — ${l.variantLabel}` : ""} × {l.quantity}</span>
                 <span>{(l.price * l.quantity).toFixed(2)} ₪</span>
               </div>
             ))}

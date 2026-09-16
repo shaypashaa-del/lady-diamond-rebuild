@@ -12,6 +12,7 @@ export type CheckoutLine = {
   productId: string; // product slug, resolved to a real id below
   variantId?: string;
   name: string;
+  variantLabel?: string;
   price: number;
   quantity: number;
 };
@@ -138,7 +139,7 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
           return {
             productId: product.id,
             variantId: line.variantId,
-            nameSnapshot: line.name,
+            nameSnapshot: line.variantLabel ? `${line.name} — ${line.variantLabel}` : line.name,
             unitPrice: line.price,
             quantity: line.quantity,
             lineTotal: line.price * line.quantity,

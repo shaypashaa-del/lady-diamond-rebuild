@@ -62,19 +62,49 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
   });
   const productBySlug = new Map(products.map((p) => [p.slug, p]));
 
+  // Resolve each line's real price and name SERVER-SIDE from the current
+  // product/variant record — never trust `line.price` from the client. It's
+  // only used for display in the cart before checkout; a tampered value
+  // there (devtools/localStorage edit) must never affect what's charged.
+  type ResolvedLine = {
+    productDbId: string;
+    variantId?: string;
+    name: string;
+    variantLabel?: string;
+    price: number;
+    quantity: number;
+  };
+  const resolvedLines: ResolvedLine[] = [];
+
   for (const line of input.lines) {
     const product = productBySlug.get(line.productId);
     if (!product) {
       return { error: `מוצר לא נמצא: ${line.productId}` };
     }
     const variant = line.variantId ? product.variants.find((v) => v.id === line.variantId) : null;
+    if (line.variantId && !variant) {
+      return { error: `הווריאציה שנבחרה עבור "${line.name}" אינה קיימת עוד.` };
+    }
     const availableInventory = variant ? variant.inventory : product.inventory;
     if (line.quantity > availableInventory) {
       return { error: `אין מספיק מלאי עבור "${line.name}" (במלאי: ${availableInventory}).` };
     }
+
+    const price = variant
+      ? Number(variant.salePrice ?? variant.price)
+      : Number(product.salePrice ?? product.basePrice);
+
+    resolvedLines.push({
+      productDbId: product.id,
+      variantId: variant?.id,
+      name: line.name,
+      variantLabel: line.variantLabel,
+      price,
+      quantity: line.quantity,
+    });
   }
 
-  const subtotal = input.lines.reduce((sum, l) => sum + l.price * l.quantity, 0);
+  const subtotal = resolvedLines.reduce((sum, l) => sum + l.price * l.quantity, 0);
 
   let discount = 0;
   let coupon = null;
@@ -171,8 +201,7 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
       // same low-stock item can't both succeed — if another order already
       // consumed the remaining stock, the guarded update matches zero rows
       // and we abort the whole transaction instead of overselling.
-      for (const line of input.lines) {
-        const product = productBySlug.get(line.productId)!;
+      for (const line of resolvedLines) {
         if (line.variantId) {
           const result = await tx.productVariant.updateMany({
             where: { id: line.variantId, inventory: { gte: line.quantity } },
@@ -183,7 +212,7 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
           }
         } else {
           const result = await tx.product.updateMany({
-            where: { id: product.id, inventory: { gte: line.quantity } },
+            where: { id: line.productDbId, inventory: { gte: line.quantity } },
             data: { inventory: { decrement: line.quantity } },
           });
           if (result.count === 0) {
@@ -223,17 +252,14 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
           billingAddress: input.billingAddress,
           shippingAddress: input.billingAddress,
           items: {
-            create: input.lines.map((line) => {
-              const product = productBySlug.get(line.productId)!;
-              return {
-                productId: product.id,
-                variantId: line.variantId,
-                nameSnapshot: line.variantLabel ? `${line.name} — ${line.variantLabel}` : line.name,
-                unitPrice: line.price,
-                quantity: line.quantity,
-                lineTotal: line.price * line.quantity,
-              };
-            }),
+            create: resolvedLines.map((line) => ({
+              productId: line.productDbId,
+              variantId: line.variantId,
+              nameSnapshot: line.variantLabel ? `${line.name} — ${line.variantLabel}` : line.name,
+              unitPrice: line.price,
+              quantity: line.quantity,
+              lineTotal: line.price * line.quantity,
+            })),
           },
         },
       });

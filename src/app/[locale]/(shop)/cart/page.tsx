@@ -1,9 +1,12 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useCartStore } from "@/lib/cart-store";
 import { useMounted } from "@/lib/use-mounted";
+import { getMyAddress } from "@/server/actions/address";
+import { getCheckoutPreview } from "@/server/actions/checkout-preview";
 
 export default function CartPage() {
   const t = useTranslations("Cart");
@@ -12,6 +15,16 @@ export default function CartPage() {
   const removeLine = useCartStore((s) => s.removeLine);
   const totalPrice = useCartStore((s) => s.totalPrice());
   const mounted = useMounted();
+  const [shipping, setShipping] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!mounted || lines.length === 0) return;
+    getMyAddress().then((addr) => {
+      getCheckoutPreview(totalPrice, addr?.country ?? "Israel").then((preview) => {
+        setShipping(preview.shipping);
+      });
+    });
+  }, [mounted, lines.length, totalPrice]);
 
   if (!mounted) return null;
 
@@ -28,6 +41,8 @@ export default function CartPage() {
       </div>
     );
   }
+
+  const estimatedTotal = totalPrice + (shipping ?? 0);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-8">
@@ -79,11 +94,13 @@ export default function CartPage() {
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide">{t("cartTotals")}</h2>
           <div className="flex justify-between border-t border-neutral-200 py-3 text-sm">
             <span>{t("shipping")}</span>
-            <span className="font-medium">{t("free")}</span>
+            <span className="font-medium">
+              {shipping == null ? "…" : shipping > 0 ? `${shipping.toFixed(2)} ₪` : t("free")}
+            </span>
           </div>
           <div className="flex justify-between border-t border-neutral-200 py-3 text-sm font-semibold">
             <span>{t("estimatedTotal")}</span>
-            <span>{totalPrice.toFixed(2)} ₪</span>
+            <span>{estimatedTotal.toFixed(2)} ₪</span>
           </div>
           <Link
             href="/checkout"

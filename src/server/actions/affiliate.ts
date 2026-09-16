@@ -25,7 +25,7 @@ export type AffiliatePaymentDetails = {
   bitPhone?: string;
 };
 
-async function getAttributionWindowDays(): Promise<number> {
+export async function getAttributionWindowDays(): Promise<number> {
   const setting = await prisma.setting.findUnique({ where: { key: "affiliate_attribution_days" } });
   const value = setting?.value;
   return typeof value === "number" ? value : DEFAULT_ATTRIBUTION_DAYS;

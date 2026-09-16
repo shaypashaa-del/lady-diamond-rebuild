@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import { calculateShipping } from "@/server/services/shipping";
 import { calculateCommission } from "@/server/services/commission";
+import { getAttributionWindowDays } from "@/server/actions/affiliate";
 import { paymentProviders, type PaymentMethodId } from "@/server/payments/types";
 import { upsertAddress } from "@/lib/address-service";
 
@@ -105,10 +106,30 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
   const session = await getSession();
   const store = await cookies();
   const refCode = store.get("ld_ref")?.value;
+  const visitorId = store.get("ld_visitor")?.value;
   const affiliate = refCode
     ? await prisma.affiliate.findUnique({ where: { code: refCode } })
     : null;
   let validAffiliate = affiliate && affiliate.status === "APPROVED" ? affiliate : null;
+
+  // The ref cookie's own maxAge was fixed to whatever attribution window was
+  // configured at click time — if the admin later SHORTENS the window, an
+  // existing long-lived cookie would otherwise keep attributing sales past
+  // the new policy. Re-check the actual click's age against the CURRENT
+  // setting rather than trusting "cookie still present" as sufficient.
+  if (validAffiliate && visitorId) {
+    const recentClick = await prisma.affiliateClick.findFirst({
+      where: { affiliateId: validAffiliate.id, sessionId: visitorId },
+      orderBy: { createdAt: "desc" },
+    });
+    if (recentClick) {
+      const windowDays = await getAttributionWindowDays();
+      const ageMs = Date.now() - recentClick.createdAt.getTime();
+      if (ageMs > windowDays * 24 * 60 * 60 * 1000) {
+        validAffiliate = null;
+      }
+    }
+  }
 
   // A personal coupon also attributes the sale to its affiliate, even
   // without a ?ref= link — matches spec: "המערכת משייכת את ההזמנה ל-Affiliate".

@@ -4,7 +4,13 @@ import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import { subscribeToNewsletter, type NewsletterResult } from "@/server/actions/newsletter";
 
-export function AnnouncementBar() {
+export function AnnouncementBar({
+  text,
+  subscribeLabel,
+}: {
+  text?: string;
+  subscribeLabel?: string;
+}) {
   const t = useTranslations("Announcement");
   const [visible, setVisible] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -16,6 +22,8 @@ export function AnnouncementBar() {
   if (!visible) return null;
 
   const subscribed = state && "subscribed" in state;
+  const displayText = text ?? t("text");
+  const displaySubscribe = subscribeLabel ?? t("subscribe");
 
   return (
     <div className="relative flex flex-col items-center justify-center gap-1 bg-[#f4efe9] px-10 py-2 text-center text-xs tracking-wide text-neutral-700 sm:flex-row sm:gap-2">
@@ -33,14 +41,14 @@ export function AnnouncementBar() {
             className="border border-neutral-300 bg-white px-2 py-1 text-xs"
           />
           <button type="submit" disabled={pending} className="font-semibold underline underline-offset-2 disabled:opacity-50">
-            {pending ? "..." : t("subscribe")}
+            {pending ? "..." : displaySubscribe}
           </button>
         </form>
       ) : (
         <p>
-          {t("text")}{" "}
+          {displayText}{" "}
           <button onClick={() => setShowForm(true)} className="font-semibold underline underline-offset-2">
-            {t("subscribe")}
+            {displaySubscribe}
           </button>
         </p>
       )}

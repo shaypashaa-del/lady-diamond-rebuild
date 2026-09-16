@@ -1,19 +1,28 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { t as localize, type LocalizedText } from "@/lib/i18n-content";
+import { getContentBlock, type AnnouncementBarContent, type HeroContent } from "@/server/actions/content-blocks";
+import { CONTENT_KEYS } from "@/lib/content-keys";
+import { AnnouncementBarForm, HomepageHeroForm } from "@/components/admin/ContentBlockForms";
 
 const STANDALONE_SLUGS = new Set(["about-us", "contact-us"]);
 
 export default async function AdminContentPage() {
   const pages = await prisma.page.findMany({ orderBy: { slug: "asc" } });
+  const announcement = await getContentBlock<AnnouncementBarContent>(CONTENT_KEYS.announcementBar);
+  const hero = await getContentBlock<HeroContent>(CONTENT_KEYS.homepageHero);
 
   return (
     <div>
       <h1 className="mb-2 text-xl font-semibold">תוכן ועמודים סטטיים</h1>
       <p className="mb-6 text-sm text-neutral-500">
-        עריכת עמוד הבית ובאנרים תתבסס בהמשך על מודל ה-ContentBlock. להלן עמודי המדיניות/תקנון
-        הניתנים לעריכה כבר עכשיו.
+        עריכת פס ההודעה ובאנר עמוד הבית, וכן עמודי המדיניות/תקנון הניתנים לעריכה.
       </p>
+
+      <div className="mb-8 space-y-6">
+        <AnnouncementBarForm initial={announcement} />
+        <HomepageHeroForm initial={hero} />
+      </div>
 
       <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white">
         <table className="w-full text-sm">

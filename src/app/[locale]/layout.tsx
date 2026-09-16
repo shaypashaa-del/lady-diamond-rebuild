@@ -13,6 +13,9 @@ import { CookieConsentBanner } from "@/components/layout/CookieConsentBanner";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { organizationSchema, websiteSchema } from "@/lib/schema";
 import { SITE_URL } from "@/lib/site-config";
+import { getContentBlock, type AnnouncementBarContent } from "@/server/actions/content-blocks";
+import { CONTENT_KEYS } from "@/lib/content-keys";
+import { t as tContent } from "@/lib/i18n-content";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -78,6 +81,8 @@ export default async function LocaleLayout({
 
   const dir = rtlLocales.includes(locale as Locale) ? "rtl" : "ltr";
 
+  const announcement = await getContentBlock<AnnouncementBarContent>(CONTENT_KEYS.announcementBar);
+
   return (
     <html
       lang={locale}
@@ -88,7 +93,10 @@ export default async function LocaleLayout({
         <JsonLd data={[organizationSchema(), websiteSchema()]} />
         <NextIntlClientProvider>
           <ReferralCapture />
-          <AnnouncementBar />
+          <AnnouncementBar
+            text={announcement ? tContent(announcement.text, locale as Locale) : undefined}
+            subscribeLabel={announcement ? tContent(announcement.linkText, locale as Locale) : undefined}
+          />
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />

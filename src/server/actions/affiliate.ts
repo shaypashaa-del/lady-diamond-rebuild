@@ -202,11 +202,17 @@ export async function updateAffiliateCommission(id: string, formData: FormData) 
   const fixedCommissionRaw = formData.get("fixedCommission");
   const tier = String(formData.get("tier") ?? "BRONZE");
 
+  // A negative override/fixed amount would make calculateCommission return a
+  // negative commission, corrupting payout totals — clamp to zero rather
+  // than trust the raw input.
+  const commissionOverride = commissionOverrideRaw ? Math.max(0, Number(commissionOverrideRaw)) : null;
+  const fixedCommission = fixedCommissionRaw ? Math.max(0, Number(fixedCommissionRaw)) : null;
+
   await prisma.affiliate.update({
     where: { id },
     data: {
-      commissionOverride: commissionOverrideRaw ? Number(commissionOverrideRaw) : null,
-      fixedCommission: fixedCommissionRaw ? Number(fixedCommissionRaw) : null,
+      commissionOverride,
+      fixedCommission,
       tier: tier as "BRONZE" | "SILVER" | "GOLD" | "DIAMOND",
     },
   });

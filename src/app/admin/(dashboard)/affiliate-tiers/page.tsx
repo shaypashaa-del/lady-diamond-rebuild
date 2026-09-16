@@ -19,6 +19,7 @@ export default async function AdminAffiliateTiersPage() {
       <p className="mb-6 text-sm text-neutral-500">
         קובע את אחוז העמלה האוטומטי לפי רמת השותף. עמלה מותאמת אישית שנקבעה ידנית לשותף
         (בעמוד השותפים) גוברת על הגדרה זו. רמת השותף עצמה עדיין נקבעת ידנית בעמוד השותפים.
+        שדה &quot;בונוס&quot; נשמר להפניה עתידית בלבד — הוא אינו משולם אוטומטית כרגע.
       </p>
 
       <div className="space-y-4">

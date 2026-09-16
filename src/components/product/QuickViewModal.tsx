@@ -54,33 +54,45 @@ export function QuickViewModal({ product, onClose }: { product: SampleProduct; o
           <p className="mt-2 font-semibold">{product.price.toFixed(2)} ₪</p>
           {product.blurb && <p className="mt-3 text-sm text-neutral-500">{product.blurb}</p>}
 
-          {!product.hasVariants && (
-            <div className="mt-4 flex items-center gap-3">
-              <div className="flex items-center border border-neutral-300">
-                <button onClick={() => setQuantity((q) => Math.max(1, q - 1))} className="px-3 py-2 text-sm">
-                  −
-                </button>
-                <span className="w-8 text-center text-sm">{quantity}</span>
-                <button onClick={() => setQuantity((q) => q + 1)} className="px-3 py-2 text-sm">
-                  +
+          {product.hasVariants ? (
+            <>
+              <p className="mt-4 text-xs text-neutral-500">{tQuick("hasVariantsNotice")}</p>
+              <Link
+                href={`/product/${product.slug}`}
+                onClick={onClose}
+                className="mt-4 block border border-neutral-900 py-2 text-center text-xs font-semibold uppercase tracking-wide hover:bg-neutral-900 hover:text-white"
+              >
+                {tQuick("viewDetails")}
+              </Link>
+            </>
+          ) : (
+            <>
+              <div className="mt-4 flex items-center gap-3">
+                <div className="flex items-center border border-neutral-300">
+                  <button onClick={() => setQuantity((q) => Math.max(1, q - 1))} className="px-3 py-2 text-sm">
+                    −
+                  </button>
+                  <span className="w-8 text-center text-sm">{quantity}</span>
+                  <button onClick={() => setQuantity((q) => q + 1)} className="px-3 py-2 text-sm">
+                    +
+                  </button>
+                </div>
+                <button
+                  onClick={handleAddToCart}
+                  className="flex-1 border border-neutral-900 py-2 text-xs font-semibold uppercase tracking-wide hover:bg-neutral-900 hover:text-white"
+                >
+                  {added ? "✓" : t("addToCart")}
                 </button>
               </div>
-              <button
-                onClick={handleAddToCart}
-                className="flex-1 border border-neutral-900 py-2 text-xs font-semibold uppercase tracking-wide hover:bg-neutral-900 hover:text-white"
+              <Link
+                href={`/product/${product.slug}`}
+                onClick={onClose}
+                className="mt-4 block text-center text-xs font-semibold uppercase tracking-wide underline underline-offset-4"
               >
-                {added ? "✓" : t("addToCart")}
-              </button>
-            </div>
+                {tQuick("viewDetails")}
+              </Link>
+            </>
           )}
-
-          <Link
-            href={`/product/${product.slug}`}
-            onClick={onClose}
-            className="mt-4 block text-center text-xs font-semibold uppercase tracking-wide underline underline-offset-4"
-          >
-            {tQuick("viewDetails")}
-          </Link>
         </div>
       </div>
     </div>

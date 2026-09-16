@@ -264,7 +264,8 @@
   },
   "QuickView": {
     "viewDetails": "View Details",
-    "close": "Close"
+    "close": "Close",
+    "hasVariantsNotice": "This product has multiple options (size/color). Select an option on the product page."
   },
   "Wishlist": {
     "title": "Wishlist",

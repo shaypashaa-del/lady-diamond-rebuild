@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { isValidEmail } from "@/lib/validation";
 
 export type NewsletterResult = { error: string } | { subscribed: true };
 
@@ -12,7 +13,7 @@ export async function subscribeToNewsletter(
     .trim()
     .toLowerCase();
 
-  if (!email || !email.includes("@")) {
+  if (!isValidEmail(email)) {
     return { error: "כתובת אימייל לא תקינה." };
   }
 

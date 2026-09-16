@@ -10,6 +10,7 @@ import { createSession } from "@/lib/auth/session";
 import { generateAffiliateCode } from "@/lib/affiliate-code";
 import { requireAffiliateSession, requireAdminSession } from "@/lib/auth/guards";
 import { isRateLimited, recordAttempt } from "@/lib/auth/rate-limit";
+import { isValidEmail, truncate } from "@/lib/validation";
 import type { AuthResult } from "@/server/actions/auth";
 
 const REF_COOKIE = "ld_ref";
@@ -36,21 +37,24 @@ export async function applyAsAffiliate(
   _prevState: AuthResult,
   formData: FormData
 ): Promise<AuthResult> {
-  const name = String(formData.get("name") ?? "").trim();
+  const name = truncate(String(formData.get("name") ?? "").trim(), 200);
   const email = String(formData.get("email") ?? "")
     .trim()
     .toLowerCase();
-  const phone = String(formData.get("phone") ?? "").trim() || null;
+  const phone = truncate(String(formData.get("phone") ?? "").trim(), 50) || null;
   const password = String(formData.get("password") ?? "");
-  const website = String(formData.get("website") ?? "").trim() || undefined;
-  const socialInstagram = String(formData.get("socialInstagram") ?? "").trim() || undefined;
-  const socialTiktok = String(formData.get("socialTiktok") ?? "").trim() || undefined;
-  const socialFacebook = String(formData.get("socialFacebook") ?? "").trim() || undefined;
-  const socialYoutube = String(formData.get("socialYoutube") ?? "").trim() || undefined;
-  const promotionMethod = String(formData.get("promotionMethod") ?? "").trim() || undefined;
+  const website = truncate(String(formData.get("website") ?? "").trim(), 300) || undefined;
+  const socialInstagram = truncate(String(formData.get("socialInstagram") ?? "").trim(), 200) || undefined;
+  const socialTiktok = truncate(String(formData.get("socialTiktok") ?? "").trim(), 200) || undefined;
+  const socialFacebook = truncate(String(formData.get("socialFacebook") ?? "").trim(), 200) || undefined;
+  const socialYoutube = truncate(String(formData.get("socialYoutube") ?? "").trim(), 200) || undefined;
+  const promotionMethod = truncate(String(formData.get("promotionMethod") ?? "").trim(), 2000) || undefined;
 
   if (!name || !email || password.length < 8) {
     return { error: "נא למלא שם, אימייל וסיסמה בת 8 תווים לפחות." };
+  }
+  if (!isValidEmail(email)) {
+    return { error: "כתובת אימייל לא תקינה." };
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });

@@ -4,10 +4,11 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import { requireAdminSession } from "@/lib/auth/guards";
+import { truncate } from "@/lib/validation";
 
 export async function addCustomerNote(userId: string, formData: FormData) {
   await requireAdminSession();
-  const body = String(formData.get("body") ?? "").trim();
+  const body = truncate(String(formData.get("body") ?? "").trim(), 5000);
   if (!body) return;
 
   const session = await getSession();

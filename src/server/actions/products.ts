@@ -145,7 +145,7 @@ export async function deleteProduct(id: string) {
 export async function duplicateProduct(id: string) {
   const original = await prisma.product.findUniqueOrThrow({
     where: { id },
-    include: { categories: true },
+    include: { categories: true, tags: true, variants: true, images: true },
   });
 
   const copy = await prisma.product.create({
@@ -154,9 +154,12 @@ export async function duplicateProduct(id: string) {
       name: original.name as object,
       shortDescription: original.shortDescription as object | undefined,
       description: original.description as object | undefined,
+      seoTitle: original.seoTitle as object | undefined,
+      seoDescription: original.seoDescription as object | undefined,
       basePrice: original.basePrice,
       salePrice: original.salePrice,
       inventory: original.inventory,
+      weightGrams: original.weightGrams,
       status: ProductStatus.DRAFT,
       isFeatured: false,
     },
@@ -165,6 +168,31 @@ export async function duplicateProduct(id: string) {
   for (const c of original.categories) {
     await prisma.productCategory.create({
       data: { productId: copy.id, categoryId: c.categoryId },
+    });
+  }
+
+  for (const t of original.tags) {
+    await prisma.productTag.create({ data: { productId: copy.id, tagId: t.tagId } });
+  }
+
+  for (const v of original.variants) {
+    await prisma.productVariant.create({
+      data: {
+        productId: copy.id,
+        attributes: v.attributes as object,
+        price: v.price,
+        salePrice: v.salePrice,
+        inventory: v.inventory,
+        imageId: v.imageId,
+        isDefault: v.isDefault,
+        // sku is unique — the copy can't reuse the original's SKU.
+      },
+    });
+  }
+
+  for (const img of original.images) {
+    await prisma.productImage.create({
+      data: { productId: copy.id, mediaId: img.mediaId, sortOrder: img.sortOrder, altText: img.altText },
     });
   }
 

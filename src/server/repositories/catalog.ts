@@ -73,8 +73,12 @@ export async function getRelatedProducts(
 }
 
 export function getProductBySlug(slug: string) {
-  return prisma.product.findUnique({
-    where: { slug },
+  // `findFirst`, not `findUnique`, because adding the `status` filter turns
+  // this into a non-unique where clause — otherwise a DRAFT product's page
+  // would still render for anyone who knows or guesses its slug, even though
+  // it's excluded from every list/search/sitemap.
+  return prisma.product.findFirst({
+    where: { slug, status: "PUBLISHED" },
     include: {
       variants: true,
       categories: { include: { category: true } },

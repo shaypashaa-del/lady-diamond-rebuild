@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { createShippingRule, deleteShippingRule, toggleShippingRule } from "@/server/actions/shipping";
+import { deleteShippingRule, toggleShippingRule } from "@/server/actions/shipping";
+import { CreateShippingRuleForm } from "@/components/admin/CreateShippingRuleForm";
 
 const typeLabels: Record<string, string> = {
   FREE: "משלוח חינם",
@@ -59,22 +60,7 @@ export default async function AdminShippingPage() {
         </table>
       </div>
 
-      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-neutral-700">כלל חדש</h2>
-      <form action={createShippingRule} className="grid max-w-2xl grid-cols-2 gap-4 sm:grid-cols-5">
-        <input name="name" placeholder="שם" required className="col-span-2 border border-neutral-300 px-3 py-2 text-sm" />
-        <select name="type" className="border border-neutral-300 px-3 py-2 text-sm">
-          <option value="FREE">משלוח חינם</option>
-          <option value="FLAT_RATE">תעריף אחיד</option>
-          <option value="BY_COUNTRY">לפי מדינה</option>
-          <option value="BY_ORDER_VALUE">לפי סכום הזמנה</option>
-        </select>
-        <input name="country" placeholder="מדינה (אם רלוונטי)" className="border border-neutral-300 px-3 py-2 text-sm" />
-        <input name="minOrderValue" type="number" placeholder="סכום מינימלי" className="border border-neutral-300 px-3 py-2 text-sm" />
-        <input name="price" type="number" step="0.01" placeholder="מחיר" className="col-span-2 border border-neutral-300 px-3 py-2 text-sm" />
-        <button type="submit" className="col-span-2 rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800">
-          הוספת כלל
-        </button>
-      </form>
+      <CreateShippingRuleForm />
     </div>
   );
 }

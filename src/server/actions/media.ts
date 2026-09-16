@@ -44,6 +44,7 @@ export async function uploadMedia(formData: FormData) {
   });
 
   revalidatePath("/admin/media");
+  return { uploaded: true as const };
 }
 
 export async function deleteMedia(id: string) {

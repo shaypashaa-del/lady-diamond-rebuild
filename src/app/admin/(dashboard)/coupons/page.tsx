@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { createCoupon, toggleCoupon, deleteCoupon } from "@/server/actions/coupons";
+import { toggleCoupon, deleteCoupon } from "@/server/actions/coupons";
+import { CreateCouponForm } from "@/components/admin/CreateCouponForm";
 
 export default async function AdminCouponsPage() {
   const [coupons, affiliates] = await Promise.all([
@@ -65,28 +66,7 @@ export default async function AdminCouponsPage() {
         </table>
       </div>
 
-      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-neutral-700">קופון חדש</h2>
-      <form action={createCoupon} className="grid max-w-2xl grid-cols-2 gap-4 sm:grid-cols-4">
-        <input name="code" placeholder="קוד" required dir="ltr" className="border border-neutral-300 px-3 py-2 text-sm" />
-        <select name="discountType" className="border border-neutral-300 px-3 py-2 text-sm">
-          <option value="PERCENTAGE">אחוז הנחה</option>
-          <option value="FIXED">סכום קבוע</option>
-        </select>
-        <input name="discountValue" type="number" step="0.01" placeholder="ערך" required className="border border-neutral-300 px-3 py-2 text-sm" />
-        <input name="usageLimit" type="number" placeholder="מגבלת שימושים" className="border border-neutral-300 px-3 py-2 text-sm" />
-        <select name="affiliateId" className="border border-neutral-300 px-3 py-2 text-sm">
-          <option value="">— ללא שיוך לשותף —</option>
-          {affiliates.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.user.name} ({a.code})
-            </option>
-          ))}
-        </select>
-        <input name="expiresAt" type="date" className="col-span-2 border border-neutral-300 px-3 py-2 text-sm" />
-        <button type="submit" className="col-span-2 rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800">
-          יצירת קופון
-        </button>
-      </form>
+      <CreateCouponForm affiliates={affiliates} />
     </div>
   );
 }

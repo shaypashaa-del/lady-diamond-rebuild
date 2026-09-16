@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { updateOrderFulfillment } from "@/server/actions/order-management";
+import { OrderFulfillmentForm } from "@/components/admin/OrderFulfillmentForm";
 
 export default async function AdminOrderDetailPage({
   params,
@@ -87,40 +87,12 @@ export default async function AdminOrderDetailPage({
         <div>
           <div className="rounded-lg border border-neutral-200 bg-white p-5">
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">ניהול הזמנה</h2>
-            <form action={updateOrderFulfillment.bind(null, order.id)} className="space-y-4">
-              <div>
-                <label className="mb-1 block text-xs font-medium text-neutral-500">סטטוס הזמנה</label>
-                <select name="status" defaultValue={order.status} className="w-full border border-neutral-300 px-3 py-2 text-sm">
-                  <option value="PENDING">ממתינה</option>
-                  <option value="PROCESSING">בטיפול</option>
-                  <option value="SHIPPED">נשלחה</option>
-                  <option value="COMPLETED">הושלמה</option>
-                  <option value="CANCELLED">בוטלה</option>
-                  <option value="REFUNDED">זוכתה</option>
-                </select>
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-medium text-neutral-500">סטטוס תשלום</label>
-                <select name="paymentStatus" defaultValue={order.paymentStatus} className="w-full border border-neutral-300 px-3 py-2 text-sm">
-                  <option value="PENDING">ממתין</option>
-                  <option value="PAID">שולם</option>
-                  <option value="FAILED">נכשל</option>
-                  <option value="REFUNDED">זוכה</option>
-                </select>
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-medium text-neutral-500">מספר מעקב משלוח</label>
-                <input
-                  name="trackingNumber"
-                  defaultValue={order.trackingNumber ?? ""}
-                  dir="ltr"
-                  className="w-full border border-neutral-300 px-3 py-2 text-sm"
-                />
-              </div>
-              <button type="submit" className="w-full rounded bg-neutral-900 py-2.5 text-sm font-medium text-white hover:bg-neutral-800">
-                שמירת עדכון
-              </button>
-            </form>
+            <OrderFulfillmentForm
+              orderId={order.id}
+              status={order.status}
+              paymentStatus={order.paymentStatus}
+              trackingNumber={order.trackingNumber}
+            />
             <p className="mt-3 text-xs text-neutral-400">
               ביטול/זיכוי הזמנה עם שותף מפנה יבטל אוטומטית עמלה שממתינה לאישור.
             </p>

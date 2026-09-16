@@ -4,7 +4,13 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import type { OrderStatus, PaymentStatus } from "@/generated/prisma/enums";
 
-export async function updateOrderFulfillment(id: string, formData: FormData) {
+export type OrderFulfillmentResult = { error: string } | { saved: true } | undefined;
+
+export async function updateOrderFulfillment(
+  id: string,
+  _prevState: OrderFulfillmentResult,
+  formData: FormData
+): Promise<OrderFulfillmentResult> {
   const status = String(formData.get("status")) as OrderStatus;
   const paymentStatus = String(formData.get("paymentStatus")) as PaymentStatus;
   const trackingNumber = String(formData.get("trackingNumber") ?? "") || null;
@@ -26,4 +32,5 @@ export async function updateOrderFulfillment(id: string, formData: FormData) {
 
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${id}`);
+  return { saved: true };
 }

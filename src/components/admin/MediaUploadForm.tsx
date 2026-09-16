@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { uploadMedia } from "@/server/actions/media";
 
-type UploadResult = { error: string } | void;
+type UploadResult = { error: string } | { uploaded: true } | undefined;
 
 export function MediaUploadForm() {
   const [state, action, pending] = useActionState<UploadResult, FormData>(
@@ -28,7 +28,10 @@ export function MediaUploadForm() {
       >
         {pending ? "מעלה..." : "העלאה"}
       </button>
-      {state?.error && <p className="w-full text-sm text-rose-600">{state.error}</p>}
+      {state && "error" in state && <p className="w-full text-sm text-rose-600">{state.error}</p>}
+      {state && "uploaded" in state && (
+        <p className="w-full text-sm text-emerald-700">התמונה הועלתה בהצלחה.</p>
+      )}
     </form>
   );
 }

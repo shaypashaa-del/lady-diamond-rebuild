@@ -9,7 +9,12 @@ export async function getSetting<T>(key: string, fallback: T): Promise<T> {
   return row ? (row.value as T) : fallback;
 }
 
-export async function updateSettings(formData: FormData) {
+export type SettingsFormResult = { error: string } | { saved: true } | undefined;
+
+export async function updateSettings(
+  _prevState: SettingsFormResult,
+  formData: FormData
+): Promise<SettingsFormResult> {
   const globalCommissionPercent = Number(formData.get("globalCommissionPercent") ?? 10);
   const attributionDays = Number(formData.get("attributionDays") ?? 30);
   const autoApproveAffiliates = formData.get("autoApproveAffiliates") === "on";
@@ -39,4 +44,5 @@ export async function updateSettings(formData: FormData) {
   ]);
 
   revalidatePath("/admin/settings");
+  return { saved: true };
 }

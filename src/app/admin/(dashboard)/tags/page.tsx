@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import { createTag, deleteTag } from "@/server/actions/tags";
+import { deleteTag } from "@/server/actions/tags";
 import { t as localize, type LocalizedText } from "@/lib/i18n-content";
+import { CreateTagForm } from "@/components/admin/CreateTagForm";
 
 export default async function AdminTagsPage() {
   const tags = await prisma.tag.findMany({
@@ -46,15 +47,7 @@ export default async function AdminTagsPage() {
         </table>
       </div>
 
-      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-neutral-700">תגית חדשה</h2>
-      <form action={createTag} className="grid max-w-xl grid-cols-3 gap-3">
-        <input name="name_he" placeholder="עברית" required className="border border-neutral-300 px-3 py-2 text-sm" />
-        <input name="name_en" placeholder="English" className="border border-neutral-300 px-3 py-2 text-sm" />
-        <input name="name_ru" placeholder="Русский" className="border border-neutral-300 px-3 py-2 text-sm" />
-        <button type="submit" className="col-span-3 rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800">
-          יצירת תגית
-        </button>
-      </form>
+      <CreateTagForm />
     </div>
   );
 }

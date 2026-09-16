@@ -8,11 +8,22 @@ import { prisma } from "@/lib/prisma";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { createSession } from "@/lib/auth/session";
 import { generateAffiliateCode } from "@/lib/affiliate-code";
+import { requireAffiliateSession } from "@/lib/auth/guards";
 import type { AuthResult } from "@/server/actions/auth";
 
 const REF_COOKIE = "ld_ref";
 const VISITOR_COOKIE = "ld_visitor";
 const DEFAULT_ATTRIBUTION_DAYS = 30;
+
+export type AffiliatePaymentDetails = {
+  method: "bank_transfer" | "paypal" | "bit";
+  accountOwner?: string;
+  bankName?: string;
+  branchNumber?: string;
+  accountNumber?: string;
+  paypalEmail?: string;
+  bitPhone?: string;
+};
 
 async function getAttributionWindowDays(): Promise<number> {
   const setting = await prisma.setting.findUnique({ where: { key: "affiliate_attribution_days" } });
@@ -157,6 +168,28 @@ export async function suspendAffiliate(id: string) {
 export async function reactivateAffiliate(id: string) {
   await prisma.affiliate.update({ where: { id }, data: { status: "APPROVED" } });
   revalidatePath("/admin/affiliates");
+}
+
+export async function updateMyPaymentDetails(formData: FormData) {
+  const session = await requireAffiliateSession();
+  const method = String(formData.get("method") ?? "bank_transfer") as AffiliatePaymentDetails["method"];
+
+  const details: AffiliatePaymentDetails = {
+    method,
+    accountOwner: String(formData.get("accountOwner") ?? "").trim() || undefined,
+    bankName: String(formData.get("bankName") ?? "").trim() || undefined,
+    branchNumber: String(formData.get("branchNumber") ?? "").trim() || undefined,
+    accountNumber: String(formData.get("accountNumber") ?? "").trim() || undefined,
+    paypalEmail: String(formData.get("paypalEmail") ?? "").trim() || undefined,
+    bitPhone: String(formData.get("bitPhone") ?? "").trim() || undefined,
+  };
+
+  await prisma.affiliate.update({
+    where: { userId: session.userId },
+    data: { paymentDetails: details },
+  });
+
+  revalidatePath("/affiliate/dashboard");
 }
 
 export async function updateAffiliateCommission(id: string, formData: FormData) {

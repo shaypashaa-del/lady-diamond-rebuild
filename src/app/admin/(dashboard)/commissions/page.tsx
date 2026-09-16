@@ -1,5 +1,20 @@
 import { prisma } from "@/lib/prisma";
 import { approveCommission, rejectCommission, payoutAffiliate } from "@/server/actions/commissions";
+import type { AffiliatePaymentDetails } from "@/server/actions/affiliate";
+
+const paymentMethodLabels: Record<string, string> = {
+  bank_transfer: "העברה בנקאית",
+  paypal: "PayPal",
+  bit: "Bit",
+};
+
+function formatPaymentDetails(details: unknown): string {
+  const d = details as AffiliatePaymentDetails | null;
+  if (!d) return "לא הוגדרו פרטי תשלום";
+  if (d.method === "paypal") return `PayPal: ${d.paypalEmail ?? "—"}`;
+  if (d.method === "bit") return `Bit: ${d.bitPhone ?? "—"}`;
+  return `${paymentMethodLabels[d.method] ?? d.method} — ${d.accountOwner ?? "—"}, בנק ${d.bankName ?? "—"}, סניף ${d.branchNumber ?? "—"}, ח-ן ${d.accountNumber ?? "—"}`;
+}
 
 const statusLabels: Record<string, string> = {
   PENDING: "ממתינה",
@@ -21,10 +36,14 @@ export default async function AdminCommissionsPage() {
   ]);
 
   // Group approved-but-unpaid commissions by affiliate so admin can pay out per-affiliate.
-  const approvedByAffiliate = new Map<string, { name: string; total: number }>();
+  const approvedByAffiliate = new Map<string, { name: string; total: number; paymentDetails: unknown }>();
   for (const c of commissions) {
     if (c.status !== "APPROVED") continue;
-    const existing = approvedByAffiliate.get(c.affiliateId) ?? { name: c.affiliate.user.name, total: 0 };
+    const existing = approvedByAffiliate.get(c.affiliateId) ?? {
+      name: c.affiliate.user.name,
+      total: 0,
+      paymentDetails: c.affiliate.paymentDetails,
+    };
     existing.total += Number(c.amount);
     approvedByAffiliate.set(c.affiliateId, existing);
   }
@@ -40,11 +59,14 @@ export default async function AdminCommissionsPage() {
           </h2>
           <div className="flex flex-wrap gap-3">
             {[...approvedByAffiliate.entries()].map(([affiliateId, info]) => (
-              <form key={affiliateId} action={payoutAffiliate.bind(null, affiliateId)} className="flex items-center gap-2 rounded-lg border border-neutral-200 bg-white p-3">
+              <form key={affiliateId} action={payoutAffiliate.bind(null, affiliateId)} className="flex flex-col gap-2 rounded-lg border border-neutral-200 bg-white p-3">
                 <span className="text-sm">
                   {info.name}: <span className="font-semibold">{info.total.toFixed(2)} ₪</span>
                 </span>
-                <button type="submit" className="rounded bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-800">
+                <span className="text-xs text-neutral-500" dir="ltr">
+                  {formatPaymentDetails(info.paymentDetails)}
+                </span>
+                <button type="submit" className="self-start rounded bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-800">
                   סמן כשולם
                 </button>
               </form>

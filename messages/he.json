@@ -188,7 +188,15 @@
     "commissionPaid": "עמלה ששולמה",
     "recentSales": "מכירות אחרונות",
     "noSales": "אין עדיין מכירות.",
-    "logout": "התנתקות"
+    "logout": "התנתקות",
+    "paymentDetails": "פרטי תשלום",
+    "paymentMethod": "אמצעי תשלום",
+    "paymentBankTransfer": "העברה בנקאית",
+    "accountOwner": "שם בעל החשבון",
+    "bankName": "שם הבנק",
+    "branchNumber": "מספר סניף",
+    "accountNumber": "מספר חשבון",
+    "saveDetails": "שמירת פרטים"
   },
   "Checkout": {
     "title": "תשלום",

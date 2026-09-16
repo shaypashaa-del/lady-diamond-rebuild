@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { requireAffiliateSession } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { logout } from "@/server/actions/auth";
+import { updateMyPaymentDetails, type AffiliatePaymentDetails } from "@/server/actions/affiliate";
 import { AffiliateLinkGenerator } from "@/components/affiliate/AffiliateLinkGenerator";
 
 export default async function AffiliateDashboardPage() {
@@ -50,6 +51,8 @@ export default async function AffiliateDashboardPage() {
     select: { slug: true, name: true },
     take: 50,
   });
+
+  const payment = affiliate.paymentDetails as AffiliatePaymentDetails | null;
 
   const stats = [
     { label: t("clicks"), value: clicks },
@@ -103,6 +106,53 @@ export default async function AffiliateDashboardPage() {
       </div>
 
       <AffiliateLinkGenerator code={affiliate.code} products={products} />
+
+      <h2 className="mb-3 mt-10 text-sm font-semibold uppercase tracking-wide text-neutral-700">
+        {t("paymentDetails")}
+      </h2>
+      <form action={updateMyPaymentDetails} className="mb-10 space-y-3 rounded-lg border border-neutral-200 bg-white p-5">
+        <div>
+          <label className="mb-1 block text-xs font-medium text-neutral-500">{t("paymentMethod")}</label>
+          <select
+            name="method"
+            defaultValue={payment?.method ?? "bank_transfer"}
+            className="w-full border border-neutral-300 px-3 py-2 text-sm sm:w-64"
+          >
+            <option value="bank_transfer">{t("paymentBankTransfer")}</option>
+            <option value="paypal">PayPal</option>
+            <option value="bit">Bit</option>
+          </select>
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-neutral-500">{t("accountOwner")}</label>
+            <input name="accountOwner" defaultValue={payment?.accountOwner ?? ""} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-neutral-500">{t("bankName")}</label>
+            <input name="bankName" defaultValue={payment?.bankName ?? ""} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-neutral-500">{t("branchNumber")}</label>
+            <input name="branchNumber" defaultValue={payment?.branchNumber ?? ""} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-neutral-500">{t("accountNumber")}</label>
+            <input name="accountNumber" defaultValue={payment?.accountNumber ?? ""} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-neutral-500">PayPal Email</label>
+            <input name="paypalEmail" dir="ltr" defaultValue={payment?.paypalEmail ?? ""} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-neutral-500">Bit</label>
+            <input name="bitPhone" dir="ltr" defaultValue={payment?.bitPhone ?? ""} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+          </div>
+        </div>
+        <button type="submit" className="rounded bg-neutral-900 px-4 py-2 text-xs font-semibold text-white">
+          {t("saveDetails")}
+        </button>
+      </form>
 
       <h2 className="mb-3 mt-10 text-sm font-semibold uppercase tracking-wide text-neutral-700">
         {t("recentSales")}

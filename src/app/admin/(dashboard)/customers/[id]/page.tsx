@@ -22,7 +22,7 @@ export default async function AdminCustomerDetailPage({
     include: {
       orders: { orderBy: { createdAt: "desc" } },
       addresses: true,
-      notes: { orderBy: { createdAt: "desc" } },
+      notes: { orderBy: { createdAt: "desc" }, include: { author: true } },
     },
   });
 
@@ -92,7 +92,9 @@ export default async function AdminCustomerDetailPage({
         {customer.notes.map((note) => (
           <li key={note.id} className="rounded border border-neutral-200 bg-neutral-50 p-3 text-sm">
             <p>{note.body}</p>
-            <p className="mt-1 text-xs text-neutral-400">{note.createdAt.toLocaleString("he-IL")}</p>
+            <p className="mt-1 text-xs text-neutral-400">
+              {note.author?.name ?? "מערכת"} · {note.createdAt.toLocaleString("he-IL")}
+            </p>
           </li>
         ))}
         {customer.notes.length === 0 && <p className="text-sm text-neutral-400">אין הערות עדיין.</p>}

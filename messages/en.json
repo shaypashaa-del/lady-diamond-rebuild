@@ -188,7 +188,15 @@
     "commissionPaid": "Paid Commission",
     "recentSales": "Recent Sales",
     "noSales": "No sales yet.",
-    "logout": "Log Out"
+    "logout": "Log Out",
+    "paymentDetails": "Payment Details",
+    "paymentMethod": "Payment Method",
+    "paymentBankTransfer": "Bank Transfer",
+    "accountOwner": "Account Owner Name",
+    "bankName": "Bank Name",
+    "branchNumber": "Branch Number",
+    "accountNumber": "Account Number",
+    "saveDetails": "Save Details"
   },
   "Checkout": {
     "title": "Checkout",

@@ -188,7 +188,15 @@
     "commissionPaid": "Выплаченная комиссия",
     "recentSales": "Последние продажи",
     "noSales": "Продаж пока нет.",
-    "logout": "Выйти"
+    "logout": "Выйти",
+    "paymentDetails": "Платёжные данные",
+    "paymentMethod": "Способ оплаты",
+    "paymentBankTransfer": "Банковский перевод",
+    "accountOwner": "Имя владельца счёта",
+    "bankName": "Название банка",
+    "branchNumber": "Номер отделения",
+    "accountNumber": "Номер счёта",
+    "saveDetails": "Сохранить данные"
   },
   "Checkout": {
     "title": "Оформление заказа",

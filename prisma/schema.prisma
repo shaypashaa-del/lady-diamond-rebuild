@@ -34,7 +34,8 @@ model User {
   addresses  Address[]
   orders     Order[]
   affiliate  Affiliate?
-  notes      CustomerNote[]
+  notes      CustomerNote[] @relation("CustomerNoteSubject")
+  authoredNotes CustomerNote[] @relation("CustomerNoteAuthor")
   resetTokens PasswordResetToken[]
 
   @@index([role])
@@ -72,8 +73,9 @@ model Address {
 model CustomerNote {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation("CustomerNoteSubject", fields: [userId], references: [id], onDelete: Cascade)
   authorId  String?
+  author    User?    @relation("CustomerNoteAuthor", fields: [authorId], references: [id], onDelete: SetNull)
   body      String
   createdAt DateTime @default(now())
 

@@ -7,7 +7,7 @@ import { getSession } from "@/lib/auth/session";
 import { calculateShipping } from "@/server/services/shipping";
 import { calculateCommission } from "@/server/services/commission";
 import { paymentProviders, type PaymentMethodId } from "@/server/payments/types";
-import { saveMyAddress } from "@/server/actions/address";
+import { upsertAddress } from "@/lib/address-service";
 
 export type CheckoutLine = {
   productId: string; // product slug, resolved to a real id below
@@ -222,7 +222,7 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
   }
 
   if (session?.userId) {
-    await saveMyAddress(session.userId, input.billingAddress);
+    await upsertAddress(session.userId, input.billingAddress);
   }
 
   if (validAffiliate) {

@@ -2,13 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { requireAdminSession } from "@/lib/auth/guards";
 
 export async function approveCommission(id: string) {
+  await requireAdminSession();
   await prisma.commission.update({ where: { id }, data: { status: "APPROVED" } });
   revalidatePath("/admin/commissions");
 }
 
 export async function rejectCommission(id: string) {
+  await requireAdminSession();
   await prisma.commission.update({ where: { id }, data: { status: "REJECTED" } });
   revalidatePath("/admin/commissions");
 }
@@ -17,6 +20,7 @@ export async function rejectCommission(id: string) {
 // records a Payout row with their total — matches spec: "Admin יכול לסמן
 // Commission כ-Paid... שמור Payment History".
 export async function payoutAffiliate(affiliateId: string) {
+  await requireAdminSession();
   const commissions = await prisma.commission.findMany({
     where: { affiliateId, status: "APPROVED", payoutId: null },
   });

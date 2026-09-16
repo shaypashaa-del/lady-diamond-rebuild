@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import type { DiscountType } from "@/generated/prisma/enums";
+import { requireAdminSession } from "@/lib/auth/guards";
 
 export type CouponFormResult = { error: string } | { created: true } | undefined;
 
@@ -10,6 +11,7 @@ export async function createCoupon(
   _prevState: CouponFormResult,
   formData: FormData
 ): Promise<CouponFormResult> {
+  await requireAdminSession();
   const code = String(formData.get("code") ?? "").trim().toUpperCase();
   const discountType = String(formData.get("discountType")) as DiscountType;
   const discountValue = Number(formData.get("discountValue"));
@@ -39,11 +41,13 @@ export async function createCoupon(
 }
 
 export async function toggleCoupon(id: string, isActive: boolean) {
+  await requireAdminSession();
   await prisma.coupon.update({ where: { id }, data: { isActive } });
   revalidatePath("/admin/coupons");
 }
 
 export async function deleteCoupon(id: string) {
+  await requireAdminSession();
   await prisma.coupon.delete({ where: { id } });
   revalidatePath("/admin/coupons");
 }

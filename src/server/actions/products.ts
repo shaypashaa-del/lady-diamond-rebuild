@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { ProductStatus } from "@/generated/prisma/enums";
+import { requireAdminSession } from "@/lib/auth/guards";
 
 function localizedFromForm(formData: FormData, prefix: string) {
   return {
@@ -70,6 +71,7 @@ async function syncTagsAndRelated(productId: string, tagIds: string[], relatedId
 }
 
 export async function createProduct(formData: FormData) {
+  await requireAdminSession();
   const data = readProductForm(formData);
 
   const product = await prisma.product.create({
@@ -103,6 +105,7 @@ export async function createProduct(formData: FormData) {
 }
 
 export async function updateProduct(id: string, formData: FormData) {
+  await requireAdminSession();
   const data = readProductForm(formData);
 
   await prisma.product.update({
@@ -138,11 +141,13 @@ export async function updateProduct(id: string, formData: FormData) {
 }
 
 export async function deleteProduct(id: string) {
+  await requireAdminSession();
   await prisma.product.delete({ where: { id } });
   revalidatePath("/admin/products");
 }
 
 export async function duplicateProduct(id: string) {
+  await requireAdminSession();
   const original = await prisma.product.findUniqueOrThrow({
     where: { id },
     include: { categories: true, tags: true, variants: true, images: true },

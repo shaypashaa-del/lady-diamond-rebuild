@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { requireAdminSession } from "@/lib/auth/guards";
 
 function localizedFromForm(formData: FormData, prefix: string) {
   return {
@@ -12,6 +13,7 @@ function localizedFromForm(formData: FormData, prefix: string) {
 }
 
 export async function addVariant(productId: string, formData: FormData) {
+  await requireAdminSession();
   const attributeName = String(formData.get("attributeName") ?? "color");
   const price = Number(formData.get("price"));
   const salePriceRaw = formData.get("salePrice");
@@ -33,6 +35,7 @@ export async function addVariant(productId: string, formData: FormData) {
 }
 
 export async function deleteVariant(id: string, productId: string) {
+  await requireAdminSession();
   await prisma.productVariant.delete({ where: { id } });
   revalidatePath(`/admin/products/${productId}`);
 }

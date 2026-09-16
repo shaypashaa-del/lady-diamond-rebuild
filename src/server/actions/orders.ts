@@ -121,12 +121,25 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
 
   // Fraud prevention: don't attribute (and don't pay commission on) an
   // affiliate referring their own purchase, when the admin setting is on.
-  if (validAffiliate && session?.userId === validAffiliate.userId) {
-    const preventSelfReferral = await prisma.setting.findUnique({
-      where: { key: "affiliate_prevent_self_referral" },
+  // Checked by user id AND by email so an affiliate can't trivially bypass
+  // this by checking out as a guest (no session) with their own email while
+  // still using their own ?ref= link or personal coupon.
+  if (validAffiliate) {
+    const affiliateUser = await prisma.user.findUnique({
+      where: { id: validAffiliate.userId },
+      select: { email: true },
     });
-    if (preventSelfReferral?.value !== false) {
-      validAffiliate = null;
+    const isSelfReferral =
+      session?.userId === validAffiliate.userId ||
+      affiliateUser?.email.toLowerCase() === input.email.trim().toLowerCase();
+
+    if (isSelfReferral) {
+      const preventSelfReferral = await prisma.setting.findUnique({
+        where: { key: "affiliate_prevent_self_referral" },
+      });
+      if (preventSelfReferral?.value !== false) {
+        validAffiliate = null;
+      }
     }
   }
 

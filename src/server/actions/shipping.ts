@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import type { ShippingMethodType } from "@/generated/prisma/enums";
+import { requireAdminSession } from "@/lib/auth/guards";
 
 export type ShippingRuleFormResult = { error: string } | { created: true } | undefined;
 
@@ -10,6 +11,7 @@ export async function createShippingRule(
   _prevState: ShippingRuleFormResult,
   formData: FormData
 ): Promise<ShippingRuleFormResult> {
+  await requireAdminSession();
   const name = String(formData.get("name") ?? "").trim();
   const type = String(formData.get("type")) as ShippingMethodType;
   const country = String(formData.get("country") ?? "") || null;
@@ -32,11 +34,13 @@ export async function createShippingRule(
 }
 
 export async function deleteShippingRule(id: string) {
+  await requireAdminSession();
   await prisma.shippingRule.delete({ where: { id } });
   revalidatePath("/admin/shipping");
 }
 
 export async function toggleShippingRule(id: string, isActive: boolean) {
+  await requireAdminSession();
   await prisma.shippingRule.update({ where: { id }, data: { isActive } });
   revalidatePath("/admin/shipping");
 }

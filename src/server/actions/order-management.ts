@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import type { OrderStatus, PaymentStatus } from "@/generated/prisma/enums";
+import { requireAdminSession } from "@/lib/auth/guards";
 
 export type OrderFulfillmentResult = { error: string } | { saved: true } | undefined;
 
@@ -11,6 +12,7 @@ export async function updateOrderFulfillment(
   _prevState: OrderFulfillmentResult,
   formData: FormData
 ): Promise<OrderFulfillmentResult> {
+  await requireAdminSession();
   const status = String(formData.get("status")) as OrderStatus;
   const paymentStatus = String(formData.get("paymentStatus")) as PaymentStatus;
   const trackingNumber = String(formData.get("trackingNumber") ?? "") || null;

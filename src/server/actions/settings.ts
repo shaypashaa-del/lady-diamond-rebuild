@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { SETTINGS_KEYS } from "@/lib/settings-keys";
+import { requireAdminSession } from "@/lib/auth/guards";
 
 export async function getSetting<T>(key: string, fallback: T): Promise<T> {
   const row = await prisma.setting.findUnique({ where: { key } });
@@ -15,6 +16,7 @@ export async function updateSettings(
   _prevState: SettingsFormResult,
   formData: FormData
 ): Promise<SettingsFormResult> {
+  await requireAdminSession();
   const globalCommissionPercent = Number(formData.get("globalCommissionPercent") ?? 10);
   const attributionDays = Number(formData.get("attributionDays") ?? 30);
   const autoApproveAffiliates = formData.get("autoApproveAffiliates") === "on";

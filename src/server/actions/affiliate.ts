@@ -8,7 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { createSession } from "@/lib/auth/session";
 import { generateAffiliateCode } from "@/lib/affiliate-code";
-import { requireAffiliateSession } from "@/lib/auth/guards";
+import { requireAffiliateSession, requireAdminSession } from "@/lib/auth/guards";
 import type { AuthResult } from "@/server/actions/auth";
 
 const REF_COOKIE = "ld_ref";
@@ -151,21 +151,25 @@ export async function trackReferral(code: string, landingPage: string, utm: Reco
 // --- Admin actions ---
 
 export async function approveAffiliate(id: string) {
+  await requireAdminSession();
   await prisma.affiliate.update({ where: { id }, data: { status: "APPROVED", approvedAt: new Date() } });
   revalidatePath("/admin/affiliates");
 }
 
 export async function rejectAffiliate(id: string) {
+  await requireAdminSession();
   await prisma.affiliate.update({ where: { id }, data: { status: "REJECTED" } });
   revalidatePath("/admin/affiliates");
 }
 
 export async function suspendAffiliate(id: string) {
+  await requireAdminSession();
   await prisma.affiliate.update({ where: { id }, data: { status: "SUSPENDED" } });
   revalidatePath("/admin/affiliates");
 }
 
 export async function reactivateAffiliate(id: string) {
+  await requireAdminSession();
   await prisma.affiliate.update({ where: { id }, data: { status: "APPROVED" } });
   revalidatePath("/admin/affiliates");
 }
@@ -193,6 +197,7 @@ export async function updateMyPaymentDetails(formData: FormData) {
 }
 
 export async function updateAffiliateCommission(id: string, formData: FormData) {
+  await requireAdminSession();
   const commissionOverrideRaw = formData.get("commissionOverride");
   const fixedCommissionRaw = formData.get("fixedCommission");
   const tier = String(formData.get("tier") ?? "BRONZE");

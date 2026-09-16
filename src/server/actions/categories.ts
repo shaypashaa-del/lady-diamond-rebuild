@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { requireAdminSession } from "@/lib/auth/guards";
 
 function localizedFromForm(formData: FormData, prefix: string) {
   return {
@@ -18,6 +19,7 @@ function optionalLocalizedFromForm(formData: FormData, prefix: string) {
 }
 
 export async function createCategory(formData: FormData) {
+  await requireAdminSession();
   const slug = String(formData.get("slug"));
   const name = localizedFromForm(formData, "name");
   const description = localizedFromForm(formData, "description");
@@ -35,6 +37,7 @@ export async function createCategory(formData: FormData) {
 }
 
 export async function updateCategory(id: string, formData: FormData) {
+  await requireAdminSession();
   const slug = String(formData.get("slug"));
   const name = localizedFromForm(formData, "name");
   const description = localizedFromForm(formData, "description");
@@ -53,6 +56,7 @@ export async function updateCategory(id: string, formData: FormData) {
 }
 
 export async function deleteCategory(id: string) {
+  await requireAdminSession();
   await prisma.category.delete({ where: { id } });
   revalidatePath("/admin/categories");
 }

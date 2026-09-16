@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import type { LocalizedText } from "@/lib/i18n-content";
 import { CONTENT_KEYS } from "@/lib/content-keys";
+import { requireAdminSession } from "@/lib/auth/guards";
 
 export type AnnouncementBarContent = {
   text: LocalizedText;
@@ -33,6 +34,7 @@ function localizedFromForm(formData: FormData, prefix: string): LocalizedText {
 }
 
 export async function updateAnnouncementBar(formData: FormData) {
+  await requireAdminSession();
   const data: AnnouncementBarContent = {
     text: localizedFromForm(formData, "text"),
     linkText: localizedFromForm(formData, "linkText"),
@@ -50,6 +52,7 @@ export async function updateAnnouncementBar(formData: FormData) {
 }
 
 export async function updateHomepageHero(formData: FormData) {
+  await requireAdminSession();
   const data: HeroContent = {
     kicker: localizedFromForm(formData, "kicker"),
     title: localizedFromForm(formData, "title"),

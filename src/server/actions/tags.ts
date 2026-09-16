@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { requireAdminSession } from "@/lib/auth/guards";
 
 function slugify(text: string) {
   return text
@@ -17,6 +18,7 @@ export async function createTag(
   _prevState: TagFormResult,
   formData: FormData
 ): Promise<TagFormResult> {
+  await requireAdminSession();
   const nameHe = String(formData.get("name_he") ?? "").trim();
   if (!nameHe) return { error: "יש להזין שם בעברית." };
 
@@ -40,6 +42,7 @@ export async function createTag(
 }
 
 export async function deleteTag(id: string) {
+  await requireAdminSession();
   await prisma.tag.delete({ where: { id } });
   revalidatePath("/admin/tags");
 }

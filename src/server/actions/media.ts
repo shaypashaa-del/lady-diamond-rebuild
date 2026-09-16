@@ -5,6 +5,7 @@ import { writeFile, unlink } from "fs/promises";
 import path from "path";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { requireAdminSession } from "@/lib/auth/guards";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -17,6 +18,7 @@ const MAX_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
 // function's body for an upload to that provider; nothing else needs to
 // change since callers only depend on the returned MediaAsset shape.
 export async function uploadMedia(formData: FormData) {
+  await requireAdminSession();
   const file = formData.get("file");
   const altText = String(formData.get("altText") ?? "");
 
@@ -48,6 +50,7 @@ export async function uploadMedia(formData: FormData) {
 }
 
 export async function deleteMedia(id: string) {
+  await requireAdminSession();
   const media = await prisma.mediaAsset.findUnique({ where: { id } });
   if (!media) return;
 

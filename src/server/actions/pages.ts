@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { requireAdminSession } from "@/lib/auth/guards";
 
 function localizedFromForm(formData: FormData, prefix: string) {
   return {
@@ -12,6 +13,7 @@ function localizedFromForm(formData: FormData, prefix: string) {
 }
 
 export async function updatePage(id: string, formData: FormData) {
+  await requireAdminSession();
   await prisma.page.update({
     where: { id },
     data: {

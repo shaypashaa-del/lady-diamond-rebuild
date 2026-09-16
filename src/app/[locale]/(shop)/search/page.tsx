@@ -1,6 +1,6 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { ProductCard } from "@/components/product/ProductCard";
-import { getAllPublishedProducts } from "@/server/repositories/catalog";
+import { getAllPublishedProductsForSearch } from "@/server/repositories/catalog";
 import { toCardProduct } from "@/lib/catalog-view";
 import type { LocalizedText } from "@/lib/i18n-content";
 import type { Locale } from "@/i18n/routing";
@@ -20,7 +20,7 @@ export default async function SearchPage({
   const t = await getTranslations("Search");
   const tCat = await getTranslations("Category");
 
-  const products = query ? await getAllPublishedProducts() : [];
+  const products = query ? await getAllPublishedProductsForSearch() : [];
 
   const matches = products.filter((p) => {
     const name = p.name as LocalizedText;

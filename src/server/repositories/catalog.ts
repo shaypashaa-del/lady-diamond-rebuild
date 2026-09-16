@@ -13,7 +13,29 @@ export function getFeaturedProducts() {
   });
 }
 
-export function getAllPublishedProducts() {
+export const PRODUCTS_PAGE_SIZE = 24;
+
+export async function getAllPublishedProducts(page = 1) {
+  const where = { status: "PUBLISHED" as const };
+  const [products, totalCount] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PRODUCTS_PAGE_SIZE,
+      take: PRODUCTS_PAGE_SIZE,
+    }),
+    prisma.product.count({ where }),
+  ]);
+  return { products, totalCount };
+}
+
+// Unpaginated on purpose — search matches across he/en/ru name + SKU by
+// substring in-process (see search/page.tsx), which needs the full catalog,
+// not one page of it. Fine while the catalog is small; a Postgres full-text
+// index (tsvector) would be the next step once it grows large enough to
+// matter — do not reuse getAllPublishedProducts's paginated version here.
+export function getAllPublishedProductsForSearch() {
   return prisma.product.findMany({
     where: { status: "PUBLISHED" },
     include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },
@@ -25,15 +47,22 @@ export function getCategoryBySlug(slug: string) {
   return prisma.category.findUnique({ where: { slug }, include: { image: true } });
 }
 
-export function getProductsByCategorySlug(slug: string) {
-  return prisma.product.findMany({
-    where: {
-      status: "PUBLISHED",
-      categories: { some: { category: { slug } } },
-    },
-    include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },
-    orderBy: { createdAt: "desc" },
-  });
+export async function getProductsByCategorySlug(slug: string, page = 1) {
+  const where = {
+    status: "PUBLISHED" as const,
+    categories: { some: { category: { slug } } },
+  };
+  const [products, totalCount] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PRODUCTS_PAGE_SIZE,
+      take: PRODUCTS_PAGE_SIZE,
+    }),
+    prisma.product.count({ where }),
+  ]);
+  return { products, totalCount };
 }
 
 export function getAllCategories() {

@@ -7,7 +7,9 @@ import {
   getAllPublishedProducts,
   getCategoryBySlug,
   getProductsByCategorySlug,
+  PRODUCTS_PAGE_SIZE,
 } from "@/server/repositories/catalog";
+import { Link } from "@/i18n/navigation";
 import { toCardProduct } from "@/lib/catalog-view";
 import { t as localize, type LocalizedText } from "@/lib/i18n-content";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -60,30 +62,40 @@ export async function generateMetadata({
 
 export default async function CategoryPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
   const { slug } = await params;
+  const { page: pageRaw } = await searchParams;
+  // Guard against a negative/NaN/non-numeric ?page= value breaking the
+  // Prisma `skip` calculation — clamp to a sane positive integer.
+  const parsedPage = Number.parseInt(pageRaw ?? "1", 10);
+  const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+
   const locale = (await getLocale()) as Locale;
   const tNav = await getTranslations("Nav");
   const tCat = await getTranslations("Category");
 
   let title: string;
   let products;
+  let totalCount: number;
   let imageUrl: string | undefined;
 
   if (slug === "all") {
     title = tNav("shop");
-    products = await getAllPublishedProducts();
+    ({ products, totalCount } = await getAllPublishedProducts(page));
   } else {
     const category = await getCategoryBySlug(slug);
     if (!category) notFound();
     title = localize(category.name as LocalizedText, locale);
-    products = await getProductsByCategorySlug(slug);
+    ({ products, totalCount } = await getProductsByCategorySlug(slug, page));
     imageUrl = category.image?.url;
   }
 
   const cards = products.map((p) => toCardProduct(p, locale));
+  const totalPages = Math.max(1, Math.ceil(totalCount / PRODUCTS_PAGE_SIZE));
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-8">
@@ -100,16 +112,35 @@ export default async function CategoryPage({
       )}
       <h1 className="mb-2 text-center text-2xl font-semibold uppercase tracking-[0.2em]">{title}</h1>
       <p className="mb-10 text-center text-sm text-neutral-400">
-        {cards.length} {cards.length === 1 ? tCat("item") : tCat("items")}
+        {totalCount} {totalCount === 1 ? tCat("item") : tCat("items")}
       </p>
       {cards.length === 0 ? (
         <p className="text-center text-neutral-500">{tCat("noProducts")}</p>
       ) : (
-        <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
-          {cards.map((p) => (
-            <ProductCard key={p.slug} product={p} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+            {cards.map((p) => (
+              <ProductCard key={p.slug} product={p} />
+            ))}
+          </div>
+          {totalPages > 1 && (
+            <nav className="mt-12 flex items-center justify-center gap-2">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <Link
+                  key={p}
+                  href={p === 1 ? `/category/${slug}` : `/category/${slug}?page=${p}`}
+                  className={`flex h-9 w-9 items-center justify-center border text-sm ${
+                    p === page
+                      ? "border-neutral-900 bg-neutral-900 text-white"
+                      : "border-neutral-300 text-neutral-700 hover:border-neutral-900"
+                  }`}
+                >
+                  {p}
+                </Link>
+              ))}
+            </nav>
+          )}
+        </>
       )}
     </div>
   );

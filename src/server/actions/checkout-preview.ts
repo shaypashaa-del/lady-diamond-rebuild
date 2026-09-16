@@ -23,12 +23,20 @@ export async function getCheckoutPreview(
 
   if (couponCode) {
     const coupon = await prisma.coupon.findUnique({ where: { code: couponCode.toUpperCase() } });
-    if (!coupon || !coupon.isActive) {
+    // A single generic message, not "invalid" vs "expired" vs "used up" —
+    // this is an unauthenticated, unrate-limited endpoint (called live as
+    // the customer types), so distinct reasons would let someone enumerate
+    // which coupon codes exist purely by probing this preview for free,
+    // without ever placing an order. createOrder (the actual checkout path)
+    // keeps the specific messages since completing a real order is much
+    // higher friction per guess.
+    const invalid =
+      !coupon ||
+      !coupon.isActive ||
+      (coupon.expiresAt && coupon.expiresAt < new Date()) ||
+      (coupon.usageLimit != null && coupon.usageCount >= coupon.usageLimit);
+    if (invalid) {
       couponError = "קוד קופון לא תקין.";
-    } else if (coupon.expiresAt && coupon.expiresAt < new Date()) {
-      couponError = "תוקף הקופון פג.";
-    } else if (coupon.usageLimit != null && coupon.usageCount >= coupon.usageLimit) {
-      couponError = "הקופון מוצה.";
     } else {
       discount =
         coupon.discountType === "PERCENTAGE"

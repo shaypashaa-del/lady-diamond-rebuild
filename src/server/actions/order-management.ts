@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import type { OrderStatus, PaymentStatus } from "@/generated/prisma/enums";
 import { requireAdminSession } from "@/lib/auth/guards";
+import { emailProvider } from "@/server/email/types";
 
 export type OrderFulfillmentResult = { error: string } | { saved: true } | undefined;
 
@@ -97,6 +98,17 @@ export async function updateOrderFulfillment(
     });
   } catch (err) {
     return { error: err instanceof Error ? err.message : "אירעה שגיאה בעדכון ההזמנה." };
+  }
+
+  if (status !== existing.status && (status === "SHIPPED" || status === "COMPLETED")) {
+    await emailProvider.send({
+      to: existing.email,
+      subject: `הזמנה ${existing.orderNumber} ${status === "SHIPPED" ? "נשלחה" : "הושלמה"} — ליידי דיאמונד`,
+      text:
+        status === "SHIPPED"
+          ? `ההזמנה שלך ${existing.orderNumber} נשלחה בדרך אליך.${trackingNumber ? ` מספר מעקב: ${trackingNumber}` : ""}`
+          : `ההזמנה שלך ${existing.orderNumber} הושלמה. תודה שקנית אצלנו!`,
+    });
   }
 
   revalidatePath("/admin/orders");

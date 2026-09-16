@@ -5,10 +5,11 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
-import { hashPassword, verifyPassword } from "@/lib/auth/password";
+import { hashPassword, verifyPasswordSafe } from "@/lib/auth/password";
 import { createSession } from "@/lib/auth/session";
 import { generateAffiliateCode } from "@/lib/affiliate-code";
 import { requireAffiliateSession, requireAdminSession } from "@/lib/auth/guards";
+import { isRateLimited, recordAttempt } from "@/lib/auth/rate-limit";
 import type { AuthResult } from "@/server/actions/auth";
 
 const REF_COOKIE = "ld_ref";
@@ -97,8 +98,16 @@ export async function loginAffiliate(
     .toLowerCase();
   const password = String(formData.get("password") ?? "");
 
+  const rateLimitKey = `login:${email}`;
+  if (isRateLimited(rateLimitKey)) {
+    return { error: "יותר מדי ניסיונות התחברות. יש לנסות שוב בעוד כמה דקות." };
+  }
+
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user || user.role !== "AFFILIATE" || !(await verifyPassword(password, user.passwordHash))) {
+  const roleOk = !!user && user.role === "AFFILIATE";
+  const passwordOk = await verifyPasswordSafe(password, user?.passwordHash);
+  if (!user || !roleOk || !passwordOk) {
+    recordAttempt(rateLimitKey);
     return { error: "אימייל או סיסמה שגויים." };
   }
 

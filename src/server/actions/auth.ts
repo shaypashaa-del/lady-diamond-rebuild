@@ -2,8 +2,9 @@
 
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { hashPassword, verifyPassword } from "@/lib/auth/password";
+import { hashPassword, verifyPasswordSafe } from "@/lib/auth/password";
 import { createSession, destroySession } from "@/lib/auth/session";
+import { isRateLimited, recordAttempt } from "@/lib/auth/rate-limit";
 
 export type AuthResult = { error: string } | void;
 
@@ -50,8 +51,15 @@ export async function loginCustomer(
     .toLowerCase();
   const password = String(formData.get("password") ?? "");
 
+  const rateLimitKey = `login:${email}`;
+  if (isRateLimited(rateLimitKey)) {
+    return { error: "יותר מדי ניסיונות התחברות. יש לנסות שוב בעוד כמה דקות." };
+  }
+
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user || !(await verifyPassword(password, user.passwordHash))) {
+  const passwordOk = await verifyPasswordSafe(password, user?.passwordHash);
+  if (!user || !passwordOk) {
+    recordAttempt(rateLimitKey);
     return { error: "אימייל או סיסמה שגויים." };
   }
 
@@ -68,9 +76,20 @@ export async function loginAdmin(
     .toLowerCase();
   const password = String(formData.get("password") ?? "");
 
+  const rateLimitKey = `login:${email}`;
+  if (isRateLimited(rateLimitKey)) {
+    return { error: "יותר מדי ניסיונות התחברות. יש לנסות שוב בעוד כמה דקות." };
+  }
+
   const user = await prisma.user.findUnique({ where: { email } });
   const allowedRoles = ["SUPER_ADMIN", "ADMIN", "STORE_MANAGER"];
-  if (!user || !allowedRoles.includes(user.role) || !(await verifyPassword(password, user.passwordHash))) {
+  const roleOk = !!user && allowedRoles.includes(user.role);
+  // Always run the bcrypt compare (against a dummy hash when there's no
+  // user), even though role is also checked, so response timing doesn't
+  // separately leak "this email exists" for admin login.
+  const passwordOk = await verifyPasswordSafe(password, user?.passwordHash);
+  if (!user || !roleOk || !passwordOk) {
+    recordAttempt(rateLimitKey);
     return { error: "אימייל או סיסמה שגויים, או שאין הרשאת ניהול." };
   }
 

@@ -7,6 +7,7 @@ import { hashPassword } from "@/lib/auth/password";
 import { createSession } from "@/lib/auth/session";
 import { emailProvider } from "@/server/email/types";
 import { SITE_URL } from "@/lib/site-config";
+import { isRateLimited, recordAttempt } from "@/lib/auth/rate-limit";
 
 const TOKEN_TTL_MS = 1000 * 60 * 60; // 1 hour
 
@@ -23,6 +24,17 @@ export async function requestPasswordReset(
   const email = String(formData.get("email") ?? "")
     .trim()
     .toLowerCase();
+
+  // Rate limit per email (not per response) so an attacker can't flood a
+  // victim's inbox with reset emails — but still return the same {sent:
+  // true} shape whether or not this request actually sent anything, so
+  // being rate-limited doesn't itself become a new way to distinguish
+  // registered emails from unregistered ones.
+  const rateLimitKey = `password-reset:${email}`;
+  if (isRateLimited(rateLimitKey)) {
+    return { sent: true };
+  }
+  recordAttempt(rateLimitKey);
 
   const user = await prisma.user.findUnique({ where: { email } });
   // Always report success even if the email doesn't exist, so this can't be

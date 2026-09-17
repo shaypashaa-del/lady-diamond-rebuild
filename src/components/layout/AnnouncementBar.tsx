@@ -26,7 +26,7 @@ export function AnnouncementBar({
   const displaySubscribe = subscribeLabel ?? t("subscribe");
 
   return (
-    <div className="relative flex flex-col items-center justify-center gap-1 bg-[#f4efe9] px-10 py-2 text-center text-xs tracking-wide text-neutral-700 sm:flex-row sm:gap-2">
+    <div className="relative flex flex-col items-center justify-center gap-1 bg-ink px-10 py-2 text-center text-xs tracking-wide text-paper sm:flex-row sm:gap-2">
       {subscribed ? (
         <p>✓ נרשמת בהצלחה!</p>
       ) : showForm ? (
@@ -40,23 +40,23 @@ export function AnnouncementBar({
             dir="ltr"
             className="border border-neutral-300 bg-white px-2 py-1 text-xs"
           />
-          <button type="submit" disabled={pending} className="font-semibold underline underline-offset-2 disabled:opacity-50">
+          <button type="submit" disabled={pending} className="font-semibold text-gold-bright underline underline-offset-2 disabled:opacity-50">
             {pending ? "..." : displaySubscribe}
           </button>
         </form>
       ) : (
         <p>
           {displayText}{" "}
-          <button onClick={() => setShowForm(true)} className="font-semibold underline underline-offset-2">
+          <button onClick={() => setShowForm(true)} className="font-semibold text-gold-bright underline underline-offset-2">
             {displaySubscribe}
           </button>
         </p>
       )}
-      {state && "error" in state && <p className="text-rose-600">{state.error}</p>}
+      {state && "error" in state && <p className="text-rose-400">{state.error}</p>}
       <button
         aria-label="Dismiss announcement"
         onClick={() => setVisible(false)}
-        className="absolute end-3 top-1/2 -translate-y-1/2 text-sm text-neutral-500 hover:text-neutral-900"
+        className="absolute end-3 top-1/2 -translate-y-1/2 text-sm text-paper/60 transition-colors hover:text-paper"
       >
         ×
       </button>

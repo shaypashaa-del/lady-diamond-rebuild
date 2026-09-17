@@ -34,11 +34,12 @@ export function Header() {
   return (
     <header className="relative z-40 border-b border-gold-soft bg-paper">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-8">
-        <Link href="/" className="flex items-center gap-3">
-          <Image src="/brand/logo.png" alt={t("brand")} width={44} height={36} className="h-9 w-auto" priority />
+        <Link href="/" className="group flex items-center gap-3">
+          <Image src="/brand/logo.png" alt={t("brand")} width={54} height={44} className="h-11 w-auto transition-transform duration-500 group-hover:scale-105" priority />
           <span className="hidden flex-col leading-none sm:flex">
             <span className="text-lg font-semibold tracking-[0.1em] text-ink">{t("brand")}</span>
-            <span className="mt-1 text-[10px] tracking-[0.3em] text-gold">{t("since")}</span>
+            <span className="gold-rule-start mt-1.5 mb-1.5 w-6" />
+            <span className="text-[10px] tracking-[0.3em] text-gold">{t("since")}</span>
           </span>
         </Link>
 
@@ -46,25 +47,25 @@ export function Header() {
           <button
             aria-label={t("search")}
             onClick={() => setSearchOpen((v) => !v)}
-            className="hidden sm:inline-flex text-neutral-700 hover:text-black"
+            className="hidden text-neutral-700 transition-colors hover:text-gold sm:inline-flex"
           >
             <Search size={18} />
           </button>
-          <Link href="/account" aria-label={t("account")} className="hidden sm:inline-flex text-neutral-700 hover:text-black">
+          <Link href="/account" aria-label={t("account")} className="hidden text-neutral-700 transition-colors hover:text-gold sm:inline-flex">
             <User size={18} />
           </Link>
-          <Link href="/wishlist" aria-label={tProduct("wishlist")} className="relative hidden sm:inline-flex text-neutral-700 hover:text-black">
+          <Link href="/wishlist" aria-label={tProduct("wishlist")} className="relative hidden text-neutral-700 transition-colors hover:text-gold sm:inline-flex">
             <Heart size={18} />
             {mounted && wishlistCount > 0 && (
-              <span className="absolute -end-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-neutral-900 text-[10px] text-white">
+              <span className="absolute -end-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-gold text-[10px] text-white">
                 {wishlistCount}
               </span>
             )}
           </Link>
-          <Link href="/cart" aria-label={t("cart")} className="relative hidden sm:inline-flex text-neutral-700 hover:text-black">
+          <Link href="/cart" aria-label={t("cart")} className="relative hidden text-neutral-700 transition-colors hover:text-gold sm:inline-flex">
             <ShoppingBag size={18} />
             {mounted && itemCount > 0 && (
-              <span className="absolute -end-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-neutral-900 text-[10px] text-white">
+              <span className="absolute -end-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-gold text-[10px] text-white">
                 {itemCount}
               </span>
             )}
@@ -72,7 +73,7 @@ export function Header() {
           <button
             aria-label={t("openMenu")}
             onClick={() => setOpen(true)}
-            className="text-neutral-800 hover:text-black"
+            className="text-neutral-800 transition-colors hover:text-gold"
           >
             <Menu size={22} />
           </button>

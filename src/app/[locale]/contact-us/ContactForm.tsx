@@ -18,7 +18,7 @@ export function ContactForm() {
   return (
     <form action={action} className="space-y-4">
       {state?.error && (
-        <p className="rounded bg-rose-50 px-3 py-2 text-sm text-clay">{state.error}</p>
+        <p className="border border-clay/30 bg-clay/10 px-3 py-2 text-sm text-clay">{state.error}</p>
       )}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <input name="name" placeholder={t("name")} required className="border border-gold-soft px-3 py-2 text-sm" />

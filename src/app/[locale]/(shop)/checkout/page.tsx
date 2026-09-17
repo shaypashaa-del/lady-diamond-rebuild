@@ -131,7 +131,7 @@ export default function CheckoutPage() {
         <p className="mb-6 text-sm text-clay">{preview.couponError}</p>
       )}
 
-      {error && <p className="mb-6 rounded bg-rose-50 px-3 py-2 text-sm text-clay">{error}</p>}
+      {error && <p className="mb-6 border border-clay/30 bg-clay/10 px-3 py-2 text-sm text-clay">{error}</p>}
 
       <form action={handleSubmit} className="grid grid-cols-1 gap-10 sm:grid-cols-2">
         <div>

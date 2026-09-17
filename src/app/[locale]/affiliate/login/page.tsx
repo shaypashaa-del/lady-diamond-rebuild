@@ -16,7 +16,7 @@ export default function AffiliateLoginPage() {
       <h1 className="mb-6 text-center text-xl font-semibold uppercase tracking-wide">{t("dashTitle")}</h1>
 
       {state?.error && (
-        <p className="mb-4 rounded bg-rose-50 px-3 py-2 text-sm text-clay">{state.error}</p>
+        <p className="mb-4 border border-clay/30 bg-clay/10 px-3 py-2 text-sm text-clay">{state.error}</p>
       )}
 
       <form action={action}>

@@ -49,7 +49,7 @@ export default function RequestResetPage() {
       )}
 
       <p className="mt-6 text-center text-sm text-ink/60">
-        <Link href="/login" className="font-medium text-ink underline">
+        <Link href="/login" className="link-underline font-medium text-ink">
           {t("backToLogin")}
         </Link>
       </p>

@@ -18,7 +18,7 @@ export default function AffiliatePage() {
       <p className="mb-10 text-center text-sm text-ink/60">{t("heroCopy")}</p>
 
       {state?.error && (
-        <p className="mb-4 rounded bg-rose-50 px-3 py-2 text-sm text-clay">{state.error}</p>
+        <p className="mb-4 border border-clay/30 bg-clay/10 px-3 py-2 text-sm text-clay">{state.error}</p>
       )}
 
       <form action={action} className="space-y-4">

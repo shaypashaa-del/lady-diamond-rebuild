@@ -38,10 +38,10 @@ export function ProductCard({ product }: { product: SampleProduct }) {
         {product.badge && (
           <span
             className={cn(
-              "absolute start-2 top-2 z-10 rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white",
-              product.badge === "Sale" && "bg-rose-600",
-              product.badge === "New" && "bg-neutral-900",
-              product.badge === "Sold" && "bg-neutral-400"
+              "absolute start-2 top-2 z-10 rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-paper",
+              product.badge === "Sale" && "bg-clay",
+              product.badge === "New" && "bg-ink",
+              product.badge === "Sold" && "bg-ink/40"
             )}
           >
             {t(product.badge.toLowerCase() as "sale" | "new" | "sold")}
@@ -51,7 +51,7 @@ export function ProductCard({ product }: { product: SampleProduct }) {
           <button
             aria-label={t("quickView")}
             onClick={() => setQuickViewOpen(true)}
-            className="rounded-full bg-white p-2 shadow hover:bg-neutral-900 hover:text-white"
+            className="rounded-full bg-paper p-2 text-ink shadow transition-colors hover:bg-gold-bright hover:text-ink"
           >
             <Eye size={14} />
           </button>
@@ -59,8 +59,8 @@ export function ProductCard({ product }: { product: SampleProduct }) {
             aria-label={t("wishlist")}
             onClick={() => toggleWishlist(product.slug)}
             className={cn(
-              "rounded-full bg-white p-2 shadow hover:bg-neutral-900 hover:text-white",
-              mounted && isWishlisted && "bg-rose-600 text-white"
+              "rounded-full bg-paper p-2 text-ink shadow transition-colors hover:bg-gold-bright hover:text-ink",
+              mounted && isWishlisted && "bg-clay text-paper"
             )}
           >
             <Heart size={14} fill={mounted && isWishlisted ? "currentColor" : "none"} />
@@ -82,38 +82,38 @@ export function ProductCard({ product }: { product: SampleProduct }) {
       </div>
 
       <div className="mt-3 text-center">
-        <p className="text-[11px] uppercase tracking-wide text-neutral-400">{product.category}</p>
-        <Link href={`/product/${product.slug}`} className="text-sm font-medium uppercase tracking-wide text-neutral-900">
+        <p className="text-[11px] uppercase tracking-wide text-gold">{product.category}</p>
+        <Link href={`/product/${product.slug}`} className="text-sm font-medium uppercase tracking-wide text-ink">
           {product.name}
         </Link>
         <div className="mt-1 flex items-center justify-center gap-2 text-sm">
           {product.salePrice ? (
             <>
-              <span className="text-neutral-400 line-through">{product.salePrice.toFixed(2)} ₪</span>
-              <span className="font-semibold text-rose-600">{product.price.toFixed(2)} ₪</span>
+              <span className="text-ink/40 line-through">{product.salePrice.toFixed(2)} ₪</span>
+              <span className="font-semibold text-clay">{product.price.toFixed(2)} ₪</span>
             </>
           ) : (
-            <span className="font-semibold">{product.price.toFixed(2)} ₪</span>
+            <span className="font-semibold text-ink">{product.price.toFixed(2)} ₪</span>
           )}
         </div>
         {isSold ? (
           <button
             disabled
-            className="mt-3 w-full border border-neutral-300 py-2 text-xs font-semibold uppercase tracking-wide text-neutral-400"
+            className="mt-3 w-full border border-gold-soft py-2 text-xs font-semibold uppercase tracking-wide text-ink/40"
           >
             {t("readMore")}
           </button>
         ) : product.hasVariants ? (
           <Link
             href={`/product/${product.slug}`}
-            className="mt-3 block w-full border border-neutral-900 py-2 text-center text-xs font-semibold uppercase tracking-wide text-neutral-900 transition-colors hover:bg-neutral-900 hover:text-white"
+            className="mt-3 block w-full border border-gold-bright py-2 text-center text-xs font-semibold uppercase tracking-wide text-ink transition-colors hover:bg-gold-bright hover:text-ink"
           >
             {t("selectOptions")}
           </Link>
         ) : (
           <button
             onClick={handleAddToCart}
-            className="mt-3 w-full border border-neutral-900 py-2 text-xs font-semibold uppercase tracking-wide text-neutral-900 transition-colors hover:bg-neutral-900 hover:text-white"
+            className="mt-3 w-full border border-gold-bright py-2 text-xs font-semibold uppercase tracking-wide text-ink transition-colors hover:bg-gold-bright hover:text-ink"
           >
             {t("addToCart")}
           </button>

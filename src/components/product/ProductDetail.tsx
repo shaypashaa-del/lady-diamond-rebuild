@@ -102,7 +102,7 @@ export function ProductDetail({
                 key={img.url}
                 onClick={() => setActiveImage(i)}
                 className={`relative h-16 w-16 overflow-hidden border ${
-                  i === activeImage ? "border-neutral-900" : "border-neutral-200"
+                  i === activeImage ? "border-gold" : "border-gold-soft"
                 }`}
               >
                 <Image src={img.url} alt={img.alt ?? name} fill sizes="64px" className="object-cover" />
@@ -113,24 +113,25 @@ export function ProductDetail({
       </div>
 
       <div>
-        <p className="text-xs uppercase tracking-wide text-neutral-400">{categoryName}</p>
-        <h1 className="mt-1 text-2xl font-semibold uppercase tracking-wide">{name}</h1>
+        <p className="text-xs uppercase tracking-wide text-gold">{categoryName}</p>
+        <h1 className="mt-1 text-2xl font-semibold uppercase tracking-wide text-ink">{name}</h1>
+        <span className="gold-rule-start mt-3 w-8" />
         <div className="mt-3 flex items-center gap-2 text-lg">
           {salePrice ? (
             <>
-              <span className="text-neutral-400 line-through">{price.toFixed(2)} ₪</span>
-              <span className="font-semibold text-rose-600">{displayPrice.toFixed(2)} ₪</span>
+              <span className="text-ink/40 line-through">{price.toFixed(2)} ₪</span>
+              <span className="font-semibold text-clay">{displayPrice.toFixed(2)} ₪</span>
             </>
           ) : (
-            <span className="font-semibold">{displayPrice.toFixed(2)} ₪</span>
+            <span className="font-semibold text-ink">{displayPrice.toFixed(2)} ₪</span>
           )}
         </div>
 
-        {shortDescription && <p className="mt-4 text-sm text-neutral-600">{shortDescription}</p>}
+        {shortDescription && <p className="mt-4 text-sm text-ink/70">{shortDescription}</p>}
 
         {variants.length > 0 && (
           <div className="mt-6">
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-ink/60">
               {t("options")}
             </label>
             <select
@@ -139,7 +140,7 @@ export function ProductDetail({
                 setVariantId(e.target.value);
                 setQuantity(1);
               }}
-              className="w-full border border-neutral-300 px-3 py-2 text-sm"
+              className="w-full border border-gold-soft px-3 py-2 text-sm text-ink focus:border-gold focus:outline-none"
             >
               <option value="">{t("chooseOption")}</option>
               {variants.map((v) => (
@@ -152,19 +153,19 @@ export function ProductDetail({
         )}
 
         <div className="mt-6 flex items-center gap-4">
-          <div className="flex items-center border border-neutral-300">
+          <div className="flex items-center border border-gold-soft">
             <button
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="px-3 py-2 text-sm"
+              className="px-3 py-2 text-sm text-ink hover:text-gold"
               aria-label={t("decreaseQty")}
             >
               −
             </button>
-            <span className="w-8 text-center text-sm">{quantity}</span>
+            <span className="w-8 text-center text-sm text-ink">{quantity}</span>
             <button
               onClick={() => setQuantity((q) => Math.min(availableInventory, q + 1))}
               disabled={quantity >= availableInventory}
-              className="px-3 py-2 text-sm disabled:cursor-not-allowed disabled:text-neutral-300"
+              className="px-3 py-2 text-sm text-ink hover:text-gold disabled:cursor-not-allowed disabled:text-ink/30"
               aria-label={t("increaseQty")}
             >
               +
@@ -173,7 +174,7 @@ export function ProductDetail({
           <button
             onClick={handleAddToCart}
             disabled={!canAdd}
-            className="flex-1 border border-neutral-900 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-900 transition-colors hover:bg-neutral-900 hover:text-white disabled:cursor-not-allowed disabled:border-neutral-300 disabled:text-neutral-400"
+            className="flex-1 border border-gold-bright py-3 text-xs font-semibold uppercase tracking-wide text-ink transition-colors hover:bg-gold-bright hover:text-ink disabled:cursor-not-allowed disabled:border-gold-soft disabled:text-ink/40"
           >
             {added ? "✓" : t("addToCart")}
           </button>
@@ -181,8 +182,8 @@ export function ProductDetail({
             onClick={() => toggleWishlist(slug)}
             aria-label={t("wishlist")}
             className={cn(
-              "flex items-center justify-center border border-neutral-300 px-3 py-3 hover:border-neutral-900",
-              mounted && isWishlisted && "border-rose-600 text-rose-600"
+              "flex items-center justify-center border border-gold-soft px-3 py-3 text-ink transition-colors hover:border-gold",
+              mounted && isWishlisted && "border-clay text-clay"
             )}
           >
             <Heart size={16} fill={mounted && isWishlisted ? "currentColor" : "none"} />
@@ -190,18 +191,18 @@ export function ProductDetail({
         </div>
 
         {(sku || weightGrams) && (
-          <div className="mt-6 flex gap-3 text-xs text-neutral-400">
+          <div className="mt-6 flex gap-3 text-xs text-ink/50">
             {sku && <span>{t("sku")}: {sku}</span>}
             {weightGrams != null && <span>{t("weight")}: {weightGrams}g</span>}
           </div>
         )}
 
         {description && (
-          <div className="mt-10 border-t border-neutral-200 pt-6">
-            <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+          <div className="mt-10 border-t border-gold-soft pt-6">
+            <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/60">
               {t("description")}
             </h2>
-            <p className="text-sm text-neutral-600">{description}</p>
+            <p className="text-sm text-ink/70">{description}</p>
           </div>
         )}
       </div>

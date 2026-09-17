@@ -12,7 +12,7 @@ export function Testimonials() {
         <div className="grid gap-8 sm:grid-cols-3">
           {testimonials.map((testimonial) => (
             <div key={testimonial.name}>
-              <p className="text-sm italic text-neutral-600">&ldquo;{testimonial.quote}&rdquo;</p>
+              <p className="text-sm italic text-ink/70">&ldquo;{testimonial.quote}&rdquo;</p>
               <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-gold">{testimonial.name}</p>
             </div>
           ))}

@@ -47,14 +47,14 @@ export function Header() {
           <button
             aria-label={t("search")}
             onClick={() => setSearchOpen((v) => !v)}
-            className="hidden text-neutral-700 transition-colors hover:text-gold sm:inline-flex"
+            className="hidden text-ink/80 transition-colors hover:text-gold sm:inline-flex"
           >
             <Search size={18} />
           </button>
-          <Link href="/account" aria-label={t("account")} className="hidden text-neutral-700 transition-colors hover:text-gold sm:inline-flex">
+          <Link href="/account" aria-label={t("account")} className="hidden text-ink/80 transition-colors hover:text-gold sm:inline-flex">
             <User size={18} />
           </Link>
-          <Link href="/wishlist" aria-label={tProduct("wishlist")} className="relative hidden text-neutral-700 transition-colors hover:text-gold sm:inline-flex">
+          <Link href="/wishlist" aria-label={tProduct("wishlist")} className="relative hidden text-ink/80 transition-colors hover:text-gold sm:inline-flex">
             <Heart size={18} />
             {mounted && wishlistCount > 0 && (
               <span className="absolute -end-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-gold text-[10px] text-white">
@@ -62,7 +62,7 @@ export function Header() {
               </span>
             )}
           </Link>
-          <Link href="/cart" aria-label={t("cart")} className="relative hidden text-neutral-700 transition-colors hover:text-gold sm:inline-flex">
+          <Link href="/cart" aria-label={t("cart")} className="relative hidden text-ink/80 transition-colors hover:text-gold sm:inline-flex">
             <ShoppingBag size={18} />
             {mounted && itemCount > 0 && (
               <span className="absolute -end-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-gold text-[10px] text-white">
@@ -73,7 +73,7 @@ export function Header() {
           <button
             aria-label={t("openMenu")}
             onClick={() => setOpen(true)}
-            className="text-neutral-800 transition-colors hover:text-gold"
+            className="text-ink transition-colors hover:text-gold"
           >
             <Menu size={22} />
           </button>

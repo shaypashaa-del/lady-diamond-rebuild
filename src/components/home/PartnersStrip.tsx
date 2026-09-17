@@ -6,12 +6,12 @@ export function PartnersStrip() {
   const t = useTranslations("Home");
   return (
     <section className="border-y border-gold-soft bg-paper-soft py-10">
-      <p className="mb-6 text-center text-xs font-semibold uppercase tracking-[0.3em] text-neutral-400">
+      <p className="mb-6 text-center text-xs font-semibold uppercase tracking-[0.3em] text-ink/50">
         {t("asSeenIn")}
       </p>
       <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-x-10 gap-y-4 px-4">
         {partners.map((p) => (
-          <span key={p} className="text-sm font-semibold uppercase tracking-widest text-neutral-400">
+          <span key={p} className="text-sm font-semibold uppercase tracking-widest text-ink/50">
             {p}
           </span>
         ))}

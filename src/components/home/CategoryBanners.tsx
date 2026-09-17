@@ -17,7 +17,7 @@ export function CategoryBanners() {
         >
           <h3 className="text-lg font-semibold uppercase tracking-[0.2em]">{b.title}</h3>
           <span className="gold-rule mt-3" />
-          <p className="mt-3 max-w-xs px-6 text-sm text-neutral-500">{b.copy}</p>
+          <p className="mt-3 max-w-xs px-6 text-sm text-ink/60">{b.copy}</p>
           <Link href={b.href} className="link-underline mt-4 text-xs font-semibold uppercase tracking-wide text-gold">
             {t("findMore")}
           </Link>

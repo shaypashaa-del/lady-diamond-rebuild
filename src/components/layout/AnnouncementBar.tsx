@@ -38,7 +38,7 @@ export function AnnouncementBar({
             autoFocus
             placeholder="you@example.com"
             dir="ltr"
-            className="border border-neutral-300 bg-white px-2 py-1 text-xs"
+            className="border border-gold-soft bg-paper px-2 py-1 text-xs"
           />
           <button type="submit" disabled={pending} className="font-semibold text-gold-bright underline underline-offset-2 disabled:opacity-50">
             {pending ? "..." : displaySubscribe}

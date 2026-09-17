@@ -62,7 +62,7 @@ export function QuickViewModal({ product, onClose }: { product: SampleProduct; o
           <X size={20} />
         </button>
 
-        <div className="relative aspect-square bg-neutral-100">
+        <div className="relative aspect-square placeholder-gradient">
           {product.imageUrl && (
             <Image
               src={product.imageUrl}

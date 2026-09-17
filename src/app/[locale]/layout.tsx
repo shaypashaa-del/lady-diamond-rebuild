@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Frank_Ruhl_Libre, Assistant, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -17,9 +17,20 @@ import { getContentBlock, type AnnouncementBarContent } from "@/server/actions/c
 import { CONTENT_KEYS } from "@/lib/content-keys";
 import { t as tContent } from "@/lib/i18n-content";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+// Frank Ruhl Libre: an editorial Hebrew serif for headings — warm and
+// crafted rather than the generic geometric sans the site launched with.
+// Assistant: a clean Hebrew-native sans for body text, paired to feel
+// intentional rather than a stock system-font fallback.
+const displayFont = Frank_Ruhl_Libre({
+  variable: "--font-display",
+  subsets: ["latin", "hebrew"],
+  weight: ["400", "700"],
+});
+
+const bodyFont = Assistant({
+  variable: "--font-body",
+  subsets: ["latin", "hebrew"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const geistMono = Geist_Mono({
@@ -87,7 +98,7 @@ export default async function LocaleLayout({
     <html
       lang={locale}
       dir={dir}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${displayFont.variable} ${bodyFont.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <JsonLd data={[organizationSchema(), websiteSchema()]} />

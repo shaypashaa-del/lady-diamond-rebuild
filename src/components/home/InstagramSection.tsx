@@ -11,7 +11,7 @@ export function InstagramSection() {
       </p>
       <div className="mx-auto mt-6 grid max-w-5xl grid-cols-3 gap-1 px-4 sm:grid-cols-6 sm:px-8">
         {tiles.map((_, i) => (
-          <div key={i} className="aspect-square bg-neutral-100" />
+          <div key={i} className="aspect-square placeholder-gradient" />
         ))}
       </div>
     </section>

@@ -22,7 +22,7 @@ export function EuphoriaSpotlight() {
   const t = useTranslations("Home");
   return (
     <section className="mx-auto max-w-7xl px-4 pb-14 text-center sm:px-8">
-      <div className="border border-neutral-200 bg-neutral-50 px-6 py-16">
+      <div className="border border-gold-soft bg-ivory-deep px-6 py-16">
         <h2 className="text-2xl font-semibold uppercase tracking-[0.3em]">{t("euphoriaTitle")}</h2>
         <p className="mx-auto mt-3 max-w-md text-sm text-neutral-500">{t("euphoriaCopy")}</p>
         <Link

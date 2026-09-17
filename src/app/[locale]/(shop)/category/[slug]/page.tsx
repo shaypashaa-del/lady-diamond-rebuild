@@ -106,7 +106,7 @@ export default async function CategoryPage({
         ])}
       />
       {imageUrl && (
-        <div className="relative mb-8 aspect-[3/1] w-full overflow-hidden bg-neutral-100">
+        <div className="relative mb-8 aspect-[3/1] w-full overflow-hidden placeholder-gradient">
           <Image src={imageUrl} alt={title} fill sizes="100vw" className="object-cover" />
         </div>
       )}

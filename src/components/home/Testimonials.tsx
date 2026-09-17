@@ -5,7 +5,7 @@ export function Testimonials() {
   const testimonials = t.raw("testimonials") as { name: string; quote: string }[];
 
   return (
-    <section className="border-t border-neutral-200 bg-neutral-50 py-14">
+    <section className="border-t border-gold-soft bg-ivory-deep py-14">
       <div className="mx-auto max-w-5xl px-4 text-center sm:px-8">
         <h2 className="mb-8 text-xl font-semibold uppercase tracking-[0.2em]">{t("kindWords")}</h2>
         <div className="grid gap-8 sm:grid-cols-3">

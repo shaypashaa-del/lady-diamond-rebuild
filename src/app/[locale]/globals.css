@@ -1,26 +1,84 @@
 @import "tailwindcss";
 
+/* Lady Diamond Jewels — design tokens.
+   Warm parchment/ink palette with an antique-brass accent, evoking the
+   brand's own material world (gold, silver, handworked at home) instead
+   of a generic stark white/gray storefront. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ivory: #faf7f2;
+  --ivory-deep: #f2ecdf;
+  --ink: #2b2622;
+  --gold: #a6813c;
+  --gold-soft: #e8dcc2;
+  --clay: #b16b54;
+  --stone: #8a8175;
+
+  --background: var(--ivory);
+  --foreground: var(--ink);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --color-ivory: var(--ivory);
+  --color-ivory-deep: var(--ivory-deep);
+  --color-ink: var(--ink);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-clay: var(--clay);
+  --color-stone: var(--stone);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+/* Signature motif: a fine, continuous hairline rule — echoing the brand's
+   own product language ("a ring that wraps the finger in one continuous
+   line"). Used as a quiet divider under section kickers and as the
+   underline reveal on text links. */
+.gold-rule {
+  display: block;
+  height: 1px;
+  width: 3rem;
+  margin-inline: auto;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.link-underline {
+  position: relative;
+  text-decoration: none;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -2px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+.link-underline:hover::after {
+  transform: scaleX(1);
+}
+
+/* Warm placeholder for products without a real photo yet — a soft
+   ivory-to-gold wash instead of a flat gray box, so a missing image reads
+   as "not photographed yet" rather than "broken". */
+.placeholder-gradient {
+  background: linear-gradient(135deg, var(--ivory-deep) 0%, var(--gold-soft) 100%);
 }

@@ -33,7 +33,7 @@ export function ProductCard({ product }: { product: SampleProduct }) {
 
   return (
     <div className="group relative flex flex-col">
-      <div className="relative aspect-[3/4] w-full overflow-hidden bg-neutral-100">
+      <div className="relative aspect-[3/4] w-full overflow-hidden placeholder-gradient">
         {product.badge && (
           <span
             className={cn(
@@ -65,7 +65,7 @@ export function ProductCard({ product }: { product: SampleProduct }) {
             <Heart size={14} fill={mounted && isWishlisted ? "currentColor" : "none"} />
           </button>
         </div>
-        <Link href={`/product/${product.slug}`} className="flex h-full w-full items-center justify-center text-neutral-300">
+        <Link href={`/product/${product.slug}`} className="flex h-full w-full items-center justify-center p-4 text-center">
           {product.imageUrl ? (
             <Image
               src={product.imageUrl}
@@ -75,7 +75,7 @@ export function ProductCard({ product }: { product: SampleProduct }) {
               className="object-cover"
             />
           ) : (
-            <span className="text-xs">{product.name}</span>
+            <span className="font-display text-sm text-gold">{product.name}</span>
           )}
         </Link>
       </div>

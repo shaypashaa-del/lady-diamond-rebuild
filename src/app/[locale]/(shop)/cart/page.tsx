@@ -51,7 +51,7 @@ export default function CartPage() {
         <div className="space-y-6 sm:col-span-2">
           {lines.map((line) => (
             <div key={line.key} className="flex items-center gap-4 border-b border-neutral-200 pb-6">
-              <div className="h-20 w-20 flex-shrink-0 bg-neutral-100" />
+              <div className="h-20 w-20 flex-shrink-0 placeholder-gradient" />
               <div className="flex-1">
                 <Link href={`/product/${line.slug}`} className="text-sm font-medium uppercase">
                   {line.name}

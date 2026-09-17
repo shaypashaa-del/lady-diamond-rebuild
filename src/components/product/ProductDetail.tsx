@@ -82,7 +82,7 @@ export function ProductDetail({
   return (
     <div className="mx-auto grid max-w-5xl grid-cols-1 gap-10 px-4 py-12 sm:grid-cols-2 sm:px-8">
       <div>
-        <div className="relative aspect-square bg-neutral-100">
+        <div className="relative aspect-square placeholder-gradient">
           {images[activeImage] && (
             <Image
               src={images[activeImage].url}

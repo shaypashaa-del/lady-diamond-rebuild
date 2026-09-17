@@ -31,11 +31,11 @@ export function Header() {
   }
 
   return (
-    <header className="relative z-40 border-b border-neutral-200 bg-white">
+    <header className="relative z-40 border-b border-gold-soft bg-ivory">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-8">
         <Link href="/" className="flex flex-col items-center leading-none">
-          <span className="text-lg font-semibold tracking-[0.2em]">{t("brand")}</span>
-          <span className="text-[10px] tracking-[0.3em] text-neutral-500">{t("since")}</span>
+          <span className="font-display text-xl tracking-[0.15em] text-ink">{t("brand")}</span>
+          <span className="mt-1 text-[10px] tracking-[0.3em] text-gold">{t("since")}</span>
         </Link>
 
         <div className="flex items-center gap-4">

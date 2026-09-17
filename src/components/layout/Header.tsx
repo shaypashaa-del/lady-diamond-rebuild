@@ -122,15 +122,15 @@ export function Header() {
                   <Link
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="font-medium uppercase text-neutral-900"
+                    className="link-underline font-medium uppercase text-neutral-900 transition-colors hover:text-gold"
                   >
                     {tNav(item.key)}
                   </Link>
                   {"mega" in item && item.mega && (
-                    <ul className="mt-3 space-y-2 border-s border-neutral-200 ps-4 text-neutral-500">
+                    <ul className="mt-3 space-y-2 border-s border-gold-soft ps-4 text-neutral-500">
                       {item.mega.map((cat) => (
                         <li key={cat.key}>
-                          <Link href={cat.href} onClick={() => setOpen(false)}>
+                          <Link href={cat.href} onClick={() => setOpen(false)} className="transition-colors hover:text-gold">
                             {tNav(cat.key)}
                           </Link>
                         </li>

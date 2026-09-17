@@ -28,6 +28,7 @@ export function ProductCard({ product }: { product: SampleProduct }) {
       slug: product.slug,
       name: product.name,
       price: product.price,
+      imageUrl: product.imageUrl,
     });
   }
 

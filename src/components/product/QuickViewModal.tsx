@@ -37,7 +37,7 @@ export function QuickViewModal({ product, onClose }: { product: SampleProduct; o
 
   function handleAddToCart() {
     addLine(
-      { key: `${product.slug}:default`, productId: product.slug, slug: product.slug, name: product.name, price: product.price },
+      { key: `${product.slug}:default`, productId: product.slug, slug: product.slug, name: product.name, price: product.price, imageUrl: product.imageUrl },
       quantity
     );
     setAdded(true);

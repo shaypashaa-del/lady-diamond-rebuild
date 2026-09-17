@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useCartStore } from "@/lib/cart-store";
@@ -51,7 +52,11 @@ export default function CartPage() {
         <div className="space-y-6 sm:col-span-2">
           {lines.map((line) => (
             <div key={line.key} className="flex items-center gap-4 border-b border-neutral-200 pb-6">
-              <div className="h-20 w-20 flex-shrink-0 placeholder-gradient" />
+              <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden placeholder-gradient">
+                {line.imageUrl && (
+                  <Image src={line.imageUrl} alt={line.name} fill sizes="80px" className="object-cover" />
+                )}
+              </div>
               <div className="flex-1">
                 <Link href={`/product/${line.slug}`} className="text-sm font-medium uppercase">
                   {line.name}

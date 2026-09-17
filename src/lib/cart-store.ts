@@ -12,6 +12,7 @@ export type CartLine = {
   variantLabel?: string;
   price: number;
   quantity: number;
+  imageUrl?: string;
 };
 
 type CartState = {

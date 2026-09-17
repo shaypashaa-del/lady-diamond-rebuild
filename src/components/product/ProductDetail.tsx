@@ -72,6 +72,7 @@ export function ProductDetail({
         name,
         variantLabel: selectedVariant?.label,
         price: displayPrice,
+        imageUrl: images[0]?.url,
       },
       quantity
     );

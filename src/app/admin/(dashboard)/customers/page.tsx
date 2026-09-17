@@ -1,13 +1,18 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/generated/prisma/client";
+import { AdminPager } from "@/components/admin/AdminPager";
+
+const PAGE_SIZE = 50;
 
 export default async function AdminCustomersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 }) {
-  const { q } = await searchParams;
+  const { q, page: pageRaw } = await searchParams;
+  const parsedPage = Number.parseInt(pageRaw ?? "1", 10);
+  const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
   const where: Prisma.UserWhereInput = { role: "CUSTOMER" };
   if (q) {
@@ -18,11 +23,17 @@ export default async function AdminCustomersPage({
     ];
   }
 
-  const customers = await prisma.user.findMany({
-    where,
-    include: { _count: { select: { orders: true } }, orders: { select: { total: true } } },
-    orderBy: { createdAt: "desc" },
-  });
+  const [customers, totalCount] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      include: { _count: { select: { orders: true } }, orders: { select: { total: true } } },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.user.count({ where }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
     <div>
@@ -87,6 +98,7 @@ export default async function AdminCustomersPage({
           </tbody>
         </table>
       </div>
+      <AdminPager page={page} totalPages={totalPages} basePath="/admin/customers" searchParams={{ q }} />
     </div>
   );
 }

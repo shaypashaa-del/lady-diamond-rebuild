@@ -2,6 +2,9 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { deleteProduct, duplicateProduct } from "@/server/actions/products";
 import { t as localize, type LocalizedText } from "@/lib/i18n-content";
+import { AdminPager } from "@/components/admin/AdminPager";
+
+const PAGE_SIZE = 50;
 
 const statusLabels: Record<string, string> = {
   DRAFT: "טיוטה",
@@ -9,11 +12,25 @@ const statusLabels: Record<string, string> = {
   ARCHIVED: "בארכיון",
 };
 
-export default async function AdminProductsPage() {
-  const products = await prisma.product.findMany({
-    include: { categories: { include: { category: true } } },
-    orderBy: { createdAt: "desc" },
-  });
+export default async function AdminProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageRaw } = await searchParams;
+  const parsedPage = Number.parseInt(pageRaw ?? "1", 10);
+  const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+
+  const [products, totalCount] = await Promise.all([
+    prisma.product.findMany({
+      include: { categories: { include: { category: true } } },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.product.count(),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
     <div>
@@ -85,6 +102,7 @@ export default async function AdminProductsPage() {
           </tbody>
         </table>
       </div>
+      <AdminPager page={page} totalPages={totalPages} basePath="/admin/products" />
     </div>
   );
 }

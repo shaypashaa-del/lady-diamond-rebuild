@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import type { OrderStatus, PaymentStatus, Prisma } from "@/generated/prisma/client";
+import { AdminPager } from "@/components/admin/AdminPager";
+
+const PAGE_SIZE = 50;
 
 const statusLabels: Record<string, string> = {
   PENDING: "ממתינה",
@@ -21,9 +24,11 @@ const paymentLabels: Record<string, string> = {
 export default async function AdminOrdersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; status?: string; payment?: string }>;
+  searchParams: Promise<{ q?: string; status?: string; payment?: string; page?: string }>;
 }) {
-  const { q, status, payment } = await searchParams;
+  const { q, status, payment, page: pageRaw } = await searchParams;
+  const parsedPage = Number.parseInt(pageRaw ?? "1", 10);
+  const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
   const where: Prisma.OrderWhereInput = {};
   if (q) {
@@ -35,11 +40,17 @@ export default async function AdminOrdersPage({
   if (status) where.status = status as OrderStatus;
   if (payment) where.paymentStatus = payment as PaymentStatus;
 
-  const orders = await prisma.order.findMany({
-    where,
-    include: { affiliate: true },
-    orderBy: { createdAt: "desc" },
-  });
+  const [orders, totalCount] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      include: { affiliate: true },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.order.count({ where }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
     <div>
@@ -119,6 +130,7 @@ export default async function AdminOrdersPage({
           </tbody>
         </table>
       </div>
+      <AdminPager page={page} totalPages={totalPages} basePath="/admin/orders" searchParams={{ q, status, payment }} />
     </div>
   );
 }

@@ -20,12 +20,12 @@ function optionalLocalizedFromForm(formData: FormData, prefix: string) {
 }
 
 function readProductForm(formData: FormData) {
-  const basePrice = Number(formData.get("basePrice"));
+  const basePrice = Math.max(0, Number(formData.get("basePrice")));
   const salePriceRaw = formData.get("salePrice");
-  const salePrice = salePriceRaw ? Number(salePriceRaw) : null;
-  const inventory = Number(formData.get("inventory") ?? 0);
+  const salePrice = salePriceRaw ? Math.max(0, Number(salePriceRaw)) : null;
+  const inventory = Math.max(0, Number(formData.get("inventory") ?? 0));
   const weightGramsRaw = formData.get("weightGrams");
-  const weightGrams = weightGramsRaw ? Number(weightGramsRaw) : null;
+  const weightGrams = weightGramsRaw ? Math.max(0, Number(weightGramsRaw)) : null;
   const status = String(formData.get("status")) as ProductStatus;
   const isFeatured = formData.get("isFeatured") === "on";
   const sku = String(formData.get("sku") ?? "") || null;

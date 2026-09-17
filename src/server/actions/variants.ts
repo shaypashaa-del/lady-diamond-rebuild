@@ -15,17 +15,17 @@ function localizedFromForm(formData: FormData, prefix: string) {
 export async function addVariant(productId: string, formData: FormData) {
   await requireAdminSession();
   const attributeName = String(formData.get("attributeName") ?? "color");
-  const price = Number(formData.get("price"));
+  const price = Math.max(0, Number(formData.get("price")));
   const salePriceRaw = formData.get("salePrice");
   const sku = String(formData.get("sku") ?? "") || undefined;
-  const inventory = Number(formData.get("inventory") ?? 0);
+  const inventory = Math.max(0, Number(formData.get("inventory") ?? 0));
 
   await prisma.productVariant.create({
     data: {
       productId,
       sku,
       price,
-      salePrice: salePriceRaw ? Number(salePriceRaw) : undefined,
+      salePrice: salePriceRaw ? Math.max(0, Number(salePriceRaw)) : undefined,
       inventory,
       attributes: { [attributeName]: localizedFromForm(formData, "value") },
     },

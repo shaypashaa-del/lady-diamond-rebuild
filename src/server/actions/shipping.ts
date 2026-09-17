@@ -16,7 +16,7 @@ export async function createShippingRule(
   const type = String(formData.get("type")) as ShippingMethodType;
   const country = String(formData.get("country") ?? "") || null;
   const minOrderValueRaw = formData.get("minOrderValue");
-  const price = Number(formData.get("price") ?? 0);
+  const price = Math.max(0, Number(formData.get("price") ?? 0));
 
   if (!name) return { error: "יש להזין שם לכלל המשלוח." };
 
@@ -25,7 +25,7 @@ export async function createShippingRule(
       name,
       type,
       country,
-      minOrderValue: minOrderValueRaw ? Number(minOrderValueRaw) : null,
+      minOrderValue: minOrderValueRaw ? Math.max(0, Number(minOrderValueRaw)) : null,
       price,
     },
   });

@@ -82,6 +82,20 @@ body {
   background: linear-gradient(135deg, var(--paper-soft) 0%, var(--gold-soft) 100%);
 }
 
+/* Hero dark scrim, darkest on the side the text sits on. The text block
+   follows normal block flow (no explicit alignment), so it sits at the
+   inline-start edge — right in RTL Hebrew, left in LTR — and the scrim
+   must follow, or the darkest patch ends up behind the photo instead of
+   behind the text. `linear-gradient(90deg, ...)` is a physical, not
+   logical, direction and does not flip with `dir`, so it's set explicitly
+   per direction here instead. */
+.hero-scrim {
+  background: linear-gradient(to right, rgba(20, 17, 14, 0.88) 0%, rgba(20, 17, 14, 0.5) 55%, rgba(20, 17, 14, 0.2) 100%);
+}
+html[dir="rtl"] .hero-scrim {
+  background: linear-gradient(to left, rgba(20, 17, 14, 0.88) 0%, rgba(20, 17, 14, 0.5) 55%, rgba(20, 17, 14, 0.2) 100%);
+}
+
 /* A slow image-zoom on hover — the one piece of "alive" motion carried
    across every product card, gallery tile, and category banner so the
    whole catalog feels considered rather than static. */

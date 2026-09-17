@@ -27,10 +27,7 @@ export function Hero({
         className="rise-in object-cover opacity-70"
         style={{ animationDuration: "1.4s" }}
       />
-      <div
-        className="absolute inset-0"
-        style={{ background: "linear-gradient(90deg, rgba(20,17,14,0.88) 0%, rgba(20,17,14,0.45) 55%, rgba(20,17,14,0.15) 100%)" }}
-      />
+      <div className="hero-scrim absolute inset-0" />
 
       <div className="relative mx-auto w-full max-w-7xl px-4 py-24 sm:px-8">
         <div className="max-w-lg">

@@ -63,7 +63,7 @@ export default function CartPage() {
                 <button
                   onClick={() => setQuantity(line.key, line.quantity - 1)}
                   className="px-2 py-1 text-sm"
-                  aria-label="Decrease quantity"
+                  aria-label={t("decreaseQty")}
                 >
                   −
                 </button>
@@ -71,7 +71,7 @@ export default function CartPage() {
                 <button
                   onClick={() => setQuantity(line.key, line.quantity + 1)}
                   className="px-2 py-1 text-sm"
-                  aria-label="Increase quantity"
+                  aria-label={t("increaseQty")}
                 >
                   +
                 </button>
@@ -81,7 +81,7 @@ export default function CartPage() {
               </p>
               <button
                 onClick={() => removeLine(line.key)}
-                aria-label="Remove"
+                aria-label={t("remove")}
                 className="text-neutral-400 hover:text-neutral-900"
               >
                 ×

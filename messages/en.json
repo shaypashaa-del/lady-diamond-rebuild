@@ -99,7 +99,9 @@
     "chooseOption": "Choose an option…",
     "description": "Description",
     "sku": "SKU",
-    "weight": "Weight"
+    "weight": "Weight",
+    "decreaseQty": "Decrease quantity",
+    "increaseQty": "Increase quantity"
   },
   "Category": {
     "items": "items",
@@ -114,7 +116,10 @@
     "shipping": "Shipping",
     "free": "Free",
     "estimatedTotal": "Estimated Total",
-    "proceedToCheckout": "Proceed to Checkout"
+    "proceedToCheckout": "Proceed to Checkout",
+    "decreaseQty": "Decrease quantity",
+    "increaseQty": "Increase quantity",
+    "remove": "Remove"
   },
   "AuthLogin": {
     "title": "Log In",

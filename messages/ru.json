@@ -99,7 +99,9 @@
     "chooseOption": "Выберите опцию...",
     "description": "Описание",
     "sku": "Артикул",
-    "weight": "Вес"
+    "weight": "Вес",
+    "decreaseQty": "Уменьшить количество",
+    "increaseQty": "Увеличить количество"
   },
   "Category": {
     "items": "товаров",
@@ -114,7 +116,10 @@
     "shipping": "Доставка",
     "free": "Бесплатно",
     "estimatedTotal": "Итого",
-    "proceedToCheckout": "Перейти к оформлению"
+    "proceedToCheckout": "Перейти к оформлению",
+    "decreaseQty": "Уменьшить количество",
+    "increaseQty": "Увеличить количество",
+    "remove": "Удалить"
   },
   "AuthLogin": {
     "title": "Вход",

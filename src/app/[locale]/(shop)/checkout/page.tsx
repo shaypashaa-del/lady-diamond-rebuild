@@ -121,6 +121,7 @@ export default function CheckoutPage() {
             value={couponCode}
             onChange={(e) => setCouponCode(e.target.value)}
             placeholder={t("couponCode")}
+            aria-label={t("couponCode")}
             className="flex-1 border border-neutral-300 px-3 py-2 text-sm"
             dir="ltr"
           />
@@ -136,22 +137,23 @@ export default function CheckoutPage() {
         <div>
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide">{t("billingDetails")}</h2>
           <div className="space-y-4">
-            <input name="fullName" placeholder={t("fullName")} defaultValue={savedAddress?.fullName} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
-            <input name="email" type="email" placeholder={t("email")} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
-            <input name="phone" placeholder={t("phone")} defaultValue={savedAddress?.phone} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+            <input name="fullName" placeholder={t("fullName")} aria-label={t("fullName")} defaultValue={savedAddress?.fullName} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+            <input name="email" type="email" placeholder={t("email")} aria-label={t("email")} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+            <input name="phone" placeholder={t("phone")} aria-label={t("phone")} defaultValue={savedAddress?.phone} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
             <input
               name="country"
               placeholder={t("country")}
+              aria-label={t("country")}
               required
               value={country}
               onChange={(e) => setCountry(e.target.value)}
               className="w-full border border-neutral-300 px-3 py-2 text-sm"
             />
-            <input name="city" placeholder={t("city")} defaultValue={savedAddress?.city} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
-            <input name="street" placeholder={t("street")} defaultValue={savedAddress?.street} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
-            <input name="apartment" placeholder={t("apartment")} defaultValue={savedAddress?.apartment} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
-            <input name="zip" placeholder={t("zip")} defaultValue={savedAddress?.zip} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
-            <textarea name="orderNotes" placeholder={t("orderNotes")} rows={3} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+            <input name="city" placeholder={t("city")} aria-label={t("city")} defaultValue={savedAddress?.city} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+            <input name="street" placeholder={t("street")} aria-label={t("street")} defaultValue={savedAddress?.street} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+            <input name="apartment" placeholder={t("apartment")} aria-label={t("apartment")} defaultValue={savedAddress?.apartment} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+            <input name="zip" placeholder={t("zip")} aria-label={t("zip")} defaultValue={savedAddress?.zip} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+            <textarea name="orderNotes" placeholder={t("orderNotes")} aria-label={t("orderNotes")} rows={3} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
           </div>
         </div>
 

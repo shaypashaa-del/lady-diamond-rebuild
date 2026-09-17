@@ -155,7 +155,7 @@ export function ProductDetail({
             <button
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
               className="px-3 py-2 text-sm"
-              aria-label="Decrease quantity"
+              aria-label={t("decreaseQty")}
             >
               −
             </button>
@@ -164,7 +164,7 @@ export function ProductDetail({
               onClick={() => setQuantity((q) => Math.min(availableInventory, q + 1))}
               disabled={quantity >= availableInventory}
               className="px-3 py-2 text-sm disabled:cursor-not-allowed disabled:text-neutral-300"
-              aria-label="Increase quantity"
+              aria-label={t("increaseQty")}
             >
               +
             </button>

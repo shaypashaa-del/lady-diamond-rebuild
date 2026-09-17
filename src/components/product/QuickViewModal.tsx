@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
@@ -14,6 +14,26 @@ export function QuickViewModal({ product, onClose }: { product: SampleProduct; o
   const addLine = useCartStore((s) => s.addLine);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Basic dialog accessibility: move focus into the modal on open, restore
+  // it to whatever triggered the modal on close, and let Escape close it —
+  // without these a screen reader user gets no indication a dialog opened
+  // and has no keyboard way to dismiss it.
+  useEffect(() => {
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    closeButtonRef.current?.focus();
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      previouslyFocused?.focus();
+    };
+  }, [onClose]);
 
   function handleAddToCart() {
     addLine(
@@ -27,8 +47,14 @@ export function QuickViewModal({ product, onClose }: { product: SampleProduct; o
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden />
-      <div className="relative grid w-full max-w-2xl grid-cols-1 gap-6 bg-white p-6 shadow-xl sm:grid-cols-2">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={product.name}
+        className="relative grid w-full max-w-2xl grid-cols-1 gap-6 bg-white p-6 shadow-xl sm:grid-cols-2"
+      >
         <button
+          ref={closeButtonRef}
           aria-label={tQuick("close")}
           onClick={onClose}
           className="absolute end-4 top-4 text-neutral-500 hover:text-neutral-900"

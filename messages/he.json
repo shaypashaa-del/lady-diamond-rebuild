@@ -99,7 +99,9 @@
     "chooseOption": "בחר אפשרות...",
     "description": "תיאור",
     "sku": "מק\"ט",
-    "weight": "משקל"
+    "weight": "משקל",
+    "decreaseQty": "הפחתת כמות",
+    "increaseQty": "הגדלת כמות"
   },
   "Category": {
     "items": "פריטים",
@@ -114,7 +116,10 @@
     "shipping": "משלוח",
     "free": "חינם",
     "estimatedTotal": "סה\"כ משוער",
-    "proceedToCheckout": "המשך לתשלום"
+    "proceedToCheckout": "המשך לתשלום",
+    "decreaseQty": "הפחתת כמות",
+    "increaseQty": "הגדלת כמות",
+    "remove": "הסרה"
   },
   "AuthLogin": {
     "title": "התחברות",

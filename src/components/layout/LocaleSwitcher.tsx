@@ -17,8 +17,8 @@ export function LocaleSwitcher() {
           onClick={() => router.replace(pathname, { locale: code })}
           className={
             code === locale
-              ? "font-semibold text-neutral-900 underline underline-offset-2"
-              : "text-neutral-400 hover:text-neutral-900"
+              ? "font-semibold text-ink underline underline-offset-2"
+              : "text-ink/50 hover:text-gold"
           }
           aria-current={code === locale}
         >

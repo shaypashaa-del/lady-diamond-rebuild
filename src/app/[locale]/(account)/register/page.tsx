@@ -14,50 +14,50 @@ export default function RegisterPage() {
       <h1 className="mb-6 text-center text-xl font-semibold uppercase tracking-wide">{t("title")}</h1>
 
       {state?.error && (
-        <p className="mb-4 rounded bg-rose-50 px-3 py-2 text-sm text-rose-600">{state.error}</p>
+        <p className="mb-4 border border-clay/30 bg-clay/10 px-3 py-2 text-sm text-clay">{state.error}</p>
       )}
 
       <form action={action}>
         <div className="mb-4">
-          <label className="mb-1 block text-xs font-medium text-neutral-500">{t("name")}</label>
-          <input name="name" required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+          <label className="mb-1 block text-xs font-medium text-ink/60">{t("name")}</label>
+          <input name="name" required className="w-full border border-gold-soft px-3 py-2 text-sm" />
         </div>
         <div className="mb-4">
-          <label className="mb-1 block text-xs font-medium text-neutral-500">{t("email")}</label>
+          <label className="mb-1 block text-xs font-medium text-ink/60">{t("email")}</label>
           <input
             name="email"
             type="email"
             required
-            className="w-full border border-neutral-300 px-3 py-2 text-sm"
+            className="w-full border border-gold-soft px-3 py-2 text-sm"
           />
         </div>
         <div className="mb-4">
-          <label className="mb-1 block text-xs font-medium text-neutral-500">{t("phone")}</label>
-          <input name="phone" className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+          <label className="mb-1 block text-xs font-medium text-ink/60">{t("phone")}</label>
+          <input name="phone" className="w-full border border-gold-soft px-3 py-2 text-sm" />
         </div>
         <div className="mb-6">
-          <label className="mb-1 block text-xs font-medium text-neutral-500">{t("password")}</label>
+          <label className="mb-1 block text-xs font-medium text-ink/60">{t("password")}</label>
           <input
             name="password"
             type="password"
             required
             minLength={8}
-            className="w-full border border-neutral-300 px-3 py-2 text-sm"
+            className="w-full border border-gold-soft px-3 py-2 text-sm"
           />
         </div>
 
         <button
           type="submit"
           disabled={pending}
-          className="w-full border border-neutral-900 bg-neutral-900 py-3 text-xs font-semibold uppercase tracking-wide text-white hover:bg-neutral-800 disabled:opacity-50"
+          className="w-full border border-gold-bright bg-ink py-3 text-xs font-semibold uppercase tracking-wide text-paper transition-colors hover:bg-gold-bright hover:text-ink disabled:opacity-50"
         >
           {pending ? t("submitting") : t("submit")}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-neutral-500">
+      <p className="mt-6 text-center text-sm text-ink/60">
         {t("haveAccount")}{" "}
-        <Link href="/login" className="font-medium text-neutral-900 underline">
+        <Link href="/login" className="link-underline font-medium text-ink">
           {t("login")}
         </Link>
       </p>

@@ -44,14 +44,14 @@ export default async function CustomerOrderDetailPage({
       <h1 className="mb-1 text-xl font-semibold uppercase tracking-wide">
         {t("title")} {order.orderNumber}
       </h1>
-      <p className="mb-8 text-sm text-neutral-500">
+      <p className="mb-8 text-sm text-ink/60">
         {order.createdAt.toLocaleDateString("he-IL")} · {statusLabels[order.status]}
       </p>
 
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-700">
+      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink/70">
         {t("items")}
       </h2>
-      <ul className="mb-6 divide-y divide-neutral-200 border-y border-neutral-200">
+      <ul className="mb-6 divide-y divide-gold-soft border-y border-gold-soft">
         {order.items.map((item) => (
           <li key={item.id} className="flex items-center justify-between py-3 text-sm">
             <span>{item.nameSnapshot} × {item.quantity}</span>
@@ -61,30 +61,30 @@ export default async function CustomerOrderDetailPage({
       </ul>
 
       <div className="mb-8 space-y-1 text-sm">
-        <div className="flex justify-between text-neutral-500">
+        <div className="flex justify-between text-ink/60">
           <span>{t("subtotal")}</span>
           <span>{Number(order.subtotal).toFixed(2)} ₪</span>
         </div>
         {Number(order.discountTotal) > 0 && (
-          <div className="flex justify-between text-neutral-500">
+          <div className="flex justify-between text-ink/60">
             <span>{t("discount")}</span>
             <span>-{Number(order.discountTotal).toFixed(2)} ₪</span>
           </div>
         )}
-        <div className="flex justify-between text-neutral-500">
+        <div className="flex justify-between text-ink/60">
           <span>{t("shipping")}</span>
           <span>{Number(order.shippingTotal).toFixed(2)} ₪</span>
         </div>
-        <div className="flex justify-between border-t border-neutral-200 pt-1 font-semibold">
+        <div className="flex justify-between border-t border-gold-soft pt-1 font-semibold">
           <span>{t("total")}</span>
           <span>{Number(order.total).toFixed(2)} ₪</span>
         </div>
       </div>
 
-      <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-neutral-700">
+      <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-ink/70">
         {t("shippingAddress")}
       </h2>
-      <p className="mb-6 text-sm text-neutral-600">
+      <p className="mb-6 text-sm text-ink/60">
         {address.fullName}
         <br />
         {address.street} {address.apartment}, {address.city}, {address.country} {address.zip}

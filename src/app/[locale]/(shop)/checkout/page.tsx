@@ -53,8 +53,8 @@ export default function CheckoutPage() {
   if (lines.length === 0) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center sm:px-8">
-        <p className="mb-6 text-sm text-neutral-500">{t("emptyCart")}</p>
-        <Link href="/category/all" className="border border-neutral-900 px-8 py-3 text-xs font-semibold uppercase tracking-wide hover:bg-neutral-900 hover:text-white">
+        <p className="mb-6 text-sm text-ink/60">{t("emptyCart")}</p>
+        <Link href="/category/all" className="border border-gold-bright px-8 py-3 text-xs font-semibold uppercase tracking-wide hover:bg-gold-bright hover:text-ink">
           {t("continueShopping")}
         </Link>
       </div>
@@ -111,7 +111,7 @@ export default function CheckoutPage() {
       <button
         type="button"
         onClick={() => setShowCoupon((v) => !v)}
-        className="mb-6 text-sm text-neutral-500 underline"
+        className="mb-6 text-sm text-ink/60 underline"
       >
         {t("haveCoupon")}
       </button>
@@ -122,24 +122,24 @@ export default function CheckoutPage() {
             onChange={(e) => setCouponCode(e.target.value)}
             placeholder={t("couponCode")}
             aria-label={t("couponCode")}
-            className="flex-1 border border-neutral-300 px-3 py-2 text-sm"
+            className="flex-1 border border-gold-soft px-3 py-2 text-sm"
             dir="ltr"
           />
         </div>
       )}
       {preview?.couponError && (
-        <p className="mb-6 text-sm text-rose-600">{preview.couponError}</p>
+        <p className="mb-6 text-sm text-clay">{preview.couponError}</p>
       )}
 
-      {error && <p className="mb-6 rounded bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p>}
+      {error && <p className="mb-6 rounded bg-rose-50 px-3 py-2 text-sm text-clay">{error}</p>}
 
       <form action={handleSubmit} className="grid grid-cols-1 gap-10 sm:grid-cols-2">
         <div>
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide">{t("billingDetails")}</h2>
           <div className="space-y-4">
-            <input name="fullName" placeholder={t("fullName")} aria-label={t("fullName")} defaultValue={savedAddress?.fullName} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
-            <input name="email" type="email" placeholder={t("email")} aria-label={t("email")} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
-            <input name="phone" placeholder={t("phone")} aria-label={t("phone")} defaultValue={savedAddress?.phone} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+            <input name="fullName" placeholder={t("fullName")} aria-label={t("fullName")} defaultValue={savedAddress?.fullName} required className="w-full border border-gold-soft px-3 py-2 text-sm" />
+            <input name="email" type="email" placeholder={t("email")} aria-label={t("email")} required className="w-full border border-gold-soft px-3 py-2 text-sm" />
+            <input name="phone" placeholder={t("phone")} aria-label={t("phone")} defaultValue={savedAddress?.phone} className="w-full border border-gold-soft px-3 py-2 text-sm" />
             <input
               name="country"
               placeholder={t("country")}
@@ -147,31 +147,31 @@ export default function CheckoutPage() {
               required
               value={country}
               onChange={(e) => setCountry(e.target.value)}
-              className="w-full border border-neutral-300 px-3 py-2 text-sm"
+              className="w-full border border-gold-soft px-3 py-2 text-sm"
             />
-            <input name="city" placeholder={t("city")} aria-label={t("city")} defaultValue={savedAddress?.city} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
-            <input name="street" placeholder={t("street")} aria-label={t("street")} defaultValue={savedAddress?.street} required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
-            <input name="apartment" placeholder={t("apartment")} aria-label={t("apartment")} defaultValue={savedAddress?.apartment} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
-            <input name="zip" placeholder={t("zip")} aria-label={t("zip")} defaultValue={savedAddress?.zip} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
-            <textarea name="orderNotes" placeholder={t("orderNotes")} aria-label={t("orderNotes")} rows={3} className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+            <input name="city" placeholder={t("city")} aria-label={t("city")} defaultValue={savedAddress?.city} required className="w-full border border-gold-soft px-3 py-2 text-sm" />
+            <input name="street" placeholder={t("street")} aria-label={t("street")} defaultValue={savedAddress?.street} required className="w-full border border-gold-soft px-3 py-2 text-sm" />
+            <input name="apartment" placeholder={t("apartment")} aria-label={t("apartment")} defaultValue={savedAddress?.apartment} className="w-full border border-gold-soft px-3 py-2 text-sm" />
+            <input name="zip" placeholder={t("zip")} aria-label={t("zip")} defaultValue={savedAddress?.zip} className="w-full border border-gold-soft px-3 py-2 text-sm" />
+            <textarea name="orderNotes" placeholder={t("orderNotes")} aria-label={t("orderNotes")} rows={3} className="w-full border border-gold-soft px-3 py-2 text-sm" />
           </div>
         </div>
 
         <div>
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide">{t("yourOrder")}</h2>
-          <div className="border border-neutral-200 p-5">
+          <div className="border border-gold-soft p-5">
             {lines.map((l) => (
               <div key={l.key} className="flex justify-between py-2 text-sm">
                 <span>{l.name}{l.variantLabel ? ` — ${l.variantLabel}` : ""} × {l.quantity}</span>
                 <span>{(l.price * l.quantity).toFixed(2)} ₪</span>
               </div>
             ))}
-            <div className="flex justify-between border-t border-neutral-200 py-2 text-sm">
+            <div className="flex justify-between border-t border-gold-soft py-2 text-sm">
               <span>{t("subtotal")}</span>
               <span>{subtotal.toFixed(2)} ₪</span>
             </div>
             {discount > 0 && (
-              <div className="flex justify-between py-2 text-sm text-rose-600">
+              <div className="flex justify-between py-2 text-sm text-clay">
                 <span>הנחה</span>
                 <span>-{discount.toFixed(2)} ₪</span>
               </div>
@@ -180,7 +180,7 @@ export default function CheckoutPage() {
               <span>{t("shipping")}</span>
               <span>{shippingCost > 0 ? `${shippingCost.toFixed(2)} ₪` : t("free")}</span>
             </div>
-            <div className="flex justify-between border-t border-neutral-200 py-2 text-sm font-semibold">
+            <div className="flex justify-between border-t border-gold-soft py-2 text-sm font-semibold">
               <span>{t("total")}</span>
               <span>{total.toFixed(2)} ₪</span>
             </div>
@@ -188,7 +188,7 @@ export default function CheckoutPage() {
 
           <h2 className="mb-3 mt-6 text-sm font-semibold uppercase tracking-wide">{t("paymentMethod")}</h2>
           <div className="space-y-2">
-            <label className="flex items-center gap-2 border border-neutral-200 p-3 text-sm">
+            <label className="flex items-center gap-2 border border-gold-soft p-3 text-sm">
               <input
                 type="radio"
                 name="paymentMethodChoice"
@@ -197,7 +197,7 @@ export default function CheckoutPage() {
               />
               {t("bankTransfer")}
             </label>
-            <label className="flex items-center gap-2 border border-neutral-200 p-3 text-sm">
+            <label className="flex items-center gap-2 border border-gold-soft p-3 text-sm">
               <input
                 type="radio"
                 name="paymentMethodChoice"
@@ -211,7 +211,7 @@ export default function CheckoutPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="mt-6 w-full border border-neutral-900 bg-neutral-900 py-3 text-xs font-semibold uppercase tracking-wide text-white hover:bg-neutral-800 disabled:opacity-50"
+            className="mt-6 w-full border border-gold-bright bg-ink py-3 text-xs font-semibold uppercase tracking-wide text-paper hover:bg-gold-bright disabled:opacity-50"
           >
             {submitting ? t("placing") : t("placeOrder")}
           </button>

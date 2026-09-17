@@ -33,13 +33,13 @@ export function CookieConsentBanner() {
   }
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-neutral-200 bg-white p-4 shadow-lg sm:p-6">
+    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-gold-soft bg-paper p-4 shadow-lg sm:p-6">
       <div className="mx-auto max-w-4xl">
-        <p className="mb-3 text-sm text-neutral-600">{t("message")}</p>
+        <p className="mb-3 text-sm text-ink/70">{t("message")}</p>
 
         {showSettings && (
           <div className="mb-3 flex flex-wrap gap-4 text-sm">
-            <label className="flex items-center gap-2 text-neutral-400">
+            <label className="flex items-center gap-2 text-ink/50">
               <input type="checkbox" checked disabled /> {t("necessary")}
             </label>
             <label className="flex items-center gap-2">
@@ -54,18 +54,18 @@ export function CookieConsentBanner() {
         )}
 
         <div className="flex flex-wrap gap-2">
-          <button onClick={acceptAll} className="border border-neutral-900 bg-neutral-900 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white hover:bg-neutral-800">
+          <button onClick={acceptAll} className="border border-gold-bright bg-ink px-4 py-2 text-xs font-semibold uppercase tracking-wide text-paper hover:bg-gold-bright">
             {t("acceptAll")}
           </button>
-          <button onClick={rejectNonEssential} className="border border-neutral-300 px-4 py-2 text-xs font-semibold uppercase tracking-wide hover:bg-neutral-100">
+          <button onClick={rejectNonEssential} className="border border-gold-soft px-4 py-2 text-xs font-semibold uppercase tracking-wide hover:bg-paper-soft">
             {t("rejectNonEssential")}
           </button>
           {showSettings ? (
-            <button onClick={savePreferences} className="border border-neutral-300 px-4 py-2 text-xs font-semibold uppercase tracking-wide hover:bg-neutral-100">
+            <button onClick={savePreferences} className="border border-gold-soft px-4 py-2 text-xs font-semibold uppercase tracking-wide hover:bg-paper-soft">
               {t("save")}
             </button>
           ) : (
-            <button onClick={() => setShowSettings(true)} className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-neutral-500 underline">
+            <button onClick={() => setShowSettings(true)} className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-ink/60 underline">
               {t("settings")}
             </button>
           )}

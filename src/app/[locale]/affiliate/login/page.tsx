@@ -16,32 +16,32 @@ export default function AffiliateLoginPage() {
       <h1 className="mb-6 text-center text-xl font-semibold uppercase tracking-wide">{t("dashTitle")}</h1>
 
       {state?.error && (
-        <p className="mb-4 rounded bg-rose-50 px-3 py-2 text-sm text-rose-600">{state.error}</p>
+        <p className="mb-4 rounded bg-rose-50 px-3 py-2 text-sm text-clay">{state.error}</p>
       )}
 
       <form action={action}>
         <div className="mb-4">
-          <label className="mb-1 block text-xs font-medium text-neutral-500">{t("email")}</label>
-          <input name="email" type="email" required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+          <label className="mb-1 block text-xs font-medium text-ink/60">{t("email")}</label>
+          <input name="email" type="email" required className="w-full border border-gold-soft px-3 py-2 text-sm" />
         </div>
         <div className="mb-6">
-          <label className="mb-1 block text-xs font-medium text-neutral-500">{t("password")}</label>
-          <input name="password" type="password" required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+          <label className="mb-1 block text-xs font-medium text-ink/60">{t("password")}</label>
+          <input name="password" type="password" required className="w-full border border-gold-soft px-3 py-2 text-sm" />
         </div>
-        <Link href="/reset-password" className="mb-6 block text-end text-xs text-neutral-400 underline">
+        <Link href="/reset-password" className="mb-6 block text-end text-xs text-ink/50 underline">
           {tLogin("forgot")}
         </Link>
         <button
           type="submit"
           disabled={pending}
-          className="w-full border border-neutral-900 bg-neutral-900 py-3 text-xs font-semibold uppercase tracking-wide text-white hover:bg-neutral-800 disabled:opacity-50"
+          className="w-full border border-gold-bright bg-ink py-3 text-xs font-semibold uppercase tracking-wide text-paper hover:bg-gold-bright disabled:opacity-50"
         >
           {pending ? tLogin("submitting") : tLogin("submit")}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-neutral-500">
-        <Link href="/affiliate" className="font-medium text-neutral-900 underline">
+      <p className="mt-6 text-center text-sm text-ink/60">
+        <Link href="/affiliate" className="font-medium text-ink underline">
           {t("apply")}
         </Link>
       </p>

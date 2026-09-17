@@ -35,11 +35,11 @@ export default async function SearchPage({
       <h1 className="mb-2 text-center text-xl font-semibold uppercase tracking-[0.2em]">
         {t("resultsFor")} &quot;{q}&quot;
       </h1>
-      <p className="mb-10 text-center text-sm text-neutral-400">
+      <p className="mb-10 text-center text-sm text-ink/50">
         {cards.length} {cards.length === 1 ? tCat("item") : tCat("items")}
       </p>
       {cards.length === 0 ? (
-        <p className="text-center text-neutral-500">{t("noResults")}</p>
+        <p className="text-center text-ink/60">{t("noResults")}</p>
       ) : (
         <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
           {cards.map((p) => (

@@ -111,11 +111,11 @@ export default async function CategoryPage({
         </div>
       )}
       <h1 className="mb-2 text-center text-2xl font-semibold uppercase tracking-[0.2em]">{title}</h1>
-      <p className="mb-10 text-center text-sm text-neutral-400">
+      <p className="mb-10 text-center text-sm text-ink/50">
         {totalCount} {totalCount === 1 ? tCat("item") : tCat("items")}
       </p>
       {cards.length === 0 ? (
-        <p className="text-center text-neutral-500">{tCat("noProducts")}</p>
+        <p className="text-center text-ink/60">{tCat("noProducts")}</p>
       ) : (
         <>
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
@@ -131,8 +131,8 @@ export default async function CategoryPage({
                   href={p === 1 ? `/category/${slug}` : `/category/${slug}?page=${p}`}
                   className={`flex h-9 w-9 items-center justify-center border text-sm ${
                     p === page
-                      ? "border-neutral-900 bg-neutral-900 text-white"
-                      : "border-neutral-300 text-neutral-700 hover:border-neutral-900"
+                      ? "border-gold-bright bg-ink text-paper"
+                      : "border-gold-soft text-ink/80 hover:border-gold"
                   }`}
                 >
                   {p}

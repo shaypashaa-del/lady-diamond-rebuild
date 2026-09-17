@@ -32,8 +32,8 @@ export default function WishlistPage() {
       <h1 className="mb-10 text-center text-2xl font-semibold uppercase tracking-[0.2em]">{t("title")}</h1>
       {cards.length === 0 ? (
         <div className="text-center">
-          <p className="mb-6 text-sm text-neutral-500">{t("empty")}</p>
-          <Link href="/category/all" className="border border-neutral-900 px-8 py-3 text-xs font-semibold uppercase tracking-wide hover:bg-neutral-900 hover:text-white">
+          <p className="mb-6 text-sm text-ink/60">{t("empty")}</p>
+          <Link href="/category/all" className="border border-gold-bright px-8 py-3 text-xs font-semibold uppercase tracking-wide hover:bg-gold-bright hover:text-ink">
             {t("continueShopping")}
           </Link>
         </div>

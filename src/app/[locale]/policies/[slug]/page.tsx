@@ -31,7 +31,7 @@ export default async function PolicyPage({
       <h1 className="mb-6 text-xl font-semibold uppercase tracking-wide">
         {localize(page.title as LocalizedText, locale)}
       </h1>
-      <p className="whitespace-pre-line text-sm leading-7 text-neutral-600">
+      <p className="whitespace-pre-line text-sm leading-7 text-ink/70">
         {localize(page.body as LocalizedText, locale)}
       </p>
     </div>

@@ -17,16 +17,16 @@ export default function RequestResetPage() {
       <h1 className="mb-6 text-center text-xl font-semibold uppercase tracking-wide">{t("title")}</h1>
 
       {state && "error" in state && (
-        <p className="mb-4 rounded bg-rose-50 px-3 py-2 text-sm text-rose-600">{state.error}</p>
+        <p className="mb-4 border border-clay/30 bg-clay/10 px-3 py-2 text-sm text-clay">{state.error}</p>
       )}
 
       {state && "sent" in state ? (
         <div>
-          <p className="mb-4 rounded bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{t("sent")}</p>
+          <p className="mb-4 border border-gold-soft bg-paper-soft px-3 py-2 text-sm text-ink">{t("sent")}</p>
           {state.resetLink && (
-            <div className="mb-4 rounded bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            <div className="mb-4 border border-gold-soft bg-paper-soft px-3 py-2 text-xs text-ink/70">
               <p className="mb-1 font-medium">{t("devLinkNote")}</p>
-              <Link href={state.resetLink} className="underline" dir="ltr">
+              <Link href={state.resetLink} className="link-underline" dir="ltr">
                 {state.resetLink}
               </Link>
             </div>
@@ -35,21 +35,21 @@ export default function RequestResetPage() {
       ) : (
         <form action={action}>
           <div className="mb-6">
-            <label className="mb-1 block text-xs font-medium text-neutral-500">{t("email")}</label>
-            <input name="email" type="email" required className="w-full border border-neutral-300 px-3 py-2 text-sm" />
+            <label className="mb-1 block text-xs font-medium text-ink/60">{t("email")}</label>
+            <input name="email" type="email" required className="w-full border border-gold-soft px-3 py-2 text-sm" />
           </div>
           <button
             type="submit"
             disabled={pending}
-            className="w-full border border-neutral-900 bg-neutral-900 py-3 text-xs font-semibold uppercase tracking-wide text-white hover:bg-neutral-800 disabled:opacity-50"
+            className="w-full border border-gold-bright bg-ink py-3 text-xs font-semibold uppercase tracking-wide text-paper hover:bg-gold-bright disabled:opacity-50"
           >
             {pending ? t("submitting") : t("submit")}
           </button>
         </form>
       )}
 
-      <p className="mt-6 text-center text-sm text-neutral-500">
-        <Link href="/login" className="font-medium text-neutral-900 underline">
+      <p className="mt-6 text-center text-sm text-ink/60">
+        <Link href="/login" className="font-medium text-ink underline">
           {t("backToLogin")}
         </Link>
       </p>

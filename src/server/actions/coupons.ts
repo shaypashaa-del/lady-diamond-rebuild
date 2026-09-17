@@ -20,6 +20,10 @@ export async function createCoupon(
   const affiliateId = String(formData.get("affiliateId") ?? "") || null;
 
   if (!code) return { error: "יש להזין קוד קופון." };
+  if (discountValue < 0) return { error: "ערך ההנחה לא יכול להיות שלילי." };
+  if (discountType === "PERCENTAGE" && discountValue > 100) {
+    return { error: "אחוז הנחה לא יכול להיות מעל 100%." };
+  }
 
   try {
     await prisma.coupon.create({

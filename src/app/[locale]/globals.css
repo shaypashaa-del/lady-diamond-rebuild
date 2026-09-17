@@ -1,34 +1,34 @@
 @import "tailwindcss";
 
-/* Lady Diamond Jewels — design tokens.
-   Warm parchment/ink palette with an antique-brass accent, evoking the
-   brand's own material world (gold, silver, handworked at home) instead
-   of a generic stark white/gray storefront. */
+/* Lady Diamond Jewels — design tokens, matched to the real brand's actual
+   identity (its logo and photography) rather than an invented palette:
+   crisp white, warm charcoal text, and the logo's antique gold as the one
+   accent color, carried through as a live, dynamic layer of detail (motion,
+   hover states, gold accent lines) rather than flat, static blocks. */
 :root {
-  --ivory: #faf7f2;
-  --ivory-deep: #f2ecdf;
-  --ink: #2b2622;
-  --gold: #a6813c;
-  --gold-soft: #e8dcc2;
-  --clay: #b16b54;
-  --stone: #8a8175;
+  --paper: #ffffff;
+  --paper-soft: #f7f5f1;
+  --ink: #2b2b2b;
+  --gold: #b0893f;
+  --gold-bright: #d4af6a;
+  --gold-soft: #ede2c8;
+  --clay: #a24a3f;
 
-  --background: var(--ivory);
+  --background: var(--paper);
   --foreground: var(--ink);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-ivory: var(--ivory);
-  --color-ivory-deep: var(--ivory-deep);
+  --color-paper: var(--paper);
+  --color-paper-soft: var(--paper-soft);
   --color-ink: var(--ink);
   --color-gold: var(--gold);
+  --color-gold-bright: var(--gold-bright);
   --color-gold-soft: var(--gold-soft);
   --color-clay: var(--clay);
-  --color-stone: var(--stone);
   --font-sans: var(--font-body);
-  --font-display: var(--font-display);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -38,23 +38,23 @@ body {
   font-family: var(--font-body), system-ui, sans-serif;
 }
 
-h1,
-h2,
-h3,
-.font-display {
-  font-family: var(--font-display), Georgia, serif;
-}
-
-/* Signature motif: a fine, continuous hairline rule — echoing the brand's
-   own product language ("a ring that wraps the finger in one continuous
-   line"). Used as a quiet divider under section kickers and as the
-   underline reveal on text links. */
+/* Signature motif: a fine, continuous gold line — echoing the brand's own
+   description of its pieces ("a ring that wraps the finger in one
+   continuous line"). Used as a quiet divider and as a hover reveal. */
 .gold-rule {
   display: block;
   height: 1px;
   width: 3rem;
   margin-inline: auto;
   background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.gold-rule-start {
+  display: block;
+  height: 1px;
+  width: 3rem;
+  margin-inline: 0;
+  background: linear-gradient(90deg, var(--gold-bright), transparent);
 }
 
 .link-underline {
@@ -76,9 +76,46 @@ h3,
   transform: scaleX(1);
 }
 
-/* Warm placeholder for products without a real photo yet — a soft
-   ivory-to-gold wash instead of a flat gray box, so a missing image reads
-   as "not photographed yet" rather than "broken". */
+/* Warm placeholder for products not photographed yet — a soft gold wash
+   instead of a flat gray box. */
 .placeholder-gradient {
-  background: linear-gradient(135deg, var(--ivory-deep) 0%, var(--gold-soft) 100%);
+  background: linear-gradient(135deg, var(--paper-soft) 0%, var(--gold-soft) 100%);
+}
+
+/* A slow image-zoom on hover — the one piece of "alive" motion carried
+   across every product card, gallery tile, and category banner so the
+   whole catalog feels considered rather than static. */
+.zoom-on-hover {
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.zoom-on-hover-trigger:hover .zoom-on-hover {
+  transform: scale(1.05);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zoom-on-hover,
+  .link-underline::after {
+    transition: none !important;
+  }
+}
+
+/* Gentle scroll-reveal for section content — a single, disciplined motion
+   pattern (fade + rise), not scattered per-component animation. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rise-in {
+  animation: rise-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rise-in {
+    animation: none;
+  }
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -31,11 +32,14 @@ export function Header() {
   }
 
   return (
-    <header className="relative z-40 border-b border-gold-soft bg-ivory">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-8">
-        <Link href="/" className="flex flex-col items-center leading-none">
-          <span className="font-display text-xl tracking-[0.15em] text-ink">{t("brand")}</span>
-          <span className="mt-1 text-[10px] tracking-[0.3em] text-gold">{t("since")}</span>
+    <header className="relative z-40 border-b border-gold-soft bg-paper">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-8">
+        <Link href="/" className="flex items-center gap-3">
+          <Image src="/brand/logo.png" alt={t("brand")} width={44} height={36} className="h-9 w-auto" priority />
+          <span className="hidden flex-col leading-none sm:flex">
+            <span className="text-lg font-semibold tracking-[0.1em] text-ink">{t("brand")}</span>
+            <span className="mt-1 text-[10px] tracking-[0.3em] text-gold">{t("since")}</span>
+          </span>
         </Link>
 
         <div className="flex items-center gap-4">

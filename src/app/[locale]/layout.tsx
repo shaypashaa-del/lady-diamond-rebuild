@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Frank_Ruhl_Libre, Assistant, Geist_Mono } from "next/font/google";
+import { Rubik, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -17,17 +17,11 @@ import { getContentBlock, type AnnouncementBarContent } from "@/server/actions/c
 import { CONTENT_KEYS } from "@/lib/content-keys";
 import { t as tContent } from "@/lib/i18n-content";
 
-// Frank Ruhl Libre: an editorial Hebrew serif for headings — warm and
-// crafted rather than the generic geometric sans the site launched with.
-// Assistant: a clean Hebrew-native sans for body text, paired to feel
-// intentional rather than a stock system-font fallback.
-const displayFont = Frank_Ruhl_Libre({
-  variable: "--font-display",
-  subsets: ["latin", "hebrew"],
-  weight: ["400", "700"],
-});
-
-const bodyFont = Assistant({
+// Rubik: a clean geometric sans with full Hebrew + Latin coverage — matches
+// the real brand's actual look (its live site runs Poppins, which has no
+// Hebrew glyphs; Rubik is the closest Hebrew-native equivalent) rather than
+// the invented editorial-serif direction from an earlier pass.
+const bodyFont = Rubik({
   variable: "--font-body",
   subsets: ["latin", "hebrew"],
   weight: ["400", "500", "600", "700"],
@@ -98,7 +92,7 @@ export default async function LocaleLayout({
     <html
       lang={locale}
       dir={dir}
-      className={`${displayFont.variable} ${bodyFont.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${bodyFont.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <JsonLd data={[organizationSchema(), websiteSchema()]} />

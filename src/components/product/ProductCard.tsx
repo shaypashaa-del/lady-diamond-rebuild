@@ -72,10 +72,10 @@ export function ProductCard({ product }: { product: SampleProduct }) {
               alt={product.imageAlt ?? product.name}
               fill
               sizes="(min-width: 640px) 25vw, 50vw"
-              className="object-cover"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
             />
           ) : (
-            <span className="font-display text-sm text-gold">{product.name}</span>
+            <span className="text-sm text-gold">{product.name}</span>
           )}
         </Link>
       </div>

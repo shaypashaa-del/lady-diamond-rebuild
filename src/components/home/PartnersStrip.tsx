@@ -5,7 +5,7 @@ const partners = ["Vogue", "Elle", "L'Officiel", "Marie Claire", "Glamour"];
 export function PartnersStrip() {
   const t = useTranslations("Home");
   return (
-    <section className="border-y border-gold-soft bg-ivory-deep py-10">
+    <section className="border-y border-gold-soft bg-paper-soft py-10">
       <p className="mb-6 text-center text-xs font-semibold uppercase tracking-[0.3em] text-neutral-400">
         {t("asSeenIn")}
       </p>

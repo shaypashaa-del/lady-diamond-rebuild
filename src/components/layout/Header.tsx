@@ -81,16 +81,16 @@ export function Header() {
       </div>
 
       {searchOpen && (
-        <div className="border-t border-neutral-200 bg-white px-4 py-3 sm:px-8">
+        <div className="border-t border-gold-soft bg-paper px-4 py-3 sm:px-8">
           <form onSubmit={submitSearch} className="mx-auto flex max-w-7xl gap-2">
             <input
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={tSearch("placeholder")}
-              className="flex-1 border border-neutral-300 px-3 py-2 text-sm"
+              className="flex-1 border border-gold-soft px-3 py-2 text-sm text-ink focus:border-gold focus:outline-none"
             />
-            <button type="submit" className="border border-neutral-900 px-4 py-2 text-xs font-semibold uppercase tracking-wide hover:bg-neutral-900 hover:text-white">
+            <button type="submit" className="border border-gold-bright px-4 py-2 text-xs font-semibold uppercase tracking-wide text-ink transition-colors hover:bg-gold-bright hover:text-ink">
               {t("search")}
             </button>
           </form>
@@ -104,13 +104,13 @@ export function Header() {
             onClick={() => setOpen(false)}
             aria-hidden
           />
-          <nav className="relative flex h-full w-full max-w-sm flex-col overflow-y-auto bg-white p-6 shadow-xl">
+          <nav className="relative flex h-full w-full max-w-sm flex-col overflow-y-auto bg-paper p-6 shadow-xl">
             <div className="mb-6 flex items-center justify-between">
               <LocaleSwitcher />
               <button
                 aria-label={t("closeMenu")}
                 onClick={() => setOpen(false)}
-                className="text-neutral-700 hover:text-black"
+                className="text-ink/70 transition-colors hover:text-gold"
               >
                 <X size={22} />
               </button>
@@ -122,12 +122,12 @@ export function Header() {
                   <Link
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="link-underline font-medium uppercase text-neutral-900 transition-colors hover:text-gold"
+                    className="link-underline font-medium uppercase text-ink transition-colors hover:text-gold"
                   >
                     {tNav(item.key)}
                   </Link>
                   {"mega" in item && item.mega && (
-                    <ul className="mt-3 space-y-2 border-s border-gold-soft ps-4 text-neutral-500">
+                    <ul className="mt-3 space-y-2 border-s border-gold-soft ps-4 text-ink/60">
                       {item.mega.map((cat) => (
                         <li key={cat.key}>
                           <Link href={cat.href} onClick={() => setOpen(false)} className="transition-colors hover:text-gold">
@@ -146,27 +146,27 @@ export function Header() {
                 submitSearch(e);
                 setOpen(false);
               }}
-              className="mt-auto flex gap-2 border-t border-neutral-200 pt-6 sm:hidden"
+              className="mt-auto flex gap-2 border-t border-gold-soft pt-6 sm:hidden"
             >
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={tSearch("placeholder")}
-                className="flex-1 border border-neutral-300 px-3 py-2 text-sm"
+                className="flex-1 border border-gold-soft px-3 py-2 text-sm text-ink focus:border-gold focus:outline-none"
               />
-              <button type="submit" aria-label={t("search")} className="border border-neutral-900 px-3">
+              <button type="submit" aria-label={t("search")} className="border border-gold-bright px-3 text-ink transition-colors hover:bg-gold-bright">
                 <Search size={16} />
               </button>
             </form>
 
-            <div className="flex items-center gap-4 border-t border-neutral-200 pt-6 sm:hidden">
-              <Link href="/account" onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm">
+            <div className="flex items-center gap-4 border-t border-gold-soft pt-6 text-ink sm:hidden">
+              <Link href="/account" onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm transition-colors hover:text-gold">
                 <User size={16} /> {tNav("account")}
               </Link>
-              <Link href="/wishlist" onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm">
+              <Link href="/wishlist" onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm transition-colors hover:text-gold">
                 <Heart size={16} /> {tProduct("wishlist")}
               </Link>
-              <Link href="/cart" onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm">
+              <Link href="/cart" onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm transition-colors hover:text-gold">
                 <ShoppingBag size={16} /> {tNav("cart")}
               </Link>
             </div>

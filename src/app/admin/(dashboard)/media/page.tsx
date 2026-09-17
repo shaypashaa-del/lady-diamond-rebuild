@@ -2,9 +2,28 @@ import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { MediaUploadForm } from "@/components/admin/MediaUploadForm";
 import { DeleteMediaButton } from "@/components/admin/DeleteMediaButton";
+import { AdminPager } from "@/components/admin/AdminPager";
 
-export default async function AdminMediaPage() {
-  const media = await prisma.mediaAsset.findMany({ orderBy: { createdAt: "desc" } });
+const PAGE_SIZE = 60;
+
+export default async function AdminMediaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageRaw } = await searchParams;
+  const parsedPage = Number.parseInt(pageRaw ?? "1", 10);
+  const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+
+  const [media, totalCount] = await Promise.all([
+    prisma.mediaAsset.findMany({
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.mediaAsset.count(),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
     <div>
@@ -32,6 +51,7 @@ export default async function AdminMediaPage() {
           <p className="col-span-full py-8 text-center text-sm text-neutral-400">אין תמונות עדיין.</p>
         )}
       </div>
+      <AdminPager page={page} totalPages={totalPages} basePath="/admin/media" />
     </div>
   );
 }

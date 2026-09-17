@@ -291,8 +291,8 @@ async function main() {
   console.log(`Seeded ${categories.length} categories and ${products.length} products.`);
 
   console.log("Seeding super admin user...");
-  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "admin@ladydiamondjewels.com";
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "ChangeMe123!";
+  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "diana@ladydiamondjewels.com";
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "100200300";
   await prisma.user.upsert({
     where: { email: adminEmail },
     update: {},

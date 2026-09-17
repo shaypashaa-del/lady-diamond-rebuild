@@ -10,6 +10,7 @@ import { getAttributionWindowDays } from "@/server/actions/affiliate";
 import { paymentProviders, type PaymentMethodId } from "@/server/payments/types";
 import { upsertAddress } from "@/lib/address-service";
 import { emailProvider } from "@/server/email/types";
+import { isValidEmail } from "@/lib/validation";
 
 export type CheckoutLine = {
   productId: string; // product slug, resolved to a real id below
@@ -54,6 +55,23 @@ function generateOrderNumber() {
 export async function createOrder(input: CheckoutInput): Promise<CheckoutResult> {
   if (input.lines.length === 0) {
     return { error: "העגלה ריקה." };
+  }
+
+  // The client marks these fields `required` in HTML, but that's trivially
+  // bypassable (devtools, or a direct call to this action) — without a
+  // server-side check an order could be created with no way to actually
+  // contact or ship to the customer.
+  const { billingAddress } = input;
+  if (
+    !input.email?.trim() ||
+    !isValidEmail(input.email.trim()) ||
+    !billingAddress?.fullName?.trim() ||
+    !billingAddress?.phone?.trim() ||
+    !billingAddress?.country?.trim() ||
+    !billingAddress?.city?.trim() ||
+    !billingAddress?.street?.trim()
+  ) {
+    return { error: "נא למלא את כל פרטי החיוב הנדרשים (שם, אימייל, טלפון, מדינה, עיר וכתובת)." };
   }
 
   // Resolve slugs -> real product ids (client cart lines key products by slug).

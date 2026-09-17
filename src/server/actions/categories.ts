@@ -18,7 +18,12 @@ function optionalLocalizedFromForm(formData: FormData, prefix: string) {
   return value.he || value.en || value.ru ? value : undefined;
 }
 
-export async function createCategory(formData: FormData) {
+export type CategoryFormResult = { error: string } | void;
+
+export async function createCategory(
+  _prevState: CategoryFormResult,
+  formData: FormData
+): Promise<CategoryFormResult> {
   await requireAdminSession();
   const slug = String(formData.get("slug"));
   const name = localizedFromForm(formData, "name");
@@ -28,15 +33,23 @@ export async function createCategory(formData: FormData) {
   const seoTitle = optionalLocalizedFromForm(formData, "seoTitle");
   const seoDescription = optionalLocalizedFromForm(formData, "seoDescription");
 
-  await prisma.category.create({
-    data: { slug, name, description, sortOrder, imageId, seoTitle, seoDescription },
-  });
+  try {
+    await prisma.category.create({
+      data: { slug, name, description, sortOrder, imageId, seoTitle, seoDescription },
+    });
+  } catch {
+    return { error: `קטגוריה עם הכתובת (slug) "${slug}" כבר קיימת.` };
+  }
 
   revalidatePath("/admin/categories");
   redirect("/admin/categories");
 }
 
-export async function updateCategory(id: string, formData: FormData) {
+export async function updateCategory(
+  id: string,
+  _prevState: CategoryFormResult,
+  formData: FormData
+): Promise<CategoryFormResult> {
   await requireAdminSession();
   const slug = String(formData.get("slug"));
   const name = localizedFromForm(formData, "name");
@@ -46,10 +59,14 @@ export async function updateCategory(id: string, formData: FormData) {
   const seoTitle = optionalLocalizedFromForm(formData, "seoTitle");
   const seoDescription = optionalLocalizedFromForm(formData, "seoDescription");
 
-  await prisma.category.update({
-    where: { id },
-    data: { slug, name, description, sortOrder, imageId, seoTitle, seoDescription },
-  });
+  try {
+    await prisma.category.update({
+      where: { id },
+      data: { slug, name, description, sortOrder, imageId, seoTitle, seoDescription },
+    });
+  } catch {
+    return { error: `קטגוריה עם הכתובת (slug) "${slug}" כבר קיימת.` };
+  }
 
   revalidatePath("/admin/categories");
   redirect("/admin/categories");

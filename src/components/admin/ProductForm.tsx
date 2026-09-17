@@ -1,4 +1,8 @@
+"use client";
+
+import { useActionState } from "react";
 import type { LocalizedText } from "@/lib/i18n-content";
+import type { ProductFormResult } from "@/server/actions/products";
 
 type CategoryOption = { id: string; name: LocalizedText };
 type TagOption = { id: string; name: LocalizedText };
@@ -64,7 +68,7 @@ export function ProductForm({
   initial,
   submitLabel,
 }: {
-  action: (formData: FormData) => void;
+  action: (prevState: ProductFormResult, formData: FormData) => Promise<ProductFormResult>;
   categories: CategoryOption[];
   tags: TagOption[];
   relatedOptions: ProductOption[];
@@ -73,9 +77,13 @@ export function ProductForm({
 }) {
   const selectedTagIds = new Set(initial?.tagIds ?? []);
   const selectedRelatedIds = new Set(initial?.relatedIds ?? []);
+  const [state, formAction, pending] = useActionState(action, undefined);
 
   return (
-    <form action={action} className="max-w-3xl space-y-6">
+    <form action={formAction} className="max-w-3xl space-y-6">
+      {state?.error && (
+        <p className="rounded bg-rose-50 px-3 py-2 text-sm text-rose-600">{state.error}</p>
+      )}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label className="mb-1 block text-xs font-medium text-neutral-500">Slug (כתובת URL)</label>
@@ -224,7 +232,8 @@ export function ProductForm({
 
       <button
         type="submit"
-        className="rounded bg-neutral-900 px-6 py-2.5 text-sm font-medium text-white hover:bg-neutral-800"
+        disabled={pending}
+        className="rounded bg-neutral-900 px-6 py-2.5 text-sm font-medium text-white hover:bg-neutral-800 disabled:opacity-50"
       >
         {submitLabel}
       </button>

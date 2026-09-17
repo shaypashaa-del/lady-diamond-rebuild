@@ -70,27 +70,37 @@ async function syncTagsAndRelated(productId: string, tagIds: string[], relatedId
   }
 }
 
-export async function createProduct(formData: FormData) {
+export type ProductFormResult = { error: string } | void;
+
+export async function createProduct(
+  _prevState: ProductFormResult,
+  formData: FormData
+): Promise<ProductFormResult> {
   await requireAdminSession();
   const data = readProductForm(formData);
 
-  const product = await prisma.product.create({
-    data: {
-      slug: data.slug,
-      name: data.name,
-      shortDescription: data.shortDescription,
-      description: data.description,
-      seoTitle: data.seoTitle,
-      seoDescription: data.seoDescription,
-      basePrice: data.basePrice,
-      salePrice: data.salePrice,
-      sku: data.sku,
-      inventory: data.inventory,
-      weightGrams: data.weightGrams,
-      status: data.status,
-      isFeatured: data.isFeatured,
-    },
-  });
+  let product;
+  try {
+    product = await prisma.product.create({
+      data: {
+        slug: data.slug,
+        name: data.name,
+        shortDescription: data.shortDescription,
+        description: data.description,
+        seoTitle: data.seoTitle,
+        seoDescription: data.seoDescription,
+        basePrice: data.basePrice,
+        salePrice: data.salePrice,
+        sku: data.sku,
+        inventory: data.inventory,
+        weightGrams: data.weightGrams,
+        status: data.status,
+        isFeatured: data.isFeatured,
+      },
+    });
+  } catch {
+    return { error: `מוצר עם הכתובת (slug) "${data.slug}" כבר קיים.` };
+  }
 
   if (data.categoryId) {
     await prisma.productCategory.create({
@@ -104,28 +114,36 @@ export async function createProduct(formData: FormData) {
   redirect("/admin/products");
 }
 
-export async function updateProduct(id: string, formData: FormData) {
+export async function updateProduct(
+  id: string,
+  _prevState: ProductFormResult,
+  formData: FormData
+): Promise<ProductFormResult> {
   await requireAdminSession();
   const data = readProductForm(formData);
 
-  await prisma.product.update({
-    where: { id },
-    data: {
-      slug: data.slug,
-      name: data.name,
-      shortDescription: data.shortDescription,
-      description: data.description,
-      seoTitle: data.seoTitle,
-      seoDescription: data.seoDescription,
-      basePrice: data.basePrice,
-      salePrice: data.salePrice,
-      sku: data.sku,
-      inventory: data.inventory,
-      weightGrams: data.weightGrams,
-      status: data.status,
-      isFeatured: data.isFeatured,
-    },
-  });
+  try {
+    await prisma.product.update({
+      where: { id },
+      data: {
+        slug: data.slug,
+        name: data.name,
+        shortDescription: data.shortDescription,
+        description: data.description,
+        seoTitle: data.seoTitle,
+        seoDescription: data.seoDescription,
+        basePrice: data.basePrice,
+        salePrice: data.salePrice,
+        sku: data.sku,
+        inventory: data.inventory,
+        weightGrams: data.weightGrams,
+        status: data.status,
+        isFeatured: data.isFeatured,
+      },
+    });
+  } catch {
+    return { error: `מוצר עם הכתובת (slug) "${data.slug}" כבר קיים.` };
+  }
 
   if (data.categoryId) {
     await prisma.productCategory.deleteMany({ where: { productId: id } });

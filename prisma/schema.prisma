@@ -257,6 +257,8 @@ model ContactMessage {
   message   String
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
+
+  @@index([isRead])
 }
 
 model NewsletterSubscriber {
@@ -317,6 +319,10 @@ model Order {
 
   @@index([status])
   @@index([affiliateId])
+  @@index([paymentStatus])
+  @@index([email])
+  @@index([userId])
+  @@index([couponId])
 }
 
 model OrderItem {
@@ -441,8 +447,13 @@ model AffiliateClick {
   ip          String?
   createdAt   DateTime @default(now())
 
+  // The dedup lookup in trackReferral filters on both columns together
+  // (affiliateId + sessionId) — a compound index serves that exact-match
+  // query directly instead of relying on two independent single-column
+  // indexes. Kept the single-column affiliateId index too since admin
+  // analytics/click-count queries filter by affiliateId alone.
   @@index([affiliateId])
-  @@index([sessionId])
+  @@index([affiliateId, sessionId])
 }
 
 enum CommissionStatus {
@@ -467,6 +478,7 @@ model Commission {
 
   @@index([affiliateId])
   @@index([status])
+  @@index([payoutId])
 }
 
 enum PayoutStatus {

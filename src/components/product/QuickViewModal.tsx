@@ -51,13 +51,13 @@ export function QuickViewModal({ product, onClose }: { product: SampleProduct; o
         role="dialog"
         aria-modal="true"
         aria-label={product.name}
-        className="relative grid w-full max-w-2xl grid-cols-1 gap-6 bg-white p-6 shadow-xl sm:grid-cols-2"
+        className="relative grid w-full max-w-2xl grid-cols-1 gap-6 bg-paper p-6 shadow-xl sm:grid-cols-2"
       >
         <button
           ref={closeButtonRef}
           aria-label={tQuick("close")}
           onClick={onClose}
-          className="absolute end-4 top-4 text-neutral-500 hover:text-neutral-900"
+          className="absolute end-4 top-4 text-ink/50 transition-colors hover:text-gold"
         >
           <X size={20} />
         </button>
@@ -75,18 +75,19 @@ export function QuickViewModal({ product, onClose }: { product: SampleProduct; o
         </div>
 
         <div>
-          <p className="text-xs uppercase tracking-wide text-neutral-400">{product.category}</p>
-          <h2 className="mt-1 text-lg font-semibold uppercase tracking-wide">{product.name}</h2>
-          <p className="mt-2 font-semibold">{product.price.toFixed(2)} ₪</p>
-          {product.blurb && <p className="mt-3 text-sm text-neutral-500">{product.blurb}</p>}
+          <p className="text-xs uppercase tracking-wide text-gold">{product.category}</p>
+          <h2 className="mt-1 text-lg font-semibold uppercase tracking-wide text-ink">{product.name}</h2>
+          <span className="gold-rule-start mt-2 w-8" />
+          <p className="mt-2 font-semibold text-ink">{product.price.toFixed(2)} ₪</p>
+          {product.blurb && <p className="mt-3 text-sm text-ink/70">{product.blurb}</p>}
 
           {product.hasVariants ? (
             <>
-              <p className="mt-4 text-xs text-neutral-500">{tQuick("hasVariantsNotice")}</p>
+              <p className="mt-4 text-xs text-ink/60">{tQuick("hasVariantsNotice")}</p>
               <Link
                 href={`/product/${product.slug}`}
                 onClick={onClose}
-                className="mt-4 block border border-neutral-900 py-2 text-center text-xs font-semibold uppercase tracking-wide hover:bg-neutral-900 hover:text-white"
+                className="mt-4 block border border-gold-bright py-2 text-center text-xs font-semibold uppercase tracking-wide text-ink transition-colors hover:bg-gold-bright hover:text-ink"
               >
                 {tQuick("viewDetails")}
               </Link>
@@ -94,18 +95,18 @@ export function QuickViewModal({ product, onClose }: { product: SampleProduct; o
           ) : (
             <>
               <div className="mt-4 flex items-center gap-3">
-                <div className="flex items-center border border-neutral-300">
-                  <button onClick={() => setQuantity((q) => Math.max(1, q - 1))} className="px-3 py-2 text-sm">
+                <div className="flex items-center border border-gold-soft">
+                  <button onClick={() => setQuantity((q) => Math.max(1, q - 1))} className="px-3 py-2 text-sm text-ink hover:text-gold">
                     −
                   </button>
-                  <span className="w-8 text-center text-sm">{quantity}</span>
-                  <button onClick={() => setQuantity((q) => q + 1)} className="px-3 py-2 text-sm">
+                  <span className="w-8 text-center text-sm text-ink">{quantity}</span>
+                  <button onClick={() => setQuantity((q) => q + 1)} className="px-3 py-2 text-sm text-ink hover:text-gold">
                     +
                   </button>
                 </div>
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 border border-neutral-900 py-2 text-xs font-semibold uppercase tracking-wide hover:bg-neutral-900 hover:text-white"
+                  className="flex-1 border border-gold-bright py-2 text-xs font-semibold uppercase tracking-wide text-ink transition-colors hover:bg-gold-bright hover:text-ink"
                 >
                   {added ? "✓" : t("addToCart")}
                 </button>
@@ -113,7 +114,7 @@ export function QuickViewModal({ product, onClose }: { product: SampleProduct; o
               <Link
                 href={`/product/${product.slug}`}
                 onClick={onClose}
-                className="mt-4 block text-center text-xs font-semibold uppercase tracking-wide underline underline-offset-4"
+                className="link-underline mt-4 block text-center text-xs font-semibold uppercase tracking-wide text-ink"
               >
                 {tQuick("viewDetails")}
               </Link>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
@@ -10,6 +10,7 @@ import { createOrder } from "@/server/actions/orders";
 import { getMyAddress, type AddressData } from "@/server/actions/address";
 import { getCheckoutPreview, type CheckoutPreview } from "@/server/actions/checkout-preview";
 import type { PaymentMethodId } from "@/server/payments/types";
+import { PayPalButton } from "@/components/checkout/PayPalButton";
 
 export default function CheckoutPage() {
   const t = useTranslations("Checkout");
@@ -27,6 +28,7 @@ export default function CheckoutPage() {
   const [savedAddress, setSavedAddress] = useState<AddressData | null>(null);
   const [addressLoaded, setAddressLoaded] = useState(false);
   const [preview, setPreview] = useState<CheckoutPreview | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     getMyAddress().then((addr) => {
@@ -65,7 +67,7 @@ export default function CheckoutPage() {
   const discount = preview?.discount ?? 0;
   const total = preview ? preview.total : subtotal;
 
-  async function handleSubmit(formData: FormData) {
+  async function submitOrder(formData: FormData, paymentMeta?: Record<string, string>) {
     setSubmitting(true);
     setError(null);
 
@@ -81,6 +83,7 @@ export default function CheckoutPage() {
         zip: String(formData.get("zip") ?? ""),
       },
       paymentMethod,
+      paymentMeta,
       couponCode: couponCode || undefined,
       orderNotes: String(formData.get("orderNotes") ?? ""),
       lines: lines.map((l) => ({
@@ -102,6 +105,15 @@ export default function CheckoutPage() {
 
     clear();
     router.push(`/order-confirmation/${result.orderNumber}`);
+  }
+
+  async function handleSubmit(formData: FormData) {
+    await submitOrder(formData);
+  }
+
+  async function handlePaypalApproved(paypalOrderId: string) {
+    if (!formRef.current?.reportValidity()) return;
+    await submitOrder(new FormData(formRef.current), { paypalOrderId });
   }
 
   return (
@@ -133,7 +145,7 @@ export default function CheckoutPage() {
 
       {error && <p className="mb-6 border border-clay/30 bg-clay/10 px-3 py-2 text-sm text-clay">{error}</p>}
 
-      <form action={handleSubmit} className="grid grid-cols-1 gap-10 sm:grid-cols-2">
+      <form ref={formRef} action={handleSubmit} className="grid grid-cols-1 gap-10 sm:grid-cols-2">
         <div>
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide">{t("billingDetails")}</h2>
           <div className="space-y-4">
@@ -224,15 +236,30 @@ export default function CheckoutPage() {
               />
               {t("creditCard")}
             </label>
+            <label className="flex items-center gap-2 border border-gold-soft p-3 text-sm">
+              <input
+                type="radio"
+                name="paymentMethodChoice"
+                checked={paymentMethod === "paypal"}
+                onChange={() => setPaymentMethod("paypal")}
+              />
+              PayPal
+            </label>
           </div>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="mt-6 w-full border border-gold-bright bg-ink py-3 text-xs font-semibold uppercase tracking-wide text-paper hover:bg-gold-bright disabled:opacity-50"
-          >
-            {submitting ? t("placing") : t("placeOrder")}
-          </button>
+          {paymentMethod === "paypal" ? (
+            <div className="mt-6">
+              <PayPalButton total={total} disabled={submitting} onApproved={handlePaypalApproved} onError={setError} />
+            </div>
+          ) : (
+            <button
+              type="submit"
+              disabled={submitting}
+              className="mt-6 w-full border border-gold-bright bg-ink py-3 text-xs font-semibold uppercase tracking-wide text-paper hover:bg-gold-bright disabled:opacity-50"
+            >
+              {submitting ? t("placing") : t("placeOrder")}
+            </button>
+          )}
         </div>
       </form>
     </div>

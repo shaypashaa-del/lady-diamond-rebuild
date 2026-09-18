@@ -33,6 +33,7 @@ export type CheckoutInput = {
     zip?: string;
   };
   paymentMethod: PaymentMethodId;
+  paymentMeta?: Record<string, string>;
   couponCode?: string;
   orderNotes?: string;
   lines: CheckoutLine[];
@@ -150,7 +151,7 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
 
   const provider = paymentProviders[input.paymentMethod];
   const orderNumber = generateOrderNumber();
-  const paymentInit = await provider.init(total, orderNumber);
+  const paymentInit = await provider.init(total, orderNumber, input.paymentMeta);
 
   const session = await getSession();
   const store = await cookies();

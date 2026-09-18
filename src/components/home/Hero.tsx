@@ -19,7 +19,7 @@ export function Hero({
   return (
     <section className="relative flex min-h-[80vh] items-center overflow-hidden bg-ink text-paper">
       <Image
-        src="/brand/hero-1.jpeg"
+        src="/brand/collection/v2-lifestyle-model-instore-heart-pendant.jpeg"
         alt=""
         fill
         priority

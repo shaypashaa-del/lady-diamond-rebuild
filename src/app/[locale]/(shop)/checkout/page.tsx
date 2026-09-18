@@ -206,6 +206,24 @@ export default function CheckoutPage() {
               />
               {t("cod")}
             </label>
+            <label className="flex items-center gap-2 border border-gold-soft p-3 text-sm">
+              <input
+                type="radio"
+                name="paymentMethodChoice"
+                checked={paymentMethod === "bit"}
+                onChange={() => setPaymentMethod("bit")}
+              />
+              {t("bit")}
+            </label>
+            <label className="flex items-center gap-2 border border-gold-soft p-3 text-sm">
+              <input
+                type="radio"
+                name="paymentMethodChoice"
+                checked={paymentMethod === "credit_card"}
+                onChange={() => setPaymentMethod("credit_card")}
+              />
+              {t("creditCard")}
+            </label>
           </div>
 
           <button

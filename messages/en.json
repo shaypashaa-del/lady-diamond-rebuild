@@ -229,6 +229,8 @@
     "paymentMethod": "Payment Method",
     "bankTransfer": "Direct Bank Transfer",
     "cod": "Cash on Delivery",
+    "bit": "Bit",
+    "creditCard": "Credit Card",
     "placeOrder": "Place Order",
     "placing": "Placing order...",
     "emptyCart": "Your cart is empty.",

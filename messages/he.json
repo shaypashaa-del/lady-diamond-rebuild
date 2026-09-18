@@ -229,6 +229,8 @@
     "paymentMethod": "אמצעי תשלום",
     "bankTransfer": "העברה בנקאית",
     "cod": "תשלום במזומן בעת המסירה",
+    "bit": "ביט",
+    "creditCard": "כרטיס אשראי",
     "placeOrder": "ביצוע הזמנה",
     "placing": "מבצע הזמנה...",
     "emptyCart": "העגלה שלך ריקה.",

@@ -4,7 +4,7 @@
 // gateway (Israeli or international) can be added later by implementing this
 // same interface; nothing in checkout/order code needs to change.
 
-export type PaymentMethodId = "bank_transfer" | "cash_on_delivery";
+export type PaymentMethodId = "bank_transfer" | "cash_on_delivery" | "bit" | "credit_card";
 
 export type PaymentInitResult = {
   // Whether the order should be marked PAID immediately (never true for
@@ -42,7 +42,37 @@ export const cashOnDeliveryProvider: PaymentProvider = {
   },
 };
 
+// Bit and Credit Card are shown to customers as real intent-to-pay options,
+// but — like Bank Transfer/COD — settle manually for now: no Israeli payment
+// processor (Cardcom/Tranzila/Meshulam/PayPlus) is connected yet, so nothing
+// here actually charges a card or requests a Bit payment. Swap the body of
+// `init` for a real gateway call once that account exists; checkout/order
+// code doesn't need to change.
+export const bitProvider: PaymentProvider = {
+  id: "bit",
+  label: "ביט",
+  async init(_orderTotal, orderNumber) {
+    return {
+      immediatelyPaid: false,
+      instructions: `ניצור איתך קשר בקרוב לשליחת בקשת תשלום בביט עבור הזמנה ${orderNumber}. ההזמנה תישלח רק לאחר קבלת התשלום.`,
+    };
+  },
+};
+
+export const creditCardProvider: PaymentProvider = {
+  id: "credit_card",
+  label: "כרטיס אשראי",
+  async init(_orderTotal, orderNumber) {
+    return {
+      immediatelyPaid: false,
+      instructions: `ניצור איתך קשר בקרוב לגביית התשלום בכרטיס אשראי עבור הזמנה ${orderNumber}. ההזמנה תישלח רק לאחר קבלת התשלום.`,
+    };
+  },
+};
+
 export const paymentProviders: Record<PaymentMethodId, PaymentProvider> = {
   bank_transfer: bankTransferProvider,
   cash_on_delivery: cashOnDeliveryProvider,
+  bit: bitProvider,
+  credit_card: creditCardProvider,
 };

@@ -7,7 +7,7 @@ export type CheckoutPreview = {
   discount: number;
   shipping: number;
   total: number;
-  couponError?: string;
+  couponError?: "invalid";
 };
 
 // Lets the checkout page show the real total (shipping + coupon discount)
@@ -19,7 +19,7 @@ export async function getCheckoutPreview(
   couponCode?: string
 ): Promise<CheckoutPreview> {
   let discount = 0;
-  let couponError: string | undefined;
+  let couponError: "invalid" | undefined;
 
   if (couponCode) {
     const coupon = await prisma.coupon.findUnique({ where: { code: couponCode.toUpperCase() } });
@@ -36,7 +36,7 @@ export async function getCheckoutPreview(
       (coupon.expiresAt && coupon.expiresAt < new Date()) ||
       (coupon.usageLimit != null && coupon.usageCount >= coupon.usageLimit);
     if (invalid) {
-      couponError = "קוד קופון לא תקין.";
+      couponError = "invalid";
     } else {
       discount =
         coupon.discountType === "PERCENTAGE"

@@ -221,6 +221,8 @@
     "yourOrder": "Your Order",
     "product": "Product",
     "subtotal": "Subtotal",
+    "discount": "Discount",
+    "couponInvalid": "Invalid coupon code.",
     "shipping": "Shipping",
     "free": "Free",
     "total": "Total",

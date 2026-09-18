@@ -56,6 +56,9 @@ body {
   margin-inline: 0;
   background: linear-gradient(90deg, var(--gold-bright), transparent);
 }
+html[dir="rtl"] .gold-rule-start {
+  background: linear-gradient(270deg, var(--gold-bright), transparent);
+}
 
 .link-underline {
   position: relative;

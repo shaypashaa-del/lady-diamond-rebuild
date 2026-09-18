@@ -221,6 +221,8 @@
     "yourOrder": "ההזמנה שלך",
     "product": "מוצר",
     "subtotal": "סכום ביניים",
+    "discount": "הנחה",
+    "couponInvalid": "קוד קופון לא תקין.",
     "shipping": "משלוח",
     "free": "חינם",
     "total": "סה\"כ",

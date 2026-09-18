@@ -128,7 +128,7 @@ export default function CheckoutPage() {
         </div>
       )}
       {preview?.couponError && (
-        <p className="mb-6 text-sm text-clay">{preview.couponError}</p>
+        <p className="mb-6 text-sm text-clay">{t("couponInvalid")}</p>
       )}
 
       {error && <p className="mb-6 border border-clay/30 bg-clay/10 px-3 py-2 text-sm text-clay">{error}</p>}
@@ -172,7 +172,7 @@ export default function CheckoutPage() {
             </div>
             {discount > 0 && (
               <div className="flex justify-between py-2 text-sm text-clay">
-                <span>הנחה</span>
+                <span>{t("discount")}</span>
                 <span>-{discount.toFixed(2)} ₪</span>
               </div>
             )}

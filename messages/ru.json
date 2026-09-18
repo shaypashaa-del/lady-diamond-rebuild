@@ -221,6 +221,8 @@
     "yourOrder": "Ваш заказ",
     "product": "Товар",
     "subtotal": "Промежуточный итог",
+    "discount": "Скидка",
+    "couponInvalid": "Неверный код купона.",
     "shipping": "Доставка",
     "free": "Бесплатно",
     "total": "Итого",

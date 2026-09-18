@@ -66,7 +66,7 @@ export function ProductCard({ product }: { product: SampleProduct }) {
             <Heart size={14} fill={mounted && isWishlisted ? "currentColor" : "none"} />
           </button>
         </div>
-        <Link href={`/product/${product.slug}`} className="flex h-full w-full items-center justify-center p-4 text-center">
+        <Link href={`/product/${product.slug}`} className="relative flex h-full w-full items-center justify-center p-4 text-center">
           {product.imageUrl ? (
             <Image
               src={product.imageUrl}

@@ -9,8 +9,8 @@
   --paper: #ffffff;
   --paper-soft: #f7f5f1;
   --ink: #2b2b2b;
-  --gold: #b0893f;
-  --gold-bright: #d4af6a;
+  --gold: #c19752;
+  --gold-bright: #ddaa5d;
   --gold-soft: #ede2c8;
   --clay: #a24a3f;
 
@@ -93,10 +93,10 @@ html[dir="rtl"] .gold-rule-start {
    logical, direction and does not flip with `dir`, so it's set explicitly
    per direction here instead. */
 .hero-scrim {
-  background: linear-gradient(to right, rgba(20, 17, 14, 0.88) 0%, rgba(20, 17, 14, 0.5) 55%, rgba(20, 17, 14, 0.2) 100%);
+  background: linear-gradient(to right, rgba(20, 17, 14, 0.6) 0%, rgba(20, 17, 14, 0.28) 55%, rgba(20, 17, 14, 0.05) 100%);
 }
 html[dir="rtl"] .hero-scrim {
-  background: linear-gradient(to left, rgba(20, 17, 14, 0.88) 0%, rgba(20, 17, 14, 0.5) 55%, rgba(20, 17, 14, 0.2) 100%);
+  background: linear-gradient(to left, rgba(20, 17, 14, 0.6) 0%, rgba(20, 17, 14, 0.28) 55%, rgba(20, 17, 14, 0.05) 100%);
 }
 
 /* A slow image-zoom on hover — the one piece of "alive" motion carried

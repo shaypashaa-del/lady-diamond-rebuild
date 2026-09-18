@@ -1,6 +1,22 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { gsap } from "gsap";
 import { Link } from "@/i18n/navigation";
+
+// The reference site's homepage hero is a Revolution Slider that rotates
+// through several images rather than showing one static photo. This
+// reproduces that behavior: a fixed set of real brand photos crossfading
+// on a timer, driven by GSAP instead of a jQuery slider plugin.
+const SLIDES = [
+  "/brand/hero-heartstone.jpeg",
+  "/brand/hero-slide-necklace.jpeg",
+  "/brand/hero-slide-earring.jpeg",
+  "/brand/hero-slide-choker.jpeg",
+];
+const SLIDE_DURATION_MS = 5500;
 
 export function Hero({
   kicker,
@@ -16,38 +32,86 @@ export function Hero({
   ctaHref?: string;
 } = {}) {
   const t = useTranslations("Home");
+  const [active, setActive] = useState(0);
+  const imageRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const timer = setInterval(() => {
+      setActive((prev) => (prev + 1) % SLIDES.length);
+    }, SLIDE_DURATION_MS);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    imageRefs.current.forEach((el, i) => {
+      if (!el) return;
+      gsap.to(el, {
+        opacity: i === active ? 1 : 0,
+        duration: 1.1,
+        ease: "power2.inOut",
+      });
+    });
+  }, [active]);
+
   return (
     <section className="relative flex min-h-[80vh] items-center overflow-hidden bg-ink text-paper">
-      <Image
-        src="/brand/hero-heartstone.jpeg"
-        alt=""
-        fill
-        priority
-        sizes="100vw"
-        className="rise-in object-cover opacity-70"
-        style={{ animationDuration: "1.4s" }}
-      />
+      {SLIDES.map((src, i) => (
+        <div
+          key={src}
+          ref={(el) => {
+            imageRefs.current[i] = el;
+          }}
+          className="absolute inset-0"
+          style={{ opacity: i === 0 ? 1 : 0 }}
+        >
+          <Image
+            src={src}
+            alt=""
+            fill
+            priority={i === 0}
+            sizes="100vw"
+            className="object-cover"
+          />
+        </div>
+      ))}
       <div className="hero-scrim absolute inset-0" />
+
+      {SLIDES.length > 1 && (
+        <div className="absolute bottom-6 start-1/2 z-10 flex -translate-x-1/2 gap-2 rtl:translate-x-1/2">
+          {SLIDES.map((src, i) => (
+            <button
+              key={src}
+              aria-label={`${i + 1}`}
+              onClick={() => setActive(i)}
+              className={`h-1.5 rounded-full transition-all ${
+                i === active ? "w-6 bg-gold-bright" : "w-1.5 bg-paper/40"
+              }`}
+            />
+          ))}
+        </div>
+      )}
 
       <div className="relative mx-auto w-full max-w-7xl px-4 py-24 sm:px-8">
         <div className="max-w-lg">
-          <p className="rise-in text-xs uppercase tracking-[0.4em] text-gold-bright" style={{ animationDelay: "0.1s" }}>
+          <p className="rise-in text-xs uppercase tracking-[0.4em] text-gold-bright" style={{ animationDuration: "1.4s" }}>
             {kicker ?? t("heroKicker")}
           </p>
-          <span className="gold-rule-start rise-in mt-4" style={{ animationDelay: "0.2s" }} />
+          <span className="gold-rule-start rise-in mt-4" style={{ animationDuration: "1.4s", animationDelay: "0.1s" }} />
           <h1
             className="rise-in mt-6 text-4xl font-semibold leading-[1.1] sm:text-6xl"
-            style={{ animationDelay: "0.3s" }}
+            style={{ animationDuration: "1.4s", animationDelay: "0.2s" }}
           >
             {title ?? t("heroTitle")}
           </h1>
-          <p className="rise-in mt-5 max-w-md text-sm leading-relaxed text-paper/80" style={{ animationDelay: "0.4s" }}>
+          <p className="rise-in mt-5 max-w-md text-sm leading-relaxed text-paper/80" style={{ animationDuration: "1.4s", animationDelay: "0.3s" }}>
             {subtitle ?? t("heroSubtitle")}
           </p>
           <Link
             href={ctaHref ?? "/category/all"}
             className="rise-in link-underline mt-9 inline-block border border-gold-bright px-10 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-paper transition-colors hover:bg-gold-bright hover:text-ink"
-            style={{ animationDelay: "0.5s" }}
+            style={{ animationDuration: "1.4s", animationDelay: "0.4s" }}
           >
             {ctaLabel ?? t("heroCta")}
           </Link>

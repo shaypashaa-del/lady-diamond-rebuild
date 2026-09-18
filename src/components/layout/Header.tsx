@@ -35,7 +35,7 @@ export function Header() {
     <header className="relative z-40 border-b border-gold-soft bg-paper">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-8">
         <Link href="/" className="group flex items-center gap-3">
-          <Image src="/brand/logo-icon.png" alt={t("brand")} width={54} height={30} className="h-9 w-auto transition-transform duration-500 group-hover:scale-105" priority />
+          <Image src="/brand/logo.png" alt={t("brand")} width={54} height={44} className="h-11 w-auto transition-transform duration-500 group-hover:scale-105" priority />
           <span className="hidden flex-col leading-none sm:flex">
             <span className="text-lg font-semibold tracking-[0.1em] text-ink">{t("brand")}</span>
             <span className="gold-rule-start mt-1.5 mb-1.5 w-6" />

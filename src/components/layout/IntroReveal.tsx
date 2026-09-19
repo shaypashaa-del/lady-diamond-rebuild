@@ -6,11 +6,13 @@ import { useEffect, useRef, useState } from "react";
 const HOLD_MS = 5000; // the full portrait holds, untouched, before fading
 const FADE_MS = 1800; // the whole photo dissolving away as one, in one motion
 
-// A one-time, full-screen entrance: Diana's portrait (her signature is
-// already baked into this photo) holds intact for a beat, then the entire
-// image fades away as a single smooth dissolve (no tiles, no cuts, no
-// visible seam) to reveal the site underneath. Runs once per browser
-// session and is skipped entirely under prefers-reduced-motion.
+// A full-screen entrance: Diana's portrait (her signature is already baked
+// into this photo) holds intact for a beat, then the entire image fades
+// away as a single smooth dissolve (no tiles, no cuts, no visible seam) to
+// reveal the site underneath. Plays on every full page load (not just
+// once per session — a one-time-per-tab gate here proved confusing during
+// testing, since revisiting the same tab silently skipped it) and is
+// skipped entirely under prefers-reduced-motion.
 export function IntroReveal() {
   const [mounted, setMounted] = useState(false);
   const [fading, setFading] = useState(false);
@@ -24,18 +26,6 @@ export function IntroReveal() {
     if (startedRef.current) return;
     if (typeof window === "undefined") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    // Some mobile browsers (notably Safari in Private Browsing) restrict or
-    // throw on sessionStorage access. An uncaught throw here would abort
-    // this whole effect before setMounted(true) ever runs, silently
-    // skipping the intro with no visible error — so treat a blocked
-    // storage API as "never shown" rather than letting it kill the intro.
-    try {
-      if (sessionStorage.getItem("ld-intro-shown")) return;
-      sessionStorage.setItem("ld-intro-shown", "1");
-    } catch {
-      // Storage unavailable — proceed and just risk it replaying once.
-    }
     startedRef.current = true;
 
     document.body.style.overflow = "hidden";

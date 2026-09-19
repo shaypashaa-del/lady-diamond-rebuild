@@ -61,7 +61,7 @@ export default async function AdminProductsPage({
             {products.map((p) => (
               <tr key={p.id} className="border-b border-neutral-100 last:border-0">
                 <td className="px-4 py-3">
-                  <Link href={`/admin/products/${p.id}`} className="font-medium hover:underline">
+                  <Link href={`/admin/products/${p.id}`} className="block font-medium hover:underline">
                     {localize(p.name as LocalizedText, "he")}
                   </Link>
                   <p className="text-xs text-neutral-400">{p.slug}</p>
@@ -75,7 +75,7 @@ export default async function AdminProductsPage({
                 <td className="px-4 py-3">{p.isFeatured ? "כן" : "—"}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3 text-xs">
-                    <Link href={`/admin/products/${p.id}`} className="text-blue-600 hover:underline">
+                    <Link href={`/admin/products/${p.id}`} className="block text-blue-600 hover:underline">
                       עריכה
                     </Link>
                     <form action={duplicateProduct.bind(null, p.id)}>

@@ -37,7 +37,7 @@ export default async function AdminCategoriesPage() {
             {categories.map((c) => (
               <tr key={c.id} className="border-b border-neutral-100 last:border-0">
                 <td className="px-4 py-3">
-                  <Link href={`/admin/categories/${c.id}`} className="font-medium hover:underline">
+                  <Link href={`/admin/categories/${c.id}`} className="block font-medium hover:underline">
                     {localize(c.name as LocalizedText, "he")}
                   </Link>
                 </td>
@@ -48,7 +48,7 @@ export default async function AdminCategoriesPage() {
                 <td className="px-4 py-3">{c.sortOrder}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3 text-xs">
-                    <Link href={`/admin/categories/${c.id}`} className="text-blue-600 hover:underline">
+                    <Link href={`/admin/categories/${c.id}`} className="block text-blue-600 hover:underline">
                       עריכה
                     </Link>
                     <ConfirmDeleteForm

@@ -27,7 +27,7 @@ export function EuphoriaSpotlight() {
   return (
     <section className="mx-auto max-w-7xl px-4 pb-14 text-center sm:px-8">
       <ScrollReveal className="border border-gold-soft bg-paper-soft px-6 py-16">
-        <h2 className="text-2xl font-semibold uppercase tracking-[0.3em]">{t("euphoriaTitle")}</h2>
+        <h2 className="font-display text-5xl font-normal sm:text-6xl">{t("euphoriaTitle")}</h2>
         <span className="gold-rule mt-4" />
         <p className="mx-auto mt-4 max-w-md text-sm text-ink/60">{t("euphoriaCopy")}</p>
         <Link

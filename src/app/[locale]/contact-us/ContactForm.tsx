@@ -12,7 +12,7 @@ export function ContactForm() {
   );
 
   if (state && "sent" in state) {
-    return <p className="rounded bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{t("sent")}</p>;
+    return <p className="border border-gold-soft bg-paper-soft px-4 py-3 text-sm text-ink">{t("sent")}</p>;
   }
 
   return (

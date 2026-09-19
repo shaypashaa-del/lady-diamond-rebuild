@@ -15,13 +15,26 @@ export function getFeaturedProducts() {
 
 export const PRODUCTS_PAGE_SIZE = 24;
 
-export async function getAllPublishedProducts(page = 1) {
+export type ProductSort = "newest" | "price_asc" | "price_desc";
+
+function sortToOrderBy(sort?: ProductSort) {
+  switch (sort) {
+    case "price_asc":
+      return { basePrice: "asc" as const };
+    case "price_desc":
+      return { basePrice: "desc" as const };
+    default:
+      return { createdAt: "desc" as const };
+  }
+}
+
+export async function getAllPublishedProducts(page = 1, sort?: ProductSort) {
   const where = { status: "PUBLISHED" as const };
   const [products, totalCount] = await Promise.all([
     prisma.product.findMany({
       where,
       include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },
-      orderBy: { createdAt: "desc" },
+      orderBy: sortToOrderBy(sort),
       skip: (page - 1) * PRODUCTS_PAGE_SIZE,
       take: PRODUCTS_PAGE_SIZE,
     }),
@@ -47,7 +60,7 @@ export function getCategoryBySlug(slug: string) {
   return prisma.category.findUnique({ where: { slug }, include: { image: true } });
 }
 
-export async function getProductsByCategorySlug(slug: string, page = 1) {
+export async function getProductsByCategorySlug(slug: string, page = 1, sort?: ProductSort) {
   const where = {
     status: "PUBLISHED" as const,
     categories: { some: { category: { slug } } },
@@ -56,7 +69,7 @@ export async function getProductsByCategorySlug(slug: string, page = 1) {
     prisma.product.findMany({
       where,
       include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },
-      orderBy: { createdAt: "desc" },
+      orderBy: sortToOrderBy(sort),
       skip: (page - 1) * PRODUCTS_PAGE_SIZE,
       take: PRODUCTS_PAGE_SIZE,
     }),

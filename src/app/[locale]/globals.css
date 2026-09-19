@@ -1,17 +1,18 @@
 @import "tailwindcss";
 
-/* Lady Diamond Jewels — design tokens, matched to the real brand's actual
-   identity (its logo and photography) rather than an invented palette:
-   crisp white, warm charcoal text, and the logo's antique gold as the one
-   accent color, carried through as a live, dynamic layer of detail (motion,
-   hover states, gold accent lines) rather than flat, static blocks. */
+/* Lady Diamond Jewels — design tokens extracted directly from the real
+   production site's computed styles (getComputedStyle on ladydiamondjewels.com).
+   The live theme is mostly monochrome ink/white/gray (buttons, prices,
+   borders all resolve to #141414 / white / #f3f3f3), with gold used only as
+   a targeted accent: the active nav-tab underline+text is exactly
+   rgb(221,170,93) = #ddaa5d, matching this token's original value. */
 :root {
   --paper: #ffffff;
   --paper-soft: #f7f5f1;
-  --ink: #2b2b2b;
-  --gold: #c19752;
+  --ink: #2d2d2d;
+  --gold: #ddaa5d;
   --gold-bright: #ddaa5d;
-  --gold-soft: #ede2c8;
+  --gold-soft: #e5e5e5;
   --clay: #a24a3f;
 
   --background: var(--paper);
@@ -36,6 +37,13 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-body), system-ui, sans-serif;
+}
+
+/* The real site's display serif for Latin-script section titles (e.g.
+   "Euphoria", the hero's collection name) — Italiana has no Hebrew glyphs,
+   so this is applied selectively, never to Hebrew headings. */
+.font-display {
+  font-family: var(--font-display), serif;
 }
 
 /* Signature motif: a fine, continuous gold line — echoing the brand's own
@@ -134,5 +142,139 @@ html[dir="rtl"] .hero-scrim {
 @media (prefers-reduced-motion: reduce) {
   .rise-in {
     animation: none;
+  }
+}
+
+/* A faint gold shooting star that drifts across the page's white space —
+   a slow, low-opacity ambient touch, not a foreground effect. Sits behind
+   all real content (negative z-index on a fixed, pointer-events-none host)
+   so it never sits on top of text or interferes with clicks/legibility. */
+.shooting-star-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.shooting-star {
+  position: absolute;
+  top: -5%;
+  inset-inline-start: -10%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--gold-bright);
+  box-shadow: 0 0 6px 1px var(--gold-bright);
+  opacity: 0;
+  animation: shooting-star-move 14s ease-in infinite;
+}
+.shooting-star::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  inset-inline-end: 100%;
+  width: 140px;
+  height: 1px;
+  background: linear-gradient(to left, var(--gold-bright), transparent);
+  transform: translateY(-50%);
+}
+html[dir="rtl"] .shooting-star::after {
+  background: linear-gradient(to right, var(--gold-bright), transparent);
+}
+@keyframes shooting-star-move {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  4% {
+    opacity: 0.45;
+  }
+  22% {
+    transform: translate(65vw, 55vh);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(65vw, 55vh);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shooting-star-layer {
+    display: none;
+  }
+}
+
+/* Hides the native OS cursor everywhere while the custom sparkle-light
+   cursor (SparkleCursor.tsx) is active, including over links/buttons that
+   would otherwise force their own `cursor: pointer`. */
+html.sparkle-cursor-active,
+html.sparkle-cursor-active * {
+  cursor: none !important;
+}
+
+/* A slow, refined light sweep across text — ink base color with a single
+   bright gold-white glint passing through, looping gently. Used on the
+   header's large centered wordmark. */
+.shimmer-text {
+  background: linear-gradient(
+    100deg,
+    var(--ink) 35%,
+    var(--ink) 45%,
+    #fff6df 50%,
+    var(--gold-bright) 52%,
+    var(--ink) 58%,
+    var(--ink) 100%
+  );
+  background-size: 250% auto;
+  background-position: 200% center;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer-sweep 11s ease-in-out infinite;
+}
+@keyframes shimmer-sweep {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -50% center;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-text {
+    animation: none;
+    background-position: 0% center;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    color: var(--ink);
+  }
+}
+
+/* Same sweep, but for gold-base text (e.g. "SINCE 2010") — the glint runs
+   bright white through the gold rather than resetting it to ink. */
+.shimmer-text-gold {
+  background: linear-gradient(
+    100deg,
+    var(--gold-bright) 35%,
+    var(--gold-bright) 45%,
+    #fff6df 50%,
+    #ffffff 52%,
+    var(--gold-bright) 58%,
+    var(--gold-bright) 100%
+  );
+  background-size: 250% auto;
+  background-position: 200% center;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer-sweep 11s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-text-gold {
+    animation: none;
+    background-position: 0% center;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    color: var(--gold-bright);
   }
 }

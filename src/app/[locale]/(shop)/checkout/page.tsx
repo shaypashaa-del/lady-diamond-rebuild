@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
@@ -15,14 +16,21 @@ import { PayPalButton } from "@/components/checkout/PayPalButton";
 export default function CheckoutPage() {
   const t = useTranslations("Checkout");
   const router = useRouter();
+  const searchParams = useSearchParams();
   const mounted = useMounted();
   const lines = useCartStore((s) => s.lines);
   const clear = useCartStore((s) => s.clear);
 
+  const requestedMethod = searchParams.get("pm");
+  const validMethods: PaymentMethodId[] = ["bank_transfer", "cash_on_delivery", "bit", "credit_card", "paypal"];
+  const initialMethod = validMethods.includes(requestedMethod as PaymentMethodId)
+    ? (requestedMethod as PaymentMethodId)
+    : "bank_transfer";
+
   const [showCoupon, setShowCoupon] = useState(false);
   const [couponCode, setCouponCode] = useState("");
   const [country, setCountry] = useState("Israel");
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodId>("bank_transfer");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodId>(initialMethod);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [savedAddress, setSavedAddress] = useState<AddressData | null>(null);

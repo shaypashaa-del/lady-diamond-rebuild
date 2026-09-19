@@ -17,6 +17,8 @@ export const primaryNav = [
   { key: "home", href: "/" },
   { key: "shop", href: "/category/all", mega: shopMegaMenu },
   { key: "aboutUs", href: "/about-us" },
+  { key: "calculators", href: "/calculators" },
+  { key: "affiliateProgram", href: "/affiliate" },
   { key: "contactUs", href: "/contact-us" },
 ] as const;
 
@@ -36,7 +38,9 @@ export const footerColumns = [
       { key: "ourStory", href: "/about-us" },
       { key: "becomeAffiliate", href: "/affiliate" },
       { key: "shipping", href: "/policies/shipping" },
+      { key: "terms", href: "/policies/terms" },
       { key: "privacy", href: "/policies/privacy" },
+      { key: "accessibility", href: "/policies/accessibility" },
     ],
   },
   {

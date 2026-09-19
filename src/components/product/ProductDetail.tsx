@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Heart } from "lucide-react";
+import { useRouter } from "@/i18n/navigation";
 import { useCartStore } from "@/lib/cart-store";
 import { useWishlistStore } from "@/lib/wishlist-store";
 import { useMounted } from "@/lib/use-mounted";
@@ -40,6 +41,7 @@ export function ProductDetail({
   images?: ProductImageView[];
 }) {
   const t = useTranslations("Product");
+  const router = useRouter();
   const addLine = useCartStore((s) => s.addLine);
   const toggleWishlist = useWishlistStore((s) => s.toggle);
   const isWishlisted = useWishlistStore((s) => s.has(slug));
@@ -58,26 +60,33 @@ export function ProductDetail({
   const availableInventory = selectedVariant ? selectedVariant.inventory : inventory;
   const canAdd = (variants.length === 0 || !!selectedVariant) && availableInventory > 0;
 
+  function currentLine() {
+    return {
+      key: `${slug}:${variantId || "default"}`,
+      productId: slug,
+      // `variantId` state doubles as a "default" sentinel for products with
+      // no real variants — never forward that literal string as a real
+      // variant id (it doesn't exist in the DB and fails the order's FK).
+      variantId: selectedVariant?.id,
+      slug,
+      name,
+      variantLabel: selectedVariant?.label,
+      price: displayPrice,
+      imageUrl: images[0]?.url,
+    };
+  }
+
   function handleAddToCart() {
     if (!canAdd) return;
-    addLine(
-      {
-        key: `${slug}:${variantId || "default"}`,
-        productId: slug,
-        // `variantId` state doubles as a "default" sentinel for products with
-        // no real variants — never forward that literal string as a real
-        // variant id (it doesn't exist in the DB and fails the order's FK).
-        variantId: selectedVariant?.id,
-        slug,
-        name,
-        variantLabel: selectedVariant?.label,
-        price: displayPrice,
-        imageUrl: images[0]?.url,
-      },
-      quantity
-    );
+    addLine(currentLine(), quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
+  }
+
+  function handleBuyNow(method: "bit" | "paypal") {
+    if (!canAdd) return;
+    addLine(currentLine(), quantity);
+    router.push(`/checkout?pm=${method}`);
   }
 
   return (
@@ -187,6 +196,23 @@ export function ProductDetail({
             )}
           >
             <Heart size={16} fill={mounted && isWishlisted ? "currentColor" : "none"} />
+          </button>
+        </div>
+
+        <div className="mt-3 flex items-center gap-3">
+          <button
+            onClick={() => handleBuyNow("bit")}
+            disabled={!canAdd}
+            className="flex-1 border border-gold-soft py-2.5 text-xs font-semibold uppercase tracking-wide text-ink transition-colors hover:border-gold disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {t("buyWithBit")}
+          </button>
+          <button
+            onClick={() => handleBuyNow("paypal")}
+            disabled={!canAdd}
+            className="flex-1 border border-gold-soft py-2.5 text-xs font-semibold uppercase tracking-wide text-ink transition-colors hover:border-gold disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {t("buyWithPaypal")}
           </button>
         </div>
 

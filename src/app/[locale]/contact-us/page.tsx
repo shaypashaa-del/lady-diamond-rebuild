@@ -36,7 +36,14 @@ export default async function ContactUsPage() {
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink/60">
             {t("info")}
           </h2>
-          <p className="text-sm text-ink/70" dir="ltr">info@ladydiamondjewels.com</p>
+          <p className="text-sm text-ink/70">{t("address")}</p>
+          <a href="tel:+972503781589" className="mt-2 block text-sm text-ink/70 hover:text-ink" dir="ltr">
+            +972-50-3781589
+          </a>
+          <p className="mt-2 text-sm text-ink/60">{t("hours")}</p>
+          <a href="mailto:info@ladydiamondjewels.com" className="mt-2 block text-sm text-ink/70 hover:text-ink" dir="ltr">
+            info@ladydiamondjewels.com
+          </a>
         </div>
       </div>
     </div>

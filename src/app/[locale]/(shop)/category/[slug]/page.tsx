@@ -8,7 +8,9 @@ import {
   getCategoryBySlug,
   getProductsByCategorySlug,
   PRODUCTS_PAGE_SIZE,
+  type ProductSort,
 } from "@/server/repositories/catalog";
+import { SortSelect } from "@/components/category/SortSelect";
 import { Link } from "@/i18n/navigation";
 import { toCardProduct } from "@/lib/catalog-view";
 import { t as localize, type LocalizedText } from "@/lib/i18n-content";
@@ -60,19 +62,22 @@ export async function generateMetadata({
   };
 }
 
+const VALID_SORTS: ProductSort[] = ["newest", "price_asc", "price_desc"];
+
 export default async function CategoryPage({
   params,
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; sort?: string }>;
 }) {
   const { slug } = await params;
-  const { page: pageRaw } = await searchParams;
+  const { page: pageRaw, sort: sortRaw } = await searchParams;
   // Guard against a negative/NaN/non-numeric ?page= value breaking the
   // Prisma `skip` calculation — clamp to a sane positive integer.
   const parsedPage = Number.parseInt(pageRaw ?? "1", 10);
   const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+  const sort: ProductSort = VALID_SORTS.includes(sortRaw as ProductSort) ? (sortRaw as ProductSort) : "newest";
 
   const locale = (await getLocale()) as Locale;
   const tNav = await getTranslations("Nav");
@@ -85,12 +90,12 @@ export default async function CategoryPage({
 
   if (slug === "all") {
     title = tNav("shop");
-    ({ products, totalCount } = await getAllPublishedProducts(page));
+    ({ products, totalCount } = await getAllPublishedProducts(page, sort));
   } else {
     const category = await getCategoryBySlug(slug);
     if (!category) notFound();
     title = localize(category.name as LocalizedText, locale);
-    ({ products, totalCount } = await getProductsByCategorySlug(slug, page));
+    ({ products, totalCount } = await getProductsByCategorySlug(slug, page, sort));
     imageUrl = category.image?.url;
   }
 
@@ -111,9 +116,12 @@ export default async function CategoryPage({
         </div>
       )}
       <h1 className="mb-2 text-center text-2xl font-semibold uppercase tracking-[0.2em]">{title}</h1>
-      <p className="mb-10 text-center text-sm text-ink/50">
-        {totalCount} {totalCount === 1 ? tCat("item") : tCat("items")}
-      </p>
+      <div className="mb-10 flex flex-col items-center justify-between gap-3 sm:flex-row">
+        <p className="text-sm text-ink/50">
+          {totalCount} {totalCount === 1 ? tCat("item") : tCat("items")}
+        </p>
+        <SortSelect value={sort} slug={slug} />
+      </div>
       {cards.length === 0 ? (
         <p className="text-center text-ink/60">{tCat("noProducts")}</p>
       ) : (
@@ -128,7 +136,13 @@ export default async function CategoryPage({
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <Link
                   key={p}
-                  href={p === 1 ? `/category/${slug}` : `/category/${slug}?page=${p}`}
+                  href={{
+                    pathname: `/category/${slug}`,
+                    query: {
+                      ...(p !== 1 ? { page: p } : {}),
+                      ...(sort !== "newest" ? { sort } : {}),
+                    },
+                  }}
                   className={`flex h-9 w-9 items-center justify-center border text-sm ${
                     p === page
                       ? "border-gold-bright bg-ink text-paper"

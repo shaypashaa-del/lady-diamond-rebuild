@@ -38,7 +38,7 @@ export function ProductCard({ product }: { product: SampleProduct }) {
         {product.badge && (
           <span
             className={cn(
-              "absolute start-2 top-2 z-10 rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-paper",
+              "absolute start-2 top-2 z-10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-paper",
               product.badge === "Sale" && "bg-clay",
               product.badge === "New" && "bg-ink",
               product.badge === "Sold" && "bg-ink/40"
@@ -47,11 +47,14 @@ export function ProductCard({ product }: { product: SampleProduct }) {
             {t(product.badge.toLowerCase() as "sale" | "new" | "sold")}
           </span>
         )}
-        <div className="absolute end-2 top-2 z-10 flex flex-col gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+        {/* Visible by default on touch devices (phones, tablets), which
+            have no real hover state to reveal these — only fades in on
+            hover for true pointer/desktop screens (lg+). */}
+        <div className="absolute end-2 top-2 z-10 flex flex-col gap-2 opacity-100 transition-opacity max-lg:opacity-100 lg:opacity-0 lg:group-hover:opacity-100">
           <button
             aria-label={t("quickView")}
             onClick={() => setQuickViewOpen(true)}
-            className="rounded-full bg-paper p-2 text-ink shadow transition-colors hover:bg-gold-bright hover:text-ink"
+            className="border border-gold-soft bg-paper p-2 text-ink shadow transition-colors hover:border-gold hover:bg-gold-bright hover:text-ink"
           >
             <Eye size={14} />
           </button>
@@ -59,8 +62,8 @@ export function ProductCard({ product }: { product: SampleProduct }) {
             aria-label={t("wishlist")}
             onClick={() => toggleWishlist(product.slug)}
             className={cn(
-              "rounded-full bg-paper p-2 text-ink shadow transition-colors hover:bg-gold-bright hover:text-ink",
-              mounted && isWishlisted && "bg-clay text-paper"
+              "border border-gold-soft bg-paper p-2 text-ink shadow transition-colors hover:border-gold hover:bg-gold-bright hover:text-ink",
+              mounted && isWishlisted && "border-clay bg-clay text-paper"
             )}
           >
             <Heart size={14} fill={mounted && isWishlisted ? "currentColor" : "none"} />
@@ -83,7 +86,7 @@ export function ProductCard({ product }: { product: SampleProduct }) {
 
       <div className="mt-3 text-center">
         <p className="text-[11px] uppercase tracking-wide text-gold">{product.category}</p>
-        <Link href={`/product/${product.slug}`} className="text-sm font-medium uppercase tracking-wide text-ink">
+        <Link href={`/product/${product.slug}`} className="block text-sm font-medium uppercase tracking-wide text-ink">
           {product.name}
         </Link>
         <div className="mt-1 flex items-center justify-center gap-2 text-sm">

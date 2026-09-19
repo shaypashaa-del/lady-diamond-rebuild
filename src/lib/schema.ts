@@ -3,10 +3,19 @@ import { SITE_URL, SITE_NAME } from "@/lib/site-config";
 export function organizationSchema() {
   return {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": "JewelryStore",
     name: SITE_NAME,
     url: SITE_URL,
-    logo: `${SITE_URL}/logo.png`,
+    logo: `${SITE_URL}/brand/logo.png`,
+    telephone: "+972-50-3781589",
+    email: "info@ladydiamondjewels.com",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Bursa Complex, Noam Building, 23 Tuval Street",
+      addressLocality: "Ramat Gan",
+      addressCountry: "IL",
+    },
+    openingHours: "Su-Th 09:00-19:00",
   };
 }
 

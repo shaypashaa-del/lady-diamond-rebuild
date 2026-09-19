@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Rubik, Geist_Mono } from "next/font/google";
+import { Rubik, Italiana, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -10,6 +10,11 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ReferralCapture } from "@/components/ReferralCapture";
 import { CookieConsentBanner } from "@/components/layout/CookieConsentBanner";
+import { WhatsappButton } from "@/components/layout/WhatsappButton";
+import { ShootingStar } from "@/components/layout/ShootingStar";
+import { FloatingLogoBadge } from "@/components/layout/FloatingLogoBadge";
+import { SparkleCursor } from "@/components/layout/SparkleCursor";
+import { IntroReveal } from "@/components/layout/IntroReveal";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { organizationSchema, websiteSchema } from "@/lib/schema";
 import { SITE_URL } from "@/lib/site-config";
@@ -30,6 +35,16 @@ const bodyFont = Rubik({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+// Italiana: the real site's actual display serif for large (60–75px)
+// section titles like "Euphoria" and its Instagram-section headline. It has
+// no Hebrew glyphs, so it's only applied (via the `.font-display` class) to
+// specific Latin-script brand/collection names, not to Hebrew headings.
+const displayFont = Italiana({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 export function generateStaticParams() {
@@ -68,6 +83,16 @@ export async function generateMetadata({
       title: t("title"),
       description: t("description"),
     },
+    // Makes "Add to Home Screen" launch as a standalone app (no browser
+    // chrome) on iOS, using the real brand icon rather than a screenshot of
+    // the page — appleWebApp controls Safari's behavior specifically, since
+    // iOS only partially honors the web manifest (auto-linked separately via
+    // the src/app/manifest.ts file convention).
+    appleWebApp: {
+      capable: true,
+      title: "Lady Diamond",
+      statusBarStyle: "default",
+    },
   };
 }
 
@@ -92,9 +117,11 @@ export default async function LocaleLayout({
     <html
       lang={locale}
       dir={dir}
-      className={`${bodyFont.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${bodyFont.variable} ${geistMono.variable} ${displayFont.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <IntroReveal />
+        <ShootingStar />
         <JsonLd data={[organizationSchema(), websiteSchema()]} />
         <NextIntlClientProvider>
           <ReferralCapture />
@@ -105,6 +132,9 @@ export default async function LocaleLayout({
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
+          <WhatsappButton />
+          <FloatingLogoBadge />
+          <SparkleCursor />
           <CookieConsentBanner />
         </NextIntlClientProvider>
       </body>

@@ -74,7 +74,7 @@ export default async function AdminCustomersPage({
               return (
                 <tr key={c.id} className="border-b border-neutral-100 last:border-0">
                   <td className="px-4 py-3 font-medium">
-                    <Link href={`/admin/customers/${c.id}`} className="hover:underline">
+                    <Link href={`/admin/customers/${c.id}`} className="block hover:underline">
                       {c.name}
                     </Link>
                   </td>

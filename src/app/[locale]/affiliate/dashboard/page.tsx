@@ -78,7 +78,7 @@ export default async function AffiliateDashboardPage() {
         </form>
       </div>
 
-      <div className="mb-8 rounded-lg border border-gold-soft bg-paper-soft p-5">
+      <div className="mb-8 border border-gold-soft bg-paper-soft p-5">
         <p className="text-xs text-ink/60">{t("yourCode")}</p>
         <p className="mb-3 text-lg font-semibold" dir="ltr">{affiliate.code}</p>
         <p className="text-xs text-ink/60">{t("yourLink")}</p>
@@ -89,7 +89,7 @@ export default async function AffiliateDashboardPage() {
 
       <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {stats.map((s) => (
-          <div key={s.label} className="rounded-lg border border-gold-soft bg-paper p-4">
+          <div key={s.label} className="border border-gold-soft bg-paper p-4">
             <p className="text-xs text-ink/50">{s.label}</p>
             <p className="mt-1 text-xl font-semibold">{s.value}</p>
           </div>
@@ -98,7 +98,7 @@ export default async function AffiliateDashboardPage() {
 
       <div className="mb-8 grid grid-cols-3 gap-4">
         {commissionStats.map((s) => (
-          <div key={s.label} className="rounded-lg border border-gold-soft bg-paper p-4">
+          <div key={s.label} className="border border-gold-soft bg-paper p-4">
             <p className="text-xs text-ink/50">{s.label}</p>
             <p className="mt-1 text-lg font-semibold">{s.value.toFixed(2)} ₪</p>
           </div>
@@ -110,7 +110,7 @@ export default async function AffiliateDashboardPage() {
       <h2 className="mb-3 mt-10 text-sm font-semibold uppercase tracking-wide text-ink/80">
         {t("paymentDetails")}
       </h2>
-      <form action={updateMyPaymentDetails} className="mb-10 space-y-3 rounded-lg border border-gold-soft bg-paper p-5">
+      <form action={updateMyPaymentDetails} className="mb-10 space-y-3 border border-gold-soft bg-paper p-5">
         <div>
           <label className="mb-1 block text-xs font-medium text-ink/60">{t("paymentMethod")}</label>
           <select
@@ -149,7 +149,7 @@ export default async function AffiliateDashboardPage() {
             <input name="bitPhone" dir="ltr" defaultValue={payment?.bitPhone ?? ""} className="w-full border border-gold-soft px-3 py-2 text-sm" />
           </div>
         </div>
-        <button type="submit" className="rounded bg-ink px-4 py-2 text-xs font-semibold text-paper">
+        <button type="submit" className="border border-gold-bright bg-ink px-4 py-2 text-xs font-semibold uppercase tracking-wide text-paper hover:bg-gold-bright">
           {t("saveDetails")}
         </button>
       </form>

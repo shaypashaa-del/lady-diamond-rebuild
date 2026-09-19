@@ -39,7 +39,7 @@ export default async function AccountPage() {
         <ul className="mb-8 divide-y divide-gold-soft border-y border-gold-soft">
           {orders.map((o) => (
             <li key={o.id} className="flex items-center justify-between py-3 text-sm">
-              <Link href={`/account/orders/${o.id}`} className="link-underline font-medium">
+              <Link href={`/account/orders/${o.id}`} className="link-underline block font-medium">
                 {o.orderNumber}
               </Link>
               <span className="text-ink/60">{statusLabels[o.status] ?? o.status}</span>

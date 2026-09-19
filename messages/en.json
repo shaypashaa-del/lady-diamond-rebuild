@@ -1,16 +1,18 @@
 {
   "Meta": {
     "title": "Lady Diamond Jewels — Fine Jewelry Since 2010",
-    "description": "Gold and silver fine jewelry designed for everyday wear — necklaces, rings, earrings and bracelets, since 2010."
+    "description": "Fine jewelry in gold, silver and diamonds — gold necklaces, diamond rings, gold earrings and bracelets, designed for everyday wear since 2010."
   },
   "Announcement": {
-    "text": "Free express worldwide shipping.",
+    "text": "Fast shipping across Israel | Join our newsletter for updates and discounts",
     "subscribe": "Subscribe to discover"
   },
   "Nav": {
     "home": "Home",
     "shop": "Shop",
     "aboutUs": "About Us",
+    "affiliateProgram": "Affiliate Program",
+    "calculators": "Calculators",
     "contactUs": "Contact Us",
     "earrings": "Earrings",
     "rings": "Rings",
@@ -30,7 +32,9 @@
   },
   "Footer": {
     "brand": "Lady Diamond",
-    "tagline": "Fine jewelry in gold and silver, designed for everyday wear since 2010.",
+    "tagline": "High-quality, elegant fine jewelry featuring diamonds and precious materials, designed to enhance your everyday style and mark life's special moments.",
+    "address": "Bursa Complex, Noam Building, 23 Tuval Street, Ramat Gan",
+    "hours": "Sun–Fri, 9:00–19:00",
     "general": "General",
     "about": "About",
     "categories": "Categories",
@@ -41,7 +45,9 @@
     "ourStory": "Our Story",
     "becomeAffiliate": "Become an Affiliate",
     "shipping": "Shipping & Returns",
+    "terms": "Terms of Service",
     "privacy": "Privacy Policy",
+    "accessibility": "Accessibility Statement",
     "earrings": "Earrings",
     "rings": "Rings",
     "bracelets": "Bracelets",
@@ -67,23 +73,9 @@
     "euphoriaTitle": "Euphoria",
     "euphoriaCopy": "Our warmest edit yet — brushed gold rings and hoops made for everyday stacking.",
     "shopMore": "Shop More",
-    "asSeenIn": "As Seen In",
-    "kindWords": "Kind Words",
+    "videoKicker": "A Closer Look",
+    "videoTitle": "Artistry in Detail",
     "instagram": "Instagram",
-    "testimonials": [
-      {
-        "name": "Noa L.",
-        "quote": "The circle necklace is so light I forget I'm wearing it — exactly what I wanted."
-      },
-      {
-        "name": "Maya K.",
-        "quote": "Ordered the simple ring in silver, sizing was spot on and it arrived beautifully packed."
-      },
-      {
-        "name": "Dana R.",
-        "quote": "Bought the heart bracelet as a gift — the quality feels much higher than the price."
-      }
-    ],
     "relatedProducts": "You May Also Like"
   },
   "Product": {
@@ -101,12 +93,18 @@
     "sku": "SKU",
     "weight": "Weight",
     "decreaseQty": "Decrease quantity",
-    "increaseQty": "Increase quantity"
+    "increaseQty": "Increase quantity",
+    "buyWithBit": "Buy with Bit",
+    "buyWithPaypal": "Buy with PayPal"
   },
   "Category": {
     "items": "items",
     "item": "item",
-    "noProducts": "No products yet."
+    "noProducts": "No products yet.",
+    "sortBy": "Sort by",
+    "sortNewest": "Newest",
+    "sortPriceAsc": "Price: Low to High",
+    "sortPriceDesc": "Price: High to Low"
   },
   "Cart": {
     "title": "Cart",
@@ -117,6 +115,8 @@
     "free": "Free",
     "estimatedTotal": "Estimated Total",
     "proceedToCheckout": "Proceed to Checkout",
+    "buyWithBit": "Buy with Bit",
+    "buyWithPaypal": "Buy with PayPal",
     "decreaseQty": "Decrease quantity",
     "increaseQty": "Increase quantity",
     "remove": "Remove"
@@ -291,7 +291,9 @@
     "submit": "Send Message",
     "submitting": "Sending...",
     "sent": "Thanks — we'll get back to you soon.",
-    "info": "Contact Information"
+    "info": "Contact Information",
+    "address": "Bursa Complex, Noam Building, 23 Tuval Street, Ramat Gan",
+    "hours": "Sun–Fri, 9:00–19:00"
   },
   "OrderDetail": {
     "title": "Order",
@@ -303,5 +305,56 @@
     "shipping": "Shipping",
     "total": "Total",
     "backToAccount": "Back to My Account"
+  },
+  "Whatsapp": {
+    "chatWithUs": "Chat with us on WhatsApp"
+  },
+  "Calculators": {
+    "pageTitle": "Diamond, Gold & Size Calculators",
+    "disclaimer": "These tools give a professional estimate for reference only — actual prices depend on the specific stone's certification and the day's market rate. Contact us for an exact quote.",
+    "tab_diamond": "Diamond Price",
+    "tab_gold": "Gold Value",
+    "tab_size": "Size Guide",
+    "caratWeight": "Carat Weight",
+    "shape": "Shape / Cut",
+    "shape_round": "Round",
+    "shape_princess": "Princess",
+    "shape_oval": "Oval",
+    "shape_cushion": "Cushion",
+    "shape_emerald": "Emerald",
+    "shape_pear": "Pear",
+    "shape_marquise": "Marquise",
+    "shape_radiant": "Radiant",
+    "shape_heart": "Heart",
+    "color": "Color Grade",
+    "clarity": "Clarity Grade",
+    "estimatedPrice": "Estimated Retail Price",
+    "marketCost": "Raw Material Cost (Market)",
+    "retailMargin": "Retail Margin (20%)",
+    "diamondNote": "Estimate based on typical market rates for a certified diamond of the selected specs.",
+    "weightGrams": "Weight (grams)",
+    "karat": "Gold Purity",
+    "goldPricePerGram": "24K Gold Price per Gram (₪)",
+    "estimatedValue": "Estimated Retail Value",
+    "goldMarketValue": "Gold Market Value",
+    "goldNote": "Enter today's 24K gold price per gram for an accurate estimate — the value scales down automatically for lower purities.",
+    "ringSizeTitle": "Ring Size Calculator",
+    "fingerCircumference": "Finger Circumference (mm)",
+    "ringSizeUS": "US Ring Size",
+    "ringSizeHelp": "Wrap a strip of paper around the base of your finger, mark where it overlaps, and measure the length in millimeters.",
+    "braceletTitle": "Bracelet Length Calculator",
+    "wristCircumference": "Wrist Circumference (cm)",
+    "fitStyle": "Fit Style",
+    "fitSnug": "Snug",
+    "fitComfortable": "Comfortable",
+    "fitLoose": "Loose",
+    "recommendedLength": "Recommended Length",
+    "cm": "cm",
+    "necklaceTitle": "Necklace Length Guide",
+    "necklace_choker": "Choker",
+    "necklace_princess": "Princess",
+    "necklace_matinee": "Matinee",
+    "necklace_opera": "Opera",
+    "necklace_rope": "Rope"
   }
 }

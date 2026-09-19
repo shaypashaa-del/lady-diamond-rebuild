@@ -24,7 +24,7 @@ export function AffiliateLinkGenerator({
   }
 
   return (
-    <div className="rounded-lg border border-gold-soft p-5">
+    <div className="border border-gold-soft p-5">
       <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink/60">Link Generator</p>
       <div className="flex flex-col gap-3 sm:flex-row">
         <select

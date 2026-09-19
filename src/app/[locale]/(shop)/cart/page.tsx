@@ -58,7 +58,7 @@ export default function CartPage() {
                 )}
               </div>
               <div className="flex-1">
-                <Link href={`/product/${line.slug}`} className="text-sm font-medium uppercase text-ink">
+                <Link href={`/product/${line.slug}`} className="block text-sm font-medium uppercase text-ink">
                   {line.name}
                 </Link>
                 {line.variantLabel && <p className="text-xs text-ink/50">{line.variantLabel}</p>}
@@ -113,6 +113,20 @@ export default function CartPage() {
           >
             {t("proceedToCheckout")}
           </Link>
+          <div className="mt-3 flex items-center gap-3">
+            <Link
+              href="/checkout?pm=bit"
+              className="flex-1 border border-gold-soft py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-ink transition-colors hover:border-gold"
+            >
+              {t("buyWithBit")}
+            </Link>
+            <Link
+              href="/checkout?pm=paypal"
+              className="flex-1 border border-gold-soft py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-ink transition-colors hover:border-gold"
+            >
+              {t("buyWithPaypal")}
+            </Link>
+          </div>
         </div>
       </div>
     </div>

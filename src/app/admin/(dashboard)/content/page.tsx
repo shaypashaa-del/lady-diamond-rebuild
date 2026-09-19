@@ -41,7 +41,7 @@ export default async function AdminContentPage() {
                   {STANDALONE_SLUGS.has(p.slug) ? `/${p.slug}` : `/policies/${p.slug}`}
                 </td>
                 <td className="px-4 py-3">
-                  <Link href={`/admin/pages/${p.id}`} className="text-xs text-blue-600 hover:underline">
+                  <Link href={`/admin/pages/${p.id}`} className="block text-xs text-blue-600 hover:underline">
                     עריכה
                   </Link>
                 </td>

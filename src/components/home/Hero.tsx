@@ -85,8 +85,8 @@ export function Hero({
               key={src}
               aria-label={`${i + 1}`}
               onClick={() => setActive(i)}
-              className={`h-1.5 rounded-full transition-all ${
-                i === active ? "w-6 bg-gold-bright" : "w-1.5 bg-paper/40"
+              className={`h-1 transition-all ${
+                i === active ? "w-8 bg-gold-bright" : "w-3 bg-paper/40"
               }`}
             />
           ))}
@@ -100,7 +100,7 @@ export function Hero({
           </p>
           <span className="gold-rule-start rise-in mt-4" style={{ animationDuration: "1.4s", animationDelay: "0.1s" }} />
           <h1
-            className="rise-in mt-6 text-4xl font-semibold leading-[1.1] sm:text-6xl"
+            className="font-display rise-in mt-6 text-5xl font-normal leading-[1.1] sm:text-7xl"
             style={{ animationDuration: "1.4s", animationDelay: "0.2s" }}
           >
             {title ?? t("heroTitle")}

@@ -204,11 +204,11 @@ html[dir="rtl"] .hero-scrim {
     transform: translateY(-10%);
     opacity: 0;
   }
-  15% {
-    opacity: 1;
+  20% {
+    opacity: 0.55;
   }
   75% {
-    opacity: 0.55;
+    opacity: 0.25;
   }
   100% {
     transform: translateY(115%);
@@ -219,8 +219,9 @@ html[dir="rtl"] .hero-scrim {
   position: absolute;
   top: 0;
   border-radius: 9999px;
-  background: radial-gradient(circle, #fff6df 0%, var(--gold-bright) 45%, rgba(221, 170, 93, 0) 75%);
-  box-shadow: 0 0 8px 1px rgba(221, 170, 93, 0.7);
+  filter: blur(1px);
+  background: radial-gradient(circle, rgba(255, 246, 223, 0.9) 0%, var(--gold-bright) 55%, rgba(221, 170, 93, 0) 78%);
+  box-shadow: 0 0 10px 2px rgba(221, 170, 93, 0.35);
   animation: gold-dust-fall linear infinite;
   pointer-events: none;
 }

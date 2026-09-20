@@ -6,8 +6,8 @@
 // 5741-1981 distance-selling / right-of-withdrawal rules for e-commerce.
 //
 // IMPORTANT: this is still not a substitute for review by a lawyer
-// licensed in Israel before the site goes live — the business identifier
-// number is intentionally left as a visible placeholder, not invented.
+// licensed in Israel before the site goes live. Business registration
+// number (310618715) provided directly by the business owner.
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import "dotenv/config";
@@ -18,7 +18,7 @@ const prisma = new PrismaClient({ adapter });
 type LT = { he: string; en: string; ru: string };
 const lt = (he: string, en: string, ru: string): LT => ({ he, en, ru });
 
-const BIZ_NUMBER_PLACEHOLDER = "[להשלים: מספר עוסק מורשה / ח\"פ]";
+const BIZ_NUMBER = "310618715";
 const LAWYER_NOTE = lt(
   "מסמך זה נכתב כטיוטה מקצועית מפורטת, אך אינו מהווה ייעוץ משפטי. יש להעבירו לאישור עורך/ת דין לפני העלאת האתר לאוויר, ולעדכן את פרטי העסק המדויקים (כולל מספר עוסק מורשה/ח\"פ) בהתאם.",
   "This document is a detailed professional draft, not legal advice. Have it reviewed by a lawyer before the site goes live, and complete the exact business details (including the business registration number) accordingly.",
@@ -26,9 +26,9 @@ const LAWYER_NOTE = lt(
 );
 
 const BUSINESS_BLOCK = lt(
-  `פרטי העסק: LADY DIAMOND ("החברה"/"אנחנו"). מספר עוסק מורשה/ח"פ: ${BIZ_NUMBER_PLACEHOLDER}. כתובת: מתחם בורסה, בניין נועם, רחוב תובל 23, רמת גן. טלפון: 972-50-3781589+. דוא"ל: info@ladydiamondjewels.com.`,
-  `Business details: LADY DIAMOND ("the Company"/"we"). Business registration number: ${BIZ_NUMBER_PLACEHOLDER}. Address: Bursa Complex, Noam Building, 23 Tuval Street, Ramat Gan, Israel. Phone: +972-50-3781589. Email: info@ladydiamondjewels.com.`,
-  `Реквизиты компании: LADY DIAMOND («Компания»/«мы»). Регистрационный номер: ${BIZ_NUMBER_PLACEHOLDER}. Адрес: Bursa Complex, Noam Building, 23 Tuval Street, Ramat Gan, Israel. Телефон: +972-50-3781589. Эл. почта: info@ladydiamondjewels.com.`
+  `פרטי העסק: LADY DIAMOND ("החברה"/"אנחנו"). מספר עוסק מורשה: ${BIZ_NUMBER}. כתובת: מתחם בורסה, בניין נועם, רחוב תובל 23, רמת גן. טלפון: 972-50-3781589+. דוא"ל: info@ladydiamondjewels.com.`,
+  `Business details: LADY DIAMOND ("the Company"/"we"). Business registration number (עוסק מורשה): ${BIZ_NUMBER}. Address: Bursa Complex, Noam Building, 23 Tuval Street, Ramat Gan, Israel. Phone: +972-50-3781589. Email: info@ladydiamondjewels.com.`,
+  `Реквизиты компании: LADY DIAMOND («Компания»/«мы»). Регистрационный номер: ${BIZ_NUMBER}. Адрес: Bursa Complex, Noam Building, 23 Tuval Street, Ramat Gan, Israel. Телефон: +972-50-3781589. Эл. почта: info@ladydiamondjewels.com.`
 );
 
 function join(...parts: LT[]): LT {

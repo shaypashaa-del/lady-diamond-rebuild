@@ -180,6 +180,22 @@ html[dir="rtl"] .hero-scrim {
   }
 }
 
+/* A slowly-rotating gold ring behind the same portrait, so its glinting
+   highlight sweeps all the way around the frame rather than sitting still. */
+@keyframes ring-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-ring-rotate {
+  animation: ring-rotate 7s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-ring-rotate {
+    animation: none;
+  }
+}
+
 /* A faint gold shooting star that drifts across the page's white space —
    a slow, low-opacity ambient touch, not a foreground effect. Sits behind
    all real content (negative z-index on a fixed, pointer-events-none host)

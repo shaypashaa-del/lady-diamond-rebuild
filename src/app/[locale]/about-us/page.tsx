@@ -228,28 +228,34 @@ export default async function AboutUsPage() {
               )}
             <span aria-hidden="true" className="gold-rule mt-8 w-16" />
 
-            <div className="relative mx-auto mt-10 h-28 w-28 sm:h-32 sm:w-32">
+            <div className="relative mx-auto mt-10 h-44 w-44 sm:h-56 sm:w-56">
               {/* A faint, larger outer ring — the same "double frame" motif
                   used on the founder-intro photo — so the portrait reads as
                   a deliberate locket rather than a plain avatar circle. */}
-              <span aria-hidden="true" className="absolute -inset-2.5 rounded-full border border-gold-bright/25" />
-              <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,var(--gold-bright),var(--gold-deep),var(--gold),var(--gold-bright))] p-[3px] shadow-[0_0_24px_-4px_rgba(212,180,131,0.55)]">
-                <div className="relative h-full w-full overflow-hidden rounded-full ring-1 ring-inset ring-ink/40">
-                  <Image
-                    src="/brand/about-founder-candid-1.jpeg"
-                    alt="דיאנה אירימוב"
-                    fill
-                    sizes="128px"
-                    className="founder-fade-a absolute inset-0 object-cover"
-                  />
-                  <Image
-                    src="/brand/about-founder-candid-2.jpeg"
-                    alt="דיאנה אירימוב"
-                    fill
-                    sizes="128px"
-                    className="founder-fade-b absolute inset-0 object-cover"
-                  />
-                </div>
+              <span aria-hidden="true" className="absolute -inset-3 rounded-full border border-gold-bright/25" />
+              {/* The gold ring itself rotates slowly behind the (static)
+                  photo circle, so its bright glint sweeps around the frame
+                  instead of sitting still — a shimmering locket edge rather
+                  than a flat painted border. */}
+              <div
+                aria-hidden="true"
+                className="animate-ring-rotate absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,var(--gold-bright)_0%,var(--gold-deep)_25%,var(--gold)_50%,#fff6df_60%,var(--gold)_70%,var(--gold-bright)_100%)] shadow-[0_0_24px_-4px_rgba(212,180,131,0.55)]"
+              />
+              <div className="absolute inset-[3px] overflow-hidden rounded-full ring-1 ring-inset ring-ink/40">
+                <Image
+                  src="/brand/about-founder-candid-1.jpeg"
+                  alt="דיאנה אירימוב"
+                  fill
+                  sizes="224px"
+                  className="founder-fade-a absolute inset-0 object-cover"
+                />
+                <Image
+                  src="/brand/about-founder-candid-2.jpeg"
+                  alt="דיאנה אירימוב"
+                  fill
+                  sizes="224px"
+                  className="founder-fade-b absolute inset-0 object-cover"
+                />
               </div>
             </div>
           </div>

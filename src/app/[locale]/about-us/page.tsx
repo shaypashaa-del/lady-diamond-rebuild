@@ -43,10 +43,12 @@ function parseStory(text: string) {
 // the small handful doesn't read as one mechanically repeated element. They
 // dissolve around the title's height rather than crossing the whole band.
 const GOLD_DUST = [
-  { left: "12%", top: "0%", size: 9, drift: -32, duration: 10, delay: -1 },
-  { left: "38%", top: "-6%", size: 7, drift: 22, duration: 12, delay: -6 },
-  { left: "67%", top: "4%", size: 10, drift: -18, duration: 9, delay: -3.5 },
-  { left: "86%", top: "-3%", size: 7, drift: 28, duration: 11, delay: -8 },
+  { left: "12%", top: "0%", size: 9, drift: -32, duration: 10, delay: -1, color: "gold" as const },
+  { left: "38%", top: "-6%", size: 7, drift: 22, duration: 12, delay: -6, color: "gold" as const },
+  { left: "67%", top: "4%", size: 10, drift: -18, duration: 9, delay: -3.5, color: "gold" as const },
+  { left: "86%", top: "-3%", size: 7, drift: 28, duration: 11, delay: -8, color: "gold" as const },
+  { left: "25%", top: "-4%", size: 6, drift: 16, duration: 13, delay: -4.5, color: "white" as const },
+  { left: "78%", top: "2%", size: 6, drift: -20, duration: 10.5, delay: -9, color: "white" as const },
 ];
 
 const DiamondMark = ({ className }: { className?: string }) => (
@@ -97,7 +99,7 @@ export default async function AboutUsPage() {
           {GOLD_DUST.map((d, i) => (
             <span
               key={i}
-              className="gold-dust"
+              className={d.color === "white" ? "gold-dust gold-dust-white" : "gold-dust"}
               style={{
                 left: d.left,
                 top: d.top,

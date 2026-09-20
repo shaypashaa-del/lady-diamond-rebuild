@@ -225,6 +225,10 @@ html[dir="rtl"] .hero-scrim {
   animation: gold-dust-fall linear infinite;
   pointer-events: none;
 }
+.gold-dust.gold-dust-white {
+  background: radial-gradient(circle, #ffffff 0%, #f3ede1 55%, rgba(255, 255, 255, 0) 78%);
+  box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.3);
+}
 @media (prefers-reduced-motion: reduce) {
   .gold-dust {
     display: none;

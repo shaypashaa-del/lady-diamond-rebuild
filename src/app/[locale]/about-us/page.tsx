@@ -228,24 +228,28 @@ export default async function AboutUsPage() {
               )}
             <span aria-hidden="true" className="gold-rule mt-8 w-16" />
 
-            <div className="mt-10 flex items-center justify-center gap-4">
-              <div className="relative h-20 w-20 overflow-hidden rounded-full border border-gold-bright/40 sm:h-24 sm:w-24">
-                <Image
-                  src="/brand/about-founder-candid-1.jpeg"
-                  alt="דיאנה אירימוב"
-                  fill
-                  sizes="96px"
-                  className="object-cover"
-                />
-              </div>
-              <div className="relative -mx-3 h-24 w-24 overflow-hidden rounded-full border border-gold-bright/40 sm:h-28 sm:w-28">
-                <Image
-                  src="/brand/about-founder-candid-2.jpeg"
-                  alt="דיאנה אירימוב"
-                  fill
-                  sizes="112px"
-                  className="object-cover"
-                />
+            <div className="relative mx-auto mt-10 h-28 w-28 sm:h-32 sm:w-32">
+              {/* A faint, larger outer ring — the same "double frame" motif
+                  used on the founder-intro photo — so the portrait reads as
+                  a deliberate locket rather than a plain avatar circle. */}
+              <span aria-hidden="true" className="absolute -inset-2.5 rounded-full border border-gold-bright/25" />
+              <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,var(--gold-bright),var(--gold-deep),var(--gold),var(--gold-bright))] p-[3px] shadow-[0_0_24px_-4px_rgba(212,180,131,0.55)]">
+                <div className="relative h-full w-full overflow-hidden rounded-full ring-1 ring-inset ring-ink/40">
+                  <Image
+                    src="/brand/about-founder-candid-1.jpeg"
+                    alt="דיאנה אירימוב"
+                    fill
+                    sizes="128px"
+                    className="founder-fade-a absolute inset-0 object-cover"
+                  />
+                  <Image
+                    src="/brand/about-founder-candid-2.jpeg"
+                    alt="דיאנה אירימוב"
+                    fill
+                    sizes="128px"
+                    className="founder-fade-b absolute inset-0 object-cover"
+                  />
+                </div>
               </div>
             </div>
           </div>

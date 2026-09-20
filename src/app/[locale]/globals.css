@@ -152,6 +152,34 @@ html[dir="rtl"] .hero-scrim {
   }
 }
 
+/* A slow, luxurious crossfade between two stacked photos in one circular
+   frame — used for the about-us closing portrait. The two images share a
+   single 12s loop, each holding for a long dwell before dissolving into the
+   other, rather than a quick slideshow-style cut. */
+@keyframes founder-fade-a {
+  0%, 42% { opacity: 1; }
+  58%, 100% { opacity: 0; }
+}
+@keyframes founder-fade-b {
+  0%, 42% { opacity: 0; }
+  58%, 100% { opacity: 1; }
+}
+.founder-fade-a {
+  animation: founder-fade-a 12s ease-in-out infinite;
+}
+.founder-fade-b {
+  animation: founder-fade-b 12s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .founder-fade-a,
+  .founder-fade-b {
+    animation: none;
+  }
+  .founder-fade-b {
+    opacity: 0;
+  }
+}
+
 /* A faint gold shooting star that drifts across the page's white space —
    a slow, low-opacity ambient touch, not a foreground effect. Sits behind
    all real content (negative z-index on a fixed, pointer-events-none host)

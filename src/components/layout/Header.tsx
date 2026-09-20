@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
@@ -10,6 +11,16 @@ import { useCartStore } from "@/lib/cart-store";
 import { useWishlistStore } from "@/lib/wishlist-store";
 import { useMounted } from "@/lib/use-mounted";
 import { LocaleSwitcher } from "./LocaleSwitcher";
+
+const DrawerDiamondMark = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
+    <path d="M12 2 L21 9 L12 22 L3 9 Z" stroke="currentColor" strokeWidth="0.4" />
+    <path d="M3 9 H21" stroke="currentColor" strokeWidth="0.4" />
+    <path d="M12 2 L8 9" stroke="currentColor" strokeWidth="0.3" />
+    <path d="M12 2 L16 9" stroke="currentColor" strokeWidth="0.3" />
+    <path d="M12 2 L12 22" stroke="currentColor" strokeWidth="0.25" />
+  </svg>
+);
 
 export function Header() {
   const t = useTranslations("Header");
@@ -157,40 +168,50 @@ export function Header() {
         </div>
       )}
 
-      {open && (
-        <div className="fixed inset-0 z-50 flex justify-end rtl:justify-start">
+      {/* Rendered via a portal straight into <body> — nesting this overlay
+          inside <header> (which itself has `relative z-40`) capped its
+          effective stacking at the header's own z-40 among page-level
+          siblings, so the fixed WhatsApp button (also z-40, later in the
+          DOM) painted on top of it despite the drawer's own z-50. A portal
+          makes this a true root-level sibling instead of a nested one. */}
+      {mounted && open && createPortal(
+        <div className="fixed inset-0 z-[100] flex justify-end rtl:justify-start">
           <div
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setOpen(false)}
             aria-hidden
           />
-          <nav className="relative flex h-full w-full max-w-sm flex-col overflow-y-auto bg-paper p-6 shadow-xl">
-            <div className="mb-6 flex items-center justify-between">
-              <LocaleSwitcher />
+          <nav className="relative flex h-full w-full max-w-sm flex-col overflow-y-auto border-s border-gold-bright/20 bg-ink text-paper shadow-2xl">
+            <DrawerDiamondMark className="pointer-events-none absolute -top-16 -end-16 h-64 w-64 text-paper/[0.04]" />
+            <DrawerDiamondMark className="pointer-events-none absolute -bottom-20 -start-20 h-72 w-72 text-paper/[0.03]" />
+
+            <div className="relative flex items-center justify-between px-6 pb-6 pt-6">
+              <LocaleSwitcher variant="dark" />
               <button
                 aria-label={t("closeMenu")}
                 onClick={() => setOpen(false)}
-                className="text-ink/70 transition-colors hover:text-gold-deep"
+                className="text-paper/70 transition-colors hover:text-gold-bright"
               >
                 <X size={22} />
               </button>
             </div>
+            <div className="relative mx-6 h-px bg-gradient-to-r from-gold-bright/60 via-gold-bright/20 to-transparent rtl:bg-gradient-to-l" />
 
-            <ul className="space-y-6 text-sm tracking-wide">
+            <ul className="relative space-y-7 px-6 pt-8 text-sm tracking-wide">
               {primaryNav.map((item) => (
                 <li key={item.key}>
                   <Link
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="link-underline font-medium uppercase text-ink transition-colors hover:text-gold-deep"
+                    className="font-medium uppercase tracking-[0.15em] text-paper transition-colors hover:text-gold-bright"
                   >
                     {tNav(item.key)}
                   </Link>
                   {"mega" in item && item.mega && (
-                    <ul className="mt-3 space-y-2 border-s border-gold-soft ps-4 text-ink/60">
+                    <ul className="mt-4 space-y-3 border-s border-gold-bright/25 ps-4 text-paper/55">
                       {item.mega.map((cat) => (
                         <li key={cat.key}>
-                          <Link href={cat.href} onClick={() => setOpen(false)} className="transition-colors hover:text-gold-deep">
+                          <Link href={cat.href} onClick={() => setOpen(false)} className="text-xs uppercase tracking-[0.1em] transition-colors hover:text-gold-bright">
                             {tNav(cat.key)}
                           </Link>
                         </li>
@@ -206,32 +227,43 @@ export function Header() {
                 submitSearch(e);
                 setOpen(false);
               }}
-              className="mt-auto flex gap-2 border-t border-gold-soft pt-6 sm:hidden"
+              className="relative mt-auto flex gap-2 px-6 pt-8 lg:hidden"
             >
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={tSearch("placeholder")}
-                className="flex-1 border border-gold-soft px-3 py-2 text-sm text-ink focus:border-gold focus:outline-none"
+                className="flex-1 border border-paper/25 bg-transparent px-3 py-2 text-sm text-paper placeholder:text-paper/40 focus:border-gold-bright focus:outline-none"
               />
-              <button type="submit" aria-label={t("search")} className="border border-gold-bright px-3 text-ink transition-colors hover:bg-gold-bright">
+              <button type="submit" aria-label={t("search")} className="border border-gold-bright px-3 text-gold-bright transition-colors hover:bg-gold-bright hover:text-ink">
                 <Search size={16} />
               </button>
             </form>
 
-            <div className="flex items-center gap-4 border-t border-gold-soft pt-6 text-ink sm:hidden">
-              <Link href="/account" onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm transition-colors hover:text-gold-deep">
-                <User size={16} /> {tNav("account")}
+            <div className="relative mx-6 mt-8 h-px bg-gradient-to-r from-gold-bright/60 via-gold-bright/20 to-transparent rtl:bg-gradient-to-l lg:hidden" />
+            <div className="relative grid grid-cols-3 gap-2 px-6 pb-10 pt-6 text-center lg:hidden">
+              <Link href="/account" onClick={() => setOpen(false)} className="group flex flex-col items-center gap-2 text-paper/80 transition-colors hover:text-gold-bright">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full border border-paper/25 transition-colors group-hover:border-gold-bright">
+                  <User size={17} />
+                </span>
+                <span className="text-[11px] uppercase tracking-[0.1em]">{tNav("account")}</span>
               </Link>
-              <Link href="/wishlist" onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm transition-colors hover:text-gold-deep">
-                <Heart size={16} /> {tProduct("wishlist")}
+              <Link href="/wishlist" onClick={() => setOpen(false)} className="group flex flex-col items-center gap-2 text-paper/80 transition-colors hover:text-gold-bright">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full border border-paper/25 transition-colors group-hover:border-gold-bright">
+                  <Heart size={17} />
+                </span>
+                <span className="text-[11px] uppercase tracking-[0.1em]">{tProduct("wishlist")}</span>
               </Link>
-              <Link href="/cart" onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm transition-colors hover:text-gold-deep">
-                <ShoppingBag size={16} /> {tNav("cart")}
+              <Link href="/cart" onClick={() => setOpen(false)} className="group flex flex-col items-center gap-2 text-paper/80 transition-colors hover:text-gold-bright">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full border border-paper/25 transition-colors group-hover:border-gold-bright">
+                  <ShoppingBag size={17} />
+                </span>
+                <span className="text-[11px] uppercase tracking-[0.1em]">{tNav("cart")}</span>
               </Link>
             </div>
           </nav>
-        </div>
+        </div>,
+        document.body
       )}
     </header>
   );

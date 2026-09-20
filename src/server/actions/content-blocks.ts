@@ -20,9 +20,24 @@ export type HeroContent = {
   ctaHref: string;
 };
 
+// This one query runs on every single page render (the root layout calls it
+// for the announcement bar), so it's the most likely place to observe a
+// transient dropped connection under load — e.g. `next build`'s parallel
+// static-generation workers racing against the local dev database's small
+// connection pool. A couple of quick retries absorb that without failing
+// the whole page.
 export async function getContentBlock<T>(key: string): Promise<T | null> {
-  const row = await prisma.contentBlock.findUnique({ where: { key } });
-  return row ? (row.data as T) : null;
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const row = await prisma.contentBlock.findUnique({ where: { key } });
+      return row ? (row.data as T) : null;
+    } catch (error) {
+      lastError = error;
+      await new Promise((resolve) => setTimeout(resolve, 150 * (attempt + 1)));
+    }
+  }
+  throw lastError;
 }
 
 function localizedFromForm(formData: FormData, prefix: string): LocalizedText {

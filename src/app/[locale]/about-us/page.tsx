@@ -37,19 +37,16 @@ function parseStory(text: string) {
   return { intro, sections };
 }
 
-// Fixed, hand-picked positions/timings for the hero's falling gold flecks —
-// deterministic (not Math.random()) so server and client markup always
-// match, and varied enough that the drift doesn't look mechanically evenly
-// spaced.
+// A few, hand-picked falling flecks — deterministic (not Math.random()) so
+// server and client markup always match. Each starts from a different spot
+// and top offset, and drifts sideways in its own direction as it falls, so
+// the small handful doesn't read as one mechanically repeated element. They
+// dissolve around the title's height rather than crossing the whole band.
 const GOLD_DUST = [
-  { left: "8%", size: 10, duration: 9, delay: -2 },
-  { left: "18%", size: 7, duration: 7, delay: -5 },
-  { left: "29%", size: 9, duration: 11, delay: -1 },
-  { left: "41%", size: 6, duration: 8, delay: -6.5 },
-  { left: "53%", size: 11, duration: 10, delay: -3.5 },
-  { left: "64%", size: 7, duration: 7.5, delay: -0.5 },
-  { left: "76%", size: 9, duration: 9.5, delay: -4 },
-  { left: "88%", size: 6, duration: 8.5, delay: -7 },
+  { left: "12%", top: "0%", size: 9, drift: -32, duration: 10, delay: -1 },
+  { left: "38%", top: "-6%", size: 7, drift: 22, duration: 12, delay: -6 },
+  { left: "67%", top: "4%", size: 10, drift: -18, duration: 9, delay: -3.5 },
+  { left: "86%", top: "-3%", size: 7, drift: 28, duration: 11, delay: -8 },
 ];
 
 const DiamondMark = ({ className }: { className?: string }) => (
@@ -103,10 +100,12 @@ export default async function AboutUsPage() {
               className="gold-dust"
               style={{
                 left: d.left,
+                top: d.top,
                 width: d.size,
                 height: d.size,
                 animationDuration: `${d.duration}s`,
                 animationDelay: `${d.delay}s`,
+                ["--dust-drift" as string]: `${d.drift}px`,
               }}
             />
           ))}

@@ -42,14 +42,14 @@ function parseStory(text: string) {
 // match, and varied enough that the drift doesn't look mechanically evenly
 // spaced.
 const GOLD_DUST = [
-  { left: "8%", size: 5, duration: 9, delay: -2 },
-  { left: "18%", size: 3, duration: 7, delay: -5 },
-  { left: "29%", size: 4, duration: 11, delay: -1 },
-  { left: "41%", size: 3, duration: 8, delay: -6.5 },
-  { left: "53%", size: 5, duration: 10, delay: -3.5 },
-  { left: "64%", size: 3, duration: 7.5, delay: -0.5 },
-  { left: "76%", size: 4, duration: 9.5, delay: -4 },
-  { left: "88%", size: 3, duration: 8.5, delay: -7 },
+  { left: "8%", size: 10, duration: 9, delay: -2 },
+  { left: "18%", size: 7, duration: 7, delay: -5 },
+  { left: "29%", size: 9, duration: 11, delay: -1 },
+  { left: "41%", size: 6, duration: 8, delay: -6.5 },
+  { left: "53%", size: 11, duration: 10, delay: -3.5 },
+  { left: "64%", size: 7, duration: 7.5, delay: -0.5 },
+  { left: "76%", size: 9, duration: 9.5, delay: -4 },
+  { left: "88%", size: 6, duration: 8.5, delay: -7 },
 ];
 
 const DiamondMark = ({ className }: { className?: string }) => (

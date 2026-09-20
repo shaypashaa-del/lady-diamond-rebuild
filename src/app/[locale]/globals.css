@@ -205,10 +205,10 @@ html[dir="rtl"] .hero-scrim {
     opacity: 0;
   }
   15% {
-    opacity: 0.7;
+    opacity: 1;
   }
   75% {
-    opacity: 0.35;
+    opacity: 0.55;
   }
   100% {
     transform: translateY(115%);
@@ -219,7 +219,8 @@ html[dir="rtl"] .hero-scrim {
   position: absolute;
   top: 0;
   border-radius: 9999px;
-  background: radial-gradient(circle, var(--gold-bright) 0%, rgba(221, 170, 93, 0) 72%);
+  background: radial-gradient(circle, #fff6df 0%, var(--gold-bright) 45%, rgba(221, 170, 93, 0) 75%);
+  box-shadow: 0 0 8px 1px rgba(221, 170, 93, 0.7);
   animation: gold-dust-fall linear infinite;
   pointer-events: none;
 }

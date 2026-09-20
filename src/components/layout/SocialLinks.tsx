@@ -33,7 +33,13 @@ const SOCIALS = [
   },
 ];
 
-export function SocialLinks({ className }: { className?: string }) {
+export function SocialLinks({
+  className,
+  variant = "light",
+}: {
+  className?: string;
+  variant?: "light" | "dark";
+}) {
   return (
     <div className={className}>
       {SOCIALS.map((s) => (
@@ -43,9 +49,13 @@ export function SocialLinks({ className }: { className?: string }) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={s.label}
-          className="text-ink/50 transition-colors hover:text-gold-deep"
+          className={
+            variant === "dark"
+              ? "flex h-9 w-9 items-center justify-center rounded-full border border-paper/20 text-paper/70 transition-colors hover:border-gold-bright hover:text-gold-bright"
+              : "text-ink/50 transition-colors hover:text-gold-deep"
+          }
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d={s.path} />
           </svg>
         </a>

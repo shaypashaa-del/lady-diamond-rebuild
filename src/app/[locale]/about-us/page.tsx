@@ -227,6 +227,27 @@ export default async function AboutUsPage() {
                 )
               )}
             <span aria-hidden="true" className="gold-rule mt-8 w-16" />
+
+            <div className="mt-10 flex items-center justify-center gap-4">
+              <div className="relative h-20 w-20 overflow-hidden rounded-full border border-gold-bright/40 sm:h-24 sm:w-24">
+                <Image
+                  src="/brand/about-founder-candid-1.jpeg"
+                  alt="דיאנה אירימוב"
+                  fill
+                  sizes="96px"
+                  className="object-cover"
+                />
+              </div>
+              <div className="relative -mx-3 h-24 w-24 overflow-hidden rounded-full border border-gold-bright/40 sm:h-28 sm:w-28">
+                <Image
+                  src="/brand/about-founder-candid-2.jpeg"
+                  alt="דיאנה אירימוב"
+                  fill
+                  sizes="112px"
+                  className="object-cover"
+                />
+              </div>
+            </div>
           </div>
         </ScrollReveal>
       </div>

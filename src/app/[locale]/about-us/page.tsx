@@ -12,6 +12,41 @@ type AboutBody = {
   quote: LocalizedText;
 };
 
+// Splits the real story text (from the DB, written by the client) into
+// its natural sections by blank-line-separated blocks, where a block
+// starting with "## " marks a new section heading. This is real content,
+// not invented — the layout below is simply a richer presentation of the
+// exact same paragraphs already approved for this page.
+function parseStory(text: string) {
+  const blocks = text.split("\n\n");
+  const intro: string[] = [];
+  const sections: { heading: string; paragraphs: string[] }[] = [];
+  let current: { heading: string; paragraphs: string[] } | null = null;
+
+  for (const block of blocks) {
+    if (block.startsWith("## ")) {
+      if (current) sections.push(current);
+      current = { heading: block.slice(3), paragraphs: [] };
+    } else if (current) {
+      current.paragraphs.push(block);
+    } else {
+      intro.push(block);
+    }
+  }
+  if (current) sections.push(current);
+  return { intro, sections };
+}
+
+const DiamondMark = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
+    <path d="M12 2 L21 9 L12 22 L3 9 Z" stroke="currentColor" strokeWidth="0.4" />
+    <path d="M3 9 H21" stroke="currentColor" strokeWidth="0.4" />
+    <path d="M12 2 L8 9" stroke="currentColor" strokeWidth="0.3" />
+    <path d="M12 2 L16 9" stroke="currentColor" strokeWidth="0.3" />
+    <path d="M12 2 L12 22" stroke="currentColor" strokeWidth="0.25" />
+  </svg>
+);
+
 export async function generateMetadata({
   params,
 }: {
@@ -23,24 +58,6 @@ export async function generateMetadata({
   return { title: localize(page.title as LocalizedText, locale as Locale) };
 }
 
-function renderStory(text: string) {
-  return text.split("\n\n").map((block, i) => {
-    if (block.startsWith("## ")) {
-      return (
-        <h2 key={i} className="mt-10 text-lg font-semibold uppercase tracking-[0.2em] text-ink first:mt-0">
-          {block.slice(3)}
-          <span className="gold-rule-start mt-3 w-10" />
-        </h2>
-      );
-    }
-    return (
-      <p key={i} className="mt-4 text-sm leading-7 text-ink/70">
-        {block}
-      </p>
-    );
-  });
-}
-
 export default async function AboutUsPage() {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("Home");
@@ -48,53 +65,145 @@ export default async function AboutUsPage() {
   if (!page) notFound();
 
   const body = page.body as unknown as AboutBody;
+  const { intro, sections } = parseStory(localize(body.story, locale));
+  const [birthOfBrand, aroundTheWorld, dianaFeature] = sections;
 
   return (
-    <div>
-      <div className="border-b border-gold-soft bg-paper-soft py-14 text-center sm:py-20">
+    <div className="overflow-hidden">
+      {/* HERO */}
+      <div className="relative overflow-hidden border-b border-gold-soft bg-paper-soft py-16 text-center sm:py-24">
+        <DiamondMark className="pointer-events-none absolute -top-16 -end-16 h-72 w-72 text-gold-bright/[0.07]" />
         <p className="text-xs uppercase tracking-[0.4em] text-gold-deep">{t("heroKicker")}</p>
         <span className="gold-rule mt-4 w-16" />
         <h1 className="font-display mt-4 text-3xl uppercase tracking-[0.15em] text-ink sm:text-5xl">
           {localize(page.title as LocalizedText, locale)}
         </h1>
+        {intro[0] && (
+          <p className="font-display mx-auto mt-5 max-w-md px-4 text-lg italic text-ink/70 sm:text-xl">{intro[0]}</p>
+        )}
       </div>
 
-      <ScrollReveal>
-        <div className="relative mx-auto mt-10 aspect-[16/9] w-full max-w-6xl px-4 sm:aspect-[21/9] sm:px-8">
-          <div className="relative h-full w-full overflow-hidden shadow-[0_30px_60px_-20px_rgba(0,0,0,0.25)]">
-            <Image
-              src="/brand/about-founder.jpeg"
-              alt="דיאנה אירימוב, מייסדת Lady Diamond"
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-            />
-          </div>
-          {/* Two fine corner brackets in gold — a quiet "framed portrait"
-              motif instead of a plain rectangular photo. */}
-          <span aria-hidden="true" className="absolute -top-3 -start-3 h-10 w-10 border-t-2 border-s-2 border-gold-bright" />
-          <span aria-hidden="true" className="absolute -bottom-3 -end-3 h-10 w-10 border-b-2 border-e-2 border-gold-bright" />
+      {/* FOUNDER INTRO */}
+      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-8 sm:py-24">
+        <div className="grid grid-cols-1 items-center gap-12 sm:grid-cols-12 sm:gap-10">
+          <ScrollReveal className="relative sm:col-span-5">
+            <div className="relative aspect-[4/5] w-full overflow-hidden border border-gold-bright">
+              <Image
+                src="/brand/about-founder.jpeg"
+                alt="דיאנה אירימוב, מייסדת Lady Diamond"
+                fill
+                sizes="(min-width: 640px) 40vw, 100vw"
+                className="object-cover"
+              />
+            </div>
+            {/* A second, offset outline behind the photo — a quiet "double
+                frame" motif instead of a plain bordered rectangle. */}
+            <div aria-hidden="true" className="absolute -z-10 inset-4 -bottom-4 -end-4 border border-gold-soft bg-paper-soft sm:inset-6 sm:-bottom-6 sm:-end-6" />
+          </ScrollReveal>
+          <ScrollReveal delay={0.1} className="sm:col-span-7">
+            <p className="text-xs uppercase tracking-[0.3em] text-gold-deep">{t("founderKicker")}</p>
+            {intro[1] && (
+              <p className="font-display mt-3 text-2xl leading-snug text-ink sm:text-3xl">{intro[1]}</p>
+            )}
+            {intro[2] && <p className="mt-5 text-sm leading-7 text-ink/60">{intro[2]}</p>}
+          </ScrollReveal>
         </div>
-      </ScrollReveal>
+      </section>
 
-      <ScrollReveal delay={0.1}>
-        <div className="mx-auto max-w-2xl px-4 py-16 sm:px-8 sm:py-20">{renderStory(localize(body.story, locale))}</div>
-      </ScrollReveal>
+      {/* BIRTH OF THE BRAND — DARK BAND */}
+      {birthOfBrand && (
+        <section className="relative overflow-hidden bg-ink py-16 text-paper sm:py-24">
+          <DiamondMark className="pointer-events-none absolute -bottom-14 -start-14 h-56 w-56 text-paper/[0.04]" />
+          <div className="relative mx-auto max-w-6xl px-4 sm:px-8">
+            <div className="grid grid-cols-1 items-center gap-10 sm:grid-cols-12 sm:gap-10">
+              <ScrollReveal className="order-2 sm:order-1 sm:col-span-6">
+                <p className="text-xs uppercase tracking-[0.3em] text-gold-bright">{t("heroKicker")}</p>
+                <h2 className="font-display mt-3 text-2xl text-paper sm:text-4xl">{birthOfBrand.heading}</h2>
+                <span className="mt-4 block h-px w-12 bg-gold-bright/60" />
+                {birthOfBrand.paragraphs.map((p, i) => (
+                  <p key={i} className="mt-5 text-sm leading-7 text-paper/60">
+                    {p}
+                  </p>
+                ))}
+              </ScrollReveal>
+              <ScrollReveal delay={0.1} className="order-1 sm:order-2 sm:col-span-5 sm:col-start-8">
+                <div className="relative aspect-[3/4] w-full max-w-xs overflow-hidden border border-paper/15 sm:max-w-none">
+                  <Image
+                    src="/brand/products/necklace-heart-yellow-gold-model.jpeg"
+                    alt="דוגמנית עונדת שרשרת לב זהב של Lady Diamond בתצוגה"
+                    fill
+                    sizes="(min-width: 640px) 35vw, 80vw"
+                    className="object-cover"
+                  />
+                </div>
+              </ScrollReveal>
+            </div>
+          </div>
+        </section>
+      )}
 
+      {/* AROUND THE WORLD — VALUES */}
+      {aroundTheWorld && (
+        <ScrollReveal>
+          <section className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-8 sm:py-24">
+            <p className="text-xs uppercase tracking-[0.3em] text-gold-deep">{aroundTheWorld.heading}</p>
+            <span className="gold-rule mt-4 w-16" />
+            {aroundTheWorld.paragraphs.map((p, i) => (
+              <p key={i} className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-ink/60">
+                {p}
+              </p>
+            ))}
+
+            <div className="mx-auto mt-14 grid max-w-3xl grid-cols-1 gap-10 sm:grid-cols-3">
+              {[
+                { title: t("value1Title"), copy: t("value1Copy") },
+                { title: t("value2Title"), copy: t("value2Copy") },
+                { title: t("value3Title"), copy: t("value3Copy") },
+              ].map((v) => (
+                <div key={v.title} className="flex flex-col items-center gap-3">
+                  <DiamondMark className="h-8 w-8 text-gold-bright" />
+                  <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-ink">{v.title}</h3>
+                  <p className="text-xs leading-6 text-ink/50">{v.copy}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        </ScrollReveal>
+      )}
+
+      {/* DIANA — NAME FEATURE */}
+      {dianaFeature && (
+        <section className="border-t border-gold-soft bg-paper-soft py-16 sm:py-24">
+          <div className="mx-auto max-w-6xl px-4 sm:px-8">
+            <div className="grid grid-cols-1 items-center gap-10 sm:grid-cols-12 sm:gap-10">
+              <ScrollReveal className="sm:col-span-5">
+                <div className="relative aspect-[4/5] w-full overflow-hidden border border-gold-bright">
+                  <Image
+                    src="/brand/about-founder.jpeg"
+                    alt="דיאנה אירימוב"
+                    fill
+                    sizes="(min-width: 640px) 40vw, 100vw"
+                    className="object-cover object-top"
+                  />
+                </div>
+              </ScrollReveal>
+              <ScrollReveal delay={0.1} className="sm:col-span-7">
+                <span className="font-display shimmer-text-gold text-5xl italic sm:text-6xl">דיאנה</span>
+                <h2 className="font-display mt-4 text-xl text-ink sm:text-2xl">{dianaFeature.heading}</h2>
+                {dianaFeature.paragraphs.map((p, i) => (
+                  <p key={i} className="mt-5 text-sm leading-7 text-ink/60">
+                    {p}
+                  </p>
+                ))}
+              </ScrollReveal>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* CLOSING QUOTE */}
       <div className="relative overflow-hidden border-t border-gold-bright/20 bg-ink py-16 text-paper sm:py-24">
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 200 200"
-          className="pointer-events-none absolute -top-10 -end-10 h-56 w-56 text-paper/[0.04]"
-        >
-          <path
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            d="M100 10 L160 70 L100 190 L40 70 Z M40 70 L160 70 M70 70 L100 190 M130 70 L100 190"
-          />
-        </svg>
+        <DiamondMark className="pointer-events-none absolute -top-10 -end-10 h-56 w-56 text-paper/[0.04]" />
         <ScrollReveal>
           <div className="relative mx-auto max-w-xl px-4 text-center sm:px-8">
             <Image

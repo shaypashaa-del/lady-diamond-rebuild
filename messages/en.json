@@ -78,7 +78,14 @@
     "videoKicker": "A Closer Look",
     "videoTitle": "Artistry in Detail",
     "instagram": "Instagram",
-    "relatedProducts": "You May Also Like"
+    "relatedProducts": "You May Also Like",
+    "founderKicker": "The Founder",
+    "value1Title": "In-House Design",
+    "value1Copy": "Every design is chosen and refined personally, in-house.",
+    "value2Title": "Recycled Gold",
+    "value2Copy": "Select pieces are cast in recycled gold, responsibly.",
+    "value3Title": "Passed Down",
+    "value3Copy": "Everyday pieces built to last, and to be passed on."
   },
   "Product": {
     "selectOptions": "Select Options",

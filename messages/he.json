@@ -78,7 +78,14 @@
     "videoKicker": "מבט מקרוב",
     "videoTitle": "אמנות בפרטים",
     "instagram": "אינסטגרם",
-    "relatedProducts": "ייתכן שיעניין אותך גם"
+    "relatedProducts": "ייתכן שיעניין אותך גם",
+    "founderKicker": "המייסדת",
+    "value1Title": "עיצוב פנימי",
+    "value1Copy": "כל עיצוב נבחר ומעודן באופן אישי, בבית היוצר.",
+    "value2Title": "זהב ממוחזר",
+    "value2Copy": "פריטים נבחרים יוצקים מזהב ממוחזר, באחריות.",
+    "value3Title": "להעברה מדור לדור",
+    "value3Copy": "פריטי יומיום שנבנים להישאר, ולעבור הלאה."
   },
   "Product": {
     "selectOptions": "בחירת אפשרויות",

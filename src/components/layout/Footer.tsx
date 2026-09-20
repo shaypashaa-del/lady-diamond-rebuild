@@ -21,7 +21,7 @@ export function Footer() {
         </div>
         {footerColumns.map((col) => (
           <div key={col.titleKey}>
-            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-gold">{t(col.titleKey)}</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-gold-deep">{t(col.titleKey)}</h3>
             <ul className="mt-3 space-y-2 text-sm text-ink/60">
               {col.links.map((link) => (
                 <li key={link.key}>

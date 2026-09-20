@@ -8,9 +8,21 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 // blockers/privacy extensions and prone to rendering blank — so real static
 // thumbnails linking out to the real posts are used instead.
 const POSTS = [
-  { image: "/brand/instagram-post-1.jpg", url: "https://www.instagram.com/lady_di_diamond/p/DHBKZHuN9aM/" },
-  { image: "/brand/instagram-post-2.jpg", url: "https://www.instagram.com/lady_di_diamond/p/DB8Y5C0oKVp/" },
-  { image: "/brand/instagram-post-3.jpg", url: "https://www.instagram.com/lady_di_diamond/p/C9J7NucN7_d/" },
+  {
+    image: "/brand/instagram-post-1.jpg",
+    url: "https://www.instagram.com/lady_di_diamond/p/DHBKZHuN9aM/",
+    alt: "פוסט מאינסטגרם @lady_di_diamond",
+  },
+  {
+    image: "/brand/instagram-post-2.jpg",
+    url: "https://www.instagram.com/lady_di_diamond/p/DB8Y5C0oKVp/",
+    alt: "פוסט מאינסטגרם @lady_di_diamond",
+  },
+  {
+    image: "/brand/instagram-post-3.jpg",
+    url: "https://www.instagram.com/lady_di_diamond/p/C9J7NucN7_d/",
+    alt: "פוסט מאינסטגרם @lady_di_diamond",
+  },
 ];
 
 export function InstagramSection() {
@@ -24,7 +36,7 @@ export function InstagramSection() {
           href="https://www.instagram.com/lady_di_diamond?stkn=MTZmcHF0cjZ2bmV2cA%3D%3D&utm_source=qr"
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-1 inline-block text-xs uppercase tracking-[0.3em] text-ink/50 hover:text-gold"
+          className="mt-1 inline-block text-xs uppercase tracking-[0.3em] text-ink/50 hover:text-gold-deep"
           dir="ltr"
         >
           @lady_di_diamond
@@ -41,7 +53,7 @@ export function InstagramSection() {
             >
               <Image
                 src={post.image}
-                alt=""
+                alt={post.alt}
                 fill
                 sizes="(min-width: 640px) 33vw, 33vw"
                 className="object-cover transition-transform duration-500 group-hover:scale-105"

@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
   experimental: {
     cpus: 2,
   },
+  // Hides the "N" dev-mode build/route indicator badge during local
+  // development (it never appears in production regardless).
+  devIndicators: false,
 };
 
 export default withNextIntl(nextConfig);

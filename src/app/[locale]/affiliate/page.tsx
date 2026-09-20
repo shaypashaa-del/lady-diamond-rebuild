@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { applyAsAffiliate } from "@/server/actions/affiliate";
 import type { AuthResult } from "@/server/actions/auth";
+import { ConsentCheckbox } from "@/components/ConsentCheckbox";
 
 export default function AffiliatePage() {
   const t = useTranslations("Affiliate");
@@ -61,6 +62,8 @@ export default function AffiliatePage() {
           <label className="mb-1 block text-xs font-medium text-ink/60">{t("promotionMethod")}</label>
           <textarea name="promotionMethod" rows={3} className="w-full border border-gold-soft px-3 py-2 text-sm" />
         </div>
+
+        <ConsentCheckbox id="affiliate-consent" />
 
         <button
           type="submit"

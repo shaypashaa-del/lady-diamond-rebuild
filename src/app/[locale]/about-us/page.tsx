@@ -50,13 +50,13 @@ export default async function AboutUsPage() {
   return (
     <div>
       <div className="border-b border-gold-soft bg-paper-soft py-12 text-center">
-        <h1 className="text-3xl font-semibold uppercase tracking-[0.2em] text-gold sm:text-4xl">
+        <h1 className="text-3xl font-semibold uppercase tracking-[0.2em] text-gold-deep sm:text-4xl">
           {localize(page.title as LocalizedText, locale)}
         </h1>
       </div>
 
       <div className="relative aspect-[16/9] w-full sm:aspect-[21/9]">
-        <Image src="/brand/about-founder.jpeg" alt="" fill priority sizes="100vw" className="object-cover" />
+        <Image src="/brand/about-founder.jpeg" alt="דיאנה אירימוב, מייסדת Lady Diamond" fill priority sizes="100vw" className="object-cover" />
       </div>
 
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-8">{renderStory(localize(body.story, locale))}</div>

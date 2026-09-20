@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { submitContactForm, type ContactResult } from "@/server/actions/contact";
+import { ConsentCheckbox } from "@/components/ConsentCheckbox";
 
 export function ContactForm() {
   const t = useTranslations("ContactPage");
@@ -27,6 +28,7 @@ export function ContactForm() {
         <input name="subject" placeholder={t("subject")} className="border border-gold-soft px-3 py-2 text-sm" />
       </div>
       <textarea name="message" placeholder={t("message")} required rows={5} className="w-full border border-gold-soft px-3 py-2 text-sm" />
+      <ConsentCheckbox id="contact-consent" />
       <button
         type="submit"
         disabled={pending}

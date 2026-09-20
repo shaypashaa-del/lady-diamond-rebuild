@@ -67,7 +67,7 @@ export default function CartPage() {
               <div className="flex items-center border border-gold-soft">
                 <button
                   onClick={() => setQuantity(line.key, line.quantity - 1)}
-                  className="px-2 py-1 text-sm text-ink hover:text-gold"
+                  className="px-2 py-1 text-sm text-ink hover:text-gold-deep"
                   aria-label={t("decreaseQty")}
                 >
                   −
@@ -75,7 +75,7 @@ export default function CartPage() {
                 <span className="w-6 text-center text-sm text-ink">{line.quantity}</span>
                 <button
                   onClick={() => setQuantity(line.key, line.quantity + 1)}
-                  className="px-2 py-1 text-sm text-ink hover:text-gold"
+                  className="px-2 py-1 text-sm text-ink hover:text-gold-deep"
                   aria-label={t("increaseQty")}
                 >
                   +

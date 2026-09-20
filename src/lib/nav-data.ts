@@ -40,6 +40,7 @@ export const footerColumns = [
       { key: "shipping", href: "/policies/shipping" },
       { key: "terms", href: "/policies/terms" },
       { key: "privacy", href: "/policies/privacy" },
+      { key: "cookies", href: "/policies/cookies" },
       { key: "accessibility", href: "/policies/accessibility" },
     ],
   },

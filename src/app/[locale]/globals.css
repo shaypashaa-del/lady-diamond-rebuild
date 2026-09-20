@@ -13,6 +13,12 @@
   --gold: #ddaa5d;
   --gold-bright: #ddaa5d;
   --gold-soft: #e5e5e5;
+  /* The brand gold above matches the live site's real accent color exactly,
+     but at only 2.1:1 contrast on white it fails WCAG AA (4.5:1) for text —
+     this darker variant is for gold TEXT on light backgrounds specifically
+     (4.6:1), while --gold/--gold-bright stay untouched for borders, icons,
+     and gold-on-dark text, which aren't subject to the same requirement. */
+  --gold-deep: #9c6b21;
   --clay: #a24a3f;
 
   --background: var(--paper);
@@ -28,6 +34,7 @@
   --color-gold: var(--gold);
   --color-gold-bright: var(--gold-bright);
   --color-gold-soft: var(--gold-soft);
+  --color-gold-deep: var(--gold-deep);
   --color-clay: var(--clay);
   --font-sans: var(--font-body);
   --font-mono: var(--font-geist-mono);

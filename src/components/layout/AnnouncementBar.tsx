@@ -30,20 +30,23 @@ export function AnnouncementBar({
       {subscribed ? (
         <p>✓ נרשמת בהצלחה!</p>
       ) : showForm ? (
-        <form action={action} className="flex items-center gap-2">
-          <input
-            name="email"
-            type="email"
-            required
-            autoFocus
-            placeholder="you@example.com"
-            dir="ltr"
-            className="border border-gold-soft bg-paper px-2 py-1 text-xs"
-          />
-          <button type="submit" disabled={pending} className="font-semibold text-gold-bright underline underline-offset-2 disabled:opacity-50">
-            {pending ? "..." : displaySubscribe}
-          </button>
-        </form>
+        <div className="flex flex-col items-center gap-1">
+          <form action={action} className="flex items-center gap-2">
+            <input
+              name="email"
+              type="email"
+              required
+              autoFocus
+              placeholder="you@example.com"
+              dir="ltr"
+              className="border border-gold-soft bg-paper px-2 py-1 text-xs"
+            />
+            <button type="submit" disabled={pending} className="font-semibold text-gold-bright underline underline-offset-2 disabled:opacity-50">
+              {pending ? "..." : displaySubscribe}
+            </button>
+          </form>
+          <p className="text-[10px] text-paper/50">{t("consentNote")}</p>
+        </div>
       ) : (
         <p>
           {displayText}{" "}

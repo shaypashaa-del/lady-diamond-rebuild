@@ -10,11 +10,11 @@ import { Link } from "@/i18n/navigation";
 // through several images rather than showing one static photo. This
 // reproduces that behavior: a fixed set of real brand photos crossfading
 // on a timer, driven by GSAP instead of a jQuery slider plugin.
-const SLIDES = [
-  "/brand/hero-heartstone.jpeg",
-  "/brand/hero-slide-necklace.jpeg",
-  "/brand/hero-slide-earring.jpeg",
-  "/brand/hero-slide-choker.jpeg",
+const SLIDES: { src: string; alt: string }[] = [
+  { src: "/brand/hero-heartstone.jpeg", alt: "אישה עונדת תכשיטי Lady Diamond בקולקציית Heart Stone" },
+  { src: "/brand/hero-slide-necklace.jpeg", alt: "שרשרת זהב של Lady Diamond בתקריב" },
+  { src: "/brand/hero-slide-earring.jpeg", alt: "עגילי זהב של Lady Diamond בתקריב" },
+  { src: "/brand/hero-slide-choker.jpeg", alt: "צ'וקר תכשיטים של Lady Diamond בתקריב" },
 ];
 const SLIDE_DURATION_MS = 5500;
 
@@ -57,9 +57,9 @@ export function Hero({
 
   return (
     <section className="relative flex min-h-[80vh] items-center overflow-hidden bg-ink text-paper">
-      {SLIDES.map((src, i) => (
+      {SLIDES.map((slide, i) => (
         <div
-          key={src}
+          key={slide.src}
           ref={(el) => {
             imageRefs.current[i] = el;
           }}
@@ -67,8 +67,8 @@ export function Hero({
           style={{ opacity: i === 0 ? 1 : 0 }}
         >
           <Image
-            src={src}
-            alt=""
+            src={slide.src}
+            alt={slide.alt}
             fill
             priority={i === 0}
             sizes="100vw"
@@ -80,9 +80,9 @@ export function Hero({
 
       {SLIDES.length > 1 && (
         <div className="absolute bottom-6 start-1/2 z-10 flex -translate-x-1/2 gap-2 rtl:translate-x-1/2">
-          {SLIDES.map((src, i) => (
+          {SLIDES.map((slide, i) => (
             <button
-              key={src}
+              key={slide.src}
               aria-label={`${i + 1}`}
               onClick={() => setActive(i)}
               className={`h-1 transition-all ${

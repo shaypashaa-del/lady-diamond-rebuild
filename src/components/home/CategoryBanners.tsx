@@ -29,7 +29,7 @@ export function CategoryBanners() {
         >
           <Image
             src={b.image}
-            alt=""
+            alt={b.title}
             fill
             sizes="(min-width: 640px) 50vw, 100vw"
             className="zoom-on-hover object-cover"

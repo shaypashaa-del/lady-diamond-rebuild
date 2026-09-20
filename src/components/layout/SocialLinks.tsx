@@ -43,7 +43,7 @@ export function SocialLinks({ className }: { className?: string }) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={s.label}
-          className="text-ink/50 transition-colors hover:text-gold"
+          className="text-ink/50 transition-colors hover:text-gold-deep"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d={s.path} />

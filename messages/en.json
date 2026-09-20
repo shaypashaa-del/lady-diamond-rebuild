@@ -5,7 +5,8 @@
   },
   "Announcement": {
     "text": "Fast shipping across Israel | Join our newsletter for updates and discounts",
-    "subscribe": "Subscribe to discover"
+    "subscribe": "Subscribe to discover",
+    "consentNote": "By subscribing you agree to receive marketing emails, per our Privacy Policy."
   },
   "Nav": {
     "home": "Home",
@@ -52,7 +53,8 @@
     "rings": "Rings",
     "bracelets": "Bracelets",
     "necklaces": "Necklaces",
-    "rights": "© Since 2010 Lady Diamond Jewels, All Rights Reserved"
+    "rights": "© Since 2010 Lady Diamond Jewels, All Rights Reserved",
+    "cookies": "Cookie Policy"
   },
   "Home": {
     "heroKicker": "Since 2010",
@@ -373,5 +375,11 @@
     "bigCursor": "Large cursor",
     "reset": "Reset settings",
     "statementLink": "Accessibility Statement"
+  },
+  "Consent": {
+    "prefix": "By submitting, I confirm I have read and agree to the",
+    "terms": "Terms of Service",
+    "and": "and",
+    "privacy": "Privacy Policy"
   }
 }

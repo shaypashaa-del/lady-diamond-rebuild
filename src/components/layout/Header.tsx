@@ -64,17 +64,17 @@ export function Header() {
           <button
             aria-label={t("search")}
             onClick={() => setSearchOpen((v) => !v)}
-            className="hidden text-ink/80 transition-colors hover:text-gold lg:inline-flex"
+            className="hidden text-ink/80 transition-colors hover:text-gold-deep lg:inline-flex"
           >
             <Search size={18} />
           </button>
           <div className="hidden lg:inline-flex">
             <LocaleSwitcher />
           </div>
-          <Link href="/account" aria-label={t("account")} className="hidden text-ink/80 transition-colors hover:text-gold lg:inline-flex">
+          <Link href="/account" aria-label={t("account")} className="hidden text-ink/80 transition-colors hover:text-gold-deep lg:inline-flex">
             <User size={18} />
           </Link>
-          <Link href="/wishlist" aria-label={tProduct("wishlist")} className="relative hidden text-ink/80 transition-colors hover:text-gold lg:inline-flex">
+          <Link href="/wishlist" aria-label={tProduct("wishlist")} className="relative hidden text-ink/80 transition-colors hover:text-gold-deep lg:inline-flex">
             <Heart size={18} />
             {mounted && wishlistCount > 0 && (
               <span className="absolute -end-2 -top-2 flex h-4 w-4 items-center justify-center border border-gold bg-gold text-[10px] text-white">
@@ -82,7 +82,7 @@ export function Header() {
               </span>
             )}
           </Link>
-          <Link href="/cart" aria-label={t("cart")} className="relative text-ink/80 transition-colors hover:text-gold">
+          <Link href="/cart" aria-label={t("cart")} className="relative text-ink/80 transition-colors hover:text-gold-deep">
             <ShoppingBag size={18} />
             {mounted && itemCount > 0 && (
               <span className="absolute -end-2 -top-2 flex h-4 w-4 items-center justify-center border border-gold bg-gold text-[10px] text-white">
@@ -93,7 +93,7 @@ export function Header() {
           <button
             aria-label={t("openMenu")}
             onClick={() => setOpen(true)}
-            className="text-ink transition-colors hover:text-gold lg:hidden"
+            className="text-ink transition-colors hover:text-gold-deep lg:hidden"
           >
             <Menu size={22} />
           </button>
@@ -110,7 +110,7 @@ export function Header() {
                 <Link
                   href={item.href}
                   className={`border-b-2 pb-1 text-xs font-semibold tracking-[0.25em] uppercase transition-colors ${
-                    isActive ? "border-gold text-gold" : "border-transparent text-ink hover:text-gold"
+                    isActive ? "border-gold text-gold-deep" : "border-transparent text-ink hover:text-gold-deep"
                   }`}
                 >
                   {tNav(item.key)}
@@ -124,7 +124,7 @@ export function Header() {
                           <li key={cat.key}>
                             <Link
                               href={cat.href}
-                              className="link-underline mx-6 block border-b border-gold-soft/60 py-3 text-center text-[11px] font-medium uppercase tracking-[0.2em] text-ink/70 transition-colors last:border-b-0 hover:text-gold"
+                              className="link-underline mx-6 block border-b border-gold-soft/60 py-3 text-center text-[11px] font-medium uppercase tracking-[0.2em] text-ink/70 transition-colors last:border-b-0 hover:text-gold-deep"
                             >
                               {tNav(cat.key)}
                             </Link>
@@ -170,7 +170,7 @@ export function Header() {
               <button
                 aria-label={t("closeMenu")}
                 onClick={() => setOpen(false)}
-                className="text-ink/70 transition-colors hover:text-gold"
+                className="text-ink/70 transition-colors hover:text-gold-deep"
               >
                 <X size={22} />
               </button>
@@ -182,7 +182,7 @@ export function Header() {
                   <Link
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="link-underline font-medium uppercase text-ink transition-colors hover:text-gold"
+                    className="link-underline font-medium uppercase text-ink transition-colors hover:text-gold-deep"
                   >
                     {tNav(item.key)}
                   </Link>
@@ -190,7 +190,7 @@ export function Header() {
                     <ul className="mt-3 space-y-2 border-s border-gold-soft ps-4 text-ink/60">
                       {item.mega.map((cat) => (
                         <li key={cat.key}>
-                          <Link href={cat.href} onClick={() => setOpen(false)} className="transition-colors hover:text-gold">
+                          <Link href={cat.href} onClick={() => setOpen(false)} className="transition-colors hover:text-gold-deep">
                             {tNav(cat.key)}
                           </Link>
                         </li>
@@ -220,13 +220,13 @@ export function Header() {
             </form>
 
             <div className="flex items-center gap-4 border-t border-gold-soft pt-6 text-ink sm:hidden">
-              <Link href="/account" onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm transition-colors hover:text-gold">
+              <Link href="/account" onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm transition-colors hover:text-gold-deep">
                 <User size={16} /> {tNav("account")}
               </Link>
-              <Link href="/wishlist" onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm transition-colors hover:text-gold">
+              <Link href="/wishlist" onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm transition-colors hover:text-gold-deep">
                 <Heart size={16} /> {tProduct("wishlist")}
               </Link>
-              <Link href="/cart" onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm transition-colors hover:text-gold">
+              <Link href="/cart" onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm transition-colors hover:text-gold-deep">
                 <ShoppingBag size={16} /> {tNav("cart")}
               </Link>
             </div>

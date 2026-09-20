@@ -9,7 +9,7 @@ export function NewCollection() {
       <ScrollReveal>
         <h2 className="text-xl font-semibold uppercase tracking-[0.2em]">{t("newCollectionTitle")}</h2>
         <span className="gold-rule mt-3" />
-        <p className="mt-3 text-sm uppercase tracking-[0.3em] text-gold">{t("newCollectionSubtitle")}</p>
+        <p className="mt-3 text-sm uppercase tracking-[0.3em] text-gold-deep">{t("newCollectionSubtitle")}</p>
         <p className="mx-auto mt-4 max-w-xl text-sm text-ink/60">{t("newCollectionCopy")}</p>
         <Link
           href="/category/all"

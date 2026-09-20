@@ -27,7 +27,7 @@ export function LocaleSwitcher() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex items-center gap-1.5 border border-gold-soft px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.15em] text-ink/70 transition-colors hover:border-gold hover:text-gold"
+        className="flex items-center gap-1.5 border border-gold-soft px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.15em] text-ink/70 transition-colors hover:border-gold hover:text-gold-deep"
       >
         <Globe size={13} strokeWidth={1.5} />
         {localeNames[locale]}
@@ -45,7 +45,7 @@ export function LocaleSwitcher() {
                 }}
                 aria-current={code === locale}
                 className={`block w-full whitespace-nowrap px-4 py-2 text-start text-[11px] uppercase tracking-[0.15em] transition-colors ${
-                  code === locale ? "bg-paper-soft text-gold" : "text-ink/70 hover:bg-paper-soft hover:text-gold"
+                  code === locale ? "bg-paper-soft text-gold-deep" : "text-ink/70 hover:bg-paper-soft hover:text-gold-deep"
                 }`}
               >
                 {localeNames[code]}

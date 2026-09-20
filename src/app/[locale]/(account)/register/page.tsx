@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { registerCustomer, type AuthResult } from "@/server/actions/auth";
+import { ConsentCheckbox } from "@/components/ConsentCheckbox";
 
 export default function RegisterPage() {
   const t = useTranslations("AuthRegister");
@@ -44,6 +45,10 @@ export default function RegisterPage() {
             minLength={8}
             className="w-full border border-gold-soft px-3 py-2 text-sm"
           />
+        </div>
+
+        <div className="mb-6">
+          <ConsentCheckbox id="register-consent" />
         </div>
 
         <button

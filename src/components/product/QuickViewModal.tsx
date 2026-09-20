@@ -57,7 +57,7 @@ export function QuickViewModal({ product, onClose }: { product: SampleProduct; o
           ref={closeButtonRef}
           aria-label={tQuick("close")}
           onClick={onClose}
-          className="absolute end-4 top-4 text-ink/50 transition-colors hover:text-gold"
+          className="absolute end-4 top-4 text-ink/50 transition-colors hover:text-gold-deep"
         >
           <X size={20} />
         </button>
@@ -75,7 +75,7 @@ export function QuickViewModal({ product, onClose }: { product: SampleProduct; o
         </div>
 
         <div>
-          <p className="text-xs uppercase tracking-wide text-gold">{product.category}</p>
+          <p className="text-xs uppercase tracking-wide text-gold-deep">{product.category}</p>
           <h2 className="mt-1 text-lg font-semibold uppercase tracking-wide text-ink">{product.name}</h2>
           <span className="gold-rule-start mt-2 w-8" />
           <p className="mt-2 font-semibold text-ink">{product.price.toFixed(2)} ₪</p>
@@ -96,11 +96,11 @@ export function QuickViewModal({ product, onClose }: { product: SampleProduct; o
             <>
               <div className="mt-4 flex items-center gap-3">
                 <div className="flex items-center border border-gold-soft">
-                  <button onClick={() => setQuantity((q) => Math.max(1, q - 1))} className="px-3 py-2 text-sm text-ink hover:text-gold">
+                  <button onClick={() => setQuantity((q) => Math.max(1, q - 1))} className="px-3 py-2 text-sm text-ink hover:text-gold-deep">
                     −
                   </button>
                   <span className="w-8 text-center text-sm text-ink">{quantity}</span>
-                  <button onClick={() => setQuantity((q) => q + 1)} className="px-3 py-2 text-sm text-ink hover:text-gold">
+                  <button onClick={() => setQuantity((q) => q + 1)} className="px-3 py-2 text-sm text-ink hover:text-gold-deep">
                     +
                   </button>
                 </div>

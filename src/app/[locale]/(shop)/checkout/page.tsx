@@ -13,6 +13,23 @@ import { getCheckoutPreview, type CheckoutPreview } from "@/server/actions/check
 import type { PaymentMethodId } from "@/server/payments/types";
 import { PayPalButton } from "@/components/checkout/PayPalButton";
 
+function ConsentText() {
+  const tc = useTranslations("Consent");
+  return (
+    <span>
+      {tc("prefix")}{" "}
+      <Link href="/policies/terms" className="underline hover:text-ink" target="_blank">
+        {tc("terms")}
+      </Link>{" "}
+      {tc("and")}{" "}
+      <Link href="/policies/privacy" className="underline hover:text-ink" target="_blank">
+        {tc("privacy")}
+      </Link>
+      .
+    </span>
+  );
+}
+
 export default function CheckoutPage() {
   const t = useTranslations("Checkout");
   const router = useRouter();
@@ -33,6 +50,7 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodId>(initialMethod);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [agreed, setAgreed] = useState(false);
   const [savedAddress, setSavedAddress] = useState<AddressData | null>(null);
   const [addressLoaded, setAddressLoaded] = useState(false);
   const [preview, setPreview] = useState<CheckoutPreview | null>(null);
@@ -255,15 +273,25 @@ export default function CheckoutPage() {
             </label>
           </div>
 
+          <label className="mt-6 flex items-start gap-2 text-xs text-ink/70">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              className="mt-0.5 h-4 w-4 accent-gold-bright"
+            />
+            <ConsentText />
+          </label>
+
           {paymentMethod === "paypal" ? (
-            <div className="mt-6">
-              <PayPalButton total={total} disabled={submitting} onApproved={handlePaypalApproved} onError={setError} />
+            <div className="mt-4">
+              <PayPalButton total={total} disabled={submitting || !agreed} onApproved={handlePaypalApproved} onError={setError} />
             </div>
           ) : (
             <button
               type="submit"
-              disabled={submitting}
-              className="mt-6 w-full border border-gold-bright bg-ink py-3 text-xs font-semibold uppercase tracking-wide text-paper hover:bg-gold-bright disabled:opacity-50"
+              disabled={submitting || !agreed}
+              className="mt-4 w-full border border-gold-bright bg-ink py-3 text-xs font-semibold uppercase tracking-wide text-paper hover:bg-gold-bright disabled:opacity-50"
             >
               {submitting ? t("placing") : t("placeOrder")}
             </button>

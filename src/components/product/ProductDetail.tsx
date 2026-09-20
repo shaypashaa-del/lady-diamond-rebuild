@@ -122,7 +122,7 @@ export function ProductDetail({
       </div>
 
       <div>
-        <p className="text-xs uppercase tracking-wide text-gold">{categoryName}</p>
+        <p className="text-xs uppercase tracking-wide text-gold-deep">{categoryName}</p>
         <h1 className="mt-1 text-2xl font-semibold uppercase tracking-wide text-ink">{name}</h1>
         <span className="gold-rule-start mt-3 w-8" />
         <div className="mt-3 flex items-center gap-2 text-lg">
@@ -165,7 +165,7 @@ export function ProductDetail({
           <div className="flex items-center border border-gold-soft">
             <button
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="px-3 py-2 text-sm text-ink hover:text-gold"
+              className="px-3 py-2 text-sm text-ink hover:text-gold-deep"
               aria-label={t("decreaseQty")}
             >
               −
@@ -174,7 +174,7 @@ export function ProductDetail({
             <button
               onClick={() => setQuantity((q) => Math.min(availableInventory, q + 1))}
               disabled={quantity >= availableInventory}
-              className="px-3 py-2 text-sm text-ink hover:text-gold disabled:cursor-not-allowed disabled:text-ink/30"
+              className="px-3 py-2 text-sm text-ink hover:text-gold-deep disabled:cursor-not-allowed disabled:text-ink/30"
               aria-label={t("increaseQty")}
             >
               +

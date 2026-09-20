@@ -79,13 +79,13 @@ export function ProductCard({ product }: { product: SampleProduct }) {
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
             />
           ) : (
-            <span className="text-sm text-gold">{product.name}</span>
+            <span className="text-sm text-gold-deep">{product.name}</span>
           )}
         </Link>
       </div>
 
       <div className="mt-3 text-center">
-        <p className="text-[11px] uppercase tracking-wide text-gold">{product.category}</p>
+        <p className="text-[11px] uppercase tracking-wide text-gold-deep">{product.category}</p>
         <Link href={`/product/${product.slug}`} className="block text-sm font-medium uppercase tracking-wide text-ink">
           {product.name}
         </Link>

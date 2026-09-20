@@ -89,7 +89,7 @@ export default async function AboutUsPage() {
           <ScrollReveal className="relative sm:col-span-5">
             <div className="relative aspect-[4/5] w-full overflow-hidden border border-gold-bright">
               <Image
-                src="/brand/about-founder.jpeg"
+                src="/brand/about-founder-window.jpeg"
                 alt="דיאנה אירימוב, מייסדת Lady Diamond"
                 fill
                 sizes="(min-width: 640px) 40vw, 100vw"
@@ -129,8 +129,8 @@ export default async function AboutUsPage() {
               <ScrollReveal delay={0.1} className="order-1 sm:order-2 sm:col-span-5 sm:col-start-8">
                 <div className="relative aspect-[3/4] w-full max-w-xs overflow-hidden border border-paper/15 sm:max-w-none">
                   <Image
-                    src="/brand/products/necklace-heart-yellow-gold-model.jpeg"
-                    alt="דוגמנית עונדת שרשרת לב זהב של Lady Diamond בתצוגה"
+                    src="/brand/about-founder-dark.jpeg"
+                    alt="דיאנה אירימוב, מייסדת Lady Diamond"
                     fill
                     sizes="(min-width: 640px) 35vw, 80vw"
                     className="object-cover"
@@ -179,7 +179,7 @@ export default async function AboutUsPage() {
               <ScrollReveal className="sm:col-span-5">
                 <div className="relative aspect-[4/5] w-full overflow-hidden border border-gold-bright">
                   <Image
-                    src="/brand/about-founder.jpeg"
+                    src="/brand/about-founder-studio.jpeg"
                     alt="דיאנה אירימוב"
                     fill
                     sizes="(min-width: 640px) 40vw, 100vw"

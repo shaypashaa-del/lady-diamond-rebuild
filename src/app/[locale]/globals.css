@@ -278,3 +278,64 @@ html.sparkle-cursor-active * {
     color: var(--gold-bright);
   }
 }
+
+/* Accessibility adjustments toolbar (AccessibilityWidget.tsx) — every rule
+   here backs a real, working toggle, not a decorative one. */
+html.a11y-contrast {
+  filter: contrast(1.35) brightness(1.05);
+}
+html.a11y-contrast body {
+  background: #000 !important;
+  color: #fff !important;
+}
+html.a11y-contrast a,
+html.a11y-contrast button {
+  color: #ffe27a !important;
+}
+
+html.a11y-grayscale {
+  filter: grayscale(1);
+}
+
+html.a11y-underline-links a {
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+html.a11y-readable-font,
+html.a11y-readable-font body,
+html.a11y-readable-font * {
+  font-family: Arial, Helvetica, sans-serif !important;
+  letter-spacing: 0.01em;
+  line-height: 1.7 !important;
+}
+
+html.a11y-stop-animations *,
+html.a11y-stop-animations *::before,
+html.a11y-stop-animations *::after {
+  animation-play-state: paused !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+html.a11y-stop-animations .shooting-star-layer,
+html.a11y-stop-animations .sparkle-canvas {
+  display: none !important;
+}
+/* The sparkle cursor's canvas is hidden above, but its cursor:none rule
+   would otherwise leave visitors with no visible pointer at all — restore
+   the native cursor whenever animations are stopped. */
+html.a11y-stop-animations.sparkle-cursor-active,
+html.a11y-stop-animations.sparkle-cursor-active * {
+  cursor: auto !important;
+}
+
+html.a11y-big-cursor,
+html.a11y-big-cursor * {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'><path d='M4 2l14 8-6 2-2 6-6-16z' fill='black' stroke='white' stroke-width='1.5'/></svg>") 4 4, auto !important;
+}
+/* The custom sparkle cursor hides the native one sitewide; a big native
+   cursor is meaningless while that's active, so force it back on here. */
+html.a11y-big-cursor.sparkle-cursor-active,
+html.a11y-big-cursor.sparkle-cursor-active * {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'><path d='M4 2l14 8-6 2-2 6-6-16z' fill='black' stroke='white' stroke-width='1.5'/></svg>") 4 4, auto !important;
+}

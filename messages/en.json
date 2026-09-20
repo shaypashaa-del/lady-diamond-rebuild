@@ -251,7 +251,8 @@
     "acceptAll": "Accept All",
     "rejectNonEssential": "Reject Non-Essential",
     "save": "Save Preferences",
-    "settings": "Cookie Settings"
+    "settings": "Cookie Settings",
+    "privacyLink": "Learn more in our Privacy Policy."
   },
   "PasswordReset": {
     "title": "Reset Password",
@@ -356,5 +357,21 @@
     "necklace_matinee": "Matinee",
     "necklace_opera": "Opera",
     "necklace_rope": "Rope"
+  },
+  "Accessibility": {
+    "openLabel": "Accessibility menu",
+    "panelTitle": "Accessibility Adjustments",
+    "close": "Close",
+    "textSize": "Text size",
+    "increaseText": "Increase text size",
+    "decreaseText": "Decrease text size",
+    "highContrast": "High contrast",
+    "grayscale": "Grayscale",
+    "underlineLinks": "Underline links",
+    "readableFont": "Readable font",
+    "stopAnimations": "Stop animations",
+    "bigCursor": "Large cursor",
+    "reset": "Reset settings",
+    "statementLink": "Accessibility Statement"
   }
 }

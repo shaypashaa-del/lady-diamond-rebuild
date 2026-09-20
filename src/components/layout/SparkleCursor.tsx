@@ -179,7 +179,7 @@ export function SparkleCursor() {
     <canvas
       ref={canvasRef}
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-[9999]"
+      className="sparkle-canvas pointer-events-none fixed inset-0 z-[9999]"
     />
   );
 }

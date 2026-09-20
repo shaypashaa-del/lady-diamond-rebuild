@@ -12,8 +12,8 @@ import { ReferralCapture } from "@/components/ReferralCapture";
 import { CookieConsentBanner } from "@/components/layout/CookieConsentBanner";
 import { WhatsappButton } from "@/components/layout/WhatsappButton";
 import { ShootingStar } from "@/components/layout/ShootingStar";
-import { FloatingLogoBadge } from "@/components/layout/FloatingLogoBadge";
 import { SparkleCursor } from "@/components/layout/SparkleCursor";
+import { AccessibilityWidget } from "@/components/layout/AccessibilityWidget";
 import { IntroReveal } from "@/components/layout/IntroReveal";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { organizationSchema, websiteSchema } from "@/lib/schema";
@@ -133,8 +133,8 @@ export default async function LocaleLayout({
           <main className="flex-1">{children}</main>
           <Footer />
           <WhatsappButton />
-          <FloatingLogoBadge />
           <SparkleCursor />
+          <AccessibilityWidget />
           <CookieConsentBanner />
         </NextIntlClientProvider>
       </body>

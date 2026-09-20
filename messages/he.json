@@ -251,7 +251,8 @@
     "acceptAll": "אישור הכל",
     "rejectNonEssential": "דחיית לא הכרחי",
     "save": "שמירת העדפות",
-    "settings": "הגדרות עוגיות"
+    "settings": "הגדרות עוגיות",
+    "privacyLink": "למידע נוסף ראו את מדיניות הפרטיות שלנו."
   },
   "PasswordReset": {
     "title": "איפוס סיסמה",
@@ -355,5 +356,21 @@
     "necklace_matinee": "מטינה",
     "necklace_opera": "אופרה",
     "necklace_rope": "חבל"
+  },
+  "Accessibility": {
+    "openLabel": "תפריט נגישות",
+    "panelTitle": "התאמות נגישות",
+    "close": "סגירה",
+    "textSize": "גודל טקסט",
+    "increaseText": "הגדלת טקסט",
+    "decreaseText": "הקטנת טקסט",
+    "highContrast": "ניגודיות גבוהה",
+    "grayscale": "גווני אפור",
+    "underlineLinks": "הדגשת קישורים",
+    "readableFont": "פונט קריא",
+    "stopAnimations": "עצירת אנימציות",
+    "bigCursor": "סמן עכבר מוגדל",
+    "reset": "איפוס הגדרות",
+    "statementLink": "הצהרת נגישות"
   }
 }

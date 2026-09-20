@@ -251,7 +251,8 @@
     "acceptAll": "Принять все",
     "rejectNonEssential": "Отклонить необязательные",
     "save": "Сохранить настройки",
-    "settings": "Настройки cookie"
+    "settings": "Настройки cookie",
+    "privacyLink": "Подробнее в нашей политике конфиденциальности."
   },
   "PasswordReset": {
     "title": "Сброс пароля",
@@ -356,5 +357,21 @@
     "necklace_matinee": "Матине",
     "necklace_opera": "Опера",
     "necklace_rope": "Роп"
+  },
+  "Accessibility": {
+    "openLabel": "Меню доступности",
+    "panelTitle": "Настройки доступности",
+    "close": "Закрыть",
+    "textSize": "Размер текста",
+    "increaseText": "Увеличить текст",
+    "decreaseText": "Уменьшить текст",
+    "highContrast": "Высокая контрастность",
+    "grayscale": "Оттенки серого",
+    "underlineLinks": "Подчеркивать ссылки",
+    "readableFont": "Читаемый шрифт",
+    "stopAnimations": "Остановить анимацию",
+    "bigCursor": "Увеличенный курсор",
+    "reset": "Сбросить настройки",
+    "statementLink": "Заявление о доступности"
   }
 }

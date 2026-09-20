@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { useMounted } from "@/lib/use-mounted";
 import { getStoredConsent, storeConsent } from "@/lib/cookie-consent";
 
@@ -35,7 +36,12 @@ export function CookieConsentBanner() {
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-gold-soft bg-paper p-4 shadow-lg sm:p-6">
       <div className="mx-auto max-w-4xl">
-        <p className="mb-3 text-sm text-ink/70">{t("message")}</p>
+        <p className="mb-3 text-sm text-ink/70">
+          {t("message")}{" "}
+          <Link href="/policies/privacy" className="underline hover:text-ink">
+            {t("privacyLink")}
+          </Link>
+        </p>
 
         {showSettings && (
           <div className="mb-3 flex flex-wrap gap-4 text-sm">

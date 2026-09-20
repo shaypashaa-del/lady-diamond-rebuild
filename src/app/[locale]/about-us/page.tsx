@@ -70,17 +70,29 @@ export default async function AboutUsPage() {
 
   return (
     <div className="overflow-hidden">
-      {/* HERO */}
-      <div className="relative overflow-hidden border-b border-gold-soft bg-paper-soft py-16 text-center sm:py-24">
-        <DiamondMark className="pointer-events-none absolute -top-16 -end-16 h-72 w-72 text-gold-bright/[0.07]" />
-        <p className="text-xs uppercase tracking-[0.4em] text-gold-deep">{t("heroKicker")}</p>
-        <span className="gold-rule mt-4 w-16" />
-        <h1 className="mt-4 text-3xl font-semibold uppercase tracking-[0.15em] text-ink sm:text-5xl">
-          {localize(page.title as LocalizedText, locale)}
-        </h1>
-        {intro[0] && (
-          <p className="mx-auto mt-5 max-w-md px-4 text-lg italic text-ink/70 sm:text-xl">{intro[0]}</p>
-        )}
+      {/* HERO — dark, jewel-box treatment rather than a flat cream band: a
+          soft gold radial glow behind the title, a large faint diamond
+          watermark, and the "Since 2010" kicker + rule sitting under the
+          title (as a caption to it) instead of introducing it. */}
+      <div className="relative overflow-hidden bg-ink py-20 text-center sm:py-28">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-1/2 h-[36rem] w-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(221,170,93,0.16)_0%,transparent_65%)]"
+        />
+        <DiamondMark className="pointer-events-none absolute -top-20 -end-20 h-80 w-80 text-paper/[0.04]" />
+        <DiamondMark className="pointer-events-none absolute -bottom-16 -start-16 h-56 w-56 text-paper/[0.03]" />
+        <div className="relative">
+          <h1 className="text-4xl font-semibold uppercase tracking-[0.15em] text-paper sm:text-6xl">
+            {localize(page.title as LocalizedText, locale)}
+          </h1>
+          <div className="mt-5 flex flex-col items-center gap-4">
+            <span className="gold-rule w-16" />
+            <p className="text-xs uppercase tracking-[0.4em] text-gold-bright">{t("heroKicker")}</p>
+          </div>
+          {intro[0] && (
+            <p className="mx-auto mt-6 max-w-md px-4 text-lg italic text-paper/70 sm:text-xl">{intro[0]}</p>
+          )}
+        </div>
       </div>
 
       {/* FOUNDER INTRO */}

@@ -296,7 +296,8 @@
     "sent": "Thanks — we'll get back to you soon.",
     "info": "Contact Information",
     "address": "Bursa Complex, Noam Building, 23 Tuval Street, Ramat Gan",
-    "hours": "Sun–Fri, 9:00–19:00"
+    "hours": "Sun–Fri, 9:00–19:00",
+    "kicker": "We'd love to hear from you"
   },
   "OrderDetail": {
     "title": "Order",

@@ -18,7 +18,7 @@ export function BrandVideoSection() {
     <section className="bg-paper-soft py-16">
       <ScrollReveal className="text-center">
         <p className="text-xs uppercase tracking-[0.35em] text-gold-deep">{t("videoKicker")}</p>
-        <h2 className="font-display mt-3 text-4xl font-normal sm:text-5xl">{t("videoTitle")}</h2>
+        <h2 className="mt-3 text-4xl font-semibold sm:text-5xl">{t("videoTitle")}</h2>
         <span className="gold-rule mt-4" />
       </ScrollReveal>
 

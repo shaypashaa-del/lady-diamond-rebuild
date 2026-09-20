@@ -100,7 +100,7 @@ export function Hero({
           </p>
           <span className="gold-rule-start rise-in mt-4" style={{ animationDuration: "1.4s", animationDelay: "0.1s" }} />
           <h1
-            className="font-display rise-in mt-6 text-5xl font-normal leading-[1.1] sm:text-7xl"
+            className="rise-in mt-6 text-5xl font-semibold leading-[1.1] sm:text-7xl"
             style={{ animationDuration: "1.4s", animationDelay: "0.2s" }}
           >
             {title ?? t("heroTitle")}

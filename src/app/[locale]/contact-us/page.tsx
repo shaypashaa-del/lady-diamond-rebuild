@@ -28,7 +28,7 @@ export default async function ContactUsPage() {
       <div className="border-b border-gold-soft bg-paper-soft py-14 text-center sm:py-20">
         <p className="text-xs uppercase tracking-[0.4em] text-gold-deep">{t("kicker")}</p>
         <span className="gold-rule mt-4 w-16" />
-        <h1 className="font-display mt-4 text-3xl uppercase tracking-[0.15em] text-ink sm:text-5xl">{t("title")}</h1>
+        <h1 className="mt-4 text-3xl font-semibold uppercase tracking-[0.15em] text-ink sm:text-5xl">{t("title")}</h1>
         {page && (
           <p className="mx-auto mt-5 max-w-xl px-4 text-center text-sm text-ink/60">
             {localize(page.body as LocalizedText, locale)}

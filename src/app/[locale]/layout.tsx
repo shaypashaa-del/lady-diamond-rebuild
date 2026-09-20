@@ -22,14 +22,17 @@ import { getContentBlock, type AnnouncementBarContent } from "@/server/actions/c
 import { CONTENT_KEYS } from "@/lib/content-keys";
 import { t as tContent } from "@/lib/i18n-content";
 
-// Rubik: a clean geometric sans with full Hebrew + Latin coverage — matches
-// the real brand's actual look (its live site runs Poppins, which has no
-// Hebrew glyphs; Rubik is the closest Hebrew-native equivalent) rather than
-// the invented editorial-serif direction from an earlier pass.
+// Rubik: a clean geometric sans with full Hebrew + Cyrillic + Latin coverage
+// — matches the real brand's actual look (its live site runs Poppins, which
+// has no Hebrew glyphs; Rubik is the closest Hebrew-native equivalent) rather
+// than the invented editorial-serif direction from an earlier pass. It is the
+// single typeface used across all three site languages (he/en/ru) so that
+// switching languages never swaps in a different, unstyled fallback font.
 const bodyFont = Rubik({
   variable: "--font-body",
-  subsets: ["latin", "hebrew"],
+  subsets: ["latin", "hebrew", "cyrillic"],
   weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
 });
 
 const geistMono = Geist_Mono({
@@ -37,10 +40,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Italiana: the real site's actual display serif for large (60–75px)
-// section titles like "Euphoria" and its Instagram-section headline. It has
-// no Hebrew glyphs, so it's only applied (via the `.font-display` class) to
-// specific Latin-script brand/collection names, not to Hebrew headings.
+// Italiana: has no Hebrew or Cyrillic glyphs, so it is reserved strictly for
+// the fixed Latin brand wordmark ("Lady Diamond" in the header) that is never
+// translated. It must never be applied to translated headings/body text —
+// doing so silently falls back to the browser's default serif for Hebrew and
+// Russian, breaking the "one consistent font everywhere" requirement.
 const displayFont = Italiana({
   variable: "--font-display",
   subsets: ["latin"],

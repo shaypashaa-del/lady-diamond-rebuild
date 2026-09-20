@@ -50,7 +50,7 @@ export function EuphoriaSpotlight() {
           <div className="hero-scrim absolute inset-0" />
         </div>
         <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center text-paper">
-          <h2 className="font-display text-5xl font-normal sm:text-6xl">{t("euphoriaTitle")}</h2>
+          <h2 className="text-5xl font-semibold sm:text-6xl">{t("euphoriaTitle")}</h2>
           <span className="gold-rule mt-4" />
           <p className="mx-auto mt-4 max-w-md text-sm text-paper/80">{t("euphoriaCopy")}</p>
           <Link

@@ -75,11 +75,11 @@ export default async function AboutUsPage() {
         <DiamondMark className="pointer-events-none absolute -top-16 -end-16 h-72 w-72 text-gold-bright/[0.07]" />
         <p className="text-xs uppercase tracking-[0.4em] text-gold-deep">{t("heroKicker")}</p>
         <span className="gold-rule mt-4 w-16" />
-        <h1 className="font-display mt-4 text-3xl uppercase tracking-[0.15em] text-ink sm:text-5xl">
+        <h1 className="mt-4 text-3xl font-semibold uppercase tracking-[0.15em] text-ink sm:text-5xl">
           {localize(page.title as LocalizedText, locale)}
         </h1>
         {intro[0] && (
-          <p className="font-display mx-auto mt-5 max-w-md px-4 text-lg italic text-ink/70 sm:text-xl">{intro[0]}</p>
+          <p className="mx-auto mt-5 max-w-md px-4 text-lg italic text-ink/70 sm:text-xl">{intro[0]}</p>
         )}
       </div>
 
@@ -103,7 +103,7 @@ export default async function AboutUsPage() {
           <ScrollReveal delay={0.1} className="sm:col-span-7">
             <p className="text-xs uppercase tracking-[0.3em] text-gold-deep">{t("founderKicker")}</p>
             {intro[1] && (
-              <p className="font-display mt-3 text-2xl leading-snug text-ink sm:text-3xl">{intro[1]}</p>
+              <p className="mt-3 text-2xl italic leading-snug text-ink sm:text-3xl">{intro[1]}</p>
             )}
             {intro[2] && <p className="mt-5 text-sm leading-7 text-ink/60">{intro[2]}</p>}
           </ScrollReveal>
@@ -118,7 +118,7 @@ export default async function AboutUsPage() {
             <div className="grid grid-cols-1 items-center gap-10 sm:grid-cols-12 sm:gap-10">
               <ScrollReveal className="order-2 sm:order-1 sm:col-span-6">
                 <p className="text-xs uppercase tracking-[0.3em] text-gold-bright">{t("heroKicker")}</p>
-                <h2 className="font-display mt-3 text-2xl text-paper sm:text-4xl">{birthOfBrand.heading}</h2>
+                <h2 className="mt-3 text-2xl font-semibold text-paper sm:text-4xl">{birthOfBrand.heading}</h2>
                 <span className="mt-4 block h-px w-12 bg-gold-bright/60" />
                 {birthOfBrand.paragraphs.map((p, i) => (
                   <p key={i} className="mt-5 text-sm leading-7 text-paper/60">
@@ -188,8 +188,8 @@ export default async function AboutUsPage() {
                 </div>
               </ScrollReveal>
               <ScrollReveal delay={0.1} className="sm:col-span-7">
-                <span className="font-display shimmer-text-gold text-5xl italic sm:text-6xl">דיאנה</span>
-                <h2 className="font-display mt-4 text-xl text-ink sm:text-2xl">{dianaFeature.heading}</h2>
+                <span className="shimmer-text-gold text-5xl font-semibold italic sm:text-6xl">{t("founderName")}</span>
+                <h2 className="mt-4 text-xl font-semibold text-ink sm:text-2xl">{dianaFeature.heading}</h2>
                 {dianaFeature.paragraphs.map((p, i) => (
                   <p key={i} className="mt-5 text-sm leading-7 text-ink/60">
                     {p}
@@ -217,7 +217,7 @@ export default async function AboutUsPage() {
               .split("\n\n")
               .map((block, i) =>
                 i === 0 ? (
-                  <h2 key={i} className="font-display shimmer-text-gold text-2xl leading-snug sm:text-3xl">
+                  <h2 key={i} className="shimmer-text-gold text-2xl font-semibold italic leading-snug sm:text-3xl">
                     {block}
                   </h2>
                 ) : (

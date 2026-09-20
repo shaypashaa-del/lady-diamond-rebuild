@@ -196,6 +196,39 @@ html[dir="rtl"] .hero-scrim {
   }
 }
 
+/* A handful of soft gold flecks drifting down inside the about-us hero and
+   fading out before they reach the bottom — a quiet, ambient touch rather
+   than a busy particle effect. */
+@keyframes gold-dust-fall {
+  0% {
+    transform: translateY(-10%);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.7;
+  }
+  75% {
+    opacity: 0.35;
+  }
+  100% {
+    transform: translateY(115%);
+    opacity: 0;
+  }
+}
+.gold-dust {
+  position: absolute;
+  top: 0;
+  border-radius: 9999px;
+  background: radial-gradient(circle, var(--gold-bright) 0%, rgba(221, 170, 93, 0) 72%);
+  animation: gold-dust-fall linear infinite;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gold-dust {
+    display: none;
+  }
+}
+
 /* A faint gold shooting star that drifts across the page's white space —
    a slow, low-opacity ambient touch, not a foreground effect. Sits behind
    all real content (negative z-index on a fixed, pointer-events-none host)

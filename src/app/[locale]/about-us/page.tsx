@@ -37,6 +37,21 @@ function parseStory(text: string) {
   return { intro, sections };
 }
 
+// Fixed, hand-picked positions/timings for the hero's falling gold flecks —
+// deterministic (not Math.random()) so server and client markup always
+// match, and varied enough that the drift doesn't look mechanically evenly
+// spaced.
+const GOLD_DUST = [
+  { left: "8%", size: 5, duration: 9, delay: -2 },
+  { left: "18%", size: 3, duration: 7, delay: -5 },
+  { left: "29%", size: 4, duration: 11, delay: -1 },
+  { left: "41%", size: 3, duration: 8, delay: -6.5 },
+  { left: "53%", size: 5, duration: 10, delay: -3.5 },
+  { left: "64%", size: 3, duration: 7.5, delay: -0.5 },
+  { left: "76%", size: 4, duration: 9.5, delay: -4 },
+  { left: "88%", size: 3, duration: 8.5, delay: -7 },
+];
+
 const DiamondMark = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
     <path d="M12 2 L21 9 L12 22 L3 9 Z" stroke="currentColor" strokeWidth="0.4" />
@@ -81,6 +96,21 @@ export default async function AboutUsPage() {
         />
         <DiamondMark className="pointer-events-none absolute -top-20 -end-20 h-80 w-80 text-paper/[0.04]" />
         <DiamondMark className="pointer-events-none absolute -bottom-16 -start-16 h-56 w-56 text-paper/[0.03]" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+          {GOLD_DUST.map((d, i) => (
+            <span
+              key={i}
+              className="gold-dust"
+              style={{
+                left: d.left,
+                width: d.size,
+                height: d.size,
+                animationDuration: `${d.duration}s`,
+                animationDelay: `${d.delay}s`,
+              }}
+            />
+          ))}
+        </div>
         <div className="relative">
           <h1 className="text-4xl font-semibold uppercase tracking-[0.15em] text-paper sm:text-6xl">
             {localize(page.title as LocalizedText, locale)}

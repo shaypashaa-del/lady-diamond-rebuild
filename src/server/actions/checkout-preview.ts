@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { calculateShipping } from "@/server/services/shipping";
+import { getClientIp, isRateLimited, recordAttempt } from "@/lib/auth/rate-limit";
 
 export type CheckoutPreview = {
   discount: number;
@@ -20,6 +21,20 @@ export async function getCheckoutPreview(
 ): Promise<CheckoutPreview> {
   let discount = 0;
   let couponError: "invalid" | undefined;
+
+  // Fires live as the customer types (debounced ~300ms), so the limit needs
+  // to be generous enough for normal typing/editing but still raise the bar
+  // against scripting this endpoint to brute-force valid coupon codes
+  // (the generic "invalid" message above prevents distinguishing *why* a
+  // code failed, but not that it succeeded — this limits how many guesses
+  // are cheap).
+  if (couponCode) {
+    const rateLimitKey = `coupon-preview:${await getClientIp()}`;
+    if (isRateLimited(rateLimitKey, 40, 5 * 60 * 1000)) {
+      return { discount: 0, shipping: await calculateShipping(subtotal, country || "Israel"), total: subtotal, couponError: "invalid" };
+    }
+    recordAttempt(rateLimitKey);
+  }
 
   if (couponCode) {
     const coupon = await prisma.coupon.findUnique({ where: { code: couponCode.toUpperCase() } });

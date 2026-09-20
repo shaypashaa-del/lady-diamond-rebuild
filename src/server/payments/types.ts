@@ -112,11 +112,14 @@ export const paypalProvider: PaymentProvider = {
 
     const token = await getPaypalAccessToken();
     if (!token) {
-      // No live PayPal credentials configured yet — trust the client-side
-      // approval (sandbox/demo mode only).
+      // No live PayPal credentials configured — fail closed. Trusting a
+      // client-reported PayPal order id here (without ever calling PayPal
+      // to confirm it) would let anyone submit a fabricated id and get an
+      // order marked PAID for free. Leave it pending for manual review
+      // instead, same as the other unconfigured manual methods.
       return {
-        immediatelyPaid: true,
-        instructions: `שולם באמצעות PayPal (מצב בדיקה — מזהה הזמנת PayPal: ${paypalOrderId}).`,
+        immediatelyPaid: false,
+        instructions: `לא ניתן היה לאמת את תשלום ה-PayPal באופן אוטומטי עבור הזמנה ${orderNumber} (מזהה: ${paypalOrderId}). ההזמנה תיבדק ותאושר ידנית.`,
       };
     }
 

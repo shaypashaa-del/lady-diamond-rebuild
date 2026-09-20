@@ -29,6 +29,10 @@ export function IntroReveal() {
     startedRef.current = true;
 
     document.body.style.overflow = "hidden";
+    // `mounted` must start false to match SSR output, then flip true only
+    // once we're sure this effect actually runs (see the StrictMode guard
+    // above) — there's no lazy-initializer alternative for "did we mount".
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
 
     setTimeout(() => setFading(true), HOLD_MS);

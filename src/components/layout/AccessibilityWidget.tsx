@@ -50,20 +50,20 @@ function applyToDocument(s: Settings) {
 export function AccessibilityWidget() {
   const t = useTranslations("Accessibility");
   const [open, setOpen] = useState(false);
-  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
-  const panelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    let initial = DEFAULT_SETTINGS;
+  // Read localStorage lazily, in the initializer rather than an effect —
+  // this component's settings-driven UI (the panel below) only ever
+  // renders after a user click on `open`, never during the initial
+  // render, so there's no SSR/hydration mismatch to guard against here.
+  const [settings, setSettings] = useState<Settings>(() => {
+    if (typeof window === "undefined") return DEFAULT_SETTINGS;
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) initial = { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+      return raw ? { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } : DEFAULT_SETTINGS;
     } catch {
-      // localStorage unavailable — fall back to defaults for this session.
+      return DEFAULT_SETTINGS;
     }
-    setSettings(initial);
-    applyToDocument(initial);
-  }, []);
+  });
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     applyToDocument(settings);

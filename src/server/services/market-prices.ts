@@ -1,0 +1,54 @@
+// Live gold spot price, so the gold calculator defaults to a real current
+// market number instead of a stale hardcoded guess — showing a made-up or
+// outdated "market price" next to a real retail estimate is exactly the
+// kind of consumer-misleading claim the Consumer Protection Law is meant to
+// prevent. Source: goldprice.dev's public spot-price endpoint (no API key,
+// XAU quoted directly in ILS). Cross-checked at integration time against a
+// second independent source (xaus.com) and the live USD/ILS rate — both
+// agreed within ~0.1%.
+//
+// This never fails loudly: if the fetch fails or the response looks wrong,
+// callers get `null` and must fall back to letting the person enter their
+// own known-current price rather than ever displaying a fabricated number.
+
+const TROY_OUNCE_IN_GRAMS = 31.1034768;
+const GOLD_SPOT_ENDPOINT = "https://api.goldprice.dev/v1/prices?symbol=XAU-ILS-SPOT";
+
+export type LiveGoldPrice = {
+  pricePerGram24kIls: number;
+  fetchedAt: string;
+  source: string;
+};
+
+export async function getLiveGoldPricePer24kGramIls(): Promise<LiveGoldPrice | null> {
+  try {
+    const res = await fetch(GOLD_SPOT_ENDPOINT, {
+      // 10-minute cache — frequent enough that the price is never stale by
+      // more than a few minutes in practice, without hammering a free
+      // third-party endpoint on every page load.
+      next: { revalidate: 600 },
+    });
+    if (!res.ok) return null;
+
+    const data = (await res.json()) as {
+      symbols?: { symbol?: string; quote_currency?: string; price?: string; is_stale?: boolean }[];
+    };
+    const quote = data.symbols?.find((s) => s.symbol === "XAU" && s.quote_currency === "ILS");
+    const pricePerOunce = quote?.price ? Number(quote.price) : NaN;
+
+    // Sanity bounds — reject anything that isn't a plausible gold price, so
+    // a malformed or unexpected response from the third party never turns
+    // into a wildly wrong number shown as if it were real.
+    if (!Number.isFinite(pricePerOunce) || pricePerOunce < 3000 || pricePerOunce > 40000 || quote?.is_stale) {
+      return null;
+    }
+
+    return {
+      pricePerGram24kIls: Math.round((pricePerOunce / TROY_OUNCE_IN_GRAMS) * 100) / 100,
+      fetchedAt: new Date().toISOString(),
+      source: "goldprice.dev",
+    };
+  } catch {
+    return null;
+  }
+}

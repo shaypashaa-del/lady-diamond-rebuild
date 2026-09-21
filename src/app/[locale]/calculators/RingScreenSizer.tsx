@@ -100,8 +100,8 @@ export function RingScreenSizer() {
             />
             <input
               type="range"
-              min={10}
-              max={24}
+              min={11}
+              max={29}
               step={0.1}
               value={diameterMm}
               onChange={(e) => setDiameterMm(Number(e.target.value))}
@@ -159,9 +159,12 @@ function RingSizeTable({ title, sizes }: { title: string; sizes: number[] }) {
 export function RingSizeReferenceTables() {
   const t = useTranslations("Calculators");
   return (
-    <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
-      <RingSizeTable title={t("womenSizes")} sizes={WOMEN_RING_SIZES} />
-      <RingSizeTable title={t("menSizes")} sizes={MEN_RING_SIZES} />
+    <div className="mt-8">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <RingSizeTable title={t("womenSizes")} sizes={WOMEN_RING_SIZES} />
+        <RingSizeTable title={t("menSizes")} sizes={MEN_RING_SIZES} />
+      </div>
+      <p className="mt-4 text-center text-xs text-ink/50">{t("sizesBeyondTableNote")}</p>
     </div>
   );
 }

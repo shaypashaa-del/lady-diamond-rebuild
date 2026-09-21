@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { circumferenceMmToUsSize } from "@/lib/ring-size";
 import { RingScreenSizer, RingSizeReferenceTables } from "./RingScreenSizer";
+import type { LiveGoldPrice } from "@/server/services/market-prices";
 
 type Tab = "diamond" | "gold" | "size";
 
@@ -57,7 +58,7 @@ function caratWeightFactor(carat: number): number {
 
 const GOLD_KARATS = [24, 22, 18, 14, 10, 9] as const;
 
-export function CalculatorsClient() {
+export function CalculatorsClient({ liveGoldPrice }: { liveGoldPrice: LiveGoldPrice | null }) {
   const t = useTranslations("Calculators");
   const [tab, setTab] = useState<Tab>("diamond");
 
@@ -83,7 +84,7 @@ export function CalculatorsClient() {
       </div>
 
       {tab === "diamond" && <DiamondCalculator />}
-      {tab === "gold" && <GoldCalculator />}
+      {tab === "gold" && <GoldCalculator liveGoldPrice={liveGoldPrice} />}
       {tab === "size" && <SizeCalculator />}
     </div>
   );
@@ -213,11 +214,14 @@ function DiamondCalculator() {
   );
 }
 
-function GoldCalculator() {
+function GoldCalculator({ liveGoldPrice }: { liveGoldPrice: LiveGoldPrice | null }) {
   const t = useTranslations("Calculators");
   const [grams, setGrams] = useState(5);
   const [karat, setKarat] = useState<number>(14);
-  const [pricePerGram24k, setPricePerGram24k] = useState(400);
+  // Defaults to today's real gold spot price when the live fetch succeeded;
+  // falls back to asking the person to enter a current price themselves
+  // rather than ever silently showing a made-up or stale number.
+  const [pricePerGram24k, setPricePerGram24k] = useState(liveGoldPrice?.pricePerGram24kIls ?? 0);
 
   const { cost, retail } = useMemo(() => {
     const costValue = Math.round(grams * (karat / 24) * pricePerGram24k);
@@ -226,6 +230,18 @@ function GoldCalculator() {
 
   return (
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      {liveGoldPrice ? (
+        <p className="sm:col-span-2 border border-gold-soft bg-paper-soft px-3 py-2 text-center text-xs text-ink/60">
+          {t("liveGoldPriceNote", {
+            price: liveGoldPrice.pricePerGram24kIls.toFixed(2),
+            time: new Date(liveGoldPrice.fetchedAt).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" }),
+          })}
+        </p>
+      ) : (
+        <p className="sm:col-span-2 border border-clay/30 bg-clay/10 px-3 py-2 text-center text-xs text-clay">
+          {t("liveGoldPriceUnavailable")}
+        </p>
+      )}
       <Field label={t("weightGrams")}>
         <input
           type="number"

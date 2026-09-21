@@ -27,10 +27,14 @@ export function usSizeToCircumferenceMm(size: number): number {
   return usSizeToDiameterMm(size) * Math.PI;
 }
 
-// Typical retail ranges for the two quick-reference tables — same
-// continuous mm scale, just the ranges customers actually order in.
-export const WOMEN_RING_SIZES = [4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9];
-export const MEN_RING_SIZES = [7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13];
+// Reference ranges for the two quick-reference tables — same continuous mm
+// scale, widened beyond the narrowest "typical" range since real finger
+// sizes vary more than a narrow chart implies (a chart that stops at a
+// common size can wrongly read as "that's the largest/smallest size that
+// exists"). Sizes above/below this range are still real and orderable —
+// see the note shown under the tables.
+export const WOMEN_RING_SIZES = [3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10];
+export const MEN_RING_SIZES = [6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15];
 
 // ISO/IEC 7810 ID-1 — the standard size for credit/debit cards worldwide
 // (including Israel), used as the on-screen calibration reference since

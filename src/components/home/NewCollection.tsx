@@ -9,12 +9,15 @@ export function NewCollection() {
     <section className="mx-auto max-w-7xl px-4 py-14 sm:px-8">
       <div className="grid grid-cols-1 items-center gap-10 sm:grid-cols-2 sm:gap-16">
         <ScrollReveal className="relative aspect-[4/5] w-full overflow-hidden shadow-[0_30px_60px_-25px_rgba(0,0,0,0.3)]">
-          <Image
-            src="/brand/collection/v2-lifestyle-model-flower-jewelry.jpeg"
-            alt="דוגמנית עונדת תכשיטי Lady Diamond מקולקציית פרח היהלומים"
-            fill
-            sizes="(min-width: 640px) 50vw, 100vw"
-            className="object-cover"
+          <video
+            className="absolute inset-0 h-full w-full object-cover"
+            src="/brand/videos/about-me-video.mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-label="דיאנה, מייסדת Lady Diamond"
           />
         </ScrollReveal>
         <ScrollReveal delay={0.1} className="text-center">

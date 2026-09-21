@@ -63,29 +63,39 @@ export function CalculatorsClient({ liveGoldPrice }: { liveGoldPrice: LiveGoldPr
   const [tab, setTab] = useState<Tab>("diamond");
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-8">
-      <h1 className="mb-2 text-center text-2xl font-semibold uppercase tracking-[0.2em]">{t("pageTitle")}</h1>
-      <p className="mx-auto mb-10 max-w-xl text-center text-sm text-ink/60">{t("disclaimer")}</p>
-
-      <div className="mb-10 flex justify-center gap-2">
-        {(["diamond", "gold", "size"] as Tab[]).map((key) => (
-          <button
-            key={key}
-            onClick={() => setTab(key)}
-            className={`border px-5 py-2.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
-              tab === key
-                ? "border-gold-bright bg-ink text-paper"
-                : "border-gold-soft text-ink/70 hover:border-gold"
-            }`}
-          >
-            {t(`tab_${key}`)}
-          </button>
-        ))}
+    <div>
+      <div className="relative overflow-hidden border-b border-gold-soft bg-paper-soft py-14 text-center sm:py-20">
+        <DiamondGlyph className="pointer-events-none absolute -top-16 -end-16 h-64 w-64 text-gold-bright/[0.08]" />
+        <DiamondGlyph className="pointer-events-none absolute -bottom-14 -start-14 h-48 w-48 text-gold-bright/[0.06]" />
+        <p className="relative text-xs uppercase tracking-[0.4em] text-gold-deep">{t("kicker")}</p>
+        <span className="gold-rule relative mt-4 w-16" />
+        <h1 className="relative mt-4 text-3xl font-semibold uppercase tracking-[0.15em] text-ink sm:text-5xl">
+          {t("pageTitle")}
+        </h1>
+        <p className="relative mx-auto mt-5 max-w-xl px-4 text-sm text-ink/60">{t("disclaimer")}</p>
       </div>
 
-      {tab === "diamond" && <DiamondCalculator />}
-      {tab === "gold" && <GoldCalculator liveGoldPrice={liveGoldPrice} />}
-      {tab === "size" && <SizeCalculator />}
+      <div className="mx-auto max-w-3xl px-4 py-12 sm:px-8">
+        <div className="mb-10 flex justify-center gap-2">
+          {(["diamond", "gold", "size"] as Tab[]).map((key) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              className={`border px-5 py-2.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
+                tab === key
+                  ? "border-gold-bright bg-ink text-paper"
+                  : "border-gold-soft text-ink/70 hover:border-gold"
+              }`}
+            >
+              {t(`tab_${key}`)}
+            </button>
+          ))}
+        </div>
+
+        {tab === "diamond" && <DiamondCalculator />}
+        {tab === "gold" && <GoldCalculator liveGoldPrice={liveGoldPrice} />}
+        {tab === "size" && <SizeCalculator />}
+      </div>
     </div>
   );
 }
@@ -99,7 +109,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-const inputClass = "w-full border border-gold-soft px-3 py-2 text-sm text-ink focus:border-gold focus:outline-none";
+const inputClass = "w-full border border-gold-soft bg-paper px-3 py-2 text-sm text-ink focus:border-gold focus:outline-none";
 
 function ResultBox({ label, value }: { label: string; value: string }) {
   return (
@@ -126,7 +136,7 @@ function PriceBreakdown({
   marginLabel: string;
 }) {
   return (
-    <div className="mt-8 border border-gold-bright bg-paper-soft p-6">
+    <div className="mt-8 border border-gold-bright bg-paper p-6">
       <div className="flex items-center justify-between text-sm text-ink/60">
         <span>{costLabel}</span>
         <span dir="ltr">₪{cost.toLocaleString()}</span>
@@ -160,55 +170,61 @@ function DiamondCalculator() {
   }, [carat, shape, color, clarity]);
 
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-      <Field label={t("caratWeight")}>
-        <input
-          type="number"
-          min={0.05}
-          max={10}
-          step={0.05}
-          value={carat}
-          onChange={(e) => setCarat(Math.max(0.05, Number(e.target.value) || 0))}
-          className={inputClass}
-        />
-      </Field>
-      <Field label={t("shape")}>
-        <select value={shape} onChange={(e) => setShape(e.target.value)} className={inputClass}>
-          {Object.keys(SHAPE_MULTIPLIER).map((s) => (
-            <option key={s} value={s}>
-              {t(`shape_${s}`)}
-            </option>
-          ))}
-        </select>
-      </Field>
-      <Field label={t("color")}>
-        <select value={color} onChange={(e) => setColor(e.target.value)} className={inputClass}>
-          {Object.keys(COLOR_MULTIPLIER).map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-      </Field>
-      <Field label={t("clarity")}>
-        <select value={clarity} onChange={(e) => setClarity(e.target.value)} className={inputClass}>
-          {Object.keys(CLARITY_MULTIPLIER).map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-      </Field>
+    <div className="border border-gold-soft bg-paper-soft p-5 sm:p-6">
+      <div className="mb-5 flex items-center justify-between gap-4">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-ink">{t("tab_diamond")}</h3>
+        <DiamondGlyph className="h-5 w-5 shrink-0 text-gold-bright" />
+      </div>
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <Field label={t("caratWeight")}>
+          <input
+            type="number"
+            min={0.05}
+            max={10}
+            step={0.05}
+            value={carat}
+            onChange={(e) => setCarat(Math.max(0.05, Number(e.target.value) || 0))}
+            className={inputClass}
+          />
+        </Field>
+        <Field label={t("shape")}>
+          <select value={shape} onChange={(e) => setShape(e.target.value)} className={inputClass}>
+            {Object.keys(SHAPE_MULTIPLIER).map((s) => (
+              <option key={s} value={s}>
+                {t(`shape_${s}`)}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label={t("color")}>
+          <select value={color} onChange={(e) => setColor(e.target.value)} className={inputClass}>
+            {Object.keys(COLOR_MULTIPLIER).map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label={t("clarity")}>
+          <select value={clarity} onChange={(e) => setClarity(e.target.value)} className={inputClass}>
+            {Object.keys(CLARITY_MULTIPLIER).map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </Field>
 
-      <div className="sm:col-span-2">
-        <PriceBreakdown
-          costLabel={t("marketCost")}
-          cost={cost}
-          marginLabel={t("retailMargin")}
-          retailLabel={t("estimatedPrice")}
-          retail={retail}
-        />
-        <p className="mt-3 text-center text-xs text-ink/50">{t("diamondNote")}</p>
+        <div className="sm:col-span-2">
+          <PriceBreakdown
+            costLabel={t("marketCost")}
+            cost={cost}
+            marginLabel={t("retailMargin")}
+            retailLabel={t("estimatedPrice")}
+            retail={retail}
+          />
+          <p className="mt-3 text-center text-xs text-ink/50">{t("diamondNote")}</p>
+        </div>
       </div>
     </div>
   );
@@ -229,58 +245,64 @@ function GoldCalculator({ liveGoldPrice }: { liveGoldPrice: LiveGoldPrice | null
   }, [grams, karat, pricePerGram24k]);
 
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-      {liveGoldPrice ? (
-        <p className="sm:col-span-2 border border-gold-soft bg-paper-soft px-3 py-2 text-center text-xs text-ink/60">
-          {t("liveGoldPriceNote", {
-            price: liveGoldPrice.pricePerGram24kIls.toFixed(2),
-            time: new Date(liveGoldPrice.fetchedAt).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" }),
-          })}
-        </p>
-      ) : (
-        <p className="sm:col-span-2 border border-clay/30 bg-clay/10 px-3 py-2 text-center text-xs text-clay">
-          {t("liveGoldPriceUnavailable")}
-        </p>
-      )}
-      <Field label={t("weightGrams")}>
-        <input
-          type="number"
-          min={0.1}
-          step={0.1}
-          value={grams}
-          onChange={(e) => setGrams(Math.max(0, Number(e.target.value) || 0))}
-          className={inputClass}
-        />
-      </Field>
-      <Field label={t("karat")}>
-        <select value={karat} onChange={(e) => setKarat(Number(e.target.value))} className={inputClass}>
-          {GOLD_KARATS.map((k) => (
-            <option key={k} value={k}>
-              {k}K
-            </option>
-          ))}
-        </select>
-      </Field>
-      <Field label={t("goldPricePerGram")}>
-        <input
-          type="number"
-          min={1}
-          step={1}
-          value={pricePerGram24k}
-          onChange={(e) => setPricePerGram24k(Math.max(0, Number(e.target.value) || 0))}
-          className={inputClass}
-        />
-      </Field>
+    <div className="border border-gold-soft bg-paper-soft p-5 sm:p-6">
+      <div className="mb-5 flex items-center justify-between gap-4">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-ink">{t("tab_gold")}</h3>
+        <DiamondGlyph className="h-5 w-5 shrink-0 text-gold-bright" />
+      </div>
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        {liveGoldPrice ? (
+          <p className="sm:col-span-2 border border-gold-bright bg-paper px-3 py-2 text-center text-xs text-ink/60">
+            {t("liveGoldPriceNote", {
+              price: liveGoldPrice.pricePerGram24kIls.toFixed(2),
+              time: new Date(liveGoldPrice.fetchedAt).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" }),
+            })}
+          </p>
+        ) : (
+          <p className="sm:col-span-2 border border-clay/30 bg-clay/10 px-3 py-2 text-center text-xs text-clay">
+            {t("liveGoldPriceUnavailable")}
+          </p>
+        )}
+        <Field label={t("weightGrams")}>
+          <input
+            type="number"
+            min={0.1}
+            step={0.1}
+            value={grams}
+            onChange={(e) => setGrams(Math.max(0, Number(e.target.value) || 0))}
+            className={inputClass}
+          />
+        </Field>
+        <Field label={t("karat")}>
+          <select value={karat} onChange={(e) => setKarat(Number(e.target.value))} className={inputClass}>
+            {GOLD_KARATS.map((k) => (
+              <option key={k} value={k}>
+                {k}K
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label={t("goldPricePerGram")}>
+          <input
+            type="number"
+            min={1}
+            step={1}
+            value={pricePerGram24k}
+            onChange={(e) => setPricePerGram24k(Math.max(0, Number(e.target.value) || 0))}
+            className={inputClass}
+          />
+        </Field>
 
-      <div className="sm:col-span-2">
-        <PriceBreakdown
-          costLabel={t("goldMarketValue")}
-          cost={cost}
-          marginLabel={t("retailMargin")}
-          retailLabel={t("estimatedValue")}
-          retail={retail}
-        />
-        <p className="mt-3 text-center text-xs text-ink/50">{t("goldNote")}</p>
+        <div className="sm:col-span-2">
+          <PriceBreakdown
+            costLabel={t("goldMarketValue")}
+            cost={cost}
+            marginLabel={t("retailMargin")}
+            retailLabel={t("estimatedValue")}
+            retail={retail}
+          />
+          <p className="mt-3 text-center text-xs text-ink/50">{t("goldNote")}</p>
+        </div>
       </div>
     </div>
   );

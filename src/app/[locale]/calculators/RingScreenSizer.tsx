@@ -60,7 +60,7 @@ export function RingScreenSizer() {
   }
 
   return (
-    <div className="border border-gold-soft bg-paper-soft p-5 sm:p-6">
+    <LuxuryPanel>
       <h3 className="text-sm font-semibold uppercase tracking-wide text-ink">{t("screenSizerTitle")}</h3>
 
       {!calibrated ? (
@@ -143,7 +143,7 @@ export function RingScreenSizer() {
           </button>
         </div>
       )}
-    </div>
+    </LuxuryPanel>
   );
 }
 
@@ -156,6 +156,24 @@ export const DiamondGlyph = ({ className }: { className?: string }) => (
     <path d="M12 2 L12 22" stroke="currentColor" strokeWidth="0.3" />
   </svg>
 );
+
+// The shared card treatment for every tool panel on this page — a soft
+// shadow and a thin gold hairline along the top edge, so the cream
+// background reads as a deliberate, lightly-lifted jewel case rather than a
+// flat, un-ornamented block of color.
+export function LuxuryPanel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div
+      className={`relative overflow-hidden border border-gold-soft bg-paper-soft p-5 shadow-[0_24px_48px_-30px_rgba(29,24,18,0.35)] sm:p-6 ${className}`}
+    >
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold-bright to-transparent"
+      />
+      {children}
+    </div>
+  );
+}
 
 // A small, tactile "pick your size" explorer rather than a printed table —
 // select a gender range, tap a chip, and see that one size's full detail
@@ -173,7 +191,7 @@ export function RingSizeReferenceTables() {
   const israeliSize = diameterMmToIsraeliSize(diameterMm);
 
   return (
-    <div className="mt-8 border border-gold-soft bg-paper-soft p-5 sm:p-6">
+    <LuxuryPanel className="mt-8">
       <div className="flex items-center justify-between gap-4">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-ink">{t("referenceSizesTitle")}</h3>
         <DiamondGlyph className="h-5 w-5 shrink-0 text-gold-bright" />
@@ -239,6 +257,6 @@ export function RingSizeReferenceTables() {
       </div>
 
       <p className="mt-4 text-center text-xs text-ink/50">{t("sizesBeyondTableNote")}</p>
-    </div>
+    </LuxuryPanel>
   );
 }

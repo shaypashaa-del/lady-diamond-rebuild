@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { circumferenceMmToUsSize, circumferenceMmToIsraeliSize } from "@/lib/ring-size";
-import { RingScreenSizer, RingSizeReferenceTables, DiamondGlyph } from "./RingScreenSizer";
+import { RingScreenSizer, RingSizeReferenceTables, DiamondGlyph, LuxuryPanel } from "./RingScreenSizer";
 import type { LiveGoldPrice } from "@/server/services/market-prices";
 
 type Tab = "diamond" | "gold" | "size";
@@ -64,15 +64,24 @@ export function CalculatorsClient({ liveGoldPrice }: { liveGoldPrice: LiveGoldPr
 
   return (
     <div>
-      <div className="relative overflow-hidden border-b border-gold-soft bg-paper-soft py-14 text-center sm:py-20">
-        <DiamondGlyph className="pointer-events-none absolute -top-16 -end-16 h-64 w-64 text-gold-bright/[0.08]" />
-        <DiamondGlyph className="pointer-events-none absolute -bottom-14 -start-14 h-48 w-48 text-gold-bright/[0.06]" />
-        <p className="relative text-xs uppercase tracking-[0.4em] text-gold-deep">{t("kicker")}</p>
-        <span className="gold-rule relative mt-4 w-16" />
-        <h1 className="relative mt-4 text-3xl font-semibold uppercase tracking-[0.15em] text-ink sm:text-5xl">
-          {t("pageTitle")}
-        </h1>
-        <p className="relative mx-auto mt-5 max-w-xl px-4 text-sm text-ink/60">{t("disclaimer")}</p>
+      {/* A dark jewel-box band, not a flat cream one — matches the about-us
+          hero treatment: a soft gold radial glow behind the title and two
+          faint diamond watermarks, rather than a pale, ornament-free strip. */}
+      <div className="relative overflow-hidden bg-ink py-16 text-center sm:py-24">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-1/2 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(221,170,93,0.16)_0%,transparent_65%)]"
+        />
+        <DiamondGlyph className="pointer-events-none absolute -top-16 -end-16 h-64 w-64 text-paper/[0.05]" />
+        <DiamondGlyph className="pointer-events-none absolute -bottom-14 -start-14 h-48 w-48 text-paper/[0.04]" />
+        <div className="relative">
+          <p className="text-xs uppercase tracking-[0.4em] text-gold-bright">{t("kicker")}</p>
+          <span className="gold-rule mt-4 w-16" />
+          <h1 className="mt-4 text-3xl font-semibold uppercase tracking-[0.15em] text-paper sm:text-5xl">
+            {t("pageTitle")}
+          </h1>
+          <p className="mx-auto mt-5 max-w-xl px-4 text-sm text-paper/60">{t("disclaimer")}</p>
+        </div>
       </div>
 
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-8">
@@ -170,7 +179,7 @@ function DiamondCalculator() {
   }, [carat, shape, color, clarity]);
 
   return (
-    <div className="border border-gold-soft bg-paper-soft p-5 sm:p-6">
+    <LuxuryPanel>
       <div className="mb-5 flex items-center justify-between gap-4">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-ink">{t("tab_diamond")}</h3>
         <DiamondGlyph className="h-5 w-5 shrink-0 text-gold-bright" />
@@ -226,7 +235,7 @@ function DiamondCalculator() {
           <p className="mt-3 text-center text-xs text-ink/50">{t("diamondNote")}</p>
         </div>
       </div>
-    </div>
+    </LuxuryPanel>
   );
 }
 
@@ -245,7 +254,7 @@ function GoldCalculator({ liveGoldPrice }: { liveGoldPrice: LiveGoldPrice | null
   }, [grams, karat, pricePerGram24k]);
 
   return (
-    <div className="border border-gold-soft bg-paper-soft p-5 sm:p-6">
+    <LuxuryPanel>
       <div className="mb-5 flex items-center justify-between gap-4">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-ink">{t("tab_gold")}</h3>
         <DiamondGlyph className="h-5 w-5 shrink-0 text-gold-bright" />
@@ -304,7 +313,7 @@ function GoldCalculator({ liveGoldPrice }: { liveGoldPrice: LiveGoldPrice | null
           <p className="mt-3 text-center text-xs text-ink/50">{t("goldNote")}</p>
         </div>
       </div>
-    </div>
+    </LuxuryPanel>
   );
 }
 
@@ -326,7 +335,7 @@ function BraceletCalculator() {
   const braceletLength = (wristCm + FIT_ADDITION[fit]).toFixed(1);
 
   return (
-    <div className="border border-gold-soft bg-paper-soft p-5 sm:p-6">
+    <LuxuryPanel>
       <div className="flex items-center justify-between gap-4">
         <p className="text-xs leading-6 text-ink/60">{t("wristMeasureHelp")}</p>
         <DiamondGlyph className="h-5 w-5 shrink-0 text-gold-bright" />
@@ -388,7 +397,7 @@ function BraceletCalculator() {
           {braceletLength} {t("cm")}
         </p>
       </div>
-    </div>
+    </LuxuryPanel>
   );
 }
 
@@ -413,7 +422,7 @@ function NecklaceLengthGuide() {
   const maxDrop = NECKLACE_LENGTHS[NECKLACE_LENGTHS.length - 1].drop;
 
   return (
-    <div className="border border-gold-soft bg-paper-soft p-5 sm:p-6">
+    <LuxuryPanel>
       <div className="flex items-center justify-between gap-4">
         <p className="text-xs leading-6 text-ink/60">{t("necklaceHelp")}</p>
         <DiamondGlyph className="h-5 w-5 shrink-0 text-gold-bright" />
@@ -479,7 +488,7 @@ function NecklaceLengthGuide() {
         </p>
         <p className="mx-auto mt-2 max-w-sm text-xs leading-6 text-ink/60">{t(`necklaceDesc_${active.key}`)}</p>
       </div>
-    </div>
+    </LuxuryPanel>
   );
 }
 

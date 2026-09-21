@@ -178,8 +178,16 @@
     "save": "Save Address"
   },
   "Affiliate": {
+    "kicker": "Affiliate Program",
     "heroTitle": "Become a Lady Diamond Affiliate",
     "heroCopy": "Share your unique link, earn commission on every sale you bring.",
+    "benefit1Title": "Commission on every sale",
+    "benefit1Copy": "Starting at 10% commission on every order you bring in — forever, not just the first one.",
+    "benefit2Title": "An instant personal link",
+    "benefit2Copy": "Your own unique code and link, ready seconds after approval.",
+    "benefit3Title": "Transparent tracking",
+    "benefit3Copy": "A personal dashboard with all your clicks, orders and commissions in real time.",
+    "formTitle": "Program Sign-up",
     "apply": "Apply Now",
     "name": "Full Name",
     "email": "Email",

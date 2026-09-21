@@ -4,15 +4,18 @@ import type { SampleProduct } from "@/lib/products-data";
 
 export function ProductSection({
   title,
+  kicker,
   products,
 }: {
   title: string;
+  kicker?: string;
   products: SampleProduct[];
 }) {
   return (
     <section className="mx-auto max-w-7xl px-4 py-14 sm:px-8">
       <ScrollReveal className="text-center">
-        <h2 className="text-xl font-semibold uppercase tracking-[0.2em]">{title}</h2>
+        {kicker && <p className="text-xs uppercase tracking-[0.35em] text-gold-deep">{kicker}</p>}
+        <h2 className="mt-3 text-xl font-semibold uppercase tracking-[0.2em]">{title}</h2>
         <span className="gold-rule mb-8 mt-3" />
       </ScrollReveal>
       <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">

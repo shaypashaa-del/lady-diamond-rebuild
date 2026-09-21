@@ -32,11 +32,12 @@ export function InstagramSection() {
     <section className="py-14 text-center">
       <ScrollReveal>
         <h2 className="text-xl font-semibold uppercase tracking-[0.2em]">{t("instagram")}</h2>
+        <span className="gold-rule mt-3" />
         <a
           href="https://www.instagram.com/lady_di_diamond?stkn=MTZmcHF0cjZ2bmV2cA%3D%3D&utm_source=qr"
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-1 inline-block text-xs uppercase tracking-[0.3em] text-ink/50 hover:text-gold-deep"
+          className="mt-3 inline-block text-xs uppercase tracking-[0.3em] text-ink/50 hover:text-gold-deep"
           dir="ltr"
         >
           @lady_di_diamond

@@ -44,9 +44,9 @@ function HomeView({
         ctaLabel={hero ? tContent(hero.ctaLabel, locale) : undefined}
         ctaHref={hero?.ctaHref}
       />
-      <ProductSection title={t("latestBeauty")} products={cards.slice(0, half)} />
+      <ProductSection kicker={t("latestBeautyKicker")} title={t("latestBeauty")} products={cards.slice(0, half)} />
       <CategoryBanners />
-      <ProductSection title={t("newEarrings")} products={cards.slice(half)} />
+      <ProductSection kicker={t("newEarringsKicker")} title={t("newEarrings")} products={cards.slice(half)} />
       <NewCollection />
       <EuphoriaSpotlight />
       <BrandVideoSection />

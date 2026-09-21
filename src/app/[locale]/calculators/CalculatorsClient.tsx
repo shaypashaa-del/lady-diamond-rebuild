@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { circumferenceMmToUsSize, circumferenceMmToIsraeliSize } from "@/lib/ring-size";
-import { RingScreenSizer, RingSizeReferenceTables } from "./RingScreenSizer";
+import { RingScreenSizer, RingSizeReferenceTables, DiamondGlyph } from "./RingScreenSizer";
 import type { LiveGoldPrice } from "@/server/services/market-prices";
 
 type Tab = "diamond" | "gold" | "size";
@@ -286,6 +286,90 @@ function GoldCalculator({ liveGoldPrice }: { liveGoldPrice: LiveGoldPrice | null
   );
 }
 
+const FIT_ADDITION: Record<"snug" | "comfortable" | "loose", number> = {
+  snug: 1,
+  comfortable: 1.75,
+  loose: 2.5,
+};
+
+// A single, self-contained panel — one slider, three fit chips, one live
+// result — instead of two plain form fields and a number, so a buyer who
+// doesn't know their wrist measurement offhand still has an obvious,
+// forgiving way to arrive at a length with confidence.
+function BraceletCalculator() {
+  const t = useTranslations("Calculators");
+  const [wristCm, setWristCm] = useState(16);
+  const [fit, setFit] = useState<"snug" | "comfortable" | "loose">("comfortable");
+
+  const braceletLength = (wristCm + FIT_ADDITION[fit]).toFixed(1);
+
+  return (
+    <div className="border border-gold-soft bg-paper-soft p-5 sm:p-6">
+      <div className="flex items-center justify-between gap-4">
+        <p className="text-xs leading-6 text-ink/60">{t("wristMeasureHelp")}</p>
+        <DiamondGlyph className="h-5 w-5 shrink-0 text-gold-bright" />
+      </div>
+
+      <div className="mt-5 flex items-center justify-center gap-2">
+        <span className="text-xs text-ink/40" dir="ltr">
+          12
+        </span>
+        <input
+          type="range"
+          min={12}
+          max={22}
+          step={0.5}
+          value={wristCm}
+          onChange={(e) => setWristCm(Number(e.target.value))}
+          className="w-full max-w-xs accent-gold-bright"
+          aria-label={t("wristCircumference")}
+        />
+        <span className="text-xs text-ink/40" dir="ltr">
+          22
+        </span>
+      </div>
+      <p className="mt-2 text-center text-lg font-semibold text-ink" dir="ltr">
+        {wristCm.toFixed(1)} {t("cm")}
+      </p>
+
+      <div className="mt-5 grid grid-cols-3 gap-2">
+        {(["snug", "comfortable", "loose"] as const).map((f) => (
+          <button
+            key={f}
+            type="button"
+            onClick={() => setFit(f)}
+            aria-pressed={fit === f}
+            className={`relative border px-2 py-3 text-center transition-colors ${
+              fit === f
+                ? "border-gold-bright bg-ink text-paper"
+                : "border-gold-soft bg-paper text-ink/70 hover:border-gold-bright hover:text-gold-deep"
+            }`}
+          >
+            {f === "comfortable" && (
+              <span className="absolute -top-2.5 start-1/2 -translate-x-1/2 whitespace-nowrap bg-gold-bright px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-ink rtl:translate-x-1/2">
+                {t("recommended")}
+              </span>
+            )}
+            <span className="block text-xs font-semibold uppercase tracking-wide">
+              {f === "snug" ? t("fitSnug") : f === "loose" ? t("fitLoose") : t("fitComfortable")}
+            </span>
+            <span className={`mt-1 block text-[11px] ${fit === f ? "text-paper/70" : "text-ink/50"}`}>
+              {t(`fitHelp_${f}`)}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-6 border-t border-gold-soft pt-5 text-center">
+        <p className="text-xs uppercase tracking-wide text-ink/50">{t("recommendedLength")}</p>
+        <p className="mt-1 text-2xl font-semibold text-ink" dir="ltr">
+          {braceletLength} {t("cm")}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 const NECKLACE_LENGTHS = [
   { cm: "35–40", key: "choker" },
   { cm: "45", key: "princess" },
@@ -297,14 +381,9 @@ const NECKLACE_LENGTHS = [
 function SizeCalculator() {
   const t = useTranslations("Calculators");
   const [circumference, setCircumference] = useState(52);
-  const [wrist, setWrist] = useState(16);
-  const [fit, setFit] = useState<"snug" | "comfortable" | "loose">("comfortable");
 
   const ringSizeUS = useMemo(() => circumferenceMmToUsSize(circumference), [circumference]);
   const ringSizeIsraeli = useMemo(() => circumferenceMmToIsraeliSize(circumference), [circumference]);
-
-  const braceletAddition = fit === "snug" ? 1 : fit === "loose" ? 2.5 : 1.75;
-  const braceletLength = (wrist + braceletAddition).toFixed(1);
 
   return (
     <div className="space-y-10">
@@ -343,27 +422,7 @@ function SizeCalculator() {
 
       <div className="border-t border-gold-soft pt-8">
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide">{t("braceletTitle")}</h2>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <Field label={t("wristCircumference")}>
-            <input
-              type="number"
-              min={10}
-              max={25}
-              step={0.5}
-              value={wrist}
-              onChange={(e) => setWrist(Number(e.target.value) || 0)}
-              className={inputClass}
-            />
-          </Field>
-          <Field label={t("fitStyle")}>
-            <select value={fit} onChange={(e) => setFit(e.target.value as typeof fit)} className={inputClass}>
-              <option value="snug">{t("fitSnug")}</option>
-              <option value="comfortable">{t("fitComfortable")}</option>
-              <option value="loose">{t("fitLoose")}</option>
-            </select>
-          </Field>
-        </div>
-        <ResultBox label={t("recommendedLength")} value={`${braceletLength} ${t("cm")}`} />
+        <BraceletCalculator />
       </div>
 
       <div className="border-t border-gold-soft pt-8">

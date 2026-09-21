@@ -147,7 +147,7 @@ export function RingScreenSizer() {
   );
 }
 
-const DiamondGlyph = ({ className }: { className?: string }) => (
+export const DiamondGlyph = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
     <path d="M12 2 L21 9 L12 22 L3 9 Z" stroke="currentColor" strokeWidth="0.6" />
     <path d="M3 9 H21" stroke="currentColor" strokeWidth="0.6" />

@@ -108,6 +108,7 @@
     "buyWithPaypal": "Купить через PayPal"
   },
   "Category": {
+    "kicker": "Lady Diamond",
     "items": "товаров",
     "item": "товар",
     "noProducts": "Пока нет товаров.",

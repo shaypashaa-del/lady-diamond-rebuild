@@ -24,6 +24,16 @@ function pathFor(locale: string, path: string) {
   return `${prefix}${path}`;
 }
 
+const DiamondMark = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
+    <path d="M12 2 L21 9 L12 22 L3 9 Z" stroke="currentColor" strokeWidth="0.4" />
+    <path d="M3 9 H21" stroke="currentColor" strokeWidth="0.4" />
+    <path d="M12 2 L8 9" stroke="currentColor" strokeWidth="0.3" />
+    <path d="M12 2 L16 9" stroke="currentColor" strokeWidth="0.3" />
+    <path d="M12 2 L12 22" stroke="currentColor" strokeWidth="0.25" />
+  </svg>
+);
+
 export async function generateMetadata({
   params,
 }: {
@@ -103,59 +113,77 @@ export default async function CategoryPage({
   const totalPages = Math.max(1, Math.ceil(totalCount / PRODUCTS_PAGE_SIZE));
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-8">
+    <div>
       <JsonLd
         data={breadcrumbSchema([
           { name: "Home", url: SITE_URL },
           { name: title, url: `${SITE_URL}${pathFor(locale, `/category/${slug}`)}` },
         ])}
       />
-      {imageUrl && (
-        <div className="relative mb-8 aspect-[3/1] w-full overflow-hidden placeholder-gradient">
-          <Image src={imageUrl} alt={title} fill sizes="100vw" className="object-cover" />
+
+      {/* A dark jewel-box band, matching the rest of the site's hero
+          treatment, rather than a bare title on plain white. */}
+      <div className="relative overflow-hidden bg-ink py-14 text-center sm:py-20">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-1/2 h-[28rem] w-[28rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(221,170,93,0.16)_0%,transparent_65%)]"
+        />
+        <DiamondMark className="pointer-events-none absolute -top-14 -end-14 h-56 w-56 text-paper/[0.05]" />
+        <DiamondMark className="pointer-events-none absolute -bottom-12 -start-12 h-44 w-44 text-paper/[0.04]" />
+        <div className="relative">
+          <p className="text-xs uppercase tracking-[0.4em] text-gold-bright">{tCat("kicker")}</p>
+          <span className="gold-rule mt-4 w-16" />
+          <h1 className="mt-4 text-2xl font-semibold uppercase tracking-[0.2em] text-paper sm:text-4xl">{title}</h1>
+          <p className="mt-4 text-sm text-paper/60">
+            {totalCount} {totalCount === 1 ? tCat("item") : tCat("items")}
+          </p>
         </div>
-      )}
-      <h1 className="mb-2 text-center text-2xl font-semibold uppercase tracking-[0.2em]">{title}</h1>
-      <div className="mb-10 flex flex-col items-center justify-between gap-3 sm:flex-row">
-        <p className="text-sm text-ink/50">
-          {totalCount} {totalCount === 1 ? tCat("item") : tCat("items")}
-        </p>
-        <SortSelect value={sort} slug={slug} />
       </div>
-      {cards.length === 0 ? (
-        <p className="text-center text-ink/60">{tCat("noProducts")}</p>
-      ) : (
-        <>
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
-            {cards.map((p) => (
-              <ProductCard key={p.slug} product={p} />
-            ))}
+
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-8">
+        {imageUrl && (
+          <div className="relative mb-10 aspect-[3/1] w-full overflow-hidden border border-gold-bright">
+            <Image src={imageUrl} alt={title} fill sizes="100vw" className="object-cover" />
           </div>
-          {totalPages > 1 && (
-            <nav className="mt-12 flex items-center justify-center gap-2">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                <Link
-                  key={p}
-                  href={{
-                    pathname: `/category/${slug}`,
-                    query: {
-                      ...(p !== 1 ? { page: p } : {}),
-                      ...(sort !== "newest" ? { sort } : {}),
-                    },
-                  }}
-                  className={`flex h-9 w-9 items-center justify-center border text-sm ${
-                    p === page
-                      ? "border-gold-bright bg-ink text-paper"
-                      : "border-gold-soft text-ink/80 hover:border-gold"
-                  }`}
-                >
-                  {p}
-                </Link>
+        )}
+        <div className="mb-10 flex justify-end">
+          <SortSelect value={sort} slug={slug} />
+        </div>
+        {cards.length === 0 ? (
+          <p className="text-center text-ink/60">{tCat("noProducts")}</p>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+              {cards.map((p) => (
+                <ProductCard key={p.slug} product={p} />
               ))}
-            </nav>
-          )}
-        </>
-      )}
+            </div>
+            {totalPages > 1 && (
+              <nav className="mt-12 flex items-center justify-center gap-2">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <Link
+                    key={p}
+                    href={{
+                      pathname: `/category/${slug}`,
+                      query: {
+                        ...(p !== 1 ? { page: p } : {}),
+                        ...(sort !== "newest" ? { sort } : {}),
+                      },
+                    }}
+                    className={`flex h-9 w-9 items-center justify-center border text-sm ${
+                      p === page
+                        ? "border-gold-bright bg-ink text-paper"
+                        : "border-gold-soft text-ink/80 hover:border-gold"
+                    }`}
+                  >
+                    {p}
+                  </Link>
+                ))}
+              </nav>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

@@ -108,6 +108,7 @@
     "buyWithPaypal": "Buy with PayPal"
   },
   "Category": {
+    "kicker": "Lady Diamond",
     "items": "items",
     "item": "item",
     "noProducts": "No products yet.",

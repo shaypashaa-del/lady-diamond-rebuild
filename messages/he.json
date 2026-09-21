@@ -108,6 +108,7 @@
     "buyWithPaypal": "רכישה בפייפאל"
   },
   "Category": {
+    "kicker": "ליידי דיאמונד",
     "items": "פריטים",
     "item": "פריט",
     "noProducts": "אין עדיין מוצרים.",

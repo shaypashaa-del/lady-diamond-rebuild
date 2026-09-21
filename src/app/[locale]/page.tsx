@@ -5,6 +5,7 @@ import { ProductSection } from "@/components/home/ProductSection";
 import { CategoryBanners } from "@/components/home/CategoryBanners";
 import { NewCollection, EuphoriaSpotlight } from "@/components/home/NewCollection";
 import { BrandVideoSection } from "@/components/home/BrandVideoSection";
+import { RingMotionGallery } from "@/components/home/RingMotionGallery";
 import { InstagramSection } from "@/components/home/InstagramSection";
 import { getFeaturedProducts } from "@/server/repositories/catalog";
 import { toCardProduct } from "@/lib/catalog-view";
@@ -49,6 +50,7 @@ function HomeView({
       <NewCollection />
       <EuphoriaSpotlight />
       <BrandVideoSection />
+      <RingMotionGallery />
       <InstagramSection />
     </>
   );

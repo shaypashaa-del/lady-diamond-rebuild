@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   diameterMmToUsSize,
+  diameterMmToIsraeliSize,
   usSizeToDiameterMm,
   MEN_RING_SIZES,
   WOMEN_RING_SIZES,
@@ -46,7 +47,8 @@ export function RingScreenSizer() {
   const pxPerMm = cardWidthPx / STANDARD_CARD_WIDTH_MM;
   const cardHeightPx = pxPerMm * STANDARD_CARD_HEIGHT_MM;
   const ringDiameterPx = diameterMm * pxPerMm;
-  const size = diameterMmToUsSize(diameterMm);
+  const usSize = diameterMmToUsSize(diameterMm);
+  const israeliSize = diameterMmToIsraeliSize(diameterMm);
 
   function confirmCalibration() {
     setCalibrated(true);
@@ -109,17 +111,26 @@ export function RingScreenSizer() {
               aria-label={t("ringSlider")}
             />
           </div>
-          <div className="mt-5 flex items-center justify-center gap-8 border-t border-gold-soft pt-5 text-center">
+          <div className="mt-5 grid grid-cols-3 gap-3 border-t border-gold-soft pt-5 text-center">
             <div>
               <p className="text-xs uppercase tracking-wide text-ink/50">{t("diameterLabel")}</p>
               <p className="mt-1 text-lg font-semibold text-ink" dir="ltr">
                 {diameterMm.toFixed(1)} {t("mm")}
               </p>
+              <p className="text-xs text-ink/40" dir="ltr">
+                ({(diameterMm / 10).toFixed(2)} {t("cm")})
+              </p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wide text-ink/50">{t("ringSizeIsraeli")}</p>
+              <p className="mt-1 text-lg font-semibold text-ink" dir="ltr">
+                {israeliSize}
+              </p>
             </div>
             <div>
               <p className="text-xs uppercase tracking-wide text-ink/50">{t("ringSizeUS")}</p>
               <p className="mt-1 text-lg font-semibold text-ink" dir="ltr">
-                {size}
+                {usSize}
               </p>
             </div>
           </div>
@@ -136,21 +147,27 @@ export function RingScreenSizer() {
   );
 }
 
-function RingSizeTable({ title, sizes }: { title: string; sizes: number[] }) {
+function RingSizeTable({ title, sizes, israeliLabel }: { title: string; sizes: number[]; israeliLabel: string }) {
   return (
     <div>
       <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/70">{title}</h4>
       <ul className="divide-y divide-gold-soft border border-gold-soft">
-        {sizes.map((s) => (
-          <li key={s} className="flex items-center justify-between px-3 py-2 text-sm">
-            <span className="text-ink/70" dir="ltr">
-              US {s}
-            </span>
-            <span className="font-medium text-ink" dir="ltr">
-              {usSizeToDiameterMm(s).toFixed(1)} mm
-            </span>
-          </li>
-        ))}
+        {sizes.map((s) => {
+          const diameterMm = usSizeToDiameterMm(s);
+          return (
+            <li key={s} className="flex items-center justify-between px-3 py-2 text-sm">
+              <span className="text-ink/70" dir="ltr">
+                US {s}
+              </span>
+              <span className="text-ink/70">
+                {israeliLabel} {diameterMmToIsraeliSize(diameterMm)}
+              </span>
+              <span className="font-medium text-ink" dir="ltr">
+                {diameterMm.toFixed(1)} mm
+              </span>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
@@ -161,8 +178,8 @@ export function RingSizeReferenceTables() {
   return (
     <div className="mt-8">
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <RingSizeTable title={t("womenSizes")} sizes={WOMEN_RING_SIZES} />
-        <RingSizeTable title={t("menSizes")} sizes={MEN_RING_SIZES} />
+        <RingSizeTable title={t("womenSizes")} sizes={WOMEN_RING_SIZES} israeliLabel={t("israeliShort")} />
+        <RingSizeTable title={t("menSizes")} sizes={MEN_RING_SIZES} israeliLabel={t("israeliShort")} />
       </div>
       <p className="mt-4 text-center text-xs text-ink/50">{t("sizesBeyondTableNote")}</p>
     </div>

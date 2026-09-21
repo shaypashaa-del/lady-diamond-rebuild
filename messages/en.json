@@ -355,6 +355,8 @@
     "ringSizeTitle": "Ring Size Calculator",
     "fingerCircumference": "Finger Circumference (mm)",
     "ringSizeUS": "US Ring Size",
+    "ringSizeIsraeli": "Israeli Size",
+    "israeliShort": "IL",
     "ringSizeHelp": "Wrap a strip of paper around the base of your finger, mark where it overlaps, and measure the length in millimeters.",
     "screenSizerTitle": "Measure directly on your screen",
     "calibrateHelp": "Step 1: hold a real credit or debit card against your screen, next to the rectangle below. Drag the slider until the rectangle exactly matches the real card's size.",

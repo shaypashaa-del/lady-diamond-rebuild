@@ -27,6 +27,24 @@ export function usSizeToCircumferenceMm(size: number): number {
   return usSizeToDiameterMm(size) * Math.PI;
 }
 
+// Israeli ring sizing (the same system used across most Israeli jewelers):
+// the size number is just the inner circumference in millimeters, rounded,
+// minus 40 — identical in spirit to the ISO/European system (circumference
+// in mm), just offset by a constant 40. E.g. a 54mm circumference is
+// European size 54 and Israeli size 14; verified against a published
+// Israeli jeweler conversion table (54mm / Israeli 14 / US 7 all agreed).
+export function circumferenceMmToIsraeliSize(circumferenceMm: number): number {
+  return Math.round(circumferenceMm) - 40;
+}
+
+export function israeliSizeToCircumferenceMm(israeliSize: number): number {
+  return israeliSize + 40;
+}
+
+export function diameterMmToIsraeliSize(diameterMm: number): number {
+  return circumferenceMmToIsraeliSize(diameterMm * Math.PI);
+}
+
 // Reference ranges for the two quick-reference tables — same continuous mm
 // scale, widened beyond the narrowest "typical" range since real finger
 // sizes vary more than a narrow chart implies (a chart that stops at a

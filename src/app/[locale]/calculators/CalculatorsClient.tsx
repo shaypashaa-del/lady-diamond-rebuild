@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { circumferenceMmToUsSize } from "@/lib/ring-size";
+import { circumferenceMmToUsSize, circumferenceMmToIsraeliSize } from "@/lib/ring-size";
 import { RingScreenSizer, RingSizeReferenceTables } from "./RingScreenSizer";
 import type { LiveGoldPrice } from "@/server/services/market-prices";
 
@@ -301,6 +301,7 @@ function SizeCalculator() {
   const [fit, setFit] = useState<"snug" | "comfortable" | "loose">("comfortable");
 
   const ringSizeUS = useMemo(() => circumferenceMmToUsSize(circumference), [circumference]);
+  const ringSizeIsraeli = useMemo(() => circumferenceMmToIsraeliSize(circumference), [circumference]);
 
   const braceletAddition = fit === "snug" ? 1 : fit === "loose" ? 2.5 : 1.75;
   const braceletLength = (wrist + braceletAddition).toFixed(1);
@@ -325,8 +326,12 @@ function SizeCalculator() {
                 onChange={(e) => setCircumference(Number(e.target.value) || 0)}
                 className={inputClass}
               />
+              <p className="mt-1 text-xs text-ink/40" dir="ltr">
+                ({(circumference / 10).toFixed(2)} {t("cm")})
+              </p>
             </Field>
-            <div className="flex items-end">
+            <div className="grid grid-cols-2 gap-3">
+              <ResultBox label={t("ringSizeIsraeli")} value={String(ringSizeIsraeli)} />
               <ResultBox label={t("ringSizeUS")} value={String(ringSizeUS)} />
             </div>
           </div>

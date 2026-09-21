@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { circumferenceMmToUsSize } from "@/lib/ring-size";
+import { RingScreenSizer, RingSizeReferenceTables } from "./RingScreenSizer";
 
 type Tab = "diamond" | "gold" | "size";
 
@@ -282,10 +284,7 @@ function SizeCalculator() {
   const [wrist, setWrist] = useState(16);
   const [fit, setFit] = useState<"snug" | "comfortable" | "loose">("comfortable");
 
-  const ringSizeUS = useMemo(() => {
-    const size = (circumference - 39.9) / 2.55 + 3;
-    return Math.round(size * 2) / 2;
-  }, [circumference]);
+  const ringSizeUS = useMemo(() => circumferenceMmToUsSize(circumference), [circumference]);
 
   const braceletAddition = fit === "snug" ? 1 : fit === "loose" ? 2.5 : 1.75;
   const braceletLength = (wrist + braceletAddition).toFixed(1);
@@ -294,23 +293,31 @@ function SizeCalculator() {
     <div className="space-y-10">
       <div>
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide">{t("ringSizeTitle")}</h2>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <Field label={t("fingerCircumference")}>
-            <input
-              type="number"
-              min={30}
-              max={90}
-              step={0.5}
-              value={circumference}
-              onChange={(e) => setCircumference(Number(e.target.value) || 0)}
-              className={inputClass}
-            />
-          </Field>
-          <div className="flex items-end">
-            <ResultBox label={t("ringSizeUS")} value={String(ringSizeUS)} />
+
+        <RingScreenSizer />
+
+        <div className="mt-8 border-t border-gold-soft pt-8">
+          <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-ink/70">{t("manualMethodTitle")}</h3>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <Field label={t("fingerCircumference")}>
+              <input
+                type="number"
+                min={30}
+                max={90}
+                step={0.5}
+                value={circumference}
+                onChange={(e) => setCircumference(Number(e.target.value) || 0)}
+                className={inputClass}
+              />
+            </Field>
+            <div className="flex items-end">
+              <ResultBox label={t("ringSizeUS")} value={String(ringSizeUS)} />
+            </div>
           </div>
+          <p className="mt-3 text-xs text-ink/50">{t("ringSizeHelp")}</p>
         </div>
-        <p className="mt-3 text-xs text-ink/50">{t("ringSizeHelp")}</p>
+
+        <RingSizeReferenceTables />
       </div>
 
       <div className="border-t border-gold-soft pt-8">

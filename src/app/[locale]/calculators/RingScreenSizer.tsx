@@ -147,40 +147,97 @@ export function RingScreenSizer() {
   );
 }
 
-function RingSizeTable({ title, sizes, israeliLabel }: { title: string; sizes: number[]; israeliLabel: string }) {
-  return (
-    <div>
-      <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/70">{title}</h4>
-      <ul className="divide-y divide-gold-soft border border-gold-soft">
-        {sizes.map((s) => {
-          const diameterMm = usSizeToDiameterMm(s);
-          return (
-            <li key={s} className="flex items-center justify-between px-3 py-2 text-sm">
-              <span className="text-ink/70" dir="ltr">
-                US {s}
-              </span>
-              <span className="text-ink/70">
-                {israeliLabel} {diameterMmToIsraeliSize(diameterMm)}
-              </span>
-              <span className="font-medium text-ink" dir="ltr">
-                {diameterMm.toFixed(1)} mm
-              </span>
-            </li>
-          );
-        })}
-      </ul>
-    </div>
-  );
-}
+const DiamondGlyph = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
+    <path d="M12 2 L21 9 L12 22 L3 9 Z" stroke="currentColor" strokeWidth="0.6" />
+    <path d="M3 9 H21" stroke="currentColor" strokeWidth="0.6" />
+    <path d="M12 2 L8 9" stroke="currentColor" strokeWidth="0.4" />
+    <path d="M12 2 L16 9" stroke="currentColor" strokeWidth="0.4" />
+    <path d="M12 2 L12 22" stroke="currentColor" strokeWidth="0.3" />
+  </svg>
+);
 
+// A small, tactile "pick your size" explorer rather than a printed table —
+// select a gender range, tap a chip, and see that one size's full detail
+// (mm/cm/Israeli/US) in the same panel style as the on-screen sizer above,
+// so the two tools read as one coherent piece rather than a tool plus a
+// plain data dump underneath it.
 export function RingSizeReferenceTables() {
   const t = useTranslations("Calculators");
+  const [gender, setGender] = useState<"women" | "men">("women");
+  const sizes = gender === "women" ? WOMEN_RING_SIZES : MEN_RING_SIZES;
+  const [selected, setSelected] = useState(7);
+
+  const activeSize = sizes.includes(selected) ? selected : sizes[Math.floor(sizes.length / 2)];
+  const diameterMm = usSizeToDiameterMm(activeSize);
+  const israeliSize = diameterMmToIsraeliSize(diameterMm);
+
   return (
-    <div className="mt-8">
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <RingSizeTable title={t("womenSizes")} sizes={WOMEN_RING_SIZES} israeliLabel={t("israeliShort")} />
-        <RingSizeTable title={t("menSizes")} sizes={MEN_RING_SIZES} israeliLabel={t("israeliShort")} />
+    <div className="mt-8 border border-gold-soft bg-paper-soft p-5 sm:p-6">
+      <div className="flex items-center justify-between gap-4">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-ink">{t("referenceSizesTitle")}</h3>
+        <DiamondGlyph className="h-5 w-5 shrink-0 text-gold-bright" />
       </div>
+
+      <div className="mt-4 inline-flex border border-gold-soft">
+        {(["women", "men"] as const).map((g) => (
+          <button
+            key={g}
+            type="button"
+            onClick={() => setGender(g)}
+            className={`px-5 py-2 text-xs font-semibold uppercase tracking-wide transition-colors ${
+              gender === g ? "bg-ink text-paper" : "text-ink/60 hover:text-gold-deep"
+            }`}
+          >
+            {g === "women" ? t("womenSizes") : t("menSizes")}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-5 grid grid-cols-4 gap-2 sm:grid-cols-5">
+        {sizes.map((s) => (
+          <button
+            key={s}
+            type="button"
+            onClick={() => setSelected(s)}
+            aria-pressed={activeSize === s}
+            className={`border py-2.5 text-center transition-colors ${
+              activeSize === s
+                ? "border-gold-bright bg-ink text-paper"
+                : "border-gold-soft bg-paper text-ink/70 hover:border-gold-bright hover:text-gold-deep"
+            }`}
+          >
+            <span className="block text-sm font-semibold" dir="ltr">
+              {s}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-5 grid grid-cols-3 gap-3 border-t border-gold-soft pt-5 text-center">
+        <div>
+          <p className="text-xs uppercase tracking-wide text-ink/50">{t("diameterLabel")}</p>
+          <p className="mt-1 text-lg font-semibold text-ink" dir="ltr">
+            {diameterMm.toFixed(1)} {t("mm")}
+          </p>
+          <p className="text-xs text-ink/40" dir="ltr">
+            ({(diameterMm / 10).toFixed(2)} {t("cm")})
+          </p>
+        </div>
+        <div>
+          <p className="text-xs uppercase tracking-wide text-ink/50">{t("ringSizeIsraeli")}</p>
+          <p className="mt-1 text-lg font-semibold text-ink" dir="ltr">
+            {israeliSize}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs uppercase tracking-wide text-ink/50">{t("ringSizeUS")}</p>
+          <p className="mt-1 text-lg font-semibold text-ink" dir="ltr">
+            {activeSize}
+          </p>
+        </div>
+      </div>
+
       <p className="mt-4 text-center text-xs text-ink/50">{t("sizesBeyondTableNote")}</p>
     </div>
   );

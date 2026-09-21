@@ -370,13 +370,96 @@ function BraceletCalculator() {
   );
 }
 
+// `drop` is roughly how far the necklace hangs below the neckline (cm) —
+// used only to position each style on the proportional scale below, not
+// shown directly.
 const NECKLACE_LENGTHS = [
-  { cm: "35–40", key: "choker" },
-  { cm: "45", key: "princess" },
-  { cm: "50–60", key: "matinee" },
-  { cm: "70–80", key: "opera" },
-  { cm: "90+", key: "rope" },
-];
+  { key: "choker", cm: "35–40", drop: 2 },
+  { key: "princess", cm: "45", drop: 7 },
+  { key: "matinee", cm: "50–60", drop: 13 },
+  { key: "opera", cm: "70–80", drop: 23 },
+  { key: "rope", cm: "90+", drop: 32 },
+] as const;
+
+// A vertical proportional scale (shortest at the top, near the neck) so a
+// buyer can see *where on the body* each style actually falls, rather than
+// guessing what "Matinee" or "Opera" means from the name alone.
+function NecklaceLengthGuide() {
+  const t = useTranslations("Calculators");
+  const [selected, setSelected] = useState<(typeof NECKLACE_LENGTHS)[number]["key"]>("princess");
+  const active = NECKLACE_LENGTHS.find((n) => n.key === selected) ?? NECKLACE_LENGTHS[1];
+  const maxDrop = NECKLACE_LENGTHS[NECKLACE_LENGTHS.length - 1].drop;
+
+  return (
+    <div className="border border-gold-soft bg-paper-soft p-5 sm:p-6">
+      <div className="flex items-center justify-between gap-4">
+        <p className="text-xs leading-6 text-ink/60">{t("necklaceHelp")}</p>
+        <DiamondGlyph className="h-5 w-5 shrink-0 text-gold-bright" />
+      </div>
+
+      <div className="mt-6 grid grid-cols-[auto_1fr] gap-6 sm:gap-8">
+        <div className="relative w-6" style={{ height: 220 }}>
+          <span aria-hidden="true" className="absolute inset-y-0 start-1/2 w-px -translate-x-1/2 bg-gold-soft" />
+          <span
+            aria-hidden="true"
+            className="absolute start-1/2 -translate-x-1/2 rounded-full bg-gold-bright"
+            style={{ top: 0, width: 10, height: 10 }}
+          />
+          {NECKLACE_LENGTHS.map((n) => {
+            const top = (n.drop / maxDrop) * 190 + 10;
+            const isActive = n.key === selected;
+            return (
+              <button
+                key={n.key}
+                type="button"
+                aria-label={t(`necklace_${n.key}`)}
+                aria-pressed={isActive}
+                onClick={() => setSelected(n.key)}
+                className="absolute start-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full transition-all"
+                style={{
+                  top,
+                  width: isActive ? 18 : 12,
+                  height: isActive ? 18 : 12,
+                  backgroundColor: isActive ? "var(--gold-bright)" : "var(--paper)",
+                  border: "2px solid var(--gold-bright)",
+                }}
+              />
+            );
+          })}
+        </div>
+
+        <div className="space-y-2">
+          {NECKLACE_LENGTHS.map((n) => (
+            <button
+              key={n.key}
+              type="button"
+              onClick={() => setSelected(n.key)}
+              aria-pressed={selected === n.key}
+              className={`flex w-full items-center justify-between border px-4 py-2.5 text-start transition-colors ${
+                selected === n.key
+                  ? "border-gold-bright bg-ink text-paper"
+                  : "border-gold-soft bg-paper text-ink/70 hover:border-gold-bright hover:text-gold-deep"
+              }`}
+            >
+              <span className="text-xs font-semibold uppercase tracking-wide">{t(`necklace_${n.key}`)}</span>
+              <span className="text-xs" dir="ltr">
+                {n.cm} {t("cm")}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-6 border-t border-gold-soft pt-5 text-center">
+        <p className="text-xs uppercase tracking-wide text-ink/50">{t(`necklace_${active.key}`)}</p>
+        <p className="mt-1 text-lg font-semibold text-ink" dir="ltr">
+          {active.cm} {t("cm")}
+        </p>
+        <p className="mx-auto mt-2 max-w-sm text-xs leading-6 text-ink/60">{t(`necklaceDesc_${active.key}`)}</p>
+      </div>
+    </div>
+  );
+}
 
 function SizeCalculator() {
   const t = useTranslations("Calculators");
@@ -427,16 +510,7 @@ function SizeCalculator() {
 
       <div className="border-t border-gold-soft pt-8">
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide">{t("necklaceTitle")}</h2>
-        <ul className="divide-y divide-gold-soft border border-gold-soft">
-          {NECKLACE_LENGTHS.map((n) => (
-            <li key={n.key} className="flex items-center justify-between px-4 py-3 text-sm">
-              <span className="text-ink/70">{t(`necklace_${n.key}`)}</span>
-              <span className="font-semibold text-ink" dir="ltr">
-                {n.cm} {t("cm")}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <NecklaceLengthGuide />
       </div>
     </div>
   );

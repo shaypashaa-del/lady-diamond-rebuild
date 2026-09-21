@@ -390,7 +390,13 @@
     "necklace_princess": "Princess",
     "necklace_matinee": "Matinee",
     "necklace_opera": "Opera",
-    "necklace_rope": "Rope"
+    "necklace_rope": "Rope",
+    "necklaceHelp": "Every necklace falls at a different point on the body — pick a length from the list, or tap a point on the scale to see where it falls and what it suits.",
+    "necklaceDesc_choker": "Sits snugly at the base of the neck. Especially striking with a high collar, an open shirt, or a round neckline.",
+    "necklaceDesc_princess": "The most common, versatile length — falls just below the collarbone. Works for any occasion and any neckline.",
+    "necklaceDesc_matinee": "Falls above the bust line. Looks great over a closed top or a dress with a subtle neckline, no collar needed.",
+    "necklaceDesc_opera": "Falls down to the waistline. An elegant evening look, and can also be doubled around the neck for a layered effect.",
+    "necklaceDesc_rope": "The longest length. Versatile — wear it long and dramatic, or doubled and tripled for a layered look."
   },
   "Accessibility": {
     "openLabel": "Accessibility menu",

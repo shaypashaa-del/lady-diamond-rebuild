@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { AutoplayVideo } from "@/components/AutoplayVideo";
 
 // Five real 360° product clips (the brand's own WhatsApp-shared footage,
 // same provenance as BrandVideoSection's showcase clip) — a small looping
@@ -33,15 +34,7 @@ export function RingMotionGallery() {
               key={src}
               className="aspect-square w-36 shrink-0 overflow-hidden border border-gold-soft bg-ink shadow-[0_14px_32px_-18px_rgba(0,0,0,0.3)] sm:w-auto"
             >
-              <video
-                className="h-full w-full object-cover"
-                src={src}
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-              />
+              <AutoplayVideo className="h-full w-full object-cover" src={src} />
             </div>
           ))}
         </div>

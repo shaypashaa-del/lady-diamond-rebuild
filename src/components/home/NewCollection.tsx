@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { AutoplayVideo } from "@/components/AutoplayVideo";
 
 export function NewCollection() {
   const t = useTranslations("Home");
@@ -9,14 +10,10 @@ export function NewCollection() {
     <section className="mx-auto max-w-7xl px-4 py-14 sm:px-8">
       <div className="grid grid-cols-1 items-center gap-10 sm:grid-cols-2 sm:gap-16">
         <ScrollReveal className="relative aspect-[4/5] w-full overflow-hidden shadow-[0_30px_60px_-25px_rgba(0,0,0,0.3)]">
-          <video
+          <AutoplayVideo
             className="absolute inset-0 h-full w-full object-cover"
             src="/brand/videos/about-me-video.mp4"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
+            poster="/brand/videos/about-me-video-poster.jpg"
             aria-label="דיאנה, מייסדת Lady Diamond"
           />
         </ScrollReveal>

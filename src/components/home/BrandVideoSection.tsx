@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { AutoplayVideo } from "@/components/AutoplayVideo";
 
 // A real branded showcase clip (ruby & diamond chandelier earrings, from the
 // brand's own real Instagram/WhatsApp content). The source file is only
@@ -24,14 +25,10 @@ export function BrandVideoSection() {
 
       <ScrollReveal delay={0.15} className="mt-10 px-4 sm:px-8">
         <div className="mx-auto w-full max-w-2xl overflow-hidden border border-gold-soft bg-ink shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)]">
-          <video
+          <AutoplayVideo
             className="aspect-[9/16] w-full object-cover sm:aspect-[4/3]"
             src="/video/brand-showcase.mp4"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
+            poster="/video/brand-showcase-poster.jpg"
           />
         </div>
       </ScrollReveal>

@@ -4,6 +4,16 @@ import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 
+const DiamondMark = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
+    <path d="M12 2 L21 9 L12 22 L3 9 Z" stroke="currentColor" strokeWidth="0.5" />
+    <path d="M3 9 H21" stroke="currentColor" strokeWidth="0.5" />
+    <path d="M12 2 L8 9" stroke="currentColor" strokeWidth="0.35" />
+    <path d="M12 2 L16 9" stroke="currentColor" strokeWidth="0.35" />
+    <path d="M12 2 L12 22" stroke="currentColor" strokeWidth="0.3" />
+  </svg>
+);
+
 export default async function OrderConfirmationPage({
   params,
 }: {
@@ -22,7 +32,8 @@ export default async function OrderConfirmationPage({
 
   return (
     <div className="mx-auto max-w-md px-4 py-20 text-center sm:px-8">
-      <h1 className="mb-6 text-xl font-semibold uppercase tracking-wide">{t("title")}</h1>
+      <DiamondMark className="mx-auto h-8 w-8 text-gold-bright" />
+      <h1 className="mt-4 mb-6 text-xl font-semibold uppercase tracking-wide">{t("title")}</h1>
 
       <div className="mb-6 border border-gold-soft p-5 text-start">
         <div className="flex justify-between text-sm">

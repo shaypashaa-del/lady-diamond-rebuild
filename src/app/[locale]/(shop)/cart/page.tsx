@@ -51,46 +51,48 @@ export default function CartPage() {
       <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
         <div className="space-y-6 sm:col-span-2">
           {lines.map((line) => (
-            <div key={line.key} className="flex items-center gap-4 border-b border-gold-soft pb-6">
+            <div key={line.key} className="flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-gold-soft pb-6">
               <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden placeholder-gradient">
                 {line.imageUrl && (
                   <Image src={line.imageUrl} alt={line.name} fill sizes="80px" className="object-cover" />
                 )}
               </div>
-              <div className="flex-1">
+              <div className="min-w-[140px] flex-1">
                 <Link href={`/product/${line.slug}`} className="block text-sm font-medium uppercase text-ink">
                   {line.name}
                 </Link>
                 {line.variantLabel && <p className="text-xs text-ink/50">{line.variantLabel}</p>}
                 <p className="mt-1 text-sm text-ink">{line.price.toFixed(2)} ₪</p>
               </div>
-              <div className="flex items-center border border-gold-soft">
+              <div className="flex w-full items-center justify-between gap-4 ps-24 sm:w-auto sm:justify-start sm:ps-0">
+                <div className="flex items-center border border-gold-soft">
+                  <button
+                    onClick={() => setQuantity(line.key, line.quantity - 1)}
+                    className="px-2 py-1 text-sm text-ink hover:text-gold-deep"
+                    aria-label={t("decreaseQty")}
+                  >
+                    −
+                  </button>
+                  <span className="w-6 text-center text-sm text-ink">{line.quantity}</span>
+                  <button
+                    onClick={() => setQuantity(line.key, line.quantity + 1)}
+                    className="px-2 py-1 text-sm text-ink hover:text-gold-deep"
+                    aria-label={t("increaseQty")}
+                  >
+                    +
+                  </button>
+                </div>
+                <p className="text-end text-sm font-semibold text-ink sm:w-20">
+                  {(line.price * line.quantity).toFixed(2)} ₪
+                </p>
                 <button
-                  onClick={() => setQuantity(line.key, line.quantity - 1)}
-                  className="px-2 py-1 text-sm text-ink hover:text-gold-deep"
-                  aria-label={t("decreaseQty")}
+                  onClick={() => removeLine(line.key)}
+                  aria-label={t("remove")}
+                  className="text-ink/40 transition-colors hover:text-clay"
                 >
-                  −
-                </button>
-                <span className="w-6 text-center text-sm text-ink">{line.quantity}</span>
-                <button
-                  onClick={() => setQuantity(line.key, line.quantity + 1)}
-                  className="px-2 py-1 text-sm text-ink hover:text-gold-deep"
-                  aria-label={t("increaseQty")}
-                >
-                  +
+                  ×
                 </button>
               </div>
-              <p className="w-20 text-end text-sm font-semibold text-ink">
-                {(line.price * line.quantity).toFixed(2)} ₪
-              </p>
-              <button
-                onClick={() => removeLine(line.key)}
-                aria-label={t("remove")}
-                className="text-ink/40 transition-colors hover:text-clay"
-              >
-                ×
-              </button>
             </div>
           ))}
         </div>

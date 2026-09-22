@@ -54,24 +54,36 @@ export default async function CustomDesignRequestDetailPage({
 
   const renderByView = new Map(req.renderImages.map((r) => [r.viewLabel, r]));
 
+  const hasAnyTechnicalDetails =
+    req.renderImages.length > 0 || req.gems.length > 0 || req.modelNumber || req.metalType;
+
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold">בקשת עיצוב — {req.customerName}</h1>
-          <p className="text-sm text-neutral-500">
-            {JEWELRY_TYPE_LABEL[req.jewelryType] ?? req.jewelryType} · {req.createdAt.toLocaleDateString("he-IL")}
-          </p>
-        </div>
-        <a
-          href={`/admin/custom-design-requests/${req.id}/pdf`}
-          target="_blank"
-          rel="noreferrer"
-          className="rounded border border-neutral-900 px-4 py-2 text-sm font-medium text-neutral-900 hover:bg-neutral-900 hover:text-white"
-        >
-          יצירת PDF ליציקה
-        </a>
+      <div className="mb-6">
+        <h1 className="text-xl font-semibold">בקשת עיצוב — {req.customerName}</h1>
+        <p className="text-sm text-neutral-500">
+          {JEWELRY_TYPE_LABEL[req.jewelryType] ?? req.jewelryType} · {req.createdAt.toLocaleDateString("he-IL")}
+        </p>
       </div>
+
+      {/* The one thing this page needs to make easy: one click produces a
+          clean, ready-to-send PDF from whatever the customer already sent —
+          no fields to fill in first. Everything below this is optional
+          extra detail for when a real CAD design exists. */}
+      <a
+        href={`/admin/custom-design-requests/${req.id}/pdf`}
+        target="_blank"
+        rel="noreferrer"
+        className="mb-8 flex items-center justify-between border border-gold-bright bg-ink px-6 py-5 text-paper transition-colors hover:bg-gold-bright hover:text-ink"
+      >
+        <span>
+          <span className="block text-base font-semibold uppercase tracking-wide">יצירת סקיצה מפורטת</span>
+          <span className="mt-1 block text-xs opacity-80">
+            מסמך PDF מקצועי עם כל פרטי הבקשה, מוכן לשליחה למפעל — בלחיצה אחת
+          </span>
+        </span>
+        <span aria-hidden="true" className="text-2xl">←</span>
+      </a>
 
       <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
         <div className="space-y-6 sm:col-span-2">
@@ -95,22 +107,37 @@ export default async function CustomDesignRequestDetailPage({
           <div className="rounded-lg border border-neutral-200 bg-white p-5">
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">תמונות מהלקוח</h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <ImageCard title="הדמיית עיצוב (ידני / AI בעתיד)" url={req.generatedImage?.url} />
               <ImageCard title="תמונת השראה מהלקוח" url={req.inspirationImage?.url} />
               <ImageCard title="שרטוט מהלקוח" url={req.sketchImage?.url} />
-            </div>
-            <div className="mt-5 border-t border-neutral-200 pt-5">
-              <p className="mb-2 text-xs font-medium text-neutral-500">
-                העלאת הדמיית עיצוב (עד לחיבור מנוע AI אוטומטי, ההעלאה כאן היא ידנית)
-              </p>
-              <GeneratedImageUploadForm id={req.id} />
+              <ImageCard title="הדמיה שצורפה" url={req.generatedImage?.url} />
             </div>
           </div>
 
-          <div className="rounded-lg border border-neutral-200 bg-white p-5">
-            <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide">תצוגות CAD ליציקה</h2>
-            <p className="mb-3 text-xs text-neutral-500">
-              4 זוויות התצוגה הסטנדרטיות מתוכנת ה-CAD (Rhino/Matrix או דומה) — יופיעו יחד בעמוד הראשון של ה-PDF.
+          {/* Collapsed by default — this whole block is only relevant once
+              a real design/CAD file exists, which won't be true for most
+              requests right after they come in. */}
+          <details className="rounded-lg border border-neutral-200 bg-white p-5 [&_summary]:cursor-pointer">
+            <summary className="text-sm font-semibold uppercase tracking-wide text-neutral-700">
+              {hasAnyTechnicalDetails ? "פרטים טכניים מהמעצב" : "הוספת פרטים טכניים מהמעצב (אופציונלי)"}
+            </summary>
+            <p className="mb-4 mt-2 text-xs text-neutral-500">
+              יש למלא רק אם יש כבר עיצוב סופי — תמונות מתוכנת CAD, משקל זהב מדויק, פירוט אבנים. אם עדיין אין, אפשר
+              לדלג ולהפיק את הסקיצה למעלה כמו שהיא.
+            </p>
+
+            <h3 className="mb-1 text-xs font-medium uppercase tracking-wide text-neutral-500">
+              העלאת הדמיית עיצוב
+            </h3>
+            <p className="mb-2 text-xs text-neutral-400">
+              תמונה בודדת שתופיע כהדמיית העיצוב (ידני כרגע, עד לחיבור מנוע AI אוטומטי)
+            </p>
+            <GeneratedImageUploadForm id={req.id} />
+
+            <h3 className="mb-1 mt-6 text-xs font-medium uppercase tracking-wide text-neutral-500">
+              תצוגות מתוכנת CAD
+            </h3>
+            <p className="mb-3 text-xs text-neutral-400">
+              4 זוויות תצוגה סטנדרטיות (Rhino/Matrix או דומה) — יופיעו יחד בעמוד הראשון של הסקיצה.
             </p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {CAD_VIEW_LABELS.map((label) => {
@@ -126,13 +153,11 @@ export default async function CustomDesignRequestDetailPage({
                 );
               })}
             </div>
-          </div>
 
-          <div className="rounded-lg border border-neutral-200 bg-white p-5">
-            <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide">פרטים טכניים ליציקה</h2>
-            <p className="mb-3 text-xs text-neutral-500">
-              מספר דגם, משקל מתכת וטבלת אבנים — כפי שמופיעים בפועל בתוכנת ה-CAD (Metal Weights / Gem Reporter).
-            </p>
+            <h3 className="mb-1 mt-6 text-xs font-medium uppercase tracking-wide text-neutral-500">
+              מספר דגם, משקל זהב ואבנים
+            </h3>
+            <p className="mb-3 text-xs text-neutral-400">כפי שמופיעים בתוכנת ה-CAD.</p>
             <CastingSpecForm
               id={req.id}
               modelNumber={req.modelNumber}
@@ -146,7 +171,7 @@ export default async function CustomDesignRequestDetailPage({
                 caratWeight: Number(g.caratWeight),
               }))}
             />
-          </div>
+          </details>
         </div>
 
         <div>

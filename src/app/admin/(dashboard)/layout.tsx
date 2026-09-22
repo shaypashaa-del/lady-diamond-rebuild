@@ -8,7 +8,6 @@ const navItems = [
   { href: "/admin/categories", label: "קטגוריות" },
   { href: "/admin/tags", label: "תגיות" },
   { href: "/admin/orders", label: "הזמנות" },
-  { href: "/admin/custom-design-requests", label: "עיצוב אישי" },
   { href: "/admin/coupons", label: "קופונים" },
   { href: "/admin/shipping", label: "משלוחים" },
   { href: "/admin/customers", label: "לקוחות" },

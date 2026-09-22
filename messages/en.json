@@ -20,8 +20,7 @@
     "bracelets": "Bracelets",
     "necklaces": "Necklaces",
     "account": "Account",
-    "cart": "Cart",
-    "customDesign": "Custom Design"
+    "cart": "Cart"
   },
   "Header": {
     "brand": "Lady Diamond",
@@ -437,42 +436,5 @@
     "terms": "Terms of Service",
     "and": "and",
     "privacy": "Privacy Policy"
-  },
-  "CustomDesign": {
-    "kicker": "Custom Design",
-    "pageTitle": "Design the piece you've been dreaming of",
-    "pageIntro": "Describe it in words, upload an inspiration photo, or sketch it freehand — our design team will review your request and get back to you with a personal rendering before it goes to casting.",
-    "jewelryTypeLabel": "Jewelry Type",
-    "typeRing": "Ring",
-    "typeNecklace": "Necklace",
-    "typeBracelet": "Bracelet",
-    "typeEarrings": "Earrings",
-    "typeOther": "Other",
-    "tabDescribe": "Describe in Words",
-    "tabUpload": "Inspiration Photo",
-    "tabSketch": "Freehand Sketch",
-    "describeLabel": "Describe the piece you're imagining",
-    "describePlaceholder": "For example: a slim solitaire ring with a heart-cut diamond, white gold, with a small engraving inside...",
-    "uploadLabel": "Upload an inspiration photo",
-    "uploadHelp": "A photo of a piece you loved, a sketch you photographed, or any other visual reference.",
-    "uploadChange": "Change photo",
-    "uploadRemove": "Remove",
-    "sketchLabel": "Freehand sketch",
-    "sketchHelp": "Draw the shape you're imagining on the canvas — even rough lines help our team understand the direction.",
-    "sketchColor": "Color",
-    "sketchBrush": "Brush size",
-    "sketchClear": "Clear",
-    "sketchUndo": "Undo last stroke",
-    "contactSectionTitle": "Contact Details",
-    "nameLabel": "Full name",
-    "emailLabel": "Email",
-    "phoneLabel": "Phone (optional)",
-    "submit": "Submit Design Request",
-    "submitting": "Sending...",
-    "successTitle": "Your request has been received",
-    "successCopy": "Thank you! Our design team will review your request and get back to you by email with an initial rendering.",
-    "backToShop": "Back to shop",
-    "errorGeneric": "Something went wrong. Please try again.",
-    "uploadingImage": "Uploading photo..."
   }
 }

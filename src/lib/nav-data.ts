@@ -17,7 +17,6 @@ export const primaryNav = [
   { key: "home", href: "/" },
   { key: "shop", href: "/category/all", mega: shopMegaMenu },
   { key: "aboutUs", href: "/about-us" },
-  { key: "customDesign", href: "/custom-design" },
   { key: "calculators", href: "/calculators" },
   { key: "affiliateProgram", href: "/affiliate" },
   { key: "contactUs", href: "/contact-us" },

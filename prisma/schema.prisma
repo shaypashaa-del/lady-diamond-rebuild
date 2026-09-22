@@ -37,7 +37,6 @@ model User {
   notes      CustomerNote[] @relation("CustomerNoteSubject")
   authoredNotes CustomerNote[] @relation("CustomerNoteAuthor")
   resetTokens PasswordResetToken[]
-  customDesignRequests CustomDesignRequest[]
 
   @@index([role])
 }
@@ -227,10 +226,6 @@ model MediaAsset {
   categories  Category[]
   productImgs ProductImage[]
   variants    ProductVariant[]
-  customDesignInspirations CustomDesignRequest[] @relation("CustomDesignInspiration")
-  customDesignSketches     CustomDesignRequest[] @relation("CustomDesignSketch")
-  customDesignGenerated    CustomDesignRequest[] @relation("CustomDesignGenerated")
-  customDesignRenders      CustomDesignRenderImage[]
 }
 
 model ContentBlock {
@@ -384,105 +379,6 @@ model ShippingRule {
   price      Decimal            @db.Decimal(10, 2) @default(0)
   isActive   Boolean            @default(true)
   sortOrder  Int                @default(0)
-}
-
-// ---------- Custom Design (AI sketch requests) ----------
-
-enum JewelryType {
-  RING
-  NECKLACE
-  BRACELET
-  EARRINGS
-  OTHER
-}
-
-enum CustomDesignStatus {
-  NEW
-  IN_REVIEW
-  GENERATED
-  SENT_TO_FACTORY
-  COMPLETED
-  REJECTED
-}
-
-// A customer's request for a one-off custom piece: free-text description,
-// an optional inspiration photo, and/or a freehand sketch drawn in the
-// on-site canvas. `generatedImage` is where staff attach the AI-rendered
-// (or, until that's wired up, manually produced) design preview — kept as
-// its own nullable MediaAsset relation rather than overwriting the
-// customer's own sketch/inspiration, since all three need to stay visible
-// side by side when preparing the casting brief.
-model CustomDesignRequest {
-  id            String   @id @default(cuid())
-  userId        String?
-  user          User?    @relation(fields: [userId], references: [id])
-
-  jewelryType   JewelryType
-  description   String
-  customerName  String
-  customerEmail String
-  customerPhone String?
-
-  inspirationImageId String?
-  inspirationImage   MediaAsset? @relation("CustomDesignInspiration", fields: [inspirationImageId], references: [id])
-  sketchImageId      String?
-  sketchImage        MediaAsset? @relation("CustomDesignSketch", fields: [sketchImageId], references: [id])
-  generatedImageId   String?
-  generatedImage     MediaAsset? @relation("CustomDesignGenerated", fields: [generatedImageId], references: [id])
-
-  status        CustomDesignStatus @default(NEW)
-  adminNotes    String?
-
-  // Technical casting spec, filled in by staff from their CAD software
-  // (Rhino/Matrix or similar) once the piece has been modeled — mirrors
-  // that software's own "Metal Weights" and "Gem Reporter" panels, so the
-  // printed casting brief carries the same real numbers a manufacturer
-  // would expect, not an estimate. All optional: nothing here is required
-  // before a piece has actually been modeled.
-  modelNumber        String?
-  metalType          String?
-  metalWeightGrams   Decimal? @db.Decimal(6, 2)
-  metalWeightDwt     Decimal? @db.Decimal(6, 2)
-
-  renderImages  CustomDesignRenderImage[]
-  gems          CustomDesignGem[]
-
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  @@index([status])
-  @@index([userId])
-}
-
-// One of up to a handful of CAD-software viewport captures (perspective,
-// front, top, right — the standard 4-view layout jewelers export) attached
-// to a single request, shown together on the casting brief.
-model CustomDesignRenderImage {
-  id        String   @id @default(cuid())
-  requestId String
-  request   CustomDesignRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  mediaId   String
-  media     MediaAsset @relation(fields: [mediaId], references: [id])
-  viewLabel String
-  sortOrder Int      @default(0)
-
-  @@index([requestId])
-}
-
-// One row of the "Gem Reporter" table — a stone shape/size that appears on
-// the piece, with its own count and total carat weight for that row (e.g.
-// "Marquise, 13.27 x 6.58mm, x1, 2.13ct").
-model CustomDesignGem {
-  id           String  @id @default(cuid())
-  requestId    String
-  request      CustomDesignRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  shape        String
-  dimensionsMm String
-  count        Int
-  caratWeight  Decimal @db.Decimal(6, 2)
-  sortOrder    Int     @default(0)
-
-  @@index([requestId])
 }
 
 // ---------- Affiliates ----------

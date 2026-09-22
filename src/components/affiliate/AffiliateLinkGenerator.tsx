@@ -30,7 +30,7 @@ export function AffiliateLinkGenerator({
         <select
           value={slug}
           onChange={(e) => setSlug(e.target.value)}
-          className="flex-1 border border-gold-soft px-3 py-2 text-sm"
+          className="flex-1 border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none"
         >
           <option value="">— Homepage —</option>
           {products.map((p) => (

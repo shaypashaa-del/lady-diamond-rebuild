@@ -5,6 +5,16 @@ import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { resetPassword, type ResetPasswordResult } from "@/server/actions/password-reset";
 
+const DiamondMark = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
+    <path d="M12 2 L21 9 L12 22 L3 9 Z" stroke="currentColor" strokeWidth="0.5" />
+    <path d="M3 9 H21" stroke="currentColor" strokeWidth="0.5" />
+    <path d="M12 2 L8 9" stroke="currentColor" strokeWidth="0.35" />
+    <path d="M12 2 L16 9" stroke="currentColor" strokeWidth="0.35" />
+    <path d="M12 2 L12 22" stroke="currentColor" strokeWidth="0.3" />
+  </svg>
+);
+
 export default function ResetPasswordTokenPage({
   params,
 }: {
@@ -17,9 +27,11 @@ export default function ResetPasswordTokenPage({
 
   return (
     <div className="mx-auto max-w-sm px-4 py-16 sm:px-8">
-      <h1 className="mb-6 text-center text-xl font-semibold uppercase tracking-wide">
+      <DiamondMark className="mx-auto h-8 w-8 text-gold-bright" />
+      <h1 className="mt-4 mb-2 text-center text-xl font-semibold uppercase tracking-wide">
         {t("newPasswordTitle")}
       </h1>
+      <span className="gold-rule mx-auto mb-6 w-12" />
 
       {state?.error && (
         <p className="mb-4 border border-clay/30 bg-clay/10 px-3 py-2 text-sm text-clay">{state.error}</p>
@@ -33,7 +45,7 @@ export default function ResetPasswordTokenPage({
             type="password"
             required
             minLength={8}
-            className="w-full border border-gold-soft px-3 py-2 text-sm"
+            className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none"
           />
         </div>
         <button

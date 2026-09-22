@@ -3,6 +3,16 @@ import { getTranslations } from "next-intl/server";
 import { requireCustomerSession } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 
+const DiamondMark = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
+    <path d="M12 2 L21 9 L12 22 L3 9 Z" stroke="currentColor" strokeWidth="0.5" />
+    <path d="M3 9 H21" stroke="currentColor" strokeWidth="0.5" />
+    <path d="M12 2 L8 9" stroke="currentColor" strokeWidth="0.35" />
+    <path d="M12 2 L16 9" stroke="currentColor" strokeWidth="0.35" />
+    <path d="M12 2 L12 22" stroke="currentColor" strokeWidth="0.3" />
+  </svg>
+);
+
 const statusLabels: Record<string, string> = {
   PENDING: "ממתינה",
   PROCESSING: "בטיפול",
@@ -41,7 +51,8 @@ export default async function CustomerOrderDetailPage({
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-8">
-      <h1 className="mb-1 text-xl font-semibold uppercase tracking-wide">
+      <DiamondMark className="h-7 w-7 text-gold-bright" />
+      <h1 className="mt-3 mb-1 text-xl font-semibold uppercase tracking-wide">
         {t("title")} {order.orderNumber}
       </h1>
       <p className="mb-8 text-sm text-ink/60">

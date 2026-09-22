@@ -5,6 +5,18 @@ import { logout } from "@/server/actions/auth";
 import { updateMyPaymentDetails, type AffiliatePaymentDetails } from "@/server/actions/affiliate";
 import { AffiliateLinkGenerator } from "@/components/affiliate/AffiliateLinkGenerator";
 
+const DiamondMark = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
+    <path d="M12 2 L21 9 L12 22 L3 9 Z" stroke="currentColor" strokeWidth="0.5" />
+    <path d="M3 9 H21" stroke="currentColor" strokeWidth="0.5" />
+    <path d="M12 2 L8 9" stroke="currentColor" strokeWidth="0.35" />
+    <path d="M12 2 L16 9" stroke="currentColor" strokeWidth="0.35" />
+    <path d="M12 2 L12 22" stroke="currentColor" strokeWidth="0.3" />
+  </svg>
+);
+
+const inputClass = "w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none";
+
 export default async function AffiliateDashboardPage() {
   const session = await requireAffiliateSession();
   const t = await getTranslations("Affiliate");
@@ -70,7 +82,10 @@ export default async function AffiliateDashboardPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-8">
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-xl font-semibold uppercase tracking-wide">{t("dashTitle")}</h1>
+        <div className="flex items-center gap-3">
+          <DiamondMark className="h-6 w-6 text-gold-bright" />
+          <h1 className="text-xl font-semibold uppercase tracking-wide">{t("dashTitle")}</h1>
+        </div>
         <form action={logout}>
           <button type="submit" className="text-xs text-clay underline">
             {t("logout")}
@@ -116,7 +131,7 @@ export default async function AffiliateDashboardPage() {
           <select
             name="method"
             defaultValue={payment?.method ?? "bank_transfer"}
-            className="w-full border border-gold-soft px-3 py-2 text-sm sm:w-64"
+            className={`${inputClass} sm:w-64`}
           >
             <option value="bank_transfer">{t("paymentBankTransfer")}</option>
             <option value="paypal">PayPal</option>
@@ -126,27 +141,27 @@ export default async function AffiliateDashboardPage() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
             <label className="mb-1 block text-xs font-medium text-ink/60">{t("accountOwner")}</label>
-            <input name="accountOwner" defaultValue={payment?.accountOwner ?? ""} className="w-full border border-gold-soft px-3 py-2 text-sm" />
+            <input name="accountOwner" defaultValue={payment?.accountOwner ?? ""} className={inputClass} />
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-ink/60">{t("bankName")}</label>
-            <input name="bankName" defaultValue={payment?.bankName ?? ""} className="w-full border border-gold-soft px-3 py-2 text-sm" />
+            <input name="bankName" defaultValue={payment?.bankName ?? ""} className={inputClass} />
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-ink/60">{t("branchNumber")}</label>
-            <input name="branchNumber" defaultValue={payment?.branchNumber ?? ""} className="w-full border border-gold-soft px-3 py-2 text-sm" />
+            <input name="branchNumber" defaultValue={payment?.branchNumber ?? ""} className={inputClass} />
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-ink/60">{t("accountNumber")}</label>
-            <input name="accountNumber" defaultValue={payment?.accountNumber ?? ""} className="w-full border border-gold-soft px-3 py-2 text-sm" />
+            <input name="accountNumber" defaultValue={payment?.accountNumber ?? ""} className={inputClass} />
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-ink/60">PayPal Email</label>
-            <input name="paypalEmail" dir="ltr" defaultValue={payment?.paypalEmail ?? ""} className="w-full border border-gold-soft px-3 py-2 text-sm" />
+            <input name="paypalEmail" dir="ltr" defaultValue={payment?.paypalEmail ?? ""} className={inputClass} />
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-ink/60">Bit</label>
-            <input name="bitPhone" dir="ltr" defaultValue={payment?.bitPhone ?? ""} className="w-full border border-gold-soft px-3 py-2 text-sm" />
+            <input name="bitPhone" dir="ltr" defaultValue={payment?.bitPhone ?? ""} className={inputClass} />
           </div>
         </div>
         <button type="submit" className="border border-gold-bright bg-ink px-4 py-2 text-xs font-semibold uppercase tracking-wide text-paper hover:bg-gold-bright">

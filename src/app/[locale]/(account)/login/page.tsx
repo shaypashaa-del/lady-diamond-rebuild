@@ -5,13 +5,25 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { loginCustomer, type AuthResult } from "@/server/actions/auth";
 
+const DiamondMark = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
+    <path d="M12 2 L21 9 L12 22 L3 9 Z" stroke="currentColor" strokeWidth="0.5" />
+    <path d="M3 9 H21" stroke="currentColor" strokeWidth="0.5" />
+    <path d="M12 2 L8 9" stroke="currentColor" strokeWidth="0.35" />
+    <path d="M12 2 L16 9" stroke="currentColor" strokeWidth="0.35" />
+    <path d="M12 2 L12 22" stroke="currentColor" strokeWidth="0.3" />
+  </svg>
+);
+
 export default function LoginPage() {
   const t = useTranslations("AuthLogin");
   const [state, action, pending] = useActionState<AuthResult, FormData>(loginCustomer, undefined);
 
   return (
     <div className="mx-auto max-w-sm px-4 py-16 sm:px-8">
-      <h1 className="mb-6 text-center text-xl font-semibold uppercase tracking-wide">{t("title")}</h1>
+      <DiamondMark className="mx-auto h-8 w-8 text-gold-bright" />
+      <h1 className="mt-4 mb-2 text-center text-xl font-semibold uppercase tracking-wide">{t("title")}</h1>
+      <span className="gold-rule mx-auto mb-6 w-12" />
 
       {state?.error && (
         <p className="mb-4 border border-clay/30 bg-clay/10 px-3 py-2 text-sm text-clay">{state.error}</p>
@@ -24,7 +36,7 @@ export default function LoginPage() {
             name="email"
             type="email"
             required
-            className="w-full border border-gold-soft px-3 py-2 text-sm"
+            className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none"
           />
         </div>
         <div className="mb-2">
@@ -33,7 +45,7 @@ export default function LoginPage() {
             name="password"
             type="password"
             required
-            className="w-full border border-gold-soft px-3 py-2 text-sm"
+            className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none"
           />
         </div>
         <Link href="/reset-password" className="link-underline mb-6 block text-end text-xs text-ink/40">

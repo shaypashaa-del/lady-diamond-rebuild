@@ -6,6 +6,8 @@ import {
   RenderViewUploadSlot,
   CastingSpecForm,
 } from "@/components/admin/CustomDesignAdminForm";
+import { deleteCustomDesignRequestAndRedirect } from "@/server/actions/custom-design-admin";
+import { ConfirmDeleteForm } from "@/components/admin/ConfirmDeleteForm";
 
 const CAD_VIEW_LABELS = ["Perspective", "Front", "Top", "Right"] as const;
 
@@ -178,6 +180,17 @@ export default async function CustomDesignRequestDetailPage({
           <div className="rounded-lg border border-neutral-200 bg-white p-5">
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">ניהול בקשה</h2>
             <CustomDesignAdminForm id={req.id} status={req.status} adminNotes={req.adminNotes} />
+            <div className="mt-4 border-t border-neutral-200 pt-4">
+              <ConfirmDeleteForm
+                action={async () => {
+                  "use server";
+                  await deleteCustomDesignRequestAndRedirect(req.id);
+                }}
+                confirmMessage={`למחוק את בקשת העיצוב של ${req.customerName}? הפעולה לא ניתנת לביטול.`}
+                label="מחיקת בקשה"
+                className="text-sm text-rose-600 hover:underline"
+              />
+            </div>
           </div>
         </div>
       </div>

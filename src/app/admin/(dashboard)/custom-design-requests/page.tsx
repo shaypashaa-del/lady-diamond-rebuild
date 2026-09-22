@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { deleteCustomDesignRequest } from "@/server/actions/custom-design-admin";
+import { ConfirmDeleteForm } from "@/components/admin/ConfirmDeleteForm";
 
 const STATUS_LABEL: Record<string, string> = {
   NEW: "חדשה",
@@ -45,6 +47,7 @@ export default async function CustomDesignRequestsPage() {
                 <th className="px-4 py-3 text-start">סוג תכשיט</th>
                 <th className="px-4 py-3 text-start">סטטוס</th>
                 <th className="px-4 py-3 text-start">תאריך</th>
+                <th className="px-4 py-3 text-start" />
               </tr>
             </thead>
             <tbody>
@@ -74,6 +77,16 @@ export default async function CustomDesignRequestsPage() {
                     </td>
                     <td className="px-4 py-3 text-neutral-500">
                       {r.createdAt.toLocaleDateString("he-IL")}
+                    </td>
+                    <td className="px-4 py-3">
+                      <ConfirmDeleteForm
+                        action={async () => {
+                          "use server";
+                          await deleteCustomDesignRequest(r.id);
+                        }}
+                        confirmMessage={`למחוק את בקשת העיצוב של ${r.customerName}? הפעולה לא ניתנת לביטול.`}
+                        className="text-xs text-rose-600 hover:underline"
+                      />
                     </td>
                   </tr>
                 );

@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 import { writeFile } from "fs/promises";
 import path from "path";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/auth/guards";
 import { sniffImageType, EXTENSION_BY_TYPE } from "@/lib/image-sniff";
@@ -214,4 +215,32 @@ export async function saveCastingSpec(
 
   revalidatePath(`/admin/custom-design-requests/${id}`);
   return { saved: true };
+}
+
+export type DeleteCustomDesignRequestResult = { error: string } | undefined;
+
+// CustomDesignRenderImage/CustomDesignGem rows cascade-delete with the
+// request (see schema). The customer's own uploaded images (inspiration,
+// sketch) and any staff-attached MediaAsset rows are deliberately left in
+// place — same as elsewhere in the app, deleting a record that references
+// a MediaAsset doesn't delete the asset itself, since other things could
+// still reference it and the file is small/harmless to leave orphaned.
+export async function deleteCustomDesignRequest(id: string): Promise<DeleteCustomDesignRequestResult> {
+  await requireAdminSession();
+
+  const existing = await prisma.customDesignRequest.findUnique({ where: { id }, select: { id: true } });
+  if (!existing) return;
+
+  await prisma.customDesignRequest.delete({ where: { id } });
+
+  revalidatePath("/admin/custom-design-requests");
+}
+
+// Same delete, but for the detail page itself — that page 404s once its
+// own record is gone, so it needs to navigate away rather than just
+// revalidate in place.
+export async function deleteCustomDesignRequestAndRedirect(id: string): Promise<DeleteCustomDesignRequestResult> {
+  const result = await deleteCustomDesignRequest(id);
+  if (result) return result;
+  redirect("/admin/custom-design-requests");
 }

@@ -37,6 +37,7 @@ model User {
   notes      CustomerNote[] @relation("CustomerNoteSubject")
   authoredNotes CustomerNote[] @relation("CustomerNoteAuthor")
   resetTokens PasswordResetToken[]
+  customDesignRequests CustomDesignRequest[]
 
   @@index([role])
 }
@@ -226,6 +227,9 @@ model MediaAsset {
   categories  Category[]
   productImgs ProductImage[]
   variants    ProductVariant[]
+  customDesignInspirations CustomDesignRequest[] @relation("CustomDesignInspiration")
+  customDesignSketches     CustomDesignRequest[] @relation("CustomDesignSketch")
+  customDesignGenerated    CustomDesignRequest[] @relation("CustomDesignGenerated")
 }
 
 model ContentBlock {
@@ -379,6 +383,60 @@ model ShippingRule {
   price      Decimal            @db.Decimal(10, 2) @default(0)
   isActive   Boolean            @default(true)
   sortOrder  Int                @default(0)
+}
+
+// ---------- Custom Design (AI sketch requests) ----------
+
+enum JewelryType {
+  RING
+  NECKLACE
+  BRACELET
+  EARRINGS
+  OTHER
+}
+
+enum CustomDesignStatus {
+  NEW
+  IN_REVIEW
+  GENERATED
+  SENT_TO_FACTORY
+  COMPLETED
+  REJECTED
+}
+
+// A customer's request for a one-off custom piece: free-text description,
+// an optional inspiration photo, and/or a freehand sketch drawn in the
+// on-site canvas. `generatedImage` is where staff attach the AI-rendered
+// (or, until that's wired up, manually produced) design preview — kept as
+// its own nullable MediaAsset relation rather than overwriting the
+// customer's own sketch/inspiration, since all three need to stay visible
+// side by side when preparing the casting brief.
+model CustomDesignRequest {
+  id            String   @id @default(cuid())
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id])
+
+  jewelryType   JewelryType
+  description   String
+  customerName  String
+  customerEmail String
+  customerPhone String?
+
+  inspirationImageId String?
+  inspirationImage   MediaAsset? @relation("CustomDesignInspiration", fields: [inspirationImageId], references: [id])
+  sketchImageId      String?
+  sketchImage        MediaAsset? @relation("CustomDesignSketch", fields: [sketchImageId], references: [id])
+  generatedImageId   String?
+  generatedImage     MediaAsset? @relation("CustomDesignGenerated", fields: [generatedImageId], references: [id])
+
+  status        CustomDesignStatus @default(NEW)
+  adminNotes    String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([status])
+  @@index([userId])
 }
 
 // ---------- Affiliates ----------

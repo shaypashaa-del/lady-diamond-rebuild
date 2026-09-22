@@ -45,7 +45,6 @@ export function RingScreenSizer() {
   const [diameterMm, setDiameterMm] = useState(17.3);
 
   const pxPerMm = cardWidthPx / STANDARD_CARD_WIDTH_MM;
-  const cardHeightPx = pxPerMm * STANDARD_CARD_HEIGHT_MM;
   const ringDiameterPx = diameterMm * pxPerMm;
   const usSize = diameterMmToUsSize(diameterMm);
   const israeliSize = diameterMmToIsraeliSize(diameterMm);
@@ -70,7 +69,11 @@ export function RingScreenSizer() {
             <div
               aria-hidden="true"
               className="rounded-md border-2 border-gold-bright bg-paper shadow-sm"
-              style={{ width: cardWidthPx, height: cardHeightPx, maxWidth: "100%" }}
+              style={{
+                width: cardWidthPx,
+                aspectRatio: `${STANDARD_CARD_WIDTH_MM} / ${STANDARD_CARD_HEIGHT_MM}`,
+                maxWidth: "100%",
+              }}
             />
             <input
               type="range"
@@ -97,8 +100,8 @@ export function RingScreenSizer() {
           <div className="mt-5 flex flex-col items-center">
             <div
               aria-hidden="true"
-              className="rounded-full border-[3px] border-gold-bright"
-              style={{ width: ringDiameterPx, height: ringDiameterPx, maxWidth: "100%", maxHeight: 260 }}
+              className="aspect-square rounded-full border-[3px] border-gold-bright"
+              style={{ width: ringDiameterPx, maxWidth: "min(100%, 260px)" }}
             />
             <input
               type="range"

@@ -20,11 +20,24 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   const req = await prisma.customDesignRequest.findUnique({
     where: { id },
-    include: { inspirationImage: true, sketchImage: true, generatedImage: true },
+    include: {
+      inspirationImage: true,
+      sketchImage: true,
+      generatedImage: true,
+      renderImages: { include: { media: true }, orderBy: { sortOrder: "asc" } },
+      gems: { orderBy: { sortOrder: "asc" } },
+    },
   });
   if (!req) {
     return NextResponse.json({ error: "not found" }, { status: 404 });
   }
+
+  const cadViews = req.renderImages
+    .map((r) => {
+      const absPath = uploadUrlToAbsPath(r.media.url);
+      return absPath ? { label: r.viewLabel, absPath } : null;
+    })
+    .filter((v): v is { label: string; absPath: string } => v !== null);
 
   const buffer = await renderToBuffer(
     <CustomDesignBrief
@@ -40,6 +53,17 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         inspirationImageAbsPath: uploadUrlToAbsPath(req.inspirationImage?.url),
         sketchImageAbsPath: uploadUrlToAbsPath(req.sketchImage?.url),
         generatedImageAbsPath: uploadUrlToAbsPath(req.generatedImage?.url),
+        modelNumber: req.modelNumber,
+        metalType: req.metalType,
+        metalWeightGrams: req.metalWeightGrams != null ? Number(req.metalWeightGrams) : null,
+        metalWeightDwt: req.metalWeightDwt != null ? Number(req.metalWeightDwt) : null,
+        cadViews,
+        gems: req.gems.map((g) => ({
+          shape: g.shape,
+          dimensionsMm: g.dimensionsMm,
+          count: g.count,
+          caratWeight: Number(g.caratWeight),
+        })),
       }}
     />
   );

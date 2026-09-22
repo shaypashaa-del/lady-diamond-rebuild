@@ -51,13 +51,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     borderBottomColor: "#ddaa5d",
     paddingBottom: 12,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   brand: { fontSize: 16, fontWeight: 700, letterSpacing: 1 },
   brandSub: { fontSize: 8, color: "#8a7a63", marginTop: 2 },
   docTitle: { fontSize: 12, fontWeight: 700, textAlign: "right" },
   docMeta: { fontSize: 8, color: "#8a7a63", textAlign: "right", marginTop: 2 },
-  section: { marginBottom: 16 },
+  section: { marginBottom: 14 },
   sectionTitle: {
     fontSize: 9,
     fontWeight: 700,
@@ -70,10 +70,41 @@ const styles = StyleSheet.create({
   label: { width: 110, color: "#8a7a63" },
   value: { flex: 1, fontWeight: 700 },
   paragraph: { lineHeight: 1.5 },
+
+  // 2x2 CAD viewport grid — mirrors the jeweler's own CAD software layout
+  // (Perspective / Front / Top / Right) rather than a single arbitrary
+  // render, so the factory sees the piece from every angle at once.
+  cadGrid: { flexDirection: "row", flexWrap: "wrap", borderWidth: 1, borderColor: "#ddaa5d" },
+  cadCell: { width: "50%", aspectRatio: 1.6, borderColor: "#ddaa5d", borderWidth: 0.5, position: "relative" },
+  cadImage: { width: "100%", height: "100%", objectFit: "cover" },
+  cadLabel: {
+    position: "absolute",
+    bottom: 4,
+    left: 6,
+    fontSize: 7,
+    color: "#8a7a63",
+    backgroundColor: "#fbf8f2",
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+  },
+
   imagesRow: { flexDirection: "row", gap: 12, marginTop: 4 },
   imageBox: { flex: 1, alignItems: "center" },
   image: { width: "100%", height: 160, objectFit: "cover", borderWidth: 1, borderColor: "#ddaa5d" },
   imageCaption: { fontSize: 8, color: "#8a7a63", marginTop: 4, textAlign: "center" },
+
+  table: { borderWidth: 1, borderColor: "#e5ddc9" },
+  tableHeadRow: { flexDirection: "row", backgroundColor: "#f7f2e7" },
+  tableRow: { flexDirection: "row", borderTopWidth: 1, borderTopColor: "#e5ddc9" },
+  tableTotalRow: {
+    flexDirection: "row",
+    borderTopWidth: 1,
+    borderTopColor: "#ddaa5d",
+    backgroundColor: "#f7f2e7",
+  },
+  th: { flex: 1, padding: 5, fontSize: 8, fontWeight: 700, color: "#8a7a63" },
+  td: { flex: 1, padding: 5, fontSize: 9 },
+
   notes: {
     borderWidth: 1,
     borderColor: "#e5ddc9",
@@ -115,15 +146,26 @@ export type CustomDesignBriefData = {
   inspirationImageAbsPath: string | null;
   sketchImageAbsPath: string | null;
   generatedImageAbsPath: string | null;
+  modelNumber: string | null;
+  metalType: string | null;
+  metalWeightGrams: number | null;
+  metalWeightDwt: number | null;
+  cadViews: { label: string; absPath: string }[];
+  gems: { shape: string; dimensionsMm: string; count: number; caratWeight: number }[];
 };
 
 export function CustomDesignBrief({ data }: { data: CustomDesignBriefData }) {
   registerFonts();
 
-  const images: { path: string; caption: string }[] = [];
-  if (data.generatedImageAbsPath) images.push({ path: data.generatedImageAbsPath, caption: "Design Preview" });
-  if (data.inspirationImageAbsPath) images.push({ path: data.inspirationImageAbsPath, caption: "Inspiration" });
-  if (data.sketchImageAbsPath) images.push({ path: data.sketchImageAbsPath, caption: "Customer Sketch" });
+  const fallbackImages: { path: string; caption: string }[] = [];
+  if (data.generatedImageAbsPath) fallbackImages.push({ path: data.generatedImageAbsPath, caption: "Design Preview" });
+  if (data.inspirationImageAbsPath) fallbackImages.push({ path: data.inspirationImageAbsPath, caption: "Inspiration" });
+  if (data.sketchImageAbsPath) fallbackImages.push({ path: data.sketchImageAbsPath, caption: "Customer Sketch" });
+
+  const hasCadViews = data.cadViews.length > 0;
+  const hasMetalSpec = data.metalType || data.metalWeightGrams != null || data.metalWeightDwt != null;
+  const totalGemCount = data.gems.reduce((sum, g) => sum + g.count, 0);
+  const totalGemWeight = data.gems.reduce((sum, g) => sum + g.caratWeight, 0);
 
   return (
     <Document title={`Custom Design Brief — ${data.id}`}>
@@ -136,9 +178,25 @@ export function CustomDesignBrief({ data }: { data: CustomDesignBriefData }) {
           <View>
             <Text style={styles.docTitle}>Casting Brief</Text>
             <Text style={styles.docMeta}>Request #{data.id.slice(-8).toUpperCase()}</Text>
+            {data.modelNumber && <Text style={styles.docMeta}>Model {data.modelNumber}</Text>}
             <Text style={styles.docMeta}>{data.createdAt.toISOString().slice(0, 10)}</Text>
           </View>
         </View>
+
+        {hasCadViews && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>CAD Views</Text>
+            <View style={styles.cadGrid}>
+              {data.cadViews.map((v) => (
+                <View key={v.label} style={styles.cadCell}>
+                  {/* eslint-disable-next-line jsx-a11y/alt-text -- this is @react-pdf/renderer's Image, not an HTML <img> */}
+                  <Image src={v.absPath} style={styles.cadImage} />
+                  <Text style={styles.cadLabel}>{v.label}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Order Details</Text>
@@ -162,6 +220,52 @@ export function CustomDesignBrief({ data }: { data: CustomDesignBriefData }) {
           )}
         </View>
 
+        {hasMetalSpec && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Metal Weight</Text>
+            <View style={styles.table}>
+              <View style={styles.tableHeadRow}>
+                <Text style={styles.th}>Metal</Text>
+                <Text style={styles.th}>Grams</Text>
+                <Text style={styles.th}>DWT</Text>
+              </View>
+              <View style={styles.tableRow}>
+                <Text style={styles.td}>{data.metalType ?? "—"}</Text>
+                <Text style={styles.td}>{data.metalWeightGrams != null ? data.metalWeightGrams.toFixed(2) : "—"}</Text>
+                <Text style={styles.td}>{data.metalWeightDwt != null ? data.metalWeightDwt.toFixed(2) : "—"}</Text>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {data.gems.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Gem Report</Text>
+            <View style={styles.table}>
+              <View style={styles.tableHeadRow}>
+                <Text style={styles.th}>Shape</Text>
+                <Text style={styles.th}>Dimensions (mm)</Text>
+                <Text style={styles.th}>Count</Text>
+                <Text style={styles.th}>Carat Weight</Text>
+              </View>
+              {data.gems.map((g, i) => (
+                <View key={i} style={styles.tableRow}>
+                  <Text style={styles.td}>{g.shape}</Text>
+                  <Text style={styles.td}>{g.dimensionsMm || "—"}</Text>
+                  <Text style={styles.td}>{g.count}</Text>
+                  <Text style={styles.td}>{g.caratWeight.toFixed(2)} ct</Text>
+                </View>
+              ))}
+              <View style={styles.tableTotalRow}>
+                <Text style={[styles.td, { fontWeight: 700 }]}>Total</Text>
+                <Text style={styles.td} />
+                <Text style={[styles.td, { fontWeight: 700 }]}>{totalGemCount}</Text>
+                <Text style={[styles.td, { fontWeight: 700 }]}>{totalGemWeight.toFixed(2)} ct tw</Text>
+              </View>
+            </View>
+          </View>
+        )}
+
         {data.description && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Customer Description</Text>
@@ -169,11 +273,11 @@ export function CustomDesignBrief({ data }: { data: CustomDesignBriefData }) {
           </View>
         )}
 
-        {images.length > 0 && (
+        {!hasCadViews && fallbackImages.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Reference Images</Text>
             <View style={styles.imagesRow}>
-              {images.map((img) => (
+              {fallbackImages.map((img) => (
                 <View key={img.path} style={styles.imageBox}>
                   {/* eslint-disable-next-line jsx-a11y/alt-text -- this is @react-pdf/renderer's Image, not an HTML <img> */}
                   <Image src={img.path} style={styles.image} />

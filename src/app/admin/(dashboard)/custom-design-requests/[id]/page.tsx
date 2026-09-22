@@ -1,6 +1,13 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { CustomDesignAdminForm, GeneratedImageUploadForm } from "@/components/admin/CustomDesignAdminForm";
+import {
+  CustomDesignAdminForm,
+  GeneratedImageUploadForm,
+  RenderViewUploadSlot,
+  CastingSpecForm,
+} from "@/components/admin/CustomDesignAdminForm";
+
+const CAD_VIEW_LABELS = ["Perspective", "Front", "Top", "Right"] as const;
 
 const JEWELRY_TYPE_LABEL: Record<string, string> = {
   RING: "טבעת",
@@ -34,9 +41,18 @@ export default async function CustomDesignRequestDetailPage({
   const { id } = await params;
   const req = await prisma.customDesignRequest.findUnique({
     where: { id },
-    include: { inspirationImage: true, sketchImage: true, generatedImage: true, user: true },
+    include: {
+      inspirationImage: true,
+      sketchImage: true,
+      generatedImage: true,
+      user: true,
+      renderImages: { include: { media: true } },
+      gems: { orderBy: { sortOrder: "asc" } },
+    },
   });
   if (!req) notFound();
+
+  const renderByView = new Map(req.renderImages.map((r) => [r.viewLabel, r]));
 
   return (
     <div>
@@ -77,9 +93,9 @@ export default async function CustomDesignRequestDetailPage({
           )}
 
           <div className="rounded-lg border border-neutral-200 bg-white p-5">
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">תמונות</h2>
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">תמונות מהלקוח</h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <ImageCard title="הדמיית עיצוב (AI/צוות)" url={req.generatedImage?.url} />
+              <ImageCard title="הדמיית עיצוב (ידני / AI בעתיד)" url={req.generatedImage?.url} />
               <ImageCard title="תמונת השראה מהלקוח" url={req.inspirationImage?.url} />
               <ImageCard title="שרטוט מהלקוח" url={req.sketchImage?.url} />
             </div>
@@ -89,6 +105,47 @@ export default async function CustomDesignRequestDetailPage({
               </p>
               <GeneratedImageUploadForm id={req.id} />
             </div>
+          </div>
+
+          <div className="rounded-lg border border-neutral-200 bg-white p-5">
+            <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide">תצוגות CAD ליציקה</h2>
+            <p className="mb-3 text-xs text-neutral-500">
+              4 זוויות התצוגה הסטנדרטיות מתוכנת ה-CAD (Rhino/Matrix או דומה) — יופיעו יחד בעמוד הראשון של ה-PDF.
+            </p>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {CAD_VIEW_LABELS.map((label) => {
+                const render = renderByView.get(label);
+                return (
+                  <RenderViewUploadSlot
+                    key={label}
+                    requestId={req.id}
+                    viewLabel={label}
+                    imageUrl={render?.media.url}
+                    renderImageId={render?.id}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-neutral-200 bg-white p-5">
+            <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide">פרטים טכניים ליציקה</h2>
+            <p className="mb-3 text-xs text-neutral-500">
+              מספר דגם, משקל מתכת וטבלת אבנים — כפי שמופיעים בפועל בתוכנת ה-CAD (Metal Weights / Gem Reporter).
+            </p>
+            <CastingSpecForm
+              id={req.id}
+              modelNumber={req.modelNumber}
+              metalType={req.metalType}
+              metalWeightGrams={req.metalWeightGrams ? Number(req.metalWeightGrams) : null}
+              metalWeightDwt={req.metalWeightDwt ? Number(req.metalWeightDwt) : null}
+              initialGems={req.gems.map((g) => ({
+                shape: g.shape,
+                dimensionsMm: g.dimensionsMm,
+                count: g.count,
+                caratWeight: Number(g.caratWeight),
+              }))}
+            />
           </div>
         </div>
 

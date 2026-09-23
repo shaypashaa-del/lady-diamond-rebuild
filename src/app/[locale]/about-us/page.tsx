@@ -12,6 +12,22 @@ type AboutBody = {
   quote: LocalizedText;
 };
 
+// Keeps the Latin "LADY DIAMOND" wordmark from being split across two
+// lines when it's embedded in a wrapping Hebrew/Russian heading — the
+// mixed LTR/RTL line-break can otherwise land between "LADY" and
+// "DIAMOND", which reads as a layout bug rather than a brand name.
+function withNoWrapBrand(text: string) {
+  return text.split(/(LADY DIAMOND)/g).map((part, i) =>
+    part === "LADY DIAMOND" ? (
+      <span key={i} className="whitespace-nowrap">
+        {part}
+      </span>
+    ) : (
+      part
+    )
+  );
+}
+
 // Splits the real story text (from the DB, written by the client) into
 // its natural sections by blank-line-separated blocks, where a block
 // starting with "## " marks a new section heading. This is real content,
@@ -261,11 +277,11 @@ export default async function AboutUsPage() {
               .map((block, i) =>
                 i === 0 ? (
                   <h2 key={i} className="shimmer-text-gold text-2xl font-semibold italic leading-snug sm:text-3xl">
-                    {block}
+                    {withNoWrapBrand(block)}
                   </h2>
                 ) : (
                   <p key={i} className="mt-5 text-sm leading-7 text-paper/70">
-                    {block}
+                    {withNoWrapBrand(block)}
                   </p>
                 )
               )}

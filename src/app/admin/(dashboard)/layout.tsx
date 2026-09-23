@@ -28,7 +28,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
     <div className="flex min-h-screen">
       <aside className="flex w-56 shrink-0 flex-col border-l border-neutral-200 bg-white">
         <div className="border-b border-neutral-200 px-5 py-4">
-          <p className="text-sm font-semibold tracking-wide">ליידי דיאמונד</p>
+          <p className="text-sm font-semibold tracking-wide">LADY DIAMOND</p>
           <p className="text-xs text-neutral-400">ניהול החנות</p>
         </div>
         <nav className="flex flex-col gap-1 p-3 text-sm">

@@ -51,7 +51,7 @@ export async function requestPasswordReset(
   const resetLink = `/reset-password/${token}`;
   await emailProvider.send({
     to: email,
-    subject: "איפוס סיסמה — ליידי דיאמונד",
+    subject: "איפוס סיסמה — LADY DIAMOND",
     text: `לחצו על הקישור הבא כדי לאפס את הסיסמה שלכם (בתוקף לשעה אחת): ${SITE_URL}${resetLink}`,
   });
 

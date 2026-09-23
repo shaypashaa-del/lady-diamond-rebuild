@@ -75,13 +75,13 @@ From a classic diamond ring to a handcrafted pendant sourced from the far corner
 };
 
 const quote = {
-  he: `ברוכים הבאים אל דיאנה ליידי דיאמונד
+  he: `ברוכים הבאים אל דיאנה LADY DIAMOND
 
 מאז הייתי ילדה קטנה, נמשכתי אל האופן שבו תכשיט יכול להכיל בתוכו רגשות, זכרונות וחלומות. עבורי, כל פריט הוא הרבה מעבר לאביזר — הוא סיפור, שיקוף של אהבה, עוצמה ויופי.
 
 אני יוצרת כל עיצוב במגע רגיש ובלב מלא בתשוקה, כך שכשתלבשו אותו, לא תלבשו רק תכשיט — תלבשו פיסת משמעות, שנוצרה במיוחד כדי לעורר בכם השראה ולהעצים אתכם.
 
-החלום שלי פשוט: לשתף ביופי, באלגנטיות וברגעים בלתי נשכחים עם נשים וגברים ברחבי העולם. כשאתם בוחרים פריט מדיאנה ליידי דיאמונד, אתם לא רק קונים תכשיט — אתם הופכים לחלק מסיפור שחוגג אתכם.`,
+החלום שלי פשוט: לשתף ביופי, באלגנטיות וברגעים בלתי נשכחים עם נשים וגברים ברחבי העולם. כשאתם בוחרים פריט מדיאנה LADY DIAMOND, אתם לא רק קונים תכשיט — אתם הופכים לחלק מסיפור שחוגג אתכם.`,
   en: `Welcome to Diana Lady Diamond
 
 Ever since I was a little girl, I've been fascinated by the way jewelry can hold emotions, memories, and dreams. For me, every piece is more than just an accessory – it's a story, a reflection of love, strength, and beauty.

@@ -306,7 +306,7 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
 
   await emailProvider.send({
     to: input.email,
-    subject: `אישור הזמנה ${orderNumber} — ליידי דיאמונד`,
+    subject: `אישור הזמנה ${orderNumber} — LADY DIAMOND`,
     text: `תודה על ההזמנה! מספר הזמנה: ${orderNumber}. סה"כ: ${total.toFixed(2)} ₪.\n\n${paymentInit.instructions}`,
   });
 

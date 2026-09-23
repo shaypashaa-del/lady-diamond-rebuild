@@ -103,7 +103,7 @@ export async function updateOrderFulfillment(
   if (status !== existing.status && (status === "SHIPPED" || status === "COMPLETED")) {
     await emailProvider.send({
       to: existing.email,
-      subject: `הזמנה ${existing.orderNumber} ${status === "SHIPPED" ? "נשלחה" : "הושלמה"} — ליידי דיאמונד`,
+      subject: `הזמנה ${existing.orderNumber} ${status === "SHIPPED" ? "נשלחה" : "הושלמה"} — LADY DIAMOND`,
       text:
         status === "SHIPPED"
           ? `ההזמנה שלך ${existing.orderNumber} נשלחה בדרך אליך.${trackingNumber ? ` מספר מעקב: ${trackingNumber}` : ""}`

@@ -94,7 +94,7 @@ export async function generateMetadata({
     // the src/app/manifest.ts file convention).
     appleWebApp: {
       capable: true,
-      title: "Lady Diamond",
+      title: "LADY DIAMOND",
       statusBarStyle: "default",
     },
   };

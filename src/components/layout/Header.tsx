@@ -65,7 +65,7 @@ export function Header() {
           dir="rtl"
         >
           <span className="font-display shimmer-text text-3xl tracking-wide sm:text-4xl" dir="ltr">
-            Lady Diamond
+            LADY DIAMOND
           </span>
           <span className="gold-rule mt-2.5 mb-2.5 w-16" />
           <span className="shimmer-text-gold text-xs uppercase tracking-[0.4em] sm:text-sm">{t("since")}</span>

@@ -72,10 +72,17 @@ export function Hero({
             fill
             priority={i === 0}
             sizes="100vw"
+            quality={95}
             className="object-cover"
           />
         </div>
       ))}
+      {/* These source photos are lower-resolution than the full-bleed hero
+          renders them at, which shows as softness on large screens. A
+          faint film-grain layer (a standard editorial-photography trick)
+          masks that softness with texture rather than leaving it looking
+          like a blurry upscale. */}
+      <div className="hero-grain pointer-events-none absolute inset-0 z-[1]" />
       <div className="hero-scrim absolute inset-0" />
 
       {SLIDES.length > 1 && (

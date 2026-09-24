@@ -280,6 +280,14 @@ model ProductDiamondOption {
   sortOrder     Int                   @default(0)
   active        Boolean               @default(true)
 
+  // Curated display name (e.g. "קלאסי", "פרימיום") shown to the customer
+  // instead of raw grade jargon like "color G, clarity VS1" — see
+  // DIAMOND_QUALITY_TIERS in src/lib/pricing/constants.ts. colorGrade/
+  // clarityGrade above still hold the real values used for cost lookup;
+  // this is purely a friendlier label, set when the admin picks a tier
+  // preset (or left null to fall back to showing the raw grades).
+  qualityTierLabel String?
+
   @@index([productId])
 }
 

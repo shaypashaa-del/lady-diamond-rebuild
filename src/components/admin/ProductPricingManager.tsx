@@ -6,7 +6,7 @@ import {
   updateProductPricingSettings,
 } from "@/server/actions/pricing";
 import { getConfiguredPriceBreakdownForAdmin } from "@/server/actions/product-pricing";
-import { PURITY_LABEL, VALID_PURITIES_FOR_METAL } from "@/lib/pricing/constants";
+import { DIAMOND_QUALITY_TIERS, PURITY_LABEL, VALID_PURITIES_FOR_METAL } from "@/lib/pricing/constants";
 import type {
   DiamondCertification,
   DiamondClarityGrade,
@@ -37,6 +37,7 @@ type DiamondOptionRow = {
   certification: DiamondCertification | null;
   quantity: number;
   isDefault: boolean;
+  qualityTierLabel: string | null;
 };
 
 const GOLD_COLOR_LABEL: Record<GoldColor, string> = { YELLOW: "צהוב", WHITE: "לבן", ROSE: "רוז" };
@@ -255,8 +256,8 @@ export async function ProductPricingManager({
                   <th className="py-2 font-medium">סוג</th>
                   <th className="py-2 font-medium">צורה</th>
                   <th className="py-2 font-medium">קראט</th>
-                  <th className="py-2 font-medium">צבע</th>
-                  <th className="py-2 font-medium">ניקיון</th>
+                  <th className="py-2 font-medium">רמת איכות</th>
+                  <th className="py-2 font-medium">צבע/ניקיון בפועל</th>
                   <th className="py-2 font-medium">כמות</th>
                   <th className="py-2 font-medium">ברירת מחדל</th>
                   <th className="py-2 font-medium"></th>
@@ -268,8 +269,10 @@ export async function ProductPricingManager({
                     <td className="py-2">{DIAMOND_TYPE_LABEL[d.diamondType]}</td>
                     <td className="py-2">{SHAPE_LABEL[d.shape]}</td>
                     <td className="py-2">{String(d.caratWeight)}</td>
-                    <td className="py-2">{d.colorGrade ?? "—"}</td>
-                    <td className="py-2">{d.clarityGrade ?? "—"}</td>
+                    <td className="py-2">{d.qualityTierLabel ?? "מותאם אישית"}</td>
+                    <td className="py-2">
+                      {d.colorGrade ?? "—"} / {d.clarityGrade ?? "—"}
+                    </td>
                     <td className="py-2">{d.quantity}</td>
                     <td className="py-2">{d.isDefault ? "✓" : ""}</td>
                     <td className="py-2">
@@ -299,18 +302,34 @@ export async function ProductPricingManager({
               ))}
             </select>
             <input name="caratWeight" type="number" step="0.001" min="0.01" placeholder="קראט" required className="border border-neutral-300 px-2 py-2 text-xs" />
-            <select name="colorGrade" className="border border-neutral-300 px-2 py-2 text-xs">
-              <option value="">צבע (D-J)</option>
-              {["D", "E", "F", "G", "H", "I", "J"].map((c) => (
-                <option key={c} value={c}>{c}</option>
+            <select name="qualityTier" className="border border-neutral-300 px-2 py-2 text-xs" required>
+              <option value="">רמת איכות…</option>
+              {DIAMOND_QUALITY_TIERS.map((tier) => (
+                <option key={tier.id} value={tier.id}>
+                  {tier.label} ({tier.colorGrade}/{tier.clarityGrade})
+                </option>
               ))}
+              <option value="custom">מותאם אישית — בחירה ידנית למטה</option>
             </select>
-            <select name="clarityGrade" className="border border-neutral-300 px-2 py-2 text-xs">
-              <option value="">ניקיון</option>
-              {["FL", "IF", "VVS1", "VVS2", "VS1", "VS2", "SI1", "SI2"].map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
+            <details className="col-span-2 text-xs sm:col-span-1">
+              <summary className="cursor-pointer select-none text-neutral-500">
+                צבע/ניקיון ידני (רק אם נבחר &quot;מותאם אישית&quot;)
+              </summary>
+              <div className="mt-2 flex gap-2">
+                <select name="colorGrade" className="w-full border border-neutral-300 px-2 py-2 text-xs">
+                  <option value="">צבע (D-J)</option>
+                  {["D", "E", "F", "G", "H", "I", "J"].map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                <select name="clarityGrade" className="w-full border border-neutral-300 px-2 py-2 text-xs">
+                  <option value="">ניקיון</option>
+                  {["FL", "IF", "VVS1", "VVS2", "VS1", "VS2", "SI1", "SI2"].map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+            </details>
             <select name="certification" className="border border-neutral-300 px-2 py-2 text-xs">
               <option value="">הסמכה</option>
               <option value="GIA">GIA</option>

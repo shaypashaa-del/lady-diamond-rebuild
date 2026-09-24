@@ -41,3 +41,38 @@ export const VALID_PURITIES_FOR_METAL: Record<string, string[]> = {
 // Target gross margin on the FINAL selling price (not a markup on cost).
 // Final Selling Price = Base Cost / (1 - GROSS_MARGIN)
 export const GROSS_MARGIN = 0.2;
+
+// Curated diamond "quality tiers" — a small, friendly set of color/clarity
+// combinations to offer per product instead of exposing all 7×8 = 56 raw
+// grade combinations to a shopper who doesn't know what VVS2 means. This
+// mirrors how real jewelry retailers present it (e.g. a competitor site
+// surveyed for this project bundles their engagement rings as a single
+// "נקי (VS)" / "קולקשן (D-F)" collection per design, rather than a free
+// grade picker). These are a curation choice, not a market-data claim —
+// the admin can still pick any raw color/clarity pair manually if a
+// product needs something outside these three.
+export const DIAMOND_QUALITY_TIERS = [
+  {
+    id: "classic",
+    label: "קלאסי",
+    description: "צבע G, ניקיון VS1 — האיזון הנפוץ ביותר בין מראה למחיר.",
+    colorGrade: "G",
+    clarityGrade: "VS1",
+  },
+  {
+    id: "premium",
+    label: "פרימיום",
+    description: "צבע F, ניקיון VVS2 — נקי וזוהר במיוחד.",
+    colorGrade: "F",
+    clarityGrade: "VVS2",
+  },
+  {
+    id: "luxury",
+    label: "יוקרה",
+    description: "צבע D, ניקיון VVS1 — הדירוג הגבוה ביותר שאנו מציעים.",
+    colorGrade: "D",
+    clarityGrade: "VVS1",
+  },
+] as const;
+
+export type DiamondQualityTierId = (typeof DIAMOND_QUALITY_TIERS)[number]["id"];

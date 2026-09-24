@@ -15,7 +15,7 @@ import {
   PricingMode,
 } from "@/generated/prisma/enums";
 import { setManualMetalPrice } from "@/server/services/market-prices";
-import { VALID_PURITIES_FOR_METAL } from "@/lib/pricing/constants";
+import { DIAMOND_QUALITY_TIERS, VALID_PURITIES_FOR_METAL } from "@/lib/pricing/constants";
 
 function enumOrNull<T extends string>(value: FormDataEntryValue | null, allowed: readonly T[]): T | null {
   const str = value ? String(value) : "";
@@ -106,8 +106,21 @@ export async function addDiamondOption(productId: string, formData: FormData) {
   const caratWeight = Number(formData.get("caratWeight"));
   if (!diamondType || !shape || !Number.isFinite(caratWeight) || caratWeight <= 0) return;
 
-  const colorGrade = enumOrNull(formData.get("colorGrade"), Object.values(DiamondColorGrade));
-  const clarityGrade = enumOrNull(formData.get("clarityGrade"), Object.values(DiamondClarityGrade));
+  // A quality-tier preset (see DIAMOND_QUALITY_TIERS) fills color/clarity
+  // and the friendly label automatically. Picking "custom" (or leaving it
+  // unset) falls back to whatever raw color/clarity the admin selected by
+  // hand, with no tier label — the technical grades still get shown.
+  const tierId = String(formData.get("qualityTier") ?? "");
+  const tier = DIAMOND_QUALITY_TIERS.find((t) => t.id === tierId);
+
+  const colorGrade = tier
+    ? (tier.colorGrade as DiamondColorGrade)
+    : enumOrNull(formData.get("colorGrade"), Object.values(DiamondColorGrade));
+  const clarityGrade = tier
+    ? (tier.clarityGrade as DiamondClarityGrade)
+    : enumOrNull(formData.get("clarityGrade"), Object.values(DiamondClarityGrade));
+  const qualityTierLabel = tier?.label ?? null;
+
   const certification = enumOrNull(formData.get("certification"), Object.values(DiamondCertification));
   const quantityRaw = Number(formData.get("quantity"));
   const quantity = Number.isFinite(quantityRaw) && quantityRaw > 0 ? Math.round(quantityRaw) : 1;
@@ -131,6 +144,7 @@ export async function addDiamondOption(productId: string, formData: FormData) {
       certification,
       quantity,
       isDefault,
+      qualityTierLabel,
     },
   });
 

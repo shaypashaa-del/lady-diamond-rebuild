@@ -20,6 +20,7 @@ type DiamondOption = {
   clarityGrade: string | null;
   quantity: number;
   isDefault: boolean;
+  qualityTierLabel: string | null;
 };
 
 const METAL_LABEL: Record<string, string> = { GOLD: "זהב", SILVER: "כסף", PLATINUM: "פלטינה" };
@@ -38,10 +39,19 @@ function materialLabel(m: MaterialOption) {
   return `${metal} ${PURITY_LABEL[m.purity]}`;
 }
 
+// A customer sees "0.5ct עגול · טבעי · קלאסי" — not raw grade codes like
+// "color G, clarity VS1", which mean nothing to most shoppers. The tier
+// label (see DIAMOND_QUALITY_TIERS) stands in for the technical grades;
+// only diamonds the admin set up without a tier fall back to showing them.
 function diamondLabel(d: DiamondOption) {
+  const quality = d.qualityTierLabel
+    ? d.qualityTierLabel
+    : [d.colorGrade && `צבע ${d.colorGrade}`, d.clarityGrade && `ניקיון ${d.clarityGrade}`]
+        .filter(Boolean)
+        .join(" · ");
   return `${d.caratWeight}ct ${SHAPE_LABEL[d.shape]} · ${DIAMOND_TYPE_LABEL[d.diamondType]}${
-    d.colorGrade ? ` · צבע ${d.colorGrade}` : ""
-  }${d.clarityGrade ? ` · ניקיון ${d.clarityGrade}` : ""}`;
+    quality ? ` · ${quality}` : ""
+  }`;
 }
 
 export function ConfigurablePriceSelector({

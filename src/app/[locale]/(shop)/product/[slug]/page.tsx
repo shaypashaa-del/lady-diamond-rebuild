@@ -59,8 +59,10 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const locale = (await getLocale()) as Locale;
-  const product = await getProductBySlug(slug);
+  const [locale, product] = await Promise.all([
+    getLocale() as Promise<Locale>,
+    getProductBySlug(slug),
+  ]);
   if (!product) notFound();
 
   const variants: VariantView[] = product.variants.map((v) => ({
@@ -79,9 +81,11 @@ export default async function ProductPage({
   const price = Number(product.salePrice ?? product.basePrice);
   const productUrl = `${SITE_URL}${pathFor(locale, `/product/${slug}`)}`;
 
-  const relatedRaw = await getRelatedProducts(product.id, product.categories[0]?.category.slug);
+  const [relatedRaw, tHome] = await Promise.all([
+    getRelatedProducts(product.id, product.categories[0]?.category.slug),
+    getTranslations("Home"),
+  ]);
   const related = relatedRaw.map((p) => toCardProduct(p, locale));
-  const tHome = await getTranslations("Home");
 
   const totalInventory =
     product.variants.length > 0

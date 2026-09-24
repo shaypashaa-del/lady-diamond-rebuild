@@ -122,7 +122,12 @@
     "sortBy": "מיון לפי",
     "sortNewest": "החדשים ביותר",
     "sortPriceAsc": "מחיר: מהנמוך לגבוה",
-    "sortPriceDesc": "מחיר: מהגבוה לנמוך"
+    "sortPriceDesc": "מחיר: מהגבוה לנמוך",
+    "filterMinPrice": "מחיר מ-",
+    "filterMaxPrice": "מחיר עד",
+    "filterInStockOnly": "במלאי בלבד",
+    "filterClear": "נקה סינון",
+    "noProductsMatchFilters": "אין מוצרים התואמים לסינון שבחרת."
   },
   "Cart": {
     "title": "עגלה",

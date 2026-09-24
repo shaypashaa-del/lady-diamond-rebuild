@@ -122,7 +122,12 @@
     "sortBy": "Sort by",
     "sortNewest": "Newest",
     "sortPriceAsc": "Price: Low to High",
-    "sortPriceDesc": "Price: High to Low"
+    "sortPriceDesc": "Price: High to Low",
+    "filterMinPrice": "Min price",
+    "filterMaxPrice": "Max price",
+    "filterInStockOnly": "In stock only",
+    "filterClear": "Clear filters",
+    "noProductsMatchFilters": "No products match the selected filters."
   },
   "Cart": {
     "title": "Cart",

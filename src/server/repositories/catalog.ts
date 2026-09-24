@@ -18,6 +18,16 @@ export const PRODUCTS_PAGE_SIZE = 24;
 
 export type ProductSort = "newest" | "price_asc" | "price_desc";
 
+// Kept small on purpose: with real structured material/diamond data on
+// almost no products yet (see AGENTS.md pricing-engine notes), a metal/
+// diamond filter would mostly return empty results. Price range and stock
+// status are the two facets every product actually has data for today.
+export type ProductFilters = {
+  minPrice?: number;
+  maxPrice?: number;
+  inStockOnly?: boolean;
+};
+
 function sortToOrderBy(sort?: ProductSort) {
   switch (sort) {
     case "price_asc":
@@ -29,8 +39,22 @@ function sortToOrderBy(sort?: ProductSort) {
   }
 }
 
-export async function getAllPublishedProducts(page = 1, sort?: ProductSort) {
-  const where = { status: "PUBLISHED" as const };
+function filtersToWhere(filters?: ProductFilters) {
+  const where: Record<string, unknown> = {};
+  if (filters?.minPrice != null || filters?.maxPrice != null) {
+    where.basePrice = {
+      ...(filters.minPrice != null ? { gte: filters.minPrice } : {}),
+      ...(filters.maxPrice != null ? { lte: filters.maxPrice } : {}),
+    };
+  }
+  if (filters?.inStockOnly) {
+    where.inventory = { gt: 0 };
+  }
+  return where;
+}
+
+export async function getAllPublishedProducts(page = 1, sort?: ProductSort, filters?: ProductFilters) {
+  const where = { status: "PUBLISHED" as const, ...filtersToWhere(filters) };
   const [products, totalCount] = await Promise.all([
     prisma.product.findMany({
       where,
@@ -61,10 +85,16 @@ export function getCategoryBySlug(slug: string) {
   return prisma.category.findUnique({ where: { slug }, include: { image: true } });
 }
 
-export async function getProductsByCategorySlug(slug: string, page = 1, sort?: ProductSort) {
+export async function getProductsByCategorySlug(
+  slug: string,
+  page = 1,
+  sort?: ProductSort,
+  filters?: ProductFilters
+) {
   const where = {
     status: "PUBLISHED" as const,
     categories: { some: { category: { slug } } },
+    ...filtersToWhere(filters),
   };
   const [products, totalCount] = await Promise.all([
     prisma.product.findMany({

@@ -11,6 +11,7 @@ import {
   type ProductSort,
 } from "@/server/repositories/catalog";
 import { SortSelect } from "@/components/category/SortSelect";
+import { FilterBar } from "@/components/category/FilterBar";
 import { Link } from "@/i18n/navigation";
 import { toCardProduct } from "@/lib/catalog-view";
 import { t as localize, type LocalizedText } from "@/lib/i18n-content";
@@ -79,15 +80,23 @@ export default async function CategoryPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ page?: string; sort?: string }>;
+  searchParams: Promise<{ page?: string; sort?: string; minPrice?: string; maxPrice?: string; inStock?: string }>;
 }) {
   const { slug } = await params;
-  const { page: pageRaw, sort: sortRaw } = await searchParams;
+  const { page: pageRaw, sort: sortRaw, minPrice: minPriceRaw, maxPrice: maxPriceRaw, inStock } = await searchParams;
   // Guard against a negative/NaN/non-numeric ?page= value breaking the
   // Prisma `skip` calculation — clamp to a sane positive integer.
   const parsedPage = Number.parseInt(pageRaw ?? "1", 10);
   const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const sort: ProductSort = VALID_SORTS.includes(sortRaw as ProductSort) ? (sortRaw as ProductSort) : "newest";
+
+  const minPrice = minPriceRaw ? Number.parseFloat(minPriceRaw) : undefined;
+  const maxPrice = maxPriceRaw ? Number.parseFloat(maxPriceRaw) : undefined;
+  const filters = {
+    minPrice: Number.isFinite(minPrice) ? minPrice : undefined,
+    maxPrice: Number.isFinite(maxPrice) ? maxPrice : undefined,
+    inStockOnly: inStock === "1",
+  };
 
   const locale = (await getLocale()) as Locale;
   const tNav = await getTranslations("Nav");
@@ -100,12 +109,12 @@ export default async function CategoryPage({
 
   if (slug === "all") {
     title = tNav("shop");
-    ({ products, totalCount } = await getAllPublishedProducts(page, sort));
+    ({ products, totalCount } = await getAllPublishedProducts(page, sort, filters));
   } else {
     const category = await getCategoryBySlug(slug);
     if (!category) notFound();
     title = localize(category.name as LocalizedText, locale);
-    ({ products, totalCount } = await getProductsByCategorySlug(slug, page, sort));
+    ({ products, totalCount } = await getProductsByCategorySlug(slug, page, sort, filters));
     imageUrl = category.image?.url;
   }
 
@@ -146,11 +155,18 @@ export default async function CategoryPage({
             <Image src={imageUrl} alt={title} fill sizes="100vw" className="object-cover" />
           </div>
         )}
+        <div className="mb-6">
+          <FilterBar minPrice={filters.minPrice} maxPrice={filters.maxPrice} inStockOnly={filters.inStockOnly} />
+        </div>
         <div className="mb-10 flex justify-end">
           <SortSelect value={sort} slug={slug} />
         </div>
         {cards.length === 0 ? (
-          <p className="text-center text-ink/60">{tCat("noProducts")}</p>
+          <p className="text-center text-ink/60">
+            {filters.minPrice != null || filters.maxPrice != null || filters.inStockOnly
+              ? tCat("noProductsMatchFilters")
+              : tCat("noProducts")}
+          </p>
         ) : (
           <>
             <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
@@ -168,6 +184,9 @@ export default async function CategoryPage({
                       query: {
                         ...(p !== 1 ? { page: p } : {}),
                         ...(sort !== "newest" ? { sort } : {}),
+                        ...(filters.minPrice != null ? { minPrice: filters.minPrice } : {}),
+                        ...(filters.maxPrice != null ? { maxPrice: filters.maxPrice } : {}),
+                        ...(filters.inStockOnly ? { inStock: "1" } : {}),
                       },
                     }}
                     className={`flex h-9 w-9 items-center justify-center border text-sm ${

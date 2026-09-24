@@ -122,7 +122,12 @@
     "sortBy": "Сортировка",
     "sortNewest": "Сначала новые",
     "sortPriceAsc": "Цена: по возрастанию",
-    "sortPriceDesc": "Цена: по убыванию"
+    "sortPriceDesc": "Цена: по убыванию",
+    "filterMinPrice": "Цена от",
+    "filterMaxPrice": "Цена до",
+    "filterInStockOnly": "Только в наличии",
+    "filterClear": "Сбросить фильтры",
+    "noProductsMatchFilters": "Нет товаров, соответствующих выбранным фильтрам."
   },
   "Cart": {
     "title": "Корзина",

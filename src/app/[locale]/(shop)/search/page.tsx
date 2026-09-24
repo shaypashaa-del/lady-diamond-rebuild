@@ -1,6 +1,7 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { ProductCard } from "@/components/product/ProductCard";
 import { getAllPublishedProductsForSearch } from "@/server/repositories/catalog";
+import { FilterBar } from "@/components/category/FilterBar";
 import { toCardProduct } from "@/lib/catalog-view";
 import type { LocalizedText } from "@/lib/i18n-content";
 import type { Locale } from "@/i18n/routing";
@@ -22,23 +23,35 @@ const DiamondMark = ({ className }: { className?: string }) => (
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; minPrice?: string; maxPrice?: string; inStock?: string }>;
 }) {
-  const { q } = await searchParams;
+  const { q, minPrice: minPriceRaw, maxPrice: maxPriceRaw, inStock } = await searchParams;
   const query = (q ?? "").trim().toLowerCase();
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("Search");
   const tCat = await getTranslations("Category");
+
+  const minPriceNum = minPriceRaw ? Number.parseFloat(minPriceRaw) : undefined;
+  const maxPriceNum = maxPriceRaw ? Number.parseFloat(maxPriceRaw) : undefined;
+  const minPrice = Number.isFinite(minPriceNum) ? minPriceNum : undefined;
+  const maxPrice = Number.isFinite(maxPriceNum) ? maxPriceNum : undefined;
+  const inStockOnly = inStock === "1";
 
   const products = query ? await getAllPublishedProductsForSearch() : [];
 
   const matches = products.filter((p) => {
     const name = p.name as LocalizedText;
     const haystack = [name.he, name.en, name.ru, p.sku].filter(Boolean).join(" ").toLowerCase();
-    return haystack.includes(query);
+    if (!haystack.includes(query)) return false;
+    const price = Number(p.salePrice ?? p.basePrice);
+    if (minPrice != null && price < minPrice) return false;
+    if (maxPrice != null && price > maxPrice) return false;
+    if (inStockOnly && p.inventory <= 0) return false;
+    return true;
   });
 
   const cards = matches.map((p) => toCardProduct(p, locale));
+  const hasActiveFilters = minPrice != null || maxPrice != null || inStockOnly;
 
   return (
     <div>
@@ -61,8 +74,13 @@ export default async function SearchPage({
         </div>
       </div>
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-8">
+        {query && (
+          <div className="mb-6">
+            <FilterBar minPrice={minPrice} maxPrice={maxPrice} inStockOnly={inStockOnly} />
+          </div>
+        )}
         {cards.length === 0 ? (
-          <p className="text-center text-ink/60">{t("noResults")}</p>
+          <p className="text-center text-ink/60">{hasActiveFilters ? tCat("noProductsMatchFilters") : t("noResults")}</p>
         ) : (
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
             {cards.map((p) => (

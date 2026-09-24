@@ -16,6 +16,12 @@ import {
 } from "@/generated/prisma/enums";
 import { setManualMetalPrice } from "@/server/services/market-prices";
 import { DIAMOND_QUALITY_TIERS, VALID_PURITIES_FOR_METAL } from "@/lib/pricing/constants";
+import { revalidateProductPage } from "@/server/revalidate-product";
+
+async function revalidateProductPageById(productId: string) {
+  const product = await prisma.product.findUnique({ where: { id: productId }, select: { slug: true } });
+  if (product) revalidateProductPage(product.slug);
+}
 
 function enumOrNull<T extends string>(value: FormDataEntryValue | null, allowed: readonly T[]): T | null {
   const str = value ? String(value) : "";
@@ -53,6 +59,7 @@ export async function updateProductPricingSettings(productId: string, formData: 
   });
 
   revalidatePath(`/admin/products/${productId}`);
+  await revalidateProductPageById(productId);
 }
 
 // ---- Material options (per product) ----
@@ -88,12 +95,14 @@ export async function addMaterialOption(productId: string, formData: FormData) {
   });
 
   revalidatePath(`/admin/products/${productId}`);
+  await revalidateProductPageById(productId);
 }
 
 export async function deleteMaterialOption(id: string, productId: string) {
   await requireAdminSession();
   await prisma.productMaterialOption.delete({ where: { id } });
   revalidatePath(`/admin/products/${productId}`);
+  await revalidateProductPageById(productId);
 }
 
 // ---- Diamond options (per product) ----
@@ -149,12 +158,14 @@ export async function addDiamondOption(productId: string, formData: FormData) {
   });
 
   revalidatePath(`/admin/products/${productId}`);
+  await revalidateProductPageById(productId);
 }
 
 export async function deleteDiamondOption(id: string, productId: string) {
   await requireAdminSession();
   await prisma.productDiamondOption.delete({ where: { id } });
   revalidatePath(`/admin/products/${productId}`);
+  await revalidateProductPageById(productId);
 }
 
 // ---- Diamond price table (global, manual — see AGENTS.md step 7/17) ----

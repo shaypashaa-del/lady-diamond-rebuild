@@ -13,6 +13,13 @@ import { productSchema, breadcrumbSchema } from "@/lib/schema";
 import { SITE_URL } from "@/lib/site-config";
 import { routing, type Locale } from "@/i18n/routing";
 
+// Cache the rendered page for up to 5 minutes instead of hitting Supabase on
+// every visit — the DB round-trip is the dominant cost of this page. Any
+// admin edit that should be visible sooner busts this cache immediately via
+// revalidateProductPage() (see src/server/actions/products.ts and
+// pricing.ts), so this is a ceiling on staleness, not a real-world delay.
+export const revalidate = 300;
+
 function pathFor(locale: string, path: string) {
   const prefix = locale === routing.defaultLocale ? "" : `/${locale}`;
   return `${prefix}${path}`;

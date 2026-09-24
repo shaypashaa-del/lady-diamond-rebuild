@@ -48,7 +48,15 @@ export function IntroReveal() {
     <div
       aria-hidden="true"
       className="fixed inset-0 z-[10000] bg-white transition-opacity ease-in-out"
-      style={{ opacity: fading ? 0 : 1, transitionDuration: `${FADE_MS}ms` }}
+      style={{
+        opacity: fading ? 0 : 1,
+        transitionDuration: `${FADE_MS}ms`,
+        // Once the fade starts, this overlay must stop intercepting clicks —
+        // it's still mounted (and painted, mid-fade) for the full FADE_MS,
+        // and without this a click during that window lands on the overlay
+        // instead of whatever is underneath (e.g. a product card link).
+        pointerEvents: fading ? "none" : "auto",
+      }}
     >
       {/* Desktop (>= sm): full-screen, edge-to-edge, same technique as
           mobile — object-fit: cover fills the entire screen. This photo's

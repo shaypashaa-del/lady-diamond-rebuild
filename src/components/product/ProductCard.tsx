@@ -50,7 +50,7 @@ export function ProductCard({ product }: { product: SampleProduct }) {
         {/* Visible by default on touch devices (phones, tablets), which
             have no real hover state to reveal these — only fades in on
             hover for true pointer/desktop screens (lg+). */}
-        <div className="absolute end-2 top-2 z-10 flex flex-col gap-2 opacity-100 transition-opacity max-lg:opacity-100 lg:opacity-0 lg:group-hover:opacity-100">
+        <div className="absolute end-2 top-2 z-10 flex w-fit flex-col gap-2 opacity-100 transition-opacity max-lg:opacity-100 lg:opacity-0 lg:group-hover:opacity-100">
           <button
             aria-label={t("quickView")}
             onClick={() => setQuickViewOpen(true)}

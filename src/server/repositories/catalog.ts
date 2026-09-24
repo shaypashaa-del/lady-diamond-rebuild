@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 
 const cardImageInclude = {
@@ -114,7 +115,13 @@ export async function getRelatedProducts(
   });
 }
 
-export function getProductBySlug(slug: string) {
+// Wrapped in React's per-request cache() because the product page calls
+// this twice (once from generateMetadata, once from the page body) — without
+// this, that's two full round-trips to Supabase for every single page view.
+// Adding materialOptions/diamondOptions here made each round-trip heavier,
+// which is what made the pre-existing double-fetch noticeably slow enough
+// to make clicking a product feel unresponsive.
+export const getProductBySlug = cache((slug: string) => {
   // `findFirst`, not `findUnique`, because adding the `status` filter turns
   // this into a non-unique where clause — otherwise a DRAFT product's page
   // would still render for anyone who knows or guesses its slug, even though
@@ -129,4 +136,4 @@ export function getProductBySlug(slug: string) {
       diamondOptions: { where: { active: true }, orderBy: { sortOrder: "asc" } },
     },
   });
-}
+});

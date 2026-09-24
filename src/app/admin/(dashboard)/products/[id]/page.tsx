@@ -4,6 +4,7 @@ import { updateProduct } from "@/server/actions/products";
 import { ProductForm } from "@/components/admin/ProductForm";
 import { VariantManager } from "@/components/admin/VariantManager";
 import { ProductImagesManager } from "@/components/admin/ProductImagesManager";
+import { ProductPricingManager } from "@/components/admin/ProductPricingManager";
 import type { LocalizedText } from "@/lib/i18n-content";
 
 export default async function EditProductPage({
@@ -21,6 +22,8 @@ export default async function EditProductPage({
         tags: true,
         relatedTo: true,
         images: { include: { media: true }, orderBy: { sortOrder: "asc" } },
+        materialOptions: true,
+        diamondOptions: true,
       },
     }),
     prisma.category.findMany({ orderBy: { sortOrder: "asc" } }),
@@ -75,6 +78,17 @@ export default async function EditProductPage({
         availableMedia={availableMedia.map((m) => ({ id: m.id, filename: m.filename }))}
       />
       <VariantManager productId={product.id} variants={product.variants} />
+      <ProductPricingManager
+        productId={product.id}
+        pricingMode={product.pricingMode}
+        metalWeightGrams={product.metalWeightGrams}
+        manufacturingCost={product.manufacturingCost}
+        settingCost={product.settingCost}
+        otherCost={product.otherCost}
+        hasDiamond={product.hasDiamond}
+        materialOptions={product.materialOptions}
+        diamondOptions={product.diamondOptions}
+      />
     </div>
   );
 }

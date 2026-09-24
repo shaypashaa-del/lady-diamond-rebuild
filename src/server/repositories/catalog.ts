@@ -125,6 +125,8 @@ export function getProductBySlug(slug: string) {
       variants: true,
       categories: { include: { category: true } },
       images: { include: { media: true }, orderBy: { sortOrder: "asc" } },
+      materialOptions: { where: { active: true }, orderBy: { sortOrder: "asc" } },
+      diamondOptions: { where: { active: true }, orderBy: { sortOrder: "asc" } },
     },
   });
 }

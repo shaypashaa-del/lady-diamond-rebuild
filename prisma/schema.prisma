@@ -138,6 +138,22 @@ model Product {
   seoDescription  Json?
   weightGrams     Int?
 
+  // ---- Configurable pricing engine (opt-in, additive) ----
+  // pricingMode stays FLAT (the historical behavior: basePrice/salePrice
+  // shown as-is) for every product unless an admin explicitly switches it
+  // to CONFIGURABLE after entering real metalWeightGrams and at least one
+  // ProductMaterialOption. Nothing here changes existing product behavior
+  // until that opt-in happens. See src/lib/pricing/engine.ts.
+  pricingMode        PricingMode @default(FLAT)
+  metalWeightGrams   Decimal?    @db.Decimal(8, 3)
+  manufacturingCost  Decimal?    @db.Decimal(10, 2)
+  settingCost        Decimal?    @db.Decimal(10, 2)
+  otherCost          Decimal?    @db.Decimal(10, 2)
+  hasDiamond         Boolean     @default(false)
+
+  materialOptions ProductMaterialOption[]
+  diamondOptions  ProductDiamondOption[]
+
   categories      ProductCategory[]
   tags            ProductTag[]
   images          ProductImage[]
@@ -151,6 +167,160 @@ model Product {
 
   @@index([status])
   @@index([isFeatured])
+}
+
+enum PricingMode {
+  FLAT
+  CONFIGURABLE
+}
+
+enum MetalType {
+  GOLD
+  SILVER
+  PLATINUM
+}
+
+// Fineness/purity, one enum shared across metal types since each value is
+// unambiguous on its own (K14 only ever means gold, S925 only ever means
+// silver) — avoids needing a separate enum + cross-validation per metal.
+enum MetalPurity {
+  K9
+  K14
+  K18
+  K22
+  K24
+  S925
+  S999
+  PT950
+}
+
+enum GoldColor {
+  YELLOW
+  WHITE
+  ROSE
+}
+
+// A specific material a customer can choose for this product (e.g. "14K
+// White Gold" or "Sterling Silver 925"). Which combinations are offered is
+// entirely admin-defined per product — see AGENTS.md step 2/14: never show
+// a metal/purity that isn't actually manufacturable for that design.
+model ProductMaterialOption {
+  id        String      @id @default(cuid())
+  productId String
+  product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  metalType MetalType
+  purity    MetalPurity
+  goldColor GoldColor?
+  isDefault Boolean     @default(false)
+  sortOrder Int         @default(0)
+  active    Boolean     @default(true)
+
+  @@index([productId])
+}
+
+enum DiamondType {
+  NATURAL
+  LAB_GROWN
+}
+
+enum DiamondShape {
+  ROUND
+  OVAL
+  EMERALD
+  PRINCESS
+  PEAR
+  MARQUISE
+  CUSHION
+  RADIANT
+  ASSCHER
+}
+
+enum DiamondColorGrade {
+  D
+  E
+  F
+  G
+  H
+  I
+  J
+}
+
+enum DiamondClarityGrade {
+  FL
+  IF
+  VVS1
+  VVS2
+  VS1
+  VS2
+  SI1
+  SI2
+}
+
+enum DiamondCertification {
+  GIA
+  IGI
+  OTHER
+}
+
+// A specific diamond configuration a customer can choose for this product.
+// Only created for products with hasDiamond = true. Multiple rows let a
+// product offer e.g. both a 0.3ct and 0.5ct version of the same setting.
+model ProductDiamondOption {
+  id            String                @id @default(cuid())
+  productId     String
+  product       Product               @relation(fields: [productId], references: [id], onDelete: Cascade)
+  diamondType   DiamondType
+  shape         DiamondShape
+  caratWeight   Decimal               @db.Decimal(6, 3)
+  colorGrade    DiamondColorGrade?
+  clarityGrade  DiamondClarityGrade?
+  certification DiamondCertification?
+  quantity      Int                   @default(1)
+  isDefault     Boolean               @default(false)
+  sortOrder     Int                   @default(0)
+  active        Boolean               @default(true)
+
+  @@index([productId])
+}
+
+// Manual admin-maintained diamond price-per-carat table (see AGENTS.md
+// step 7/17 — no free reliable live diamond market API exists, and paid
+// feeds like RapNet/IDEX require explicit owner approval before
+// integrating). A ProductDiamondOption's cost is looked up here by closest
+// matching band; if no entry matches, pricing is flagged incomplete rather
+// than guessed.
+model DiamondPriceEntry {
+  id            String                @id @default(cuid())
+  diamondType   DiamondType
+  shape         DiamondShape
+  caratMin      Decimal               @db.Decimal(6, 3)
+  caratMax      Decimal               @db.Decimal(6, 3)
+  colorGrade    DiamondColorGrade?
+  clarityGrade  DiamondClarityGrade?
+  pricePerCarat Decimal               @db.Decimal(10, 2)
+  currency      String                @default("ILS")
+  source        String
+  sourceUrl     String?
+  updatedAt     DateTime              @updatedAt
+  createdAt     DateTime              @default(now())
+
+  @@index([diamondType, shape])
+}
+
+// Current reference price for one pure metal (per gram, 24K-gold-equivalent
+// basis for gold; per gram fine silver/platinum for the others), refreshed
+// by src/server/services/market-prices.ts. isManual marks a row an admin
+// entered by hand (silver/platinum currently have no live free feed wired
+// up) rather than one fetched automatically, so the admin panel can show
+// which prices are live vs manually maintained.
+model MetalPrice {
+  metalType     MetalType @id
+  pricePerGram  Decimal   @db.Decimal(10, 2)
+  currency      String    @default("ILS")
+  source        String
+  sourceUrl     String?
+  isManual      Boolean   @default(false)
+  fetchedAt     DateTime  @default(now())
 }
 
 model ProductCategory {

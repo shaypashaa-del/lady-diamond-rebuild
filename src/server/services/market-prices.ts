@@ -11,6 +11,9 @@
 // callers get `null` and must fall back to letting the person enter their
 // own known-current price rather than ever displaying a fabricated number.
 
+import { prisma } from "@/lib/prisma";
+import { MetalType } from "@/generated/prisma/enums";
+
 const TROY_OUNCE_IN_GRAMS = 31.1034768;
 const GOLD_SPOT_ENDPOINT = "https://api.goldprice.dev/v1/prices?symbol=XAU-ILS-SPOT";
 
@@ -51,4 +54,84 @@ export async function getLiveGoldPricePer24kGramIls(): Promise<LiveGoldPrice | n
   } catch {
     return null;
   }
+}
+
+// ---- DB-backed price cache (src/lib/pricing/engine.ts reads from this,
+// never calls a live API directly) ----
+//
+// Gold: refreshed from the live feed above on a cadence (see
+// refreshGoldPriceIfStale), and only overwritten by a successful fetch —
+// a failed refresh silently keeps serving the last known-good price rather
+// than blocking pricing or falling back to a fabricated number.
+// Silver/Platinum: goldprice.dev's silver symbol is paid-tier only (no free
+// live source was found — see AGENTS.md step 17, "don't connect to a paid
+// service without approval"), so those two are admin-entered via
+// setManualMetalPrice and marked isManual: true so the admin panel is
+// honest about which prices are live vs hand-maintained.
+
+const GOLD_REFRESH_INTERVAL_MS = 10 * 60 * 1000; // matches the fetch()'s own 600s revalidate window
+
+export async function getMetalPrice(metalType: MetalType) {
+  return prisma.metalPrice.findUnique({ where: { metalType } });
+}
+
+export async function getAllMetalPrices() {
+  return prisma.metalPrice.findMany({ orderBy: { metalType: "asc" } });
+}
+
+// Called on-demand (e.g. right before a configurable price is computed) —
+// keeps the DB row fresh without a separate cron job. No-op, quickly, once
+// the cached row is recent enough.
+export async function refreshGoldPriceIfStale(): Promise<void> {
+  const existing = await prisma.metalPrice.findUnique({ where: { metalType: MetalType.GOLD } });
+  const isStale = !existing || Date.now() - existing.fetchedAt.getTime() > GOLD_REFRESH_INTERVAL_MS;
+  if (!isStale) return;
+
+  const live = await getLiveGoldPricePer24kGramIls();
+  if (!live) return; // keep serving the last known-good price; never blank it out
+
+  await prisma.metalPrice.upsert({
+    where: { metalType: MetalType.GOLD },
+    create: {
+      metalType: MetalType.GOLD,
+      pricePerGram: live.pricePerGram24kIls,
+      currency: "ILS",
+      source: live.source,
+      isManual: false,
+      fetchedAt: new Date(live.fetchedAt),
+    },
+    update: {
+      pricePerGram: live.pricePerGram24kIls,
+      source: live.source,
+      isManual: false,
+      fetchedAt: new Date(live.fetchedAt),
+    },
+  });
+}
+
+export async function setManualMetalPrice(params: {
+  metalType: MetalType;
+  pricePerGram: number;
+  source: string;
+  sourceUrl?: string;
+}) {
+  await prisma.metalPrice.upsert({
+    where: { metalType: params.metalType },
+    create: {
+      metalType: params.metalType,
+      pricePerGram: params.pricePerGram,
+      currency: "ILS",
+      source: params.source,
+      sourceUrl: params.sourceUrl,
+      isManual: true,
+      fetchedAt: new Date(),
+    },
+    update: {
+      pricePerGram: params.pricePerGram,
+      source: params.source,
+      sourceUrl: params.sourceUrl,
+      isManual: true,
+      fetchedAt: new Date(),
+    },
+  });
 }

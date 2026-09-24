@@ -6,6 +6,7 @@ import { getProductBySlug, getRelatedProducts } from "@/server/repositories/cata
 import { t as localize, type LocalizedText } from "@/lib/i18n-content";
 import { toCardProduct } from "@/lib/catalog-view";
 import { ProductDetail, type VariantView } from "@/components/product/ProductDetail";
+import { ConfigurablePriceSelector } from "@/components/product/ConfigurablePriceSelector";
 import { ProductSection } from "@/components/home/ProductSection";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { productSchema, breadcrumbSchema } from "@/lib/schema";
@@ -122,6 +123,15 @@ export default async function ProductPage({
         variants={variants}
         images={product.images.map((img) => ({ url: img.media.url, alt: img.media.altText ?? undefined }))}
       />
+      {product.pricingMode === "CONFIGURABLE" && product.materialOptions.length > 0 && (
+        <div className="mx-auto max-w-3xl px-4 sm:px-8">
+          <ConfigurablePriceSelector
+            productId={product.id}
+            materialOptions={product.materialOptions}
+            diamondOptions={product.diamondOptions.map((d) => ({ ...d, caratWeight: Number(d.caratWeight) }))}
+          />
+        </div>
+      )}
       {related.length > 0 && (
         <ProductSection title={tHome("relatedProducts")} products={related} />
       )}

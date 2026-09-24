@@ -5,6 +5,8 @@ import { logout } from "@/server/actions/auth";
 const navItems = [
   { href: "/admin", label: "לוח בקרה" },
   { href: "/admin/products", label: "מוצרים" },
+  { href: "/admin/pricing/metals", label: "מחירי מתכות" },
+  { href: "/admin/pricing/diamonds", label: "טבלת מחירי יהלומים" },
   { href: "/admin/categories", label: "קטגוריות" },
   { href: "/admin/tags", label: "תגיות" },
   { href: "/admin/orders", label: "הזמנות" },

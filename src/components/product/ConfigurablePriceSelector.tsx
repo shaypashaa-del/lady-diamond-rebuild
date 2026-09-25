@@ -228,6 +228,43 @@ export function ConfigurablePriceSelector({
           {diamond ? ` עם ${diamondLabel(diamond)}` : ""}.
         </p>
       )}
+
+      {diamond && (
+        <details className="group border border-gold-soft/60 open:border-gold-soft">
+          <summary className="cursor-pointer select-none px-4 py-3 text-sm font-medium text-ink marker:content-none">
+            <span className="inline-flex items-center gap-1.5">
+              נתוני אבן החן
+              <span className="text-ink/40 transition-transform group-open:rotate-180">▾</span>
+            </span>
+          </summary>
+          <dl className="grid grid-cols-2 gap-x-4 gap-y-2 border-t border-gold-soft/60 px-4 py-3 text-sm">
+            <dt className="text-ink/50">סוג</dt>
+            <dd className="text-ink">{DIAMOND_TYPE_LABEL[diamond.diamondType]}</dd>
+            <dt className="text-ink/50">צורה</dt>
+            <dd className="text-ink">{SHAPE_LABEL[diamond.shape] ?? diamond.shape}</dd>
+            <dt className="text-ink/50">משקל</dt>
+            <dd className="text-ink">{diamond.caratWeight} קראט</dd>
+            {diamond.quantity > 1 && (
+              <>
+                <dt className="text-ink/50">כמות אבנים</dt>
+                <dd className="text-ink">{diamond.quantity}</dd>
+              </>
+            )}
+            {diamond.colorGrade && (
+              <>
+                <dt className="text-ink/50">גוון</dt>
+                <dd className="text-ink">{diamond.colorGrade}</dd>
+              </>
+            )}
+            {diamond.clarityGrade && (
+              <>
+                <dt className="text-ink/50">ניקיון</dt>
+                <dd className="text-ink">{diamond.clarityGrade}</dd>
+              </>
+            )}
+          </dl>
+        </details>
+      )}
     </div>
   );
 }

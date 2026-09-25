@@ -103,6 +103,15 @@ export function ConfigurablePriceSelector({
   // sense for them.
   const hasGoldColorSwatches = materialOptions.some((m) => m.metalType === "GOLD" && m.goldColor);
 
+  // If every diamond option is the same shape and type, the only real
+  // choice is carat weight — show a carat dropdown instead of pills that
+  // would otherwise all look identical apart from a number.
+  const isCaratOnlyChoice =
+    diamondOptions.length > 1 &&
+    diamondOptions.every(
+      (d) => d.shape === diamondOptions[0].shape && d.diamondType === diamondOptions[0].diamondType
+    );
+
   return (
     <div className="mt-6 space-y-5 border-t border-gold-soft pt-6">
       {/* Price leads, "starting from" framing, since it changes with the
@@ -169,23 +178,45 @@ export function ConfigurablePriceSelector({
 
       {diamondOptions.length > 0 && (
         <div>
-          <label className="mb-2 block text-sm font-medium text-ink">יהלום</label>
-          <div className="flex flex-wrap gap-2">
-            {diamondOptions.map((d) => (
-              <button
-                key={d.id}
-                type="button"
-                onClick={() => setDiamondId(d.id)}
-                className={`rounded-full border px-4 py-2 text-sm transition-colors ${
-                  d.id === diamondId
-                    ? "border-gold-bright bg-ink text-paper"
-                    : "border-gold-soft text-ink hover:border-gold-bright"
-                }`}
-              >
-                {diamondLabel(d)}
-              </button>
-            ))}
-          </div>
+          <label className="mb-2 block text-sm font-medium text-ink">
+            {isCaratOnlyChoice ? "בחרי לפי קראט" : "יהלום"}
+          </label>
+          {isCaratOnlyChoice ? (
+            // Same shape/type across all options (e.g. a solitaire ring
+            // offered at several carat weights) — a carat dropdown reads
+            // far cleaner than a row of near-identical pills, matching how
+            // jewelry sites present this exact choice.
+            <select
+              value={diamondId}
+              onChange={(e) => setDiamondId(e.target.value)}
+              className="w-full max-w-[220px] border border-gold-soft bg-paper px-4 py-2.5 text-sm text-ink focus:border-gold-bright focus:outline-none"
+            >
+              {[...diamondOptions]
+                .sort((a, b) => a.caratWeight - b.caratWeight)
+                .map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.caratWeight} קראט
+                  </option>
+                ))}
+            </select>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {diamondOptions.map((d) => (
+                <button
+                  key={d.id}
+                  type="button"
+                  onClick={() => setDiamondId(d.id)}
+                  className={`rounded-full border px-4 py-2 text-sm transition-colors ${
+                    d.id === diamondId
+                      ? "border-gold-bright bg-ink text-paper"
+                      : "border-gold-soft text-ink hover:border-gold-bright"
+                  }`}
+                >
+                  {diamondLabel(d)}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

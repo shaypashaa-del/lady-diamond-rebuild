@@ -204,6 +204,54 @@ describe("computeConfiguredPrice", () => {
     expect(result.reason).toBe("MISSING_MANUFACTURING_COST");
   });
 
+  it("fancy-color diamond falls back to the category base-cost range (ILS) when no shape/carat band matches", () => {
+    const result = computeConfiguredPrice({
+      ...baseInput,
+      diamonds: [
+        {
+          diamondType: "FANCY_COLOR",
+          shape: "CUSHION",
+          caratWeight: 1,
+          colorGrade: null,
+          clarityGrade: null,
+          fancyColor: "PINK",
+          quantity: 1,
+        },
+      ],
+      diamondPriceEntries: [],
+      diamondBaseCostRanges: [
+        { category: "FANCY_PINK", minCostPerCarat: 60000, maxCostPerCarat: 100000, currency: "ILS" },
+      ],
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    // 1ct * midpoint(60000, 100000) = 80000
+    expect(result.diamondCost).toBeCloseTo(80000, 2);
+  });
+
+  it("flags a missing FX rate instead of guessing a conversion when the base-cost range isn't in ILS", () => {
+    const result = computeConfiguredPrice({
+      ...baseInput,
+      diamonds: [
+        {
+          diamondType: "LAB_GROWN",
+          shape: "ROUND",
+          caratWeight: 1,
+          colorGrade: "G",
+          clarityGrade: "VS1",
+          quantity: 1,
+        },
+      ],
+      diamondPriceEntries: [],
+      diamondBaseCostRanges: [
+        { category: "LAB_GROWN", minCostPerCarat: 350, maxCostPerCarat: 650, currency: "USD" },
+      ],
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.reason).toBe("MISSING_FX_RATE");
+  });
+
   it("never produces NaN, negative, or zero prices when ok", () => {
     const result = computeConfiguredPrice(baseInput);
     if (!result.ok) throw new Error("expected ok");

@@ -76,3 +76,59 @@ export const DIAMOND_QUALITY_TIERS = [
 ] as const;
 
 export type DiamondQualityTierId = (typeof DIAMOND_QUALITY_TIERS)[number]["id"];
+
+// Full carat weight menu from the owner's 2026-09-26 diamond spec — used to
+// populate the admin's carat picker; each product only needs the sizes it
+// actually offers, not all of these.
+export const DIAMOND_CARAT_OPTIONS = [
+  0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.75, 0.8, 0.9, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0,
+] as const;
+
+// Maps a diamond's real attributes to one of the 10 wholesale reference
+// buckets in DiamondBaseCostRange — a direct reading of the owner's own
+// category boundaries ("D-F / VS-VVS", "G-H / VS2", "lower commercial
+// quality"), not an invented cutoff. Returns null when there isn't enough
+// data to categorize (e.g. a NATURAL diamond with no color/clarity set),
+// which the pricing engine treats as missing data rather than guessing.
+export function resolveDiamondCostCategory(input: {
+  diamondType: "NATURAL" | "LAB_GROWN" | "FANCY_COLOR";
+  colorGrade?: string | null;
+  clarityGrade?: string | null;
+  fancyColor?: string | null;
+}): string | null {
+  if (input.diamondType === "LAB_GROWN") return "LAB_GROWN";
+
+  if (input.diamondType === "FANCY_COLOR") {
+    switch (input.fancyColor) {
+      case "BROWN_CHAMPAGNE":
+        return "NATURAL_BROWN_CHAMPAGNE";
+      case "YELLOW":
+        return "FANCY_YELLOW";
+      case "ORANGE":
+        return "FANCY_ORANGE";
+      case "PINK":
+        return "FANCY_PINK";
+      case "GREEN":
+        return "FANCY_GREEN";
+      case "BLUE":
+        return "FANCY_BLUE";
+      case "RED":
+        return "FANCY_RED";
+      default:
+        return null;
+    }
+  }
+
+  // NATURAL white diamond — bucket by the owner's own three commercial tiers.
+  const { colorGrade, clarityGrade } = input;
+  if (!colorGrade || !clarityGrade) return null;
+
+  const topColor = ["D", "E", "F"].includes(colorGrade);
+  const midColor = ["G", "H"].includes(colorGrade);
+  const topClarity = ["FL", "IF", "VVS1", "VVS2", "VS1", "VS2"].includes(clarityGrade);
+  const midClarity = ["VS1", "VS2"].includes(clarityGrade);
+
+  if (topColor && topClarity) return "NATURAL_WHITE_DF_VS_VVS";
+  if (midColor && midClarity) return "NATURAL_WHITE_GH_VS2";
+  return "NATURAL_WHITE_COMMERCIAL";
+}

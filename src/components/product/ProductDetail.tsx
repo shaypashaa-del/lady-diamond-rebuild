@@ -9,11 +9,13 @@ import { useCartStore } from "@/lib/cart-store";
 import { useWishlistStore } from "@/lib/wishlist-store";
 import { useMounted } from "@/lib/use-mounted";
 import { cn } from "@/lib/cn";
+import { PriceDropAlert } from "./PriceDropAlert";
 
 export type VariantView = { id: string; label: string; price: number; inventory: number };
 export type ProductImageView = { url: string; alt?: string };
 
 export function ProductDetail({
+  productId,
   slug,
   name,
   shortDescription,
@@ -29,6 +31,7 @@ export function ProductDetail({
   variants,
   images = [],
 }: {
+  productId: string;
   slug: string;
   name: string;
   shortDescription: string;
@@ -245,6 +248,8 @@ export function ProductDetail({
               : t("freeShipping")}
           </p>
         )}
+
+        <PriceDropAlert productId={productId} />
 
         {(sku || weightGrams) && (
           <div className="mt-6 flex gap-3 text-xs text-ink/50">

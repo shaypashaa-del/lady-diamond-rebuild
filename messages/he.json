@@ -116,7 +116,11 @@
     "breadcrumb": "נתיב ניווט",
     "breadcrumbHome": "ראשי",
     "shippingCost": "משלוח: {price} ₪",
-    "freeShipping": "משלוח חינם"
+    "freeShipping": "משלוח חינם",
+    "priceDropCta": "עדכן אותי על ירידת מחיר",
+    "priceDropEmailPlaceholder": "האימייל שלך",
+    "priceDropSubmit": "עדכנו אותי",
+    "priceDropSubscribed": "מעולה! נעדכן אותך במייל אם המחיר ירד."
   },
   "Category": {
     "kicker": "LADY DIAMOND",

@@ -126,6 +126,7 @@ export default async function ProductPage({
         ]}
       />
       <ProductDetail
+        productId={product.id}
         slug={product.slug}
         name={name}
         shortDescription={description}

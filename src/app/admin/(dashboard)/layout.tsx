@@ -7,6 +7,7 @@ const navItems = [
   { href: "/admin/products", label: "מוצרים" },
   { href: "/admin/pricing/metals", label: "מחירי מתכות" },
   { href: "/admin/pricing/diamonds", label: "טבלת מחירי יהלומים" },
+  { href: "/admin/pricing/diamond-base-costs", label: "עלות בסיס יהלום (Fancy/מעבדה)" },
   { href: "/admin/categories", label: "קטגוריות" },
   { href: "/admin/tags", label: "תגיות" },
   { href: "/admin/orders", label: "הזמנות" },

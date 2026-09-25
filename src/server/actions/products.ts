@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { ProductStatus } from "@/generated/prisma/enums";
 import { requireAdminSession } from "@/lib/auth/guards";
 import { revalidateProductPage } from "@/server/revalidate-product";
+import { notifyPriceDropSubscribers } from "@/server/actions/price-drop";
 
 function localizedFromForm(formData: FormData, prefix: string) {
   return {
@@ -123,7 +124,10 @@ export async function updateProduct(
   await requireAdminSession();
   const data = readProductForm(formData);
 
-  const existing = await prisma.product.findUnique({ where: { id }, select: { slug: true } });
+  const existing = await prisma.product.findUnique({
+    where: { id },
+    select: { slug: true, basePrice: true, salePrice: true },
+  });
 
   try {
     await prisma.product.update({
@@ -146,6 +150,14 @@ export async function updateProduct(
     });
   } catch {
     return { error: `מוצר עם הכתובת (slug) "${data.slug}" כבר קיים.` };
+  }
+
+  if (existing) {
+    const oldDisplayPrice = Number(existing.salePrice ?? existing.basePrice);
+    const newDisplayPrice = data.salePrice ?? data.basePrice;
+    if (newDisplayPrice < oldDisplayPrice) {
+      await notifyPriceDropSubscribers(id, newDisplayPrice);
+    }
   }
 
   if (data.categoryId) {

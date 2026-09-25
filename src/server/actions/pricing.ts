@@ -7,8 +7,14 @@ import {
   DiamondCertification,
   DiamondClarityGrade,
   DiamondColorGrade,
+  DiamondCostCategory,
+  DiamondCutGrade,
+  DiamondFluorescence,
+  DiamondGrowthMethod,
   DiamondShape,
   DiamondType,
+  FancyColor,
+  FancyIntensity,
   GoldColor,
   MetalPurity,
   MetalType,
@@ -135,6 +141,25 @@ export async function addDiamondOption(productId: string, formData: FormData) {
   const quantity = Number.isFinite(quantityRaw) && quantityRaw > 0 ? Math.round(quantityRaw) : 1;
   const isDefault = formData.get("isDefault") === "on";
 
+  // Additive attributes from the owner's fuller diamond spec — each only
+  // meaningful for a specific diamondType, so only stored when it applies
+  // (a lab-grown option never gets a fancy color; a natural white diamond
+  // never gets a growth method) even if the form somehow submitted one.
+  const cutGrade = enumOrNull(formData.get("cutGrade"), Object.values(DiamondCutGrade));
+  const fluorescence = enumOrNull(formData.get("fluorescence"), Object.values(DiamondFluorescence));
+  const growthMethod =
+    diamondType === DiamondType.LAB_GROWN
+      ? enumOrNull(formData.get("growthMethod"), Object.values(DiamondGrowthMethod))
+      : null;
+  const fancyColor =
+    diamondType === DiamondType.FANCY_COLOR
+      ? enumOrNull(formData.get("fancyColor"), Object.values(FancyColor))
+      : null;
+  const fancyIntensity =
+    diamondType === DiamondType.FANCY_COLOR
+      ? enumOrNull(formData.get("fancyIntensity"), Object.values(FancyIntensity))
+      : null;
+
   if (isDefault) {
     await prisma.productDiamondOption.updateMany({
       where: { productId },
@@ -154,6 +179,11 @@ export async function addDiamondOption(productId: string, formData: FormData) {
       quantity,
       isDefault,
       qualityTierLabel,
+      cutGrade,
+      fluorescence,
+      growthMethod,
+      fancyColor,
+      fancyIntensity,
     },
   });
 
@@ -219,6 +249,48 @@ export async function deleteDiamondPriceEntry(id: string) {
   await requireAdminSession();
   await prisma.diamondPriceEntry.delete({ where: { id } });
   revalidatePath("/admin/pricing/diamonds");
+}
+
+// ---- Diamond base-cost reference ranges (the 10-category wholesale table
+// from the owner's spec) — one editable row per category, no code change
+// needed to update a number. Explicitly "approximate reference ranges, not
+// live supplier prices" per the owner's own instruction — never treat this
+// as more precise than that. ----
+
+export async function setDiamondBaseCostRange(formData: FormData) {
+  await requireAdminSession();
+
+  const category = enumOrNull(formData.get("category"), Object.values(DiamondCostCategory));
+  const minCostPerCarat = Number(formData.get("minCostPerCarat"));
+  const maxCostPerCarat = Number(formData.get("maxCostPerCarat"));
+  const currency = String(formData.get("currency") ?? "").trim() || "USD";
+  const source = String(formData.get("source") ?? "").trim();
+  const note = String(formData.get("note") ?? "").trim() || null;
+
+  if (
+    !category ||
+    !Number.isFinite(minCostPerCarat) ||
+    !Number.isFinite(maxCostPerCarat) ||
+    minCostPerCarat < 0 ||
+    maxCostPerCarat < minCostPerCarat ||
+    !source
+  ) {
+    return;
+  }
+
+  await prisma.diamondBaseCostRange.upsert({
+    where: { category },
+    update: { minCostPerCarat, maxCostPerCarat, currency, source, note },
+    create: { category, minCostPerCarat, maxCostPerCarat, currency, source, note },
+  });
+
+  revalidatePath("/admin/pricing/diamond-base-costs");
+}
+
+export async function deleteDiamondBaseCostRange(category: string) {
+  await requireAdminSession();
+  await prisma.diamondBaseCostRange.delete({ where: { category: category as DiamondCostCategory } });
+  revalidatePath("/admin/pricing/diamond-base-costs");
 }
 
 // ---- Metal reference prices ----

@@ -13,7 +13,7 @@ type MaterialOption = {
 
 type DiamondOption = {
   id: string;
-  diamondType: "NATURAL" | "LAB_GROWN";
+  diamondType: "NATURAL" | "LAB_GROWN" | "FANCY_COLOR";
   shape: string;
   caratWeight: number;
   colorGrade: string | null;
@@ -30,9 +30,13 @@ const PURITY_LABEL: Record<string, string> = {
 const GOLD_COLOR_LABEL: Record<string, string> = { YELLOW: "זהב צהוב", WHITE: "זהב לבן", ROSE: "זהב רוז" };
 const SHAPE_LABEL: Record<string, string> = {
   ROUND: "עגול", OVAL: "אובלי", EMERALD: "אמרלד", PRINCESS: "פרינסס", PEAR: "אגס",
-  MARQUISE: "מרקיז", CUSHION: "כרית", RADIANT: "רדיאנט", ASSCHER: "אשר",
+  MARQUISE: "מרקיז", CUSHION: "כרית", RADIANT: "רדיאנט", ASSCHER: "אשר", HEART: "לב",
 };
-const DIAMOND_TYPE_LABEL: Record<string, string> = { NATURAL: "יהלום טבעי", LAB_GROWN: "יהלום מעבדה (CVD)" };
+const DIAMOND_TYPE_LABEL: Record<string, string> = {
+  NATURAL: "יהלום טבעי",
+  LAB_GROWN: "יהלום מעבדה",
+  FANCY_COLOR: "יהלום טבעי בגוון (Fancy Color)",
+};
 
 // Swatch colors for the round color-picker dots — a real gold-tone hex per
 // color, not a generic UI accent, so the dot itself reads as "this metal"

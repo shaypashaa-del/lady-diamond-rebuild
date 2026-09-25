@@ -116,7 +116,11 @@
     "breadcrumb": "Breadcrumb",
     "breadcrumbHome": "Home",
     "shippingCost": "Shipping: ₪{price}",
-    "freeShipping": "Free shipping"
+    "freeShipping": "Free shipping",
+    "priceDropCta": "Notify me if the price drops",
+    "priceDropEmailPlaceholder": "Your email",
+    "priceDropSubmit": "Notify me",
+    "priceDropSubscribed": "Great! We'll email you if the price drops."
   },
   "Category": {
     "kicker": "LADY DIAMOND",

@@ -12,7 +12,7 @@
 // available returns a typed `MissingData` result instead of a guessed
 // price — callers must treat that as "pricing not ready", never as zero.
 
-import { GROSS_MARGIN, PURITY_FRACTION } from "./constants";
+import { GROSS_MARGIN, PURITY_FRACTION, resolveDiamondCostCategory } from "./constants";
 
 export type MetalSelection = {
   metalType: "GOLD" | "SILVER" | "PLATINUM";
@@ -20,22 +20,34 @@ export type MetalSelection = {
 };
 
 export type DiamondSelection = {
-  diamondType: "NATURAL" | "LAB_GROWN";
+  diamondType: "NATURAL" | "LAB_GROWN" | "FANCY_COLOR";
   shape: string;
   caratWeight: number;
   colorGrade: string | null;
   clarityGrade: string | null;
+  fancyColor?: string | null;
   quantity: number;
 };
 
 export type DiamondPriceEntryLike = {
-  diamondType: "NATURAL" | "LAB_GROWN";
+  diamondType: "NATURAL" | "LAB_GROWN" | "FANCY_COLOR";
   shape: string;
   caratMin: number;
   caratMax: number;
   colorGrade: string | null;
   clarityGrade: string | null;
   pricePerCarat: number;
+};
+
+// A wholesale ~1ct reference range for one of the 10 DiamondCostCategory
+// buckets — see DiamondBaseCostRange in schema.prisma. Only used as a
+// fallback when no shape/carat-band DiamondPriceEntry matches (fancy
+// colors, brown/champagne — categories the granular table doesn't cover).
+export type DiamondBaseCostRangeLike = {
+  category: string;
+  minCostPerCarat: number;
+  maxCostPerCarat: number;
+  currency: string;
 };
 
 export type PricingCostInputs = {
@@ -47,6 +59,7 @@ export type PricingCostInputs = {
   metal: MetalSelection;
   diamonds: DiamondSelection[];
   diamondPriceEntries: DiamondPriceEntryLike[];
+  diamondBaseCostRanges?: DiamondBaseCostRangeLike[];
 };
 
 export type PricingBreakdown = {
@@ -68,7 +81,8 @@ export type MissingDataResult = {
     | "MISSING_METAL_WEIGHT"
     | "MISSING_METAL_PRICE"
     | "MISSING_MANUFACTURING_COST"
-    | "MISSING_DIAMOND_PRICE";
+    | "MISSING_DIAMOND_PRICE"
+    | "MISSING_FX_RATE";
   detail: string;
 };
 
@@ -78,10 +92,15 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
+type DiamondPriceLookup =
+  | { ok: true; pricePerCarat: number }
+  | { ok: false; reason: "MISSING_DIAMOND_PRICE" | "MISSING_FX_RATE"; detail: string };
+
 function findDiamondPrice(
   spec: DiamondSelection,
-  entries: DiamondPriceEntryLike[]
-): number | null {
+  entries: DiamondPriceEntryLike[],
+  baseCostRanges: DiamondBaseCostRangeLike[]
+): DiamondPriceLookup {
   const match = entries.find(
     (e) =>
       e.diamondType === spec.diamondType &&
@@ -91,7 +110,40 @@ function findDiamondPrice(
       (e.colorGrade === null || e.colorGrade === spec.colorGrade) &&
       (e.clarityGrade === null || e.clarityGrade === spec.clarityGrade)
   );
-  return match ? match.pricePerCarat : null;
+  if (match) return { ok: true, pricePerCarat: match.pricePerCarat };
+
+  // Fall back to the category-level wholesale reference range (fancy
+  // colors, brown/champagne — the granular shape/carat table doesn't cover
+  // these). This never invents a rate: if the range isn't priced in ILS,
+  // there's no approved FX conversion wired up, so it's reported as
+  // missing rather than converted with a guessed rate.
+  const category = resolveDiamondCostCategory({
+    diamondType: spec.diamondType,
+    colorGrade: spec.colorGrade,
+    clarityGrade: spec.clarityGrade,
+    fancyColor: spec.fancyColor,
+  });
+  const range = category ? baseCostRanges.find((r) => r.category === category) : undefined;
+
+  if (!range) {
+    return {
+      ok: false,
+      reason: "MISSING_DIAMOND_PRICE",
+      detail: `No price entry or reference range covers a ${spec.caratWeight}ct ${spec.shape} ${spec.diamondType} diamond${
+        spec.colorGrade ? ` (color ${spec.colorGrade})` : ""
+      }${spec.clarityGrade ? ` (clarity ${spec.clarityGrade})` : ""}${
+        spec.fancyColor ? ` (fancy ${spec.fancyColor})` : ""
+      }.`,
+    };
+  }
+  if (range.currency !== "ILS") {
+    return {
+      ok: false,
+      reason: "MISSING_FX_RATE",
+      detail: `The ${category} reference range is in ${range.currency}, and no approved exchange rate is configured to convert it to ILS.`,
+    };
+  }
+  return { ok: true, pricePerCarat: (range.minCostPerCarat + range.maxCostPerCarat) / 2 };
 }
 
 export function computeConfiguredPrice(input: PricingCostInputs): PricingResult {
@@ -123,17 +175,11 @@ export function computeConfiguredPrice(input: PricingCostInputs): PricingResult 
 
   let diamondCost = 0;
   for (const spec of input.diamonds) {
-    const pricePerCarat = findDiamondPrice(spec, input.diamondPriceEntries);
-    if (pricePerCarat === null) {
-      return {
-        ok: false,
-        reason: "MISSING_DIAMOND_PRICE",
-        detail: `No price entry covers a ${spec.caratWeight}ct ${spec.shape} ${spec.diamondType} diamond${
-          spec.colorGrade ? ` (color ${spec.colorGrade})` : ""
-        }${spec.clarityGrade ? ` (clarity ${spec.clarityGrade})` : ""}.`,
-      };
+    const lookup = findDiamondPrice(spec, input.diamondPriceEntries, input.diamondBaseCostRanges ?? []);
+    if (!lookup.ok) {
+      return { ok: false, reason: lookup.reason, detail: lookup.detail };
     }
-    diamondCost += pricePerCarat * spec.caratWeight * spec.quantity;
+    diamondCost += lookup.pricePerCarat * spec.caratWeight * spec.quantity;
   }
 
   const manufacturingCost = input.manufacturingCost;

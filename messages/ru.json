@@ -116,7 +116,11 @@
     "breadcrumb": "Навигационная цепочка",
     "breadcrumbHome": "Главная",
     "shippingCost": "Доставка: {price} ₪",
-    "freeShipping": "Бесплатная доставка"
+    "freeShipping": "Бесплатная доставка",
+    "priceDropCta": "Сообщить о снижении цены",
+    "priceDropEmailPlaceholder": "Ваш email",
+    "priceDropSubmit": "Сообщить мне",
+    "priceDropSubscribed": "Отлично! Мы напишем вам, если цена снизится."
   },
   "Category": {
     "kicker": "Lady Diamond",

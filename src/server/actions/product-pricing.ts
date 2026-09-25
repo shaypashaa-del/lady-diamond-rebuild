@@ -23,6 +23,7 @@ const MISSING_DATA_MESSAGE_HE: Record<string, string> = {
   MISSING_METAL_PRICE: "מחיר השוק הנוכחי אינו זמין כרגע — נסו שוב בעוד מספר דקות.",
   MISSING_MANUFACTURING_COST: "התמחור עבור המוצר הזה עדיין בבדיקה.",
   MISSING_DIAMOND_PRICE: "התמחור עבור הבחירה הזו עדיין בבדיקה.",
+  MISSING_FX_RATE: "התמחור עבור הבחירה הזו עדיין בבדיקה.",
 };
 
 // Called from the product page client component whenever the shopper
@@ -40,9 +41,9 @@ export async function getConfiguredPrice(req: ConfiguredPriceRequest): Promise<C
   }
   const metalPrice = await getMetalPrice(req.metal.metalType);
 
-  const diamondPriceEntries = req.diamondOptionIds.length
-    ? await prisma.diamondPriceEntry.findMany()
-    : [];
+  const [diamondPriceEntries, diamondBaseCostRanges] = req.diamondOptionIds.length
+    ? await Promise.all([prisma.diamondPriceEntry.findMany(), prisma.diamondBaseCostRange.findMany()])
+    : [[], []];
 
   const selectedDiamonds: DiamondSelection[] = product.diamondOptions
     .filter((d) => req.diamondOptionIds.includes(d.id))
@@ -52,6 +53,7 @@ export async function getConfiguredPrice(req: ConfiguredPriceRequest): Promise<C
       caratWeight: Number(d.caratWeight),
       colorGrade: d.colorGrade,
       clarityGrade: d.clarityGrade,
+      fancyColor: d.fancyColor,
       quantity: d.quantity,
     }));
 
@@ -71,6 +73,12 @@ export async function getConfiguredPrice(req: ConfiguredPriceRequest): Promise<C
       colorGrade: e.colorGrade,
       clarityGrade: e.clarityGrade,
       pricePerCarat: Number(e.pricePerCarat),
+    })),
+    diamondBaseCostRanges: diamondBaseCostRanges.map((r) => ({
+      category: r.category,
+      minCostPerCarat: Number(r.minCostPerCarat),
+      maxCostPerCarat: Number(r.maxCostPerCarat),
+      currency: r.currency,
     })),
   });
 
@@ -100,7 +108,9 @@ export async function getConfiguredPriceBreakdownForAdmin(productId: string) {
   const metalPrice = await getMetalPrice(metal.metalType);
 
   const defaultDiamonds = product.diamondOptions.filter((d) => d.isDefault);
-  const diamondPriceEntries = defaultDiamonds.length ? await prisma.diamondPriceEntry.findMany() : [];
+  const [diamondPriceEntries, diamondBaseCostRanges] = defaultDiamonds.length
+    ? await Promise.all([prisma.diamondPriceEntry.findMany(), prisma.diamondBaseCostRange.findMany()])
+    : [[], []];
 
   return computeConfiguredPrice({
     metalWeightGrams: product.metalWeightGrams ? Number(product.metalWeightGrams) : null,
@@ -115,6 +125,7 @@ export async function getConfiguredPriceBreakdownForAdmin(productId: string) {
       caratWeight: Number(d.caratWeight),
       colorGrade: d.colorGrade,
       clarityGrade: d.clarityGrade,
+      fancyColor: d.fancyColor,
       quantity: d.quantity,
     })),
     diamondPriceEntries: diamondPriceEntries.map((e) => ({
@@ -125,6 +136,12 @@ export async function getConfiguredPriceBreakdownForAdmin(productId: string) {
       colorGrade: e.colorGrade,
       clarityGrade: e.clarityGrade,
       pricePerCarat: Number(e.pricePerCarat),
+    })),
+    diamondBaseCostRanges: diamondBaseCostRanges.map((r) => ({
+      category: r.category,
+      minCostPerCarat: Number(r.minCostPerCarat),
+      maxCostPerCarat: Number(r.maxCostPerCarat),
+      currency: r.currency,
     })),
   });
 }

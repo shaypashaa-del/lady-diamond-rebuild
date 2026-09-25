@@ -44,9 +44,13 @@ const GOLD_COLOR_LABEL: Record<GoldColor, string> = { YELLOW: "צהוב", WHITE:
 const METAL_LABEL: Record<MetalType, string> = { GOLD: "זהב", SILVER: "כסף", PLATINUM: "פלטינה" };
 const SHAPE_LABEL: Record<DiamondShape, string> = {
   ROUND: "עגול", OVAL: "אובלי", EMERALD: "אמרלד", PRINCESS: "פרינסס", PEAR: "אגס",
-  MARQUISE: "מרקיז", CUSHION: "כרית", RADIANT: "רדיאנט", ASSCHER: "אשר",
+  MARQUISE: "מרקיז", CUSHION: "כרית", RADIANT: "רדיאנט", ASSCHER: "אשר", HEART: "לב",
 };
-const DIAMOND_TYPE_LABEL: Record<DiamondType, string> = { NATURAL: "טבעי", LAB_GROWN: "מעבדה" };
+const DIAMOND_TYPE_LABEL: Record<DiamondType, string> = {
+  NATURAL: "טבעי",
+  LAB_GROWN: "מעבדה",
+  FANCY_COLOR: "טבעי בגוון (Fancy Color)",
+};
 
 export async function ProductPricingManager({
   productId,

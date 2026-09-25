@@ -3,8 +3,8 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { Heart } from "lucide-react";
-import { useRouter } from "@/i18n/navigation";
+import { Heart, ChevronLeft } from "lucide-react";
+import { Link, useRouter } from "@/i18n/navigation";
 import { useCartStore } from "@/lib/cart-store";
 import { useWishlistStore } from "@/lib/wishlist-store";
 import { useMounted } from "@/lib/use-mounted";
@@ -24,6 +24,7 @@ export function ProductDetail({
   sku,
   weightGrams,
   categoryName,
+  categorySlug,
   variants,
   images = [],
 }: {
@@ -37,6 +38,7 @@ export function ProductDetail({
   sku?: string;
   weightGrams?: number | null;
   categoryName: string;
+  categorySlug?: string;
   variants: VariantView[];
   images?: ProductImageView[];
 }) {
@@ -90,7 +92,24 @@ export function ProductDetail({
   }
 
   return (
-    <div className="mx-auto grid max-w-5xl grid-cols-1 gap-10 px-4 py-12 sm:grid-cols-2 sm:px-8">
+    <div className="mx-auto max-w-5xl px-4 pt-6 sm:px-8">
+      <nav aria-label={t("breadcrumb")} className="mb-4 flex items-center gap-1.5 text-xs text-ink/50">
+        <Link href="/" className="hover:text-ink">
+          {t("breadcrumbHome")}
+        </Link>
+        {categoryName && (
+          <>
+            <ChevronLeft size={12} className="rtl:rotate-180" />
+            <Link href={categorySlug ? `/category/${categorySlug}` : "/category/all"} className="hover:text-ink">
+              {categoryName}
+            </Link>
+          </>
+        )}
+        <ChevronLeft size={12} className="rtl:rotate-180" />
+        <span className="truncate text-ink/70">{name}</span>
+      </nav>
+
+      <div className="grid grid-cols-1 gap-10 pb-12 sm:grid-cols-2">
       <div>
         <div className="relative aspect-square placeholder-gradient">
           {images[activeImage] && (
@@ -231,6 +250,7 @@ export function ProductDetail({
             <p className="text-sm text-ink/70">{description}</p>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

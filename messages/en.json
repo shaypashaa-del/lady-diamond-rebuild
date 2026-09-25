@@ -112,7 +112,9 @@
     "decreaseQty": "Decrease quantity",
     "increaseQty": "Increase quantity",
     "buyWithBit": "Buy with Bit",
-    "buyWithPaypal": "Buy with PayPal"
+    "buyWithPaypal": "Buy with PayPal",
+    "breadcrumb": "Breadcrumb",
+    "breadcrumbHome": "Home"
   },
   "Category": {
     "kicker": "LADY DIAMOND",

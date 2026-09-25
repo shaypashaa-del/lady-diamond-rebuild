@@ -112,7 +112,9 @@
     "decreaseQty": "Уменьшить количество",
     "increaseQty": "Увеличить количество",
     "buyWithBit": "Купить через Bit",
-    "buyWithPaypal": "Купить через PayPal"
+    "buyWithPaypal": "Купить через PayPal",
+    "breadcrumb": "Навигационная цепочка",
+    "breadcrumbHome": "Главная"
   },
   "Category": {
     "kicker": "Lady Diamond",

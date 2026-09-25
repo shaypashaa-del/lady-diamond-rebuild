@@ -112,7 +112,9 @@
     "decreaseQty": "הפחתת כמות",
     "increaseQty": "הגדלת כמות",
     "buyWithBit": "רכישה בביט",
-    "buyWithPaypal": "רכישה בפייפאל"
+    "buyWithPaypal": "רכישה בפייפאל",
+    "breadcrumb": "נתיב ניווט",
+    "breadcrumbHome": "ראשי"
   },
   "Category": {
     "kicker": "LADY DIAMOND",

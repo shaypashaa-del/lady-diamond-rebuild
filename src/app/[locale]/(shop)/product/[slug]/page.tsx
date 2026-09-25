@@ -131,6 +131,7 @@ export default async function ProductPage({
         sku={product.sku ?? undefined}
         weightGrams={product.weightGrams}
         categoryName={categoryName}
+        categorySlug={product.categories[0]?.category.slug}
         variants={variants}
         images={product.images.map((img) => ({ url: img.media.url, alt: img.media.altText ?? undefined }))}
       />

@@ -114,7 +114,9 @@
     "buyWithBit": "רכישה בביט",
     "buyWithPaypal": "רכישה בפייפאל",
     "breadcrumb": "נתיב ניווט",
-    "breadcrumbHome": "ראשי"
+    "breadcrumbHome": "ראשי",
+    "shippingCost": "משלוח: {price} ₪",
+    "freeShipping": "משלוח חינם"
   },
   "Category": {
     "kicker": "LADY DIAMOND",

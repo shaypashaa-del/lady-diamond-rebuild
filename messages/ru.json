@@ -114,7 +114,9 @@
     "buyWithBit": "Купить через Bit",
     "buyWithPaypal": "Купить через PayPal",
     "breadcrumb": "Навигационная цепочка",
-    "breadcrumbHome": "Главная"
+    "breadcrumbHome": "Главная",
+    "shippingCost": "Доставка: {price} ₪",
+    "freeShipping": "Бесплатная доставка"
   },
   "Category": {
     "kicker": "Lady Diamond",

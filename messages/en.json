@@ -114,7 +114,9 @@
     "buyWithBit": "Buy with Bit",
     "buyWithPaypal": "Buy with PayPal",
     "breadcrumb": "Breadcrumb",
-    "breadcrumbHome": "Home"
+    "breadcrumbHome": "Home",
+    "shippingCost": "Shipping: ₪{price}",
+    "freeShipping": "Free shipping"
   },
   "Category": {
     "kicker": "LADY DIAMOND",

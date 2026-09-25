@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { Heart, ChevronLeft } from "lucide-react";
+import { Heart, ChevronLeft, Truck } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { useCartStore } from "@/lib/cart-store";
 import { useWishlistStore } from "@/lib/wishlist-store";
@@ -25,6 +25,7 @@ export function ProductDetail({
   weightGrams,
   categoryName,
   categorySlug,
+  shippingPrice,
   variants,
   images = [],
 }: {
@@ -39,6 +40,7 @@ export function ProductDetail({
   weightGrams?: number | null;
   categoryName: string;
   categorySlug?: string;
+  shippingPrice?: number;
   variants: VariantView[];
   images?: ProductImageView[];
 }) {
@@ -234,6 +236,15 @@ export function ProductDetail({
             {t("buyWithPaypal")}
           </button>
         </div>
+
+        {shippingPrice != null && (
+          <p className="mt-3 flex items-center gap-1.5 text-xs text-ink/60">
+            <Truck size={14} className="text-gold-deep" />
+            {shippingPrice > 0
+              ? t("shippingCost", { price: shippingPrice.toFixed(2) })
+              : t("freeShipping")}
+          </p>
+        )}
 
         {(sku || weightGrams) && (
           <div className="mt-6 flex gap-3 text-xs text-ink/50">

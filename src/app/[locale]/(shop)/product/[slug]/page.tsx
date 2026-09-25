@@ -3,6 +3,7 @@ import { getLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getProductBySlug, getRelatedProducts } from "@/server/repositories/catalog";
+import { calculateShipping } from "@/server/services/shipping";
 import { t as localize, type LocalizedText } from "@/lib/i18n-content";
 import { toCardProduct } from "@/lib/catalog-view";
 import { ProductDetail, type VariantView } from "@/components/product/ProductDetail";
@@ -88,9 +89,13 @@ export default async function ProductPage({
   const price = Number(product.salePrice ?? product.basePrice);
   const productUrl = `${SITE_URL}${pathFor(locale, `/product/${slug}`)}`;
 
-  const [relatedRaw, tHome] = await Promise.all([
+  const [relatedRaw, tHome, shippingPrice] = await Promise.all([
     getRelatedProducts(product.id, product.categories[0]?.category.slug),
     getTranslations("Home"),
+    // Real admin-configured shipping rules (see /admin/shipping), not a
+    // marketing claim — whatever this returns is what checkout actually
+    // charges for a single unit of this product.
+    calculateShipping(price, "IL"),
   ]);
   const related = relatedRaw.map((p) => toCardProduct(p, locale));
 
@@ -132,6 +137,7 @@ export default async function ProductPage({
         weightGrams={product.weightGrams}
         categoryName={categoryName}
         categorySlug={product.categories[0]?.category.slug}
+        shippingPrice={shippingPrice}
         variants={variants}
         images={product.images.map((img) => ({ url: img.media.url, alt: img.media.altText ?? undefined }))}
       />

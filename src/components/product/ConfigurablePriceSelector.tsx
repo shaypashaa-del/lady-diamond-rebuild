@@ -32,7 +32,12 @@ const SHAPE_LABEL: Record<string, string> = {
   ROUND: "עגול", OVAL: "אובלי", EMERALD: "אמרלד", PRINCESS: "פרינסס", PEAR: "אגס",
   MARQUISE: "מרקיז", CUSHION: "כרית", RADIANT: "רדיאנט", ASSCHER: "אשר",
 };
-const DIAMOND_TYPE_LABEL: Record<string, string> = { NATURAL: "טבעי", LAB_GROWN: "מעבדה" };
+const DIAMOND_TYPE_LABEL: Record<string, string> = { NATURAL: "יהלום טבעי", LAB_GROWN: "יהלום מעבדה (CVD)" };
+
+// Swatch colors for the round color-picker dots — a real gold-tone hex per
+// color, not a generic UI accent, so the dot itself reads as "this metal"
+// the way a jewelry site's swatches do.
+const GOLD_COLOR_SWATCH: Record<string, string> = { YELLOW: "#D4AF37", WHITE: "#D9D9D9", ROSE: "#E8B4A0" };
 
 function materialLabel(m: MaterialOption) {
   const metal = m.metalType === "GOLD" && m.goldColor ? GOLD_COLOR_LABEL[m.goldColor] : METAL_LABEL[m.metalType];
@@ -92,26 +97,74 @@ export function ConfigurablePriceSelector({
 
   if (materialOptions.length === 0) return null;
 
+  // Gold-color options render as round swatches (matching how jewelry
+  // retailers present metal color); silver/platinum and multi-purity
+  // choices fall back to labeled pills since a color dot wouldn't make
+  // sense for them.
+  const hasGoldColorSwatches = materialOptions.some((m) => m.metalType === "GOLD" && m.goldColor);
+
   return (
-    <div className="mt-6 space-y-4 border-t border-gold-soft pt-6">
+    <div className="mt-6 space-y-5 border-t border-gold-soft pt-6">
+      {/* Price leads, "starting from" framing, since it changes with the
+          selection below it rather than being fixed. */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-ink">חומר</label>
-        <div className="flex flex-wrap gap-2">
-          {materialOptions.map((m) => (
-            <button
-              key={m.id}
-              type="button"
-              onClick={() => setMaterialId(m.id)}
-              className={`rounded-full border px-4 py-2 text-sm transition-colors ${
-                m.id === materialId
-                  ? "border-gold-bright bg-ink text-paper"
-                  : "border-gold-soft text-ink hover:border-gold-bright"
-              }`}
-            >
-              {materialLabel(m)}
-            </button>
-          ))}
+        <p className="text-xs uppercase tracking-wide text-ink/50">
+          {materialOptions.length > 1 || diamondOptions.length > 1 ? "החל מ-" : "מחיר"}
+        </p>
+        <div className="text-3xl font-semibold text-ink" aria-live="polite">
+          {isPending && <span className="text-lg font-normal text-ink/50">מעדכן מחיר…</span>}
+          {!isPending && result?.ok && `${result.sellingPrice.toLocaleString("he-IL")} ₪`}
+          {!isPending && result && !result.ok && (
+            <span className="text-base font-normal text-ink/60">{result.message}</span>
+          )}
         </div>
+      </div>
+
+      <div>
+        <label className="mb-2 block text-sm font-medium text-ink">
+          {hasGoldColorSwatches ? "צבע זהב" : "חומר"}
+        </label>
+        {hasGoldColorSwatches ? (
+          <div className="flex flex-wrap items-center gap-3">
+            {materialOptions.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                title={materialLabel(m)}
+                aria-label={materialLabel(m)}
+                aria-pressed={m.id === materialId}
+                onClick={() => setMaterialId(m.id)}
+                className={`h-8 w-8 rounded-full border-2 transition-transform ${
+                  m.id === materialId ? "border-ink scale-110" : "border-transparent hover:scale-105"
+                }`}
+                style={{
+                  backgroundColor:
+                    m.metalType === "GOLD" && m.goldColor ? GOLD_COLOR_SWATCH[m.goldColor] : "#C0C0C0",
+                }}
+              />
+            ))}
+            <span className="text-sm text-ink/70">
+              {material ? materialLabel(material) : ""}
+            </span>
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {materialOptions.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => setMaterialId(m.id)}
+                className={`rounded-full border px-4 py-2 text-sm transition-colors ${
+                  m.id === materialId
+                    ? "border-gold-bright bg-ink text-paper"
+                    : "border-gold-soft text-ink hover:border-gold-bright"
+                }`}
+              >
+                {materialLabel(m)}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {diamondOptions.length > 0 && (
@@ -141,17 +194,9 @@ export function ConfigurablePriceSelector({
       {material && (
         <p className="rounded-lg bg-paper-soft px-4 py-3 text-sm leading-relaxed text-ink/80">
           אתה קונה: {materialLabel(material)}
-          {diamond ? ` עם יהלום ${diamondLabel(diamond)}` : ""}.
+          {diamond ? ` עם ${diamondLabel(diamond)}` : ""}.
         </p>
       )}
-
-      <div className="text-2xl font-semibold text-ink" aria-live="polite">
-        {isPending && "מעדכן מחיר…"}
-        {!isPending && result?.ok && `${result.sellingPrice.toLocaleString("he-IL")} ₪`}
-        {!isPending && result && !result.ok && (
-          <span className="text-base font-normal text-ink/60">{result.message}</span>
-        )}
-      </div>
     </div>
   );
 }

@@ -71,8 +71,8 @@ export function Footer() {
         </div>
       </div>
       <div className="relative border-t border-paper/5 bg-black/20 py-3">
-        <p dir="rtl" className="mx-auto max-w-7xl px-4 text-center text-[11px] tracking-wide text-paper/30 sm:px-8">
-          כל הזכויות שמורות <bdi dir="ltr">© 2007</bdi> פשה גרופ.
+        <p className="mx-auto max-w-7xl px-4 text-center text-[11px] tracking-wide text-paper/30 sm:px-8">
+          {t("legalRights")}
         </p>
       </div>
     </footer>

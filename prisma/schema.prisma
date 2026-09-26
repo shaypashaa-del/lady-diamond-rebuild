@@ -216,6 +216,14 @@ model ProductMaterialOption {
   sortOrder Int         @default(0)
   active    Boolean     @default(true)
 
+  // Optional per-color product photo — most products only have one photo
+  // (the actual manufactured color), so this stays null and the product's
+  // default gallery image is shown regardless of color selected. Only set
+  // when a real photo of that specific color exists (never an AI mockup
+  // presented as a photo without the "made to order" disclaimer already
+  // shown next to the color swatches).
+  imageUrl String?
+
   @@index([productId])
 }
 

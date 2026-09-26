@@ -3,15 +3,16 @@
 import { useEffect, useState, useTransition } from "react";
 import { getConfiguredPrice } from "@/server/actions/product-pricing";
 
-type MaterialOption = {
+export type MaterialOption = {
   id: string;
   metalType: "GOLD" | "SILVER" | "PLATINUM";
   purity: "K9" | "K14" | "K18" | "K22" | "K24" | "S925" | "S999" | "PT950";
   goldColor: "YELLOW" | "WHITE" | "ROSE" | null;
   isDefault: boolean;
+  imageUrl?: string | null;
 };
 
-type DiamondOption = {
+export type DiamondOption = {
   id: string;
   diamondType: "NATURAL" | "LAB_GROWN" | "FANCY_COLOR";
   shape: string;
@@ -67,10 +68,12 @@ export function ConfigurablePriceSelector({
   productId,
   materialOptions,
   diamondOptions,
+  onMaterialImageChange,
 }: {
   productId: string;
   materialOptions: MaterialOption[];
   diamondOptions: DiamondOption[];
+  onMaterialImageChange?: (imageUrl: string | null) => void;
 }) {
   const [materialId, setMaterialId] = useState(
     materialOptions.find((m) => m.isDefault)?.id ?? materialOptions[0]?.id ?? ""
@@ -85,6 +88,14 @@ export function ConfigurablePriceSelector({
 
   const material = materialOptions.find((m) => m.id === materialId);
   const diamond = diamondOptions.find((d) => d.id === diamondId);
+
+  // Only overrides the gallery's main photo when this specific color has a
+  // real photo of its own (imageUrl set) — otherwise leaves the product's
+  // default image showing rather than guessing.
+  useEffect(() => {
+    onMaterialImageChange?.(material?.imageUrl ?? null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [material?.imageUrl]);
 
   useEffect(() => {
     if (!material) return;

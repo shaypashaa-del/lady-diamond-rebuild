@@ -30,6 +30,7 @@ export function ProductDetail({
   shippingPrice,
   variants,
   images = [],
+  colorImageOverride = null,
 }: {
   productId: string;
   slug: string;
@@ -46,6 +47,10 @@ export function ProductDetail({
   shippingPrice?: number;
   variants: VariantView[];
   images?: ProductImageView[];
+  // When set (by ConfigurablePriceSelector, via ProductPageInteractive),
+  // shows this specific photo instead of the thumbnail-selected one — only
+  // populated for a color that has a real photo of its own.
+  colorImageOverride?: string | null;
 }) {
   const t = useTranslations("Product");
   const router = useRouter();
@@ -117,15 +122,27 @@ export function ProductDetail({
       <div className="grid grid-cols-1 gap-10 pb-12 sm:grid-cols-2">
       <div>
         <div className="relative aspect-square placeholder-gradient">
-          {images[activeImage] && (
+          {colorImageOverride ? (
             <Image
-              src={images[activeImage].url}
-              alt={images[activeImage].alt ?? name}
+              key={colorImageOverride}
+              src={colorImageOverride}
+              alt={name}
               fill
               sizes="(min-width: 640px) 40vw, 90vw"
               priority
               className="object-cover"
             />
+          ) : (
+            images[activeImage] && (
+              <Image
+                src={images[activeImage].url}
+                alt={images[activeImage].alt ?? name}
+                fill
+                sizes="(min-width: 640px) 40vw, 90vw"
+                priority
+                className="object-cover"
+              />
+            )
           )}
         </div>
         {images.length > 1 && (

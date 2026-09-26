@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { MediaUploadForm } from "@/components/admin/MediaUploadForm";
 import { DeleteMediaButton } from "@/components/admin/DeleteMediaButton";
 import { AdminPager } from "@/components/admin/AdminPager";
+import { tMediaAlt } from "@/lib/i18n-content";
 
 const PAGE_SIZE = 60;
 
@@ -39,7 +40,7 @@ export default async function AdminMediaPage({
         {media.map((m) => (
           <div key={m.id} className="overflow-hidden rounded-lg border border-neutral-200 bg-white">
             <div className="relative aspect-square bg-neutral-100">
-              <Image src={m.url} alt={m.altText ?? m.filename} fill sizes="200px" className="object-cover" />
+              <Image src={m.url} alt={tMediaAlt(m.altText, "he") || m.filename} fill sizes="200px" className="object-cover" />
             </div>
             <div className="p-2">
               <p className="truncate text-xs text-neutral-500">{m.filename}</p>

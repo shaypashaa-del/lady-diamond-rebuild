@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getProductBySlug, getRelatedProducts } from "@/server/repositories/catalog";
 import { calculateShipping } from "@/server/services/shipping";
-import { t as localize, type LocalizedText } from "@/lib/i18n-content";
+import { t as localize, tMediaAlt, type LocalizedText } from "@/lib/i18n-content";
 import { toCardProduct } from "@/lib/catalog-view";
 import type { VariantView } from "@/components/product/ProductDetail";
 import { ProductPageInteractive } from "@/components/product/ProductPageInteractive";
@@ -143,7 +143,7 @@ export default async function ProductPage({
         categorySlug={product.categories[0]?.category.slug}
         shippingPrice={shippingPrice}
         variants={variants}
-        images={product.images.map((img) => ({ url: img.media.url, alt: img.media.altText ?? undefined }))}
+        images={product.images.map((img) => ({ url: img.media.url, alt: tMediaAlt(img.media.altText, locale) || undefined }))}
       />
       {related.length > 0 && (
         <ProductSection title={tHome("relatedProducts")} products={related} />

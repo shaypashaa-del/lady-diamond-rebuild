@@ -510,7 +510,11 @@ model MediaAsset {
   id        String   @id @default(cuid())
   url       String
   filename  String
-  altText   String?
+  // LocalizedText JSON ({ he, en?, ru? }), same shape as Product.name etc. —
+  // see src/lib/i18n-content.ts. Existing rows hold a plain string from
+  // before this field was localized; callers must treat a bare string value
+  // as Hebrew-only (see the migration script that normalized old rows).
+  altText   Json?
   width     Int?
   height    Int?
   createdAt DateTime @default(now())

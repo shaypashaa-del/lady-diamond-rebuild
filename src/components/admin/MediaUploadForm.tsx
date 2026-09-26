@@ -19,7 +19,17 @@ export function MediaUploadForm() {
       </div>
       <div>
         <label className="mb-1 block text-xs font-medium text-neutral-500">טקסט חלופי (alt)</label>
-        <input name="altText" className="border border-neutral-300 px-3 py-2 text-sm" />
+        <div className="flex gap-2">
+          {(["he", "en", "ru"] as const).map((locale) => (
+            <div key={locale}>
+              <span className="mb-1 block text-[10px] uppercase text-neutral-400">{locale}</span>
+              <input
+                name={`altText_${locale}`}
+                className="w-36 border border-neutral-300 px-3 py-2 text-sm"
+              />
+            </div>
+          ))}
+        </div>
       </div>
       <button
         type="submit"

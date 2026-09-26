@@ -10,11 +10,11 @@ import { Link } from "@/i18n/navigation";
 // through several images rather than showing one static photo. This
 // reproduces that behavior: a fixed set of real brand photos crossfading
 // on a timer, driven by GSAP instead of a jQuery slider plugin.
-const SLIDES: { src: string; alt: string }[] = [
-  { src: "/brand/hero-heartstone.jpeg", alt: "אישה עונדת תכשיטי Lady Diamond בקולקציית Heart Stone" },
-  { src: "/brand/hero-slide-necklace.jpeg", alt: "שרשרת זהב של Lady Diamond בתקריב" },
-  { src: "/brand/hero-slide-earring.jpeg", alt: "עגילי זהב של Lady Diamond בתקריב" },
-  { src: "/brand/hero-slide-choker.jpeg", alt: "צ'וקר תכשיטים של Lady Diamond בתקריב" },
+const SLIDES: { src: string; altKey: "heroSlideAlt1" | "heroSlideAlt2" | "heroSlideAlt3" | "heroSlideAlt4" }[] = [
+  { src: "/brand/hero-heartstone.jpeg", altKey: "heroSlideAlt1" },
+  { src: "/brand/hero-slide-necklace.jpeg", altKey: "heroSlideAlt2" },
+  { src: "/brand/hero-slide-earring.jpeg", altKey: "heroSlideAlt3" },
+  { src: "/brand/hero-slide-choker.jpeg", altKey: "heroSlideAlt4" },
 ];
 const SLIDE_DURATION_MS = 5500;
 
@@ -68,7 +68,7 @@ export function Hero({
         >
           <Image
             src={slide.src}
-            alt={slide.alt}
+            alt={t(slide.altKey)}
             fill
             priority={i === 0}
             sizes="100vw"

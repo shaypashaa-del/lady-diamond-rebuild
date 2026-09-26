@@ -1,5 +1,5 @@
 import type { Locale } from "@/i18n/routing";
-import { t, type LocalizedText } from "@/lib/i18n-content";
+import { t, tMediaAlt, type LocalizedText } from "@/lib/i18n-content";
 import type { SampleProduct } from "@/lib/products-data";
 
 // Minimal shape we need from a Prisma product query result (with variants + categories included).
@@ -12,7 +12,7 @@ type ProductWithRelations = {
   inventory: number;
   variants: { id: string }[];
   categories: { category: { name: unknown } }[];
-  images?: { media: { url: string; altText: string | null } }[];
+  images?: { media: { url: string; altText: unknown } }[];
 };
 
 export function toCardProduct(product: ProductWithRelations, locale: Locale): SampleProduct {
@@ -38,6 +38,6 @@ export function toCardProduct(product: ProductWithRelations, locale: Locale): Sa
     badge,
     blurb: product.shortDescription ? t(product.shortDescription as LocalizedText, locale) : "",
     imageUrl: firstImage?.url,
-    imageAlt: firstImage?.altText ?? undefined,
+    imageAlt: firstImage ? tMediaAlt(firstImage.altText, locale) || undefined : undefined,
   };
 }

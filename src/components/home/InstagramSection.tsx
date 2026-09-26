@@ -11,17 +11,14 @@ const POSTS = [
   {
     image: "/brand/instagram-post-1.jpg",
     url: "https://www.instagram.com/lady_di_diamond/p/DHBKZHuN9aM/",
-    alt: "פוסט מאינסטגרם @lady_di_diamond",
   },
   {
     image: "/brand/instagram-post-2.jpg",
     url: "https://www.instagram.com/lady_di_diamond/p/DB8Y5C0oKVp/",
-    alt: "פוסט מאינסטגרם @lady_di_diamond",
   },
   {
     image: "/brand/instagram-post-3.jpg",
     url: "https://www.instagram.com/lady_di_diamond/p/C9J7NucN7_d/",
-    alt: "פוסט מאינסטגרם @lady_di_diamond",
   },
 ];
 
@@ -54,7 +51,7 @@ export function InstagramSection() {
             >
               <Image
                 src={post.image}
-                alt={post.alt}
+                alt={t("instagramPostAlt")}
                 fill
                 sizes="(min-width: 640px) 33vw, 33vw"
                 className="object-cover transition-transform duration-500 group-hover:scale-105"

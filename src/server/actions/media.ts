@@ -11,6 +11,15 @@ import { sniffImageType, EXTENSION_BY_TYPE } from "@/lib/image-sniff";
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 const MAX_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
 
+function optionalLocalizedFromForm(formData: FormData, prefix: string) {
+  const value = {
+    he: String(formData.get(`${prefix}_he`) ?? ""),
+    en: String(formData.get(`${prefix}_en`) ?? "") || undefined,
+    ru: String(formData.get(`${prefix}_ru`) ?? "") || undefined,
+  };
+  return value.he || value.en || value.ru ? value : undefined;
+}
+
 // NOTE: stores files on local disk under public/uploads. Fine for development
 // and single-instance deployments, but a real production deployment (multiple
 // server instances, ephemeral filesystems like most serverless platforms)
@@ -20,7 +29,7 @@ const MAX_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
 export async function uploadMedia(formData: FormData) {
   await requireAdminSession();
   const file = formData.get("file");
-  const altText = String(formData.get("altText") ?? "");
+  const altText = optionalLocalizedFromForm(formData, "altText");
 
   if (!(file instanceof File)) {
     return { error: "לא נבחר קובץ." };
@@ -43,7 +52,7 @@ export async function uploadMedia(formData: FormData) {
     data: {
       url: `/uploads/${filename}`,
       filename: file.name,
-      altText: altText || undefined,
+      altText,
     },
   });
 

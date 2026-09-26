@@ -16,7 +16,7 @@ import { Link } from "@/i18n/navigation";
 import { toCardProduct } from "@/lib/catalog-view";
 import { t as localize, type LocalizedText } from "@/lib/i18n-content";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { breadcrumbSchema } from "@/lib/schema";
+import { breadcrumbSchema, itemListSchema } from "@/lib/schema";
 import { SITE_URL } from "@/lib/site-config";
 import { routing, type Locale } from "@/i18n/routing";
 
@@ -124,10 +124,22 @@ export default async function CategoryPage({
   return (
     <div>
       <JsonLd
-        data={breadcrumbSchema([
-          { name: "Home", url: SITE_URL },
-          { name: title, url: `${SITE_URL}${pathFor(locale, `/category/${slug}`)}` },
-        ])}
+        data={[
+          breadcrumbSchema([
+            { name: "Home", url: SITE_URL },
+            { name: title, url: `${SITE_URL}${pathFor(locale, `/category/${slug}`)}` },
+          ]),
+          ...(cards.length > 0
+            ? [
+                itemListSchema(
+                  cards.map((c) => ({
+                    name: c.name,
+                    url: `${SITE_URL}${pathFor(locale, `/product/${c.slug}`)}`,
+                  }))
+                ),
+              ]
+            : []),
+        ]}
       />
 
       {/* A dark jewel-box band, matching the rest of the site's hero

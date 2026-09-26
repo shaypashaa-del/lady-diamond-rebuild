@@ -46,6 +46,20 @@ export function breadcrumbSchema(items: { name: string; url: string }[]) {
   };
 }
 
+export function itemListSchema(items: { name: string; url: string; image?: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: items.map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: item.url,
+      name: item.name,
+      image: item.image,
+    })),
+  };
+}
+
 export function productSchema(product: {
   name: string;
   description: string;

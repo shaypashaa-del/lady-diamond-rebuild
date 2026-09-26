@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getTranslations, getLocale } from "next-intl/server";
 import { ProductCard } from "@/components/product/ProductCard";
 import { getAllPublishedProductsForSearch } from "@/server/repositories/catalog";
@@ -5,6 +6,28 @@ import { FilterBar } from "@/components/category/FilterBar";
 import { toCardProduct } from "@/lib/catalog-view";
 import type { LocalizedText } from "@/lib/i18n-content";
 import type { Locale } from "@/i18n/routing";
+import { routing } from "@/i18n/routing";
+
+// Search results are query-driven, per-visitor, and duplicate the same
+// products already indexable via category pages — classic thin/duplicate
+// content, so we keep the page crawlable (users can still open it from a
+// shared link) but ask search engines not to index it or follow its faceted
+// filter links, and give it a stable per-locale title instead of inheriting
+// the homepage's from the layout.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Nav" });
+  const path = locale === routing.defaultLocale ? "/search" : `/${locale}/search`;
+  return {
+    title: t("search"),
+    alternates: { canonical: path },
+    robots: { index: false, follow: false },
+  };
+}
 
 const DiamondMark = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>

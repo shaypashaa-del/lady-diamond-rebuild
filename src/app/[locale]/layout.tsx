@@ -97,6 +97,17 @@ export async function generateMetadata({
       title: "LADY DIAMOND",
       statusBarStyle: "default",
     },
+    // Google Search Console / Bing Webmaster Tools "HTML tag" verification
+    // method — paste the code each tool gives you (not the whole <meta> tag,
+    // just the `content` value) into NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION /
+    // NEXT_PUBLIC_BING_SITE_VERIFICATION in the deployment env. Left undefined
+    // (and so omitted from the page) until those env vars are set.
+    verification: {
+      google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+      other: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+        ? { "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION }
+        : undefined,
+    },
   };
 }
 

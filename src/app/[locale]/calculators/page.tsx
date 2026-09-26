@@ -4,6 +4,14 @@ import { CalculatorsClient } from "./CalculatorsClient";
 import { getLiveGoldPricePer24kGramIls } from "@/server/services/market-prices";
 import { prisma } from "@/lib/prisma";
 
+// Without this, Next.js statically renders this page once at build time —
+// a plain Prisma call (unlike fetch()) gives no dynamic-rendering signal on
+// its own, so the diamond price tables (and the live gold price) would be
+// frozen at whatever they were during the last deploy and never reflect a
+// later admin edit or DB seed. 5 minutes matches the same ceiling used on
+// the product page for the same reason.
+export const revalidate = 300;
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Calculators");
   return { title: t("pageTitle") };

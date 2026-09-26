@@ -129,32 +129,23 @@ function ResultBox({ label, value }: { label: string; value: string }) {
   );
 }
 
-// Shows the raw material/market cost alongside the final estimated price.
-// Deliberately does NOT show the margin/markup amount or percentage — a
-// customer-facing screen must never expose the store's retail margin.
+// Shows only the final estimated price. Deliberately does NOT show the raw
+// material/market cost alongside it — showing both lets a customer just
+// subtract the two and back out the store's exact margin, which is exactly
+// as much a leak as printing the margin percentage directly.
 function PriceBreakdown({
-  costLabel,
-  cost,
   retailLabel,
   retail,
 }: {
-  costLabel: string;
-  cost: number;
   retailLabel: string;
   retail: number;
 }) {
   return (
-    <div className="mt-8 border border-gold-bright bg-paper p-6">
-      <div className="flex items-center justify-between text-sm text-ink/60">
-        <span>{costLabel}</span>
-        <span dir="ltr">₪{cost.toLocaleString()}</span>
-      </div>
-      <div className="mt-3 flex items-center justify-between border-t border-gold-soft pt-3">
-        <span className="text-xs uppercase tracking-wide text-ink/60">{retailLabel}</span>
-        <span className="text-2xl font-semibold text-ink" dir="ltr">
-          ₪{retail.toLocaleString()}
-        </span>
-      </div>
+    <div className="mt-8 border border-gold-bright bg-paper p-6 text-center">
+      <span className="text-xs uppercase tracking-wide text-ink/60">{retailLabel}</span>
+      <p className="mt-2 text-2xl font-semibold text-ink" dir="ltr">
+        ₪{retail.toLocaleString()}
+      </p>
     </div>
   );
 }
@@ -166,7 +157,7 @@ function DiamondCalculator() {
   const [color, setColor] = useState("G-H");
   const [clarity, setClarity] = useState("VS");
 
-  const { cost, retail } = useMemo(() => {
+  const { retail } = useMemo(() => {
     const perCaratBase = BASE_PRICE_PER_CARAT * SHAPE_MULTIPLIER[shape] * COLOR_MULTIPLIER[color] * CLARITY_MULTIPLIER[clarity];
     const perCaratAdjusted = perCaratBase * caratWeightFactor(carat);
     const costValue = Math.round(perCaratAdjusted * carat);
@@ -220,12 +211,7 @@ function DiamondCalculator() {
         </Field>
 
         <div className="sm:col-span-2">
-          <PriceBreakdown
-            costLabel={t("marketCost")}
-            cost={cost}
-            retailLabel={t("estimatedPrice")}
-            retail={retail}
-          />
+          <PriceBreakdown retailLabel={t("estimatedPrice")} retail={retail} />
           <p className="mt-3 text-center text-xs text-ink/50">{t("diamondNote")}</p>
         </div>
       </div>
@@ -242,7 +228,7 @@ function GoldCalculator({ liveGoldPrice }: { liveGoldPrice: LiveGoldPrice | null
   // rather than ever silently showing a made-up or stale number.
   const [pricePerGram24k, setPricePerGram24k] = useState(liveGoldPrice?.pricePerGram24kIls ?? 0);
 
-  const { cost, retail } = useMemo(() => {
+  const { retail } = useMemo(() => {
     const costValue = Math.round(grams * (karat / 24) * pricePerGram24k);
     return { cost: costValue, retail: Math.round(costValue * (1 + RETAIL_MARGIN)) };
   }, [grams, karat, pricePerGram24k]);
@@ -297,12 +283,7 @@ function GoldCalculator({ liveGoldPrice }: { liveGoldPrice: LiveGoldPrice | null
         </Field>
 
         <div className="sm:col-span-2">
-          <PriceBreakdown
-            costLabel={t("goldMarketValue")}
-            cost={cost}
-            retailLabel={t("estimatedValue")}
-            retail={retail}
-          />
+          <PriceBreakdown retailLabel={t("estimatedValue")} retail={retail} />
           <p className="mt-3 text-center text-xs text-ink/50">{t("goldNote")}</p>
         </div>
       </div>

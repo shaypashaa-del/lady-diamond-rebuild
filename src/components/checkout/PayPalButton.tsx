@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 
 // Renders PayPal's own Buttons SDK — this is real, working PayPal Checkout,
 // not a placeholder. It defaults to PayPal's public sandbox test client id
@@ -46,6 +47,7 @@ export function PayPalButton({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
+  const t = useTranslations("Checkout");
 
   useEffect(() => {
     let cancelled = false;
@@ -67,15 +69,15 @@ export function PayPalButton({
                 const captured = await actions.order.capture();
                 onApproved(captured.id);
               } catch {
-                onError("אימות התשלום מול PayPal נכשל. נסו שוב.");
+                onError(t("paypalCaptureFailed"));
               }
             },
-            onError: () => onError("אירעה שגיאה בתשלום PayPal. נסו שוב."),
+            onError: () => onError(t("paypalError")),
           })
           .render(containerRef.current);
         setLoading(false);
       })
-      .catch(() => onError("טעינת PayPal נכשלה. בדקו את החיבור ונסו שוב."));
+      .catch(() => onError(t("paypalLoadFailed")));
 
     return () => {
       cancelled = true;
@@ -85,7 +87,7 @@ export function PayPalButton({
 
   return (
     <div className={disabled ? "pointer-events-none opacity-50" : undefined}>
-      {loading && <p className="mb-2 text-xs text-ink/50">טוען PayPal...</p>}
+      {loading && <p className="mb-2 text-xs text-ink/50">{t("paypalLoading")}</p>}
       <div ref={containerRef} />
     </div>
   );

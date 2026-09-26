@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { getConfiguredPrice } from "@/server/actions/product-pricing";
 
 export type MaterialOption = {
@@ -24,42 +25,33 @@ export type DiamondOption = {
   qualityTierLabel: string | null;
 };
 
-const METAL_LABEL: Record<string, string> = { GOLD: "זהב", SILVER: "כסף", PLATINUM: "פלטינה" };
-const PURITY_LABEL: Record<string, string> = {
-  K9: "9K", K14: "14K", K18: "18K", K22: "22K", K24: "24K", S925: "925", S999: "999", PT950: "950",
-};
-const GOLD_COLOR_LABEL: Record<string, string> = { YELLOW: "זהב צהוב", WHITE: "זהב לבן", ROSE: "זהב רוז" };
-const SHAPE_LABEL: Record<string, string> = {
-  ROUND: "עגול", OVAL: "אובלי", EMERALD: "אמרלד", PRINCESS: "פרינסס", PEAR: "אגס",
-  MARQUISE: "מרקיז", CUSHION: "כרית", RADIANT: "רדיאנט", ASSCHER: "אשר", HEART: "לב",
-};
-const DIAMOND_TYPE_LABEL: Record<string, string> = {
-  NATURAL: "יהלום טבעי",
-  LAB_GROWN: "יהלום מעבדה",
-  FANCY_COLOR: "יהלום טבעי בגוון (Fancy Color)",
-};
-
 // Swatch colors for the round color-picker dots — a real gold-tone hex per
 // color, not a generic UI accent, so the dot itself reads as "this metal"
 // the way a jewelry site's swatches do.
 const GOLD_COLOR_SWATCH: Record<string, string> = { YELLOW: "#D4AF37", WHITE: "#D9D9D9", ROSE: "#E8B4A0" };
 
-function materialLabel(m: MaterialOption) {
-  const metal = m.metalType === "GOLD" && m.goldColor ? GOLD_COLOR_LABEL[m.goldColor] : METAL_LABEL[m.metalType];
-  return `${metal} ${PURITY_LABEL[m.purity]}`;
+type Translator = ReturnType<typeof useTranslations>;
+
+function materialLabel(t: Translator, m: MaterialOption) {
+  const metal =
+    m.metalType === "GOLD" && m.goldColor ? t(`goldColor_${m.goldColor}`) : t(`metal_${m.metalType}`);
+  return `${metal} ${t(`purity_${m.purity}`)}`;
 }
 
-// A customer sees "0.5ct עגול · טבעי · קלאסי" — not raw grade codes like
-// "color G, clarity VS1", which mean nothing to most shoppers. The tier
+// A customer sees "0.5ct Round · Natural · Classic" — not raw grade codes
+// like "color G, clarity VS1", which mean nothing to most shoppers. The tier
 // label (see DIAMOND_QUALITY_TIERS) stands in for the technical grades;
 // only diamonds the admin set up without a tier fall back to showing them.
-function diamondLabel(d: DiamondOption) {
+function diamondLabel(t: Translator, d: DiamondOption) {
   const quality = d.qualityTierLabel
     ? d.qualityTierLabel
-    : [d.colorGrade && `צבע ${d.colorGrade}`, d.clarityGrade && `ניקיון ${d.clarityGrade}`]
+    : [
+        d.colorGrade && t("colorGradeLabel", { grade: d.colorGrade }),
+        d.clarityGrade && t("clarityGradeLabel", { grade: d.clarityGrade }),
+      ]
         .filter(Boolean)
         .join(" · ");
-  return `${d.caratWeight}ct ${SHAPE_LABEL[d.shape]} · ${DIAMOND_TYPE_LABEL[d.diamondType]}${
+  return `${d.caratWeight}ct ${t(`shape_${d.shape}`)} · ${t(`diamondType_${d.diamondType}`)}${
     quality ? ` · ${quality}` : ""
   }`;
 }
@@ -85,6 +77,7 @@ export function ConfigurablePriceSelector({
     null
   );
   const [isPending, startTransition] = useTransition();
+  const t = useTranslations("Product");
 
   const material = materialOptions.find((m) => m.id === materialId);
   const diamond = diamondOptions.find((d) => d.id === diamondId);
@@ -133,10 +126,10 @@ export function ConfigurablePriceSelector({
           selection below it rather than being fixed. */}
       <div>
         <p className="text-xs uppercase tracking-wide text-ink/50">
-          {materialOptions.length > 1 || diamondOptions.length > 1 ? "החל מ-" : "מחיר"}
+          {materialOptions.length > 1 || diamondOptions.length > 1 ? t("startingFrom") : t("priceLabel")}
         </p>
         <div className="text-3xl font-semibold text-ink" aria-live="polite">
-          {isPending && <span className="text-lg font-normal text-ink/50">מעדכן מחיר…</span>}
+          {isPending && <span className="text-lg font-normal text-ink/50">{t("updatingPrice")}</span>}
           {!isPending && result?.ok && `${result.sellingPrice.toLocaleString("he-IL")} ₪`}
           {!isPending && result && !result.ok && (
             <span className="text-base font-normal text-ink/60">{result.message}</span>
@@ -146,7 +139,7 @@ export function ConfigurablePriceSelector({
 
       <div>
         <label className="mb-2 block text-sm font-medium text-ink">
-          {hasGoldColorSwatches ? "צבע זהב" : "חומר"}
+          {hasGoldColorSwatches ? t("goldColorLabel") : t("materialLabel")}
         </label>
         {hasGoldColorSwatches ? (
           <div className="flex flex-wrap items-center gap-3">
@@ -154,8 +147,8 @@ export function ConfigurablePriceSelector({
               <button
                 key={m.id}
                 type="button"
-                title={materialLabel(m)}
-                aria-label={materialLabel(m)}
+                title={materialLabel(t, m)}
+                aria-label={materialLabel(t, m)}
                 aria-pressed={m.id === materialId}
                 onClick={() => setMaterialId(m.id)}
                 className={`h-8 w-8 rounded-full border-2 transition-transform ${
@@ -168,12 +161,12 @@ export function ConfigurablePriceSelector({
               />
             ))}
             <span className="text-sm text-ink/70">
-              {material ? materialLabel(material) : ""}
+              {material ? materialLabel(t, material) : ""}
             </span>
           </div>
         ) : null}
         {hasGoldColorSwatches && (
-          <p className="mt-2 text-xs text-ink/50">מיוצר לפי הזמנה. הגוון בתמונה להמחשה.</p>
+          <p className="mt-2 text-xs text-ink/50">{t("madeToOrderDisclaimer")}</p>
         )}
         {!hasGoldColorSwatches && (
           <div className="flex flex-wrap gap-2">
@@ -188,7 +181,7 @@ export function ConfigurablePriceSelector({
                     : "border-gold-soft text-ink hover:border-gold-bright"
                 }`}
               >
-                {materialLabel(m)}
+                {materialLabel(t, m)}
               </button>
             ))}
           </div>
@@ -198,7 +191,7 @@ export function ConfigurablePriceSelector({
       {diamondOptions.length > 0 && (
         <div>
           <label className="mb-2 block text-sm font-medium text-ink">
-            {isCaratOnlyChoice ? "בחרי לפי קראט" : "יהלום"}
+            {isCaratOnlyChoice ? t("chooseByCarat") : t("diamondLabel")}
           </label>
           {isCaratOnlyChoice ? (
             // Same shape/type across all options (e.g. a solitaire ring
@@ -214,7 +207,7 @@ export function ConfigurablePriceSelector({
                 .sort((a, b) => a.caratWeight - b.caratWeight)
                 .map((d) => (
                   <option key={d.id} value={d.id}>
-                    {d.caratWeight} קראט
+                    {t("caratUnit", { weight: d.caratWeight })}
                   </option>
                 ))}
             </select>
@@ -231,7 +224,7 @@ export function ConfigurablePriceSelector({
                       : "border-gold-soft text-ink hover:border-gold-bright"
                   }`}
                 >
-                  {diamondLabel(d)}
+                  {diamondLabel(t, d)}
                 </button>
               ))}
             </div>
@@ -240,11 +233,12 @@ export function ConfigurablePriceSelector({
       )}
 
       {/* Plain-language summary of exactly what's selected — no internal
-          cost data, per AGENTS.md step 20/26. */}
+          cost data. */}
       {material && (
         <p className="rounded-lg bg-paper-soft px-4 py-3 text-sm leading-relaxed text-ink/80">
-          אתה קונה: {materialLabel(material)}
-          {diamond ? ` עם ${diamondLabel(diamond)}` : ""}.
+          {t("youAreBuying", {
+            summary: `${materialLabel(t, material)}${diamond ? ` · ${diamondLabel(t, diamond)}` : ""}`,
+          })}
         </p>
       )}
 
@@ -252,32 +246,32 @@ export function ConfigurablePriceSelector({
         <details className="group border border-gold-soft/60 open:border-gold-soft">
           <summary className="cursor-pointer select-none px-4 py-3 text-sm font-medium text-ink marker:content-none">
             <span className="inline-flex items-center gap-1.5">
-              נתוני אבן החן
+              {t("gemstoneDetails")}
               <span className="text-ink/40 transition-transform group-open:rotate-180">▾</span>
             </span>
           </summary>
           <dl className="grid grid-cols-2 gap-x-4 gap-y-2 border-t border-gold-soft/60 px-4 py-3 text-sm">
-            <dt className="text-ink/50">סוג</dt>
-            <dd className="text-ink">{DIAMOND_TYPE_LABEL[diamond.diamondType]}</dd>
-            <dt className="text-ink/50">צורה</dt>
-            <dd className="text-ink">{SHAPE_LABEL[diamond.shape] ?? diamond.shape}</dd>
-            <dt className="text-ink/50">משקל</dt>
-            <dd className="text-ink">{diamond.caratWeight} קראט</dd>
+            <dt className="text-ink/50">{t("detailType")}</dt>
+            <dd className="text-ink">{t(`diamondType_${diamond.diamondType}`)}</dd>
+            <dt className="text-ink/50">{t("detailShape")}</dt>
+            <dd className="text-ink">{t(`shape_${diamond.shape}`)}</dd>
+            <dt className="text-ink/50">{t("detailWeight")}</dt>
+            <dd className="text-ink">{t("caratUnit", { weight: diamond.caratWeight })}</dd>
             {diamond.quantity > 1 && (
               <>
-                <dt className="text-ink/50">כמות אבנים</dt>
+                <dt className="text-ink/50">{t("detailQuantity")}</dt>
                 <dd className="text-ink">{diamond.quantity}</dd>
               </>
             )}
             {diamond.colorGrade && (
               <>
-                <dt className="text-ink/50">גוון</dt>
+                <dt className="text-ink/50">{t("detailColor")}</dt>
                 <dd className="text-ink">{diamond.colorGrade}</dd>
               </>
             )}
             {diamond.clarityGrade && (
               <>
-                <dt className="text-ink/50">ניקיון</dt>
+                <dt className="text-ink/50">{t("detailClarity")}</dt>
                 <dd className="text-ink">{diamond.clarityGrade}</dd>
               </>
             )}

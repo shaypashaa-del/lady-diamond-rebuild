@@ -13,15 +13,6 @@ const DiamondMark = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const statusLabels: Record<string, string> = {
-  PENDING: "ממתינה",
-  PROCESSING: "בטיפול",
-  SHIPPED: "נשלחה",
-  COMPLETED: "הושלמה",
-  CANCELLED: "בוטלה",
-  REFUNDED: "זוכתה",
-};
-
 export default async function CustomerOrderDetailPage({
   params,
 }: {
@@ -56,7 +47,7 @@ export default async function CustomerOrderDetailPage({
         {t("title")} {order.orderNumber}
       </h1>
       <p className="mb-8 text-sm text-ink/60">
-        {order.createdAt.toLocaleDateString("he-IL")} · {statusLabels[order.status]}
+        {order.createdAt.toLocaleDateString("he-IL")} · {t(`status_${order.status}`)}
       </p>
 
       <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink/70">

@@ -38,8 +38,8 @@ export function Footer() {
             <Image src="/brand/logo.png" alt={t("brand")} width={72} height={58} className="h-14 w-auto brightness-0 invert" />
             <p className="mt-5 max-w-[26ch] text-sm leading-6 text-paper/60">{t("tagline")}</p>
             <p className="mt-4 text-sm text-paper/50">{t("address")}</p>
-            <a href="tel:+972503781589" className="mt-2 block text-sm text-paper/50 transition-colors hover:text-gold-bright" dir="ltr">
-              +972-50-3781589
+            <a href="tel:+972503781589" className="mt-2 block text-sm text-paper/50 transition-colors hover:text-gold-bright">
+              <bdi dir="ltr">+972-50-3781589</bdi>
             </a>
             <p className="mt-1 text-xs text-paper/40">{t("hours")}</p>
             <SocialLinks variant="dark" className="mt-6 flex items-center gap-3" />

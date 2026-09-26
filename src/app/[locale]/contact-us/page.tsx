@@ -7,6 +7,12 @@ import { ContactForm } from "./ContactForm";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { SocialLinks } from "@/components/layout/SocialLinks";
 
+// This page reads its content from the DB (Page model) via a plain Prisma
+// query in a Server Component — without an explicit revalidate, Next.js
+// statically freezes it at build time, so admin edits never show up in
+// production (same class of bug as the shapes-page pricing freeze).
+export const revalidate = 300;
+
 const DiamondMark = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
     <path d="M12 2 L21 9 L12 22 L3 9 Z" stroke="currentColor" strokeWidth="0.4" />

@@ -7,6 +7,13 @@ import { t as localize, type LocalizedText } from "@/lib/i18n-content";
 import type { Locale } from "@/i18n/routing";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
+// This page reads its content from the DB (Page model) via a plain Prisma
+// query in a Server Component — without an explicit revalidate, Next.js
+// statically freezes it at build time, so admin edits to the About Us
+// story/quote never show up in production (same class of bug as the
+// shapes-page pricing freeze; see AGENTS.md history).
+export const revalidate = 300;
+
 type AboutBody = {
   story: LocalizedText;
   quote: LocalizedText;

@@ -160,7 +160,11 @@ export function ConfigurablePriceSelector({
               {material ? materialLabel(material) : ""}
             </span>
           </div>
-        ) : (
+        ) : null}
+        {hasGoldColorSwatches && (
+          <p className="mt-2 text-xs text-ink/50">מיוצר לפי הזמנה. הגוון בתמונה להמחשה.</p>
+        )}
+        {!hasGoldColorSwatches && (
           <div className="flex flex-wrap gap-2">
             {materialOptions.map((m) => (
               <button

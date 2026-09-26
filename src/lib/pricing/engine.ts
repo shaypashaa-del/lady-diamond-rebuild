@@ -92,11 +92,15 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
-type DiamondPriceLookup =
+export type DiamondPriceLookup =
   | { ok: true; pricePerCarat: number }
   | { ok: false; reason: "MISSING_DIAMOND_PRICE" | "MISSING_FX_RATE"; detail: string };
 
-function findDiamondPrice(
+// Exported so any customer-facing "estimate a diamond's price" surface
+// (currently just the public calculator) reuses the exact same lookup the
+// real product pricing engine uses, instead of a second, drifting copy of
+// the logic with its own guessed numbers.
+export function findDiamondPrice(
   spec: DiamondSelection,
   entries: DiamondPriceEntryLike[],
   baseCostRanges: DiamondBaseCostRangeLike[]
@@ -202,4 +206,24 @@ export function computeConfiguredPrice(input: PricingCostInputs): PricingResult 
     grossProfit: round2(grossProfit),
     grossMargin: GROSS_MARGIN,
   };
+}
+
+export type DiamondOnlyEstimate = { ok: true; retailPrice: number } | { ok: false; detail: string };
+
+// A diamond-only price estimate — for the public calculator, which has no
+// metal/manufacturing inputs to combine with. Uses the exact same
+// findDiamondPrice lookup and GROSS_MARGIN formula as computeConfiguredPrice,
+// so an estimate here can never imply a different price than a real product
+// page would compute for the same diamond. Never returns a cost breakdown —
+// only the final retail figure, same customer-facing rule as everywhere else.
+export function estimateDiamondRetailPrice(
+  spec: DiamondSelection,
+  diamondPriceEntries: DiamondPriceEntryLike[],
+  diamondBaseCostRanges: DiamondBaseCostRangeLike[]
+): DiamondOnlyEstimate {
+  const lookup = findDiamondPrice(spec, diamondPriceEntries, diamondBaseCostRanges);
+  if (!lookup.ok) return { ok: false, detail: lookup.detail };
+  const cost = lookup.pricePerCarat * spec.caratWeight * spec.quantity;
+  const retailPrice = cost / (1 - GROSS_MARGIN);
+  return { ok: true, retailPrice: round2(retailPrice) };
 }

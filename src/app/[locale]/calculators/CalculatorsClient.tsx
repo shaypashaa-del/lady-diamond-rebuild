@@ -5,60 +5,30 @@ import { useTranslations } from "next-intl";
 import { circumferenceMmToUsSize, circumferenceMmToIsraeliSize } from "@/lib/ring-size";
 import { RingScreenSizer, RingSizeReferenceTables, DiamondGlyph, LuxuryPanel } from "./RingScreenSizer";
 import type { LiveGoldPrice } from "@/server/services/market-prices";
+import {
+  estimateDiamondRetailPrice,
+  type DiamondPriceEntryLike,
+  type DiamondBaseCostRangeLike,
+} from "@/lib/pricing/engine";
 
 type Tab = "diamond" | "gold" | "size";
 
-// Retail margin applied on top of the raw material/market cost in both the
-// diamond and gold calculators, per the store's pricing policy.
+// Retail margin applied on top of the raw material/market cost in the gold
+// calculator (the diamond calculator now uses the real pricing engine's own
+// GROSS_MARGIN via estimateDiamondRetailPrice instead of this constant).
 const RETAIL_MARGIN = 0.2;
-
-// Base price (ILS) per carat for a round, G-color, VS-clarity, 1.00ct diamond —
-// a reference midpoint only; real prices vary by exact grading and market
-// conditions, so results are explicitly labeled as estimates throughout.
-const BASE_PRICE_PER_CARAT = 18000;
-
-const SHAPE_MULTIPLIER: Record<string, number> = {
-  round: 1.0,
-  princess: 0.85,
-  oval: 0.9,
-  cushion: 0.82,
-  emerald: 0.78,
-  pear: 0.83,
-  marquise: 0.8,
-  radiant: 0.8,
-  heart: 0.75,
-};
-
-const COLOR_MULTIPLIER: Record<string, number> = {
-  "D-F": 1.35,
-  "G-H": 1.0,
-  "I-J": 0.78,
-  "K-M": 0.55,
-};
-
-const CLARITY_MULTIPLIER: Record<string, number> = {
-  "FL-IF": 1.6,
-  VVS: 1.3,
-  VS: 1.0,
-  SI: 0.72,
-  I: 0.42,
-};
-
-// Larger stones command a higher price *per carat*, not just linear scaling.
-function caratWeightFactor(carat: number): number {
-  if (carat < 0.3) return 0.55;
-  if (carat < 0.5) return 0.75;
-  if (carat < 0.7) return 0.9;
-  if (carat < 1.0) return 1.0;
-  if (carat < 1.5) return 1.35;
-  if (carat < 2.0) return 1.7;
-  if (carat < 3.0) return 2.2;
-  return 2.8;
-}
 
 const GOLD_KARATS = [24, 22, 18, 14, 10, 9] as const;
 
-export function CalculatorsClient({ liveGoldPrice }: { liveGoldPrice: LiveGoldPrice | null }) {
+export function CalculatorsClient({
+  liveGoldPrice,
+  diamondPriceEntries,
+  diamondBaseCostRanges,
+}: {
+  liveGoldPrice: LiveGoldPrice | null;
+  diamondPriceEntries: DiamondPriceEntryLike[];
+  diamondBaseCostRanges: DiamondBaseCostRangeLike[];
+}) {
   const t = useTranslations("Calculators");
   const [tab, setTab] = useState<Tab>("diamond");
 
@@ -101,7 +71,9 @@ export function CalculatorsClient({ liveGoldPrice }: { liveGoldPrice: LiveGoldPr
           ))}
         </div>
 
-        {tab === "diamond" && <DiamondCalculator />}
+        {tab === "diamond" && (
+          <DiamondCalculator diamondPriceEntries={diamondPriceEntries} diamondBaseCostRanges={diamondBaseCostRanges} />
+        )}
         {tab === "gold" && <GoldCalculator liveGoldPrice={liveGoldPrice} />}
         {tab === "size" && <SizeCalculator />}
       </div>
@@ -150,19 +122,70 @@ function PriceBreakdown({
   );
 }
 
-function DiamondCalculator() {
+// UI origin options -> real diamondType + fancyColor pair the pricing
+// engine understands. "Natural Brown/Champagne" from the owner's spec is
+// modeled as FANCY_COLOR + fancyColor=BROWN_CHAMPAGNE (see
+// resolveDiamondCostCategory), not a fourth top-level type.
+const ORIGIN_OPTIONS = [
+  { id: "natural", diamondType: "NATURAL" as const, fancyColor: null },
+  { id: "lab_cvd", diamondType: "LAB_GROWN" as const, fancyColor: null, growthMethod: "CVD" as const },
+  { id: "lab_hpht", diamondType: "LAB_GROWN" as const, fancyColor: null, growthMethod: "HPHT" as const },
+  { id: "fancy_brown_champagne", diamondType: "FANCY_COLOR" as const, fancyColor: "BROWN_CHAMPAGNE" },
+  { id: "fancy_yellow", diamondType: "FANCY_COLOR" as const, fancyColor: "YELLOW" },
+  { id: "fancy_orange", diamondType: "FANCY_COLOR" as const, fancyColor: "ORANGE" },
+  { id: "fancy_pink", diamondType: "FANCY_COLOR" as const, fancyColor: "PINK" },
+  { id: "fancy_green", diamondType: "FANCY_COLOR" as const, fancyColor: "GREEN" },
+  { id: "fancy_blue", diamondType: "FANCY_COLOR" as const, fancyColor: "BLUE" },
+  { id: "fancy_red", diamondType: "FANCY_COLOR" as const, fancyColor: "RED" },
+] as const;
+
+const SHAPE_OPTIONS = [
+  "ROUND", "OVAL", "EMERALD", "PRINCESS", "PEAR", "MARQUISE", "CUSHION", "RADIANT", "ASSCHER", "HEART",
+] as const;
+
+// Representative single grade per band, only used to populate the
+// DiamondSelection so the category fallback (natural white diamonds outside
+// any priced carat band) can bucket correctly — the granular price-table
+// lookup itself matches on shape/carat only (see DiamondPriceEntry seed
+// data), so within a priced band the exact grade chosen here doesn't change
+// the result, same as on a real product page.
+const COLOR_BAND_GRADE: Record<string, string> = { "D-F": "E", "G-H": "G", "I-J": "I", "K-M": "L" };
+const CLARITY_BAND_GRADE: Record<string, string> = { "FL-IF": "IF", VVS: "VVS2", VS: "VS1", SI: "SI1", I: "I1" };
+const FANCY_INTENSITY_OPTIONS = ["LIGHT", "FANCY", "INTENSE", "VIVID", "DEEP", "DARK"] as const;
+
+function DiamondCalculator({
+  diamondPriceEntries,
+  diamondBaseCostRanges,
+}: {
+  diamondPriceEntries: DiamondPriceEntryLike[];
+  diamondBaseCostRanges: DiamondBaseCostRangeLike[];
+}) {
   const t = useTranslations("Calculators");
+  const [originId, setOriginId] = useState<(typeof ORIGIN_OPTIONS)[number]["id"]>("natural");
   const [carat, setCarat] = useState(1);
-  const [shape, setShape] = useState("round");
+  const [shape, setShape] = useState<(typeof SHAPE_OPTIONS)[number]>("ROUND");
   const [color, setColor] = useState("G-H");
   const [clarity, setClarity] = useState("VS");
+  const [fancyIntensity, setFancyIntensity] = useState<(typeof FANCY_INTENSITY_OPTIONS)[number]>("FANCY");
 
-  const { retail } = useMemo(() => {
-    const perCaratBase = BASE_PRICE_PER_CARAT * SHAPE_MULTIPLIER[shape] * COLOR_MULTIPLIER[color] * CLARITY_MULTIPLIER[clarity];
-    const perCaratAdjusted = perCaratBase * caratWeightFactor(carat);
-    const costValue = Math.round(perCaratAdjusted * carat);
-    return { cost: costValue, retail: Math.round(costValue * (1 + RETAIL_MARGIN)) };
-  }, [carat, shape, color, clarity]);
+  const origin = ORIGIN_OPTIONS.find((o) => o.id === originId) ?? ORIGIN_OPTIONS[0];
+  const isFancy = origin.diamondType === "FANCY_COLOR";
+
+  const estimate = useMemo(() => {
+    return estimateDiamondRetailPrice(
+      {
+        diamondType: origin.diamondType,
+        shape,
+        caratWeight: carat,
+        colorGrade: isFancy ? null : (COLOR_BAND_GRADE[color] ?? null),
+        clarityGrade: isFancy ? null : (CLARITY_BAND_GRADE[clarity] ?? null),
+        fancyColor: origin.fancyColor,
+        quantity: 1,
+      },
+      diamondPriceEntries,
+      diamondBaseCostRanges
+    );
+  }, [origin, shape, carat, color, clarity, isFancy, diamondPriceEntries, diamondBaseCostRanges]);
 
   return (
     <LuxuryPanel>
@@ -171,6 +194,19 @@ function DiamondCalculator() {
         <DiamondGlyph className="h-5 w-5 shrink-0 text-gold-bright" />
       </div>
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <Field label={t("origin")}>
+          <select
+            value={originId}
+            onChange={(e) => setOriginId(e.target.value as (typeof ORIGIN_OPTIONS)[number]["id"])}
+            className={inputClass}
+          >
+            {ORIGIN_OPTIONS.map((o) => (
+              <option key={o.id} value={o.id}>
+                {t(`origin_${o.id}`)}
+              </option>
+            ))}
+          </select>
+        </Field>
         <Field label={t("caratWeight")}>
           <input
             type="number"
@@ -183,35 +219,62 @@ function DiamondCalculator() {
           />
         </Field>
         <Field label={t("shape")}>
-          <select value={shape} onChange={(e) => setShape(e.target.value)} className={inputClass}>
-            {Object.keys(SHAPE_MULTIPLIER).map((s) => (
+          <select value={shape} onChange={(e) => setShape(e.target.value as (typeof SHAPE_OPTIONS)[number])} className={inputClass}>
+            {SHAPE_OPTIONS.map((s) => (
               <option key={s} value={s}>
-                {t(`shape_${s}`)}
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Field label={t("color")}>
-          <select value={color} onChange={(e) => setColor(e.target.value)} className={inputClass}>
-            {Object.keys(COLOR_MULTIPLIER).map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Field label={t("clarity")}>
-          <select value={clarity} onChange={(e) => setClarity(e.target.value)} className={inputClass}>
-            {Object.keys(CLARITY_MULTIPLIER).map((c) => (
-              <option key={c} value={c}>
-                {c}
+                {t(`shape_${s.toLowerCase()}`)}
               </option>
             ))}
           </select>
         </Field>
 
+        {!isFancy && (
+          <>
+            <Field label={t("color")}>
+              <select value={color} onChange={(e) => setColor(e.target.value)} className={inputClass}>
+                {Object.keys(COLOR_BAND_GRADE).map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label={t("clarity")}>
+              <select value={clarity} onChange={(e) => setClarity(e.target.value)} className={inputClass}>
+                {Object.keys(CLARITY_BAND_GRADE).map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          </>
+        )}
+
+        {isFancy && (
+          <Field label={t("fancyIntensity")}>
+            <select
+              value={fancyIntensity}
+              onChange={(e) => setFancyIntensity(e.target.value as (typeof FANCY_INTENSITY_OPTIONS)[number])}
+              className={inputClass}
+            >
+              {FANCY_INTENSITY_OPTIONS.map((i) => (
+                <option key={i} value={i}>
+                  {t(`fancyIntensity_${i}`)}
+                </option>
+              ))}
+            </select>
+          </Field>
+        )}
+
         <div className="sm:col-span-2">
-          <PriceBreakdown retailLabel={t("estimatedPrice")} retail={retail} />
+          {estimate.ok ? (
+            <PriceBreakdown retailLabel={t("estimatedPrice")} retail={estimate.retailPrice} />
+          ) : (
+            <div className="mt-8 border border-clay/30 bg-clay/10 p-6 text-center text-sm text-clay">
+              {t("diamondPricingUnavailable")}
+            </div>
+          )}
           <p className="mt-3 text-center text-xs text-ink/50">{t("diamondNote")}</p>
         </div>
       </div>

@@ -34,15 +34,25 @@ export async function getLiveGoldPricePer24kGramIls(): Promise<LiveGoldPrice | n
     if (!res.ok) return null;
 
     const data = (await res.json()) as {
-      symbols?: { symbol?: string; quote_currency?: string; price?: string; is_stale?: boolean }[];
+      symbols?: { symbol?: string; quote_currency?: string; price?: string; is_stale?: boolean; computed_at?: string }[];
     };
     const quote = data.symbols?.find((s) => s.symbol === "XAU" && s.quote_currency === "ILS");
     const pricePerOunce = quote?.price ? Number(quote.price) : NaN;
 
+    // The vendor's own `is_stale` flag turns out to be true on essentially
+    // every response we've observed on their free tier — even for a quote
+    // computed a few hours ago — so trusting it outright made this reject
+    // almost every real fetch. Judge staleness ourselves from `computed_at`
+    // instead: reject only a quote old enough to actually be untrustworthy
+    // (or with no timestamp to check at all).
+    const computedAt = quote?.computed_at ? new Date(quote.computed_at) : null;
+    const ageMs = computedAt ? Date.now() - computedAt.getTime() : Infinity;
+    const MAX_QUOTE_AGE_MS = 48 * 60 * 60 * 1000; // 48h — generous given no live paid feed exists
+
     // Sanity bounds — reject anything that isn't a plausible gold price, so
     // a malformed or unexpected response from the third party never turns
     // into a wildly wrong number shown as if it were real.
-    if (!Number.isFinite(pricePerOunce) || pricePerOunce < 3000 || pricePerOunce > 40000 || quote?.is_stale) {
+    if (!Number.isFinite(pricePerOunce) || pricePerOunce < 3000 || pricePerOunce > 40000 || ageMs > MAX_QUOTE_AGE_MS) {
       return null;
     }
 

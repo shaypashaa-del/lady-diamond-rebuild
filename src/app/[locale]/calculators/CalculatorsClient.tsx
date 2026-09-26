@@ -129,30 +129,25 @@ function ResultBox({ label, value }: { label: string; value: string }) {
   );
 }
 
-// Shows the raw material/market cost alongside the retail price after the
-// store's margin — transparent breakdown rather than a single opaque number.
+// Shows the raw material/market cost alongside the final estimated price.
+// Deliberately does NOT show the margin/markup amount or percentage — a
+// customer-facing screen must never expose the store's retail margin.
 function PriceBreakdown({
   costLabel,
   cost,
   retailLabel,
   retail,
-  marginLabel,
 }: {
   costLabel: string;
   cost: number;
   retailLabel: string;
   retail: number;
-  marginLabel: string;
 }) {
   return (
     <div className="mt-8 border border-gold-bright bg-paper p-6">
       <div className="flex items-center justify-between text-sm text-ink/60">
         <span>{costLabel}</span>
         <span dir="ltr">₪{cost.toLocaleString()}</span>
-      </div>
-      <div className="mt-2 flex items-center justify-between text-sm text-ink/60">
-        <span>{marginLabel}</span>
-        <span dir="ltr">+₪{(retail - cost).toLocaleString()}</span>
       </div>
       <div className="mt-3 flex items-center justify-between border-t border-gold-soft pt-3">
         <span className="text-xs uppercase tracking-wide text-ink/60">{retailLabel}</span>
@@ -228,7 +223,6 @@ function DiamondCalculator() {
           <PriceBreakdown
             costLabel={t("marketCost")}
             cost={cost}
-            marginLabel={t("retailMargin")}
             retailLabel={t("estimatedPrice")}
             retail={retail}
           />
@@ -306,7 +300,6 @@ function GoldCalculator({ liveGoldPrice }: { liveGoldPrice: LiveGoldPrice | null
           <PriceBreakdown
             costLabel={t("goldMarketValue")}
             cost={cost}
-            marginLabel={t("retailMargin")}
             retailLabel={t("estimatedValue")}
             retail={retail}
           />

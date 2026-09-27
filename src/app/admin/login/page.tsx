@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { loginAdmin, type AuthResult } from "@/server/actions/auth";
 
@@ -44,6 +45,12 @@ export default function AdminLoginPage() {
         >
           {pending ? "מתחבר..." : "כניסה"}
         </button>
+
+        <p className="mt-4 text-center text-sm text-neutral-500">
+          <Link href="/admin/forgot-password" className="font-medium text-neutral-900 hover:underline">
+            שכחת סיסמה?
+          </Link>
+        </p>
       </form>
     </div>
   );

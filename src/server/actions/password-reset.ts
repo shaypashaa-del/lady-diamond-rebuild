@@ -97,5 +97,9 @@ export async function resetPassword(
     email: resetToken.user.email,
   });
 
+  const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "STORE_MANAGER"];
+  if (ADMIN_ROLES.includes(resetToken.user.role)) {
+    redirect("/admin");
+  }
   redirect(resetToken.user.role === "AFFILIATE" ? "/affiliate/dashboard" : "/account");
 }

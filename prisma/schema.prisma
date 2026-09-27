@@ -396,6 +396,35 @@ model DiamondPriceEntry {
   @@index([diamondType, shape])
 }
 
+// A dedicated, exact-match price table for the PUBLIC diamond calculator only
+// (src/app/[locale]/calculators) — completely separate from DiamondPriceEntry
+// above, which real catalog products price against. This isolation is
+// deliberate: rebuilding the calculator's numbers from a new data source must
+// never change what an existing product actually sells for. Seeded entirely
+// from two owner-supplied spreadsheets (Sep 2026 natural-diamond market data;
+// Q2 2026 CVD lab-grown wholesale data — see docs/diamond-pricing-sources/),
+// storing the raw wholesale $/ct with no margin applied. The calculator
+// applies its own margin (see CALCULATOR_DIAMOND_MARGIN in
+// src/lib/pricing/constants.ts) on top of this at display time — never store
+// a margin-inclusive number here.
+model CalculatorDiamondPrice {
+  id                       String                @id @default(cuid())
+  diamondType              DiamondType
+  growthMethod             DiamondGrowthMethod?
+  shape                    DiamondShape
+  caratWeight              Decimal               @db.Decimal(5, 2)
+  colorGrade               DiamondColorGrade
+  clarityGrade             DiamondClarityGrade
+  costPerCaratUsd          Decimal               @db.Decimal(10, 4)
+  source                   String
+  sourceUrl                String?
+  updatedAt                DateTime              @updatedAt
+  createdAt                DateTime              @default(now())
+
+  @@unique([diamondType, growthMethod, shape, caratWeight, colorGrade, clarityGrade])
+  @@index([diamondType, shape])
+}
+
 // The 10 wholesale base-cost buckets from the owner's diamond pricing spec
 // (2026-09-26) — explicitly given as approximate ~1ct reference RANGES, not
 // live supplier prices or fixed retail prices (owner's own words). This is

@@ -95,6 +95,36 @@ export default async function DiamondBaseCostsPage() {
         שימו לב: אם המטבע כאן הוא USD, מנוע התמחור לא ישתמש בשורה הזו לחישוב מחיר בפועל (כדי לא
         להמציא שער המרה) — היא תוצג ללקוח כ&quot;תמחור בבדיקה&quot; עד שתוזן שורה מקבילה בש&quot;ח.
       </p>
+
+      <div className="mt-10 max-w-2xl border-t border-neutral-200 pt-6">
+        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide">
+          מקורות נתונים — מחשבון היהלום הציבורי
+        </h2>
+        <p className="mb-3 text-xs text-neutral-500">
+          מחיר היהלום שמוצג ב-/calculators (לא ההצעות שמוצגות ללקוח בדף מוצר) נשען על טבלה נפרדת
+          (CalculatorDiamondPrice) שנבנתה מ-2 קבצי האקסל המקוריים למטה — עלות סיטונאית גולמית בדולר,
+          עם רווח של 25% שמנוע התמחור מוסיף בזמן ההצגה. שינוי מחירי מוצר בקטלוג דורש עדכון בטבלה
+          הרגילה למעלה או ב-DiamondPriceEntry — לא בקבצים האלה.
+        </p>
+        <ul className="space-y-1 text-xs">
+          <li>
+            <a
+              href="/admin/api/diamond-pricing-sources/natural-diamond-calculator.xlsx"
+              className="text-neutral-700 underline hover:text-neutral-900"
+            >
+              יהלום טבעי — Lady_Diamond_Natural_Diamond_Calculator_Sep_2026.xlsx
+            </a>
+          </li>
+          <li>
+            <a
+              href="/admin/api/diamond-pricing-sources/cvd-calculator.xlsx"
+              className="text-neutral-700 underline hover:text-neutral-900"
+            >
+              יהלום CVD (מעבדה) — Lady_Diamond_CVD_Calculator_Google_Sheets.xlsx
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }

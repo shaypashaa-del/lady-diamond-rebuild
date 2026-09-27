@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { computeConfiguredPrice, type PricingCostInputs } from "./engine";
+import {
+  computeConfiguredPrice,
+  estimateCalculatorDiamondPrice,
+  type PricingCostInputs,
+  type CalculatorDiamondPriceLike,
+} from "./engine";
+import { USD_TO_ILS_RATE, CALCULATOR_DIAMOND_MARGIN } from "./constants";
 
 const baseInput: PricingCostInputs = {
   metalWeightGrams: 5,
@@ -258,5 +264,68 @@ describe("computeConfiguredPrice", () => {
     expect(Number.isFinite(result.sellingPrice)).toBe(true);
     expect(result.sellingPrice).toBeGreaterThan(0);
     expect(Number.isNaN(result.sellingPrice)).toBe(false);
+  });
+});
+
+describe("estimateCalculatorDiamondPrice", () => {
+  const entries: CalculatorDiamondPriceLike[] = [
+    {
+      diamondType: "NATURAL",
+      growthMethod: null,
+      shape: "ROUND",
+      caratWeight: 1,
+      colorGrade: "D",
+      clarityGrade: "FL",
+      costPerCaratUsd: 12665,
+    },
+    {
+      diamondType: "LAB_GROWN",
+      growthMethod: "CVD",
+      shape: "ROUND",
+      caratWeight: 1,
+      colorGrade: "D",
+      clarityGrade: "VVS1",
+      costPerCaratUsd: 84,
+    },
+  ];
+
+  it("applies cost / (1 - 25%) on top of the USD->ILS-converted wholesale cost, for a natural diamond", () => {
+    const result = estimateCalculatorDiamondPrice(
+      { diamondType: "NATURAL", growthMethod: null, shape: "ROUND", caratWeight: 1, colorGrade: "D", clarityGrade: "FL" },
+      entries
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const expected = (12665 * 1 * USD_TO_ILS_RATE) / (1 - CALCULATOR_DIAMOND_MARGIN);
+    expect(result.retailPrice).toBeCloseTo(expected, 1);
+    expect(CALCULATOR_DIAMOND_MARGIN).toBe(0.25);
+  });
+
+  it("does the same for a CVD lab-grown diamond, keyed on growthMethod too", () => {
+    const result = estimateCalculatorDiamondPrice(
+      { diamondType: "LAB_GROWN", growthMethod: "CVD", shape: "ROUND", caratWeight: 1, colorGrade: "D", clarityGrade: "VVS1" },
+      entries
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const expected = (84 * 1 * USD_TO_ILS_RATE) / (1 - CALCULATOR_DIAMOND_MARGIN);
+    expect(result.retailPrice).toBeCloseTo(expected, 1);
+  });
+
+  it("never guesses a nearby grade — a combination absent from the table is reported missing", () => {
+    const result = estimateCalculatorDiamondPrice(
+      { diamondType: "LAB_GROWN", growthMethod: "HPHT", shape: "ROUND", caratWeight: 1, colorGrade: "D", clarityGrade: "VVS1" },
+      entries
+    );
+    expect(result.ok).toBe(false);
+  });
+
+  it("treats LAB_GROWN CVD and HPHT as distinct — CVD data never answers an HPHT query", () => {
+    const result = estimateCalculatorDiamondPrice(
+      { diamondType: "LAB_GROWN", growthMethod: "HPHT", shape: "ROUND", caratWeight: 1, colorGrade: "D", clarityGrade: "VVS1" },
+      entries
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.detail).toContain("HPHT");
   });
 });

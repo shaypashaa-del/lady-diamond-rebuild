@@ -7,8 +7,10 @@ import { RingScreenSizer, RingSizeReferenceTables, DiamondGlyph, LuxuryPanel } f
 import type { LiveGoldPrice } from "@/server/services/market-prices";
 import {
   estimateDiamondRetailPrice,
+  estimateCalculatorDiamondPrice,
   type DiamondPriceEntryLike,
   type DiamondBaseCostRangeLike,
+  type CalculatorDiamondPriceLike,
 } from "@/lib/pricing/engine";
 
 type Tab = "diamond" | "gold" | "size";
@@ -24,10 +26,12 @@ export function CalculatorsClient({
   liveGoldPrice,
   diamondPriceEntries,
   diamondBaseCostRanges,
+  calculatorDiamondPrices,
 }: {
   liveGoldPrice: LiveGoldPrice | null;
   diamondPriceEntries: DiamondPriceEntryLike[];
   diamondBaseCostRanges: DiamondBaseCostRangeLike[];
+  calculatorDiamondPrices: CalculatorDiamondPriceLike[];
 }) {
   const t = useTranslations("Calculators");
   const [tab, setTab] = useState<Tab>("diamond");
@@ -72,7 +76,11 @@ export function CalculatorsClient({
         </div>
 
         {tab === "diamond" && (
-          <DiamondCalculator diamondPriceEntries={diamondPriceEntries} diamondBaseCostRanges={diamondBaseCostRanges} />
+          <DiamondCalculator
+            diamondPriceEntries={diamondPriceEntries}
+            diamondBaseCostRanges={diamondBaseCostRanges}
+            calculatorDiamondPrices={calculatorDiamondPrices}
+          />
         )}
         {tab === "gold" && <GoldCalculator liveGoldPrice={liveGoldPrice} />}
         {tab === "size" && <SizeCalculator />}
@@ -153,16 +161,24 @@ const COLOR_BAND_GRADE: Record<string, string> = { "D-F": "E", "G-H": "G", "I-J"
 const CLARITY_BAND_GRADE: Record<string, string> = { "FL-IF": "IF", VVS: "VVS2", VS: "VS1", SI: "SI1", I: "I1" };
 const FANCY_INTENSITY_OPTIONS = ["LIGHT", "FANCY", "INTENSE", "VIVID", "DEEP", "DARK"] as const;
 
+// Sort helper for the exact grade dropdowns below — plain alphabetical
+// order would put "VS1"/"VS2" ahead of "VVS1"/"VVS2" incorrectly and mix up
+// color letters with clarity codes, so each list is ordered against its own
+// real-world best-to-worst scale.
+const COLOR_ORDER = ["D", "E", "F", "G", "H", "I", "J", "K", "L", "M"];
+const CLARITY_ORDER = ["FL", "IF", "VVS1", "VVS2", "VS1", "VS2", "SI1", "SI2", "I1"];
+
 function DiamondCalculator({
   diamondPriceEntries,
   diamondBaseCostRanges,
+  calculatorDiamondPrices,
 }: {
   diamondPriceEntries: DiamondPriceEntryLike[];
   diamondBaseCostRanges: DiamondBaseCostRangeLike[];
+  calculatorDiamondPrices: CalculatorDiamondPriceLike[];
 }) {
   const t = useTranslations("Calculators");
   const [originId, setOriginId] = useState<(typeof ORIGIN_OPTIONS)[number]["id"]>("natural");
-  const [carat, setCarat] = useState(1);
   const [shape, setShape] = useState<(typeof SHAPE_OPTIONS)[number]>("ROUND");
   const [color, setColor] = useState("G-H");
   const [clarity, setClarity] = useState("VS");
@@ -170,13 +186,70 @@ function DiamondCalculator({
 
   const origin = ORIGIN_OPTIONS.find((o) => o.id === originId) ?? ORIGIN_OPTIONS[0];
   const isFancy = origin.diamondType === "FANCY_COLOR";
+  // "natural" and "lab_cvd" are priced from the exact-match spreadsheet data
+  // (CalculatorDiamondPrice); "lab_hpht" and every fancy-color origin have no
+  // such data and keep using the older band-based estimate/fallback path.
+  const usesExactData = origin.diamondType === "NATURAL" || (origin.diamondType === "LAB_GROWN" && origin.growthMethod === "CVD");
+
+  // Only the carat/color/clarity combinations actually present in the
+  // source spreadsheet for this origin — picking one always resolves to a
+  // real price, never a silent gap.
+  const exactOptions = useMemo(() => {
+    if (!usesExactData) return null;
+    const growthMethod = origin.diamondType === "LAB_GROWN" ? (origin.growthMethod ?? null) : null;
+    const rows = calculatorDiamondPrices.filter(
+      (e) => e.diamondType === origin.diamondType && (e.growthMethod ?? null) === growthMethod
+    );
+    const carats = [...new Set(rows.map((r) => r.caratWeight))].sort((a, b) => a - b);
+    const colors = [...new Set(rows.map((r) => r.colorGrade))].sort(
+      (a, b) => COLOR_ORDER.indexOf(a) - COLOR_ORDER.indexOf(b)
+    );
+    const clarities = [...new Set(rows.map((r) => r.clarityGrade))].sort(
+      (a, b) => CLARITY_ORDER.indexOf(a) - CLARITY_ORDER.indexOf(b)
+    );
+    return { carats, colors, clarities };
+  }, [usesExactData, origin, calculatorDiamondPrices]);
+
+  const [exactCarat, setExactCarat] = useState<number | null>(null);
+  const [exactColor, setExactColor] = useState<string | null>(null);
+  const [exactClarity, setExactClarity] = useState<string | null>(null);
+
+  // Whenever the origin changes to/from the exact-data path, snap the
+  // carat/color/clarity selection to a value that's actually valid for it —
+  // switching from CVD (D-H) to natural (D-K) with "H" still selected would
+  // otherwise silently carry over a stale value that happens to still work,
+  // masking the fact the lists differ.
+  const exactKey = exactOptions ? `${origin.id}` : null;
+  const [lastExactKey, setLastExactKey] = useState<string | null>(null);
+  if (exactOptions && exactKey !== lastExactKey) {
+    setLastExactKey(exactKey);
+    setExactCarat(exactOptions.carats.includes(1) ? 1 : (exactOptions.carats[0] ?? null));
+    setExactColor(exactOptions.colors[0] ?? null);
+    setExactClarity(exactOptions.clarities[0] ?? null);
+  }
 
   const estimate = useMemo(() => {
+    if (usesExactData) {
+      if (exactCarat == null || exactColor == null || exactClarity == null) {
+        return { ok: false as const, detail: "" };
+      }
+      return estimateCalculatorDiamondPrice(
+        {
+          diamondType: origin.diamondType as "NATURAL" | "LAB_GROWN",
+          growthMethod: origin.diamondType === "LAB_GROWN" ? (origin.growthMethod ?? null) : null,
+          shape,
+          caratWeight: exactCarat,
+          colorGrade: exactColor,
+          clarityGrade: exactClarity,
+        },
+        calculatorDiamondPrices
+      );
+    }
     return estimateDiamondRetailPrice(
       {
         diamondType: origin.diamondType,
         shape,
-        caratWeight: carat,
+        caratWeight: 1,
         colorGrade: isFancy ? null : (COLOR_BAND_GRADE[color] ?? null),
         clarityGrade: isFancy ? null : (CLARITY_BAND_GRADE[clarity] ?? null),
         fancyColor: origin.fancyColor,
@@ -185,7 +258,20 @@ function DiamondCalculator({
       diamondPriceEntries,
       diamondBaseCostRanges
     );
-  }, [origin, shape, carat, color, clarity, isFancy, diamondPriceEntries, diamondBaseCostRanges]);
+  }, [
+    usesExactData,
+    origin,
+    shape,
+    exactCarat,
+    exactColor,
+    exactClarity,
+    color,
+    clarity,
+    isFancy,
+    calculatorDiamondPrices,
+    diamondPriceEntries,
+    diamondBaseCostRanges,
+  ]);
 
   return (
     <LuxuryPanel>
@@ -207,17 +293,29 @@ function DiamondCalculator({
             ))}
           </select>
         </Field>
-        <Field label={t("caratWeight")}>
-          <input
-            type="number"
-            min={0.05}
-            max={10}
-            step={0.05}
-            value={carat}
-            onChange={(e) => setCarat(Math.max(0.05, Number(e.target.value) || 0))}
-            className={inputClass}
-          />
-        </Field>
+
+        {usesExactData && exactOptions ? (
+          <Field label={t("caratWeight")}>
+            <select
+              value={exactCarat ?? ""}
+              onChange={(e) => setExactCarat(Number(e.target.value))}
+              className={inputClass}
+            >
+              {exactOptions.carats.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </Field>
+        ) : (
+          <Field label={t("caratWeight")}>
+            <select value="1" disabled className={inputClass}>
+              <option value="1">1</option>
+            </select>
+          </Field>
+        )}
+
         <Field label={t("shape")}>
           <select value={shape} onChange={(e) => setShape(e.target.value as (typeof SHAPE_OPTIONS)[number])} className={inputClass}>
             {SHAPE_OPTIONS.map((s) => (
@@ -228,7 +326,30 @@ function DiamondCalculator({
           </select>
         </Field>
 
-        {!isFancy && (
+        {usesExactData && exactOptions && (
+          <>
+            <Field label={t("color")}>
+              <select value={exactColor ?? ""} onChange={(e) => setExactColor(e.target.value)} className={inputClass}>
+                {exactOptions.colors.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label={t("clarity")}>
+              <select value={exactClarity ?? ""} onChange={(e) => setExactClarity(e.target.value)} className={inputClass}>
+                {exactOptions.clarities.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          </>
+        )}
+
+        {!usesExactData && !isFancy && (
           <>
             <Field label={t("color")}>
               <select value={color} onChange={(e) => setColor(e.target.value)} className={inputClass}>

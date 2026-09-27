@@ -42,6 +42,21 @@ export const VALID_PURITIES_FOR_METAL: Record<string, string[]> = {
 // Final Selling Price = Base Cost / (1 - GROSS_MARGIN)
 export const GROSS_MARGIN = 0.2;
 
+// Margin used ONLY for the public diamond calculator's displayed price
+// (src/app/[locale]/calculators), on top of the raw wholesale $/ct in
+// CalculatorDiamondPrice — per the owner's explicit choice (2026-09-27):
+// gross-margin style, Final Price = Cost / (1 - 0.25), scoped to the
+// calculator display only. Real catalog products keep using GROSS_MARGIN
+// above via DiamondPriceEntry, completely unaffected by this constant.
+export const CALCULATOR_DIAMOND_MARGIN = 0.25;
+
+// USD→ILS conversion used only for CalculatorDiamondPrice, whose source
+// spreadsheets are priced in USD. Same rate the owner gave earlier in this
+// project for StoneAlgo-sourced shape data (2026-09 conversation) — reused
+// here for consistency. Update this single constant if the owner supplies a
+// fresher rate; never let a component invent its own conversion.
+export const USD_TO_ILS_RATE = 3.04725;
+
 // Curated diamond "quality tiers" — a small, friendly set of color/clarity
 // combinations to offer per product instead of exposing all 7×8 = 56 raw
 // grade combinations to a shopper who doesn't know what VVS2 means. This

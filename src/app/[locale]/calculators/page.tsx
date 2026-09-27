@@ -18,10 +18,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function CalculatorsPage() {
-  const [liveGoldPrice, diamondPriceEntries, diamondBaseCostRanges] = await Promise.all([
+  const [liveGoldPrice, diamondPriceEntries, diamondBaseCostRanges, calculatorDiamondPrices] = await Promise.all([
     getLiveGoldPricePer24kGramIls(),
     prisma.diamondPriceEntry.findMany(),
     prisma.diamondBaseCostRange.findMany(),
+    prisma.calculatorDiamondPrice.findMany(),
   ]);
 
   return (
@@ -41,6 +42,15 @@ export default async function CalculatorsPage() {
         minCostPerCarat: Number(r.minCostPerCarat),
         maxCostPerCarat: Number(r.maxCostPerCarat),
         currency: r.currency,
+      }))}
+      calculatorDiamondPrices={calculatorDiamondPrices.map((e) => ({
+        diamondType: e.diamondType as "NATURAL" | "LAB_GROWN",
+        growthMethod: e.growthMethod,
+        shape: e.shape,
+        caratWeight: Number(e.caratWeight),
+        colorGrade: e.colorGrade,
+        clarityGrade: e.clarityGrade,
+        costPerCaratUsd: Number(e.costPerCaratUsd),
       }))}
     />
   );

@@ -12,7 +12,13 @@
 // available returns a typed `MissingData` result instead of a guessed
 // price — callers must treat that as "pricing not ready", never as zero.
 
-import { GROSS_MARGIN, PURITY_FRACTION, resolveDiamondCostCategory } from "./constants";
+import {
+  GROSS_MARGIN,
+  PURITY_FRACTION,
+  resolveDiamondCostCategory,
+  CALCULATOR_DIAMOND_MARGIN,
+  USD_TO_ILS_RATE,
+} from "./constants";
 
 export type MetalSelection = {
   metalType: "GOLD" | "SILVER" | "PLATINUM";
@@ -225,5 +231,60 @@ export function estimateDiamondRetailPrice(
   if (!lookup.ok) return { ok: false, detail: lookup.detail };
   const cost = lookup.pricePerCarat * spec.caratWeight * spec.quantity;
   const retailPrice = cost / (1 - GROSS_MARGIN);
+  return { ok: true, retailPrice: round2(retailPrice) };
+}
+
+export type CalculatorDiamondSpec = {
+  diamondType: "NATURAL" | "LAB_GROWN";
+  growthMethod: "CVD" | "HPHT" | null;
+  shape: string;
+  caratWeight: number;
+  colorGrade: string;
+  clarityGrade: string;
+};
+
+export type CalculatorDiamondPriceLike = {
+  diamondType: "NATURAL" | "LAB_GROWN";
+  growthMethod: "CVD" | "HPHT" | null;
+  shape: string;
+  caratWeight: number;
+  colorGrade: string;
+  clarityGrade: string;
+  costPerCaratUsd: number;
+};
+
+// Exact-match price estimate for the public diamond calculator ONLY, sourced
+// from CalculatorDiamondPrice (see prisma/schema.prisma) — completely
+// separate from findDiamondPrice/DiamondPriceEntry above, which real catalog
+// products use. Deliberately requires an EXACT match on every dimension (no
+// wildcard/band fallback): the source spreadsheets give exact per-grade
+// wholesale costs, so silently substituting a nearby grade would show a
+// number the data doesn't actually support. No match (e.g. HPHT, or a
+// carat/color/clarity combination outside the sheets) returns MISSING, never
+// a guess.
+export function estimateCalculatorDiamondPrice(
+  spec: CalculatorDiamondSpec,
+  entries: CalculatorDiamondPriceLike[]
+): DiamondOnlyEstimate {
+  const match = entries.find(
+    (e) =>
+      e.diamondType === spec.diamondType &&
+      (e.growthMethod ?? null) === (spec.growthMethod ?? null) &&
+      e.shape === spec.shape &&
+      e.caratWeight === spec.caratWeight &&
+      e.colorGrade === spec.colorGrade &&
+      e.clarityGrade === spec.clarityGrade
+  );
+  if (!match) {
+    return {
+      ok: false,
+      detail: `No calculator price data for a ${spec.caratWeight}ct ${spec.shape} ${spec.diamondType}${
+        spec.growthMethod ? ` (${spec.growthMethod})` : ""
+      }, color ${spec.colorGrade}, clarity ${spec.clarityGrade}.`,
+    };
+  }
+  const costUsd = match.costPerCaratUsd * spec.caratWeight;
+  const costIls = costUsd * USD_TO_ILS_RATE;
+  const retailPrice = costIls / (1 - CALCULATOR_DIAMOND_MARGIN);
   return { ok: true, retailPrice: round2(retailPrice) };
 }

@@ -90,12 +90,15 @@ export default async function ProductPage({
   const price = Number(product.salePrice ?? product.basePrice);
   const productUrl = `${SITE_URL}${pathFor(locale, `/product/${slug}`)}`;
 
-  // This product has a diamond but no real ProductDiamondOption rows of its
-  // own yet (a data gap — see AGENTS.md) — the customer picks a diamond via
-  // the same exact-match pricelist filter the public calculator uses
-  // instead (see CalculatorDiamondSelector / resolveConfiguredPrice).
+  // This product has no real ProductDiamondOption rows of its own yet (a
+  // data gap — see AGENTS.md; `hasDiamond` turns out to be unmaintained and
+  // unusable as a signal here, since it's only ever set true exactly when
+  // real diamond options already exist) — the customer either confirms
+  // there's no diamond or picks one via the same exact-match pricelist
+  // filter the public calculator uses (see CalculatorDiamondSelector /
+  // resolveConfiguredPrice).
   const needsCalculatorDiamondFallback =
-    product.pricingMode === "CONFIGURABLE" && product.hasDiamond && product.diamondOptions.length === 0;
+    product.pricingMode === "CONFIGURABLE" && product.diamondOptions.length === 0;
 
   const [relatedRaw, tHome, shippingPrice, calculatorDiamondPrices] = await Promise.all([
     getRelatedProducts(product.id, product.categories[0]?.category.slug),

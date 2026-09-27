@@ -180,7 +180,8 @@
     "caratLabel": "Карат",
     "colorLabel": "Цвет",
     "clarityLabel": "Чистота",
-    "diamondSpecUnavailable": "Для этого происхождения пока нет данных о цене — попробуйте другой вариант."
+    "diamondSpecUnavailable": "Для этого происхождения пока нет данных о цене — попробуйте другой вариант.",
+    "origin_none": "Без бриллианта"
   },
   "Category": {
     "kicker": "Lady Diamond",

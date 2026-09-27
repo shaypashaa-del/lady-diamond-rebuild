@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { getConfiguredPrice } from "@/server/actions/product-pricing";
 import { CalculatorDiamondSelector } from "./CalculatorDiamondSelector";
-import type { CalculatorDiamondPriceLike, CalculatorDiamondSpec } from "@/lib/pricing/engine";
+import type { CalculatorDiamondPriceLike, CalculatorDiamondChoice } from "@/lib/pricing/engine";
 
 export type MaterialOption = {
   id: string;
@@ -65,7 +65,7 @@ export type ConfiguredPriceState =
       sellingPrice: number;
       materialOptionId: string;
       diamondOptionIds: string[];
-      calculatorDiamondSpec?: CalculatorDiamondSpec;
+      calculatorDiamondSpec?: CalculatorDiamondChoice;
     }
   | { status: "error"; message: string };
 
@@ -105,7 +105,7 @@ export function ConfigurablePriceSelector({
   const diamond = diamondOptions.find((d) => d.id === diamondId);
 
   const usesCalculatorDiamondFallback = diamondOptions.length === 0 && (calculatorDiamondPrices?.length ?? 0) > 0;
-  const [calculatorDiamondSpec, setCalculatorDiamondSpec] = useState<CalculatorDiamondSpec | null>(null);
+  const [calculatorDiamondSpec, setCalculatorDiamondSpec] = useState<CalculatorDiamondChoice | null>(null);
 
   // Only overrides the gallery's main photo when this specific color has a
   // real photo of its own (imageUrl set) — otherwise leaves the product's

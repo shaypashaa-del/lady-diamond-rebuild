@@ -2,16 +2,20 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import type { CalculatorDiamondPriceLike, CalculatorDiamondSpec } from "@/lib/pricing/engine";
+import type { CalculatorDiamondPriceLike, CalculatorDiamondChoice } from "@/lib/pricing/engine";
 
-// Only these two origins have real exact-match pricelist data (see
+// "natural"/"lab_cvd" have real exact-match pricelist data (see
 // estimateCalculatorDiamondPrice / CalculatorDiamondPrice) — the same
-// restriction the public diamond calculator applies. Never offer an origin
-// here that would only ever resolve to "no data".
-const ORIGINS = [
+// restriction the public diamond calculator applies, never offer an origin
+// that would only ever resolve to "no data". "none" is a first-class third
+// option, not an afterthought: this product has no ProductDiamondOption
+// rows of its own, which for a plain metal piece (a band, a chain) is
+// simply correct, not missing data — see resolveConfiguredPrice.
+const DIAMOND_ORIGINS = [
   { id: "natural" as const, diamondType: "NATURAL" as const, growthMethod: null },
   { id: "lab_cvd" as const, diamondType: "LAB_GROWN" as const, growthMethod: "CVD" as const },
 ];
+const ORIGINS = [...DIAMOND_ORIGINS, { id: "none" as const }];
 
 const COLOR_ORDER = ["D", "E", "F", "G", "H", "I", "J", "K", "L", "M"];
 const CLARITY_ORDER = ["FL", "IF", "VVS1", "VVS2", "VS1", "VS2", "SI1", "SI2", "I1"];
@@ -28,18 +32,21 @@ export function CalculatorDiamondSelector({
   onSpecChange,
 }: {
   calculatorDiamondPrices: CalculatorDiamondPriceLike[];
-  onSpecChange: (spec: CalculatorDiamondSpec | null) => void;
+  onSpecChange: (choice: CalculatorDiamondChoice | null) => void;
 }) {
   const t = useTranslations("Product");
   const [originId, setOriginId] = useState<(typeof ORIGINS)[number]["id"]>("natural");
-  const origin = ORIGINS.find((o) => o.id === originId) ?? ORIGINS[0];
+  const isNone = originId === "none";
+  const origin = DIAMOND_ORIGINS.find((o) => o.id === originId) ?? DIAMOND_ORIGINS[0];
 
   const rowsForOrigin = useMemo(
     () =>
-      calculatorDiamondPrices.filter(
-        (r) => r.diamondType === origin.diamondType && (r.growthMethod ?? null) === origin.growthMethod
-      ),
-    [calculatorDiamondPrices, origin]
+      isNone
+        ? []
+        : calculatorDiamondPrices.filter(
+            (r) => r.diamondType === origin.diamondType && (r.growthMethod ?? null) === origin.growthMethod
+          ),
+    [calculatorDiamondPrices, origin, isNone]
   );
 
   const shapes = useMemo(
@@ -114,6 +121,10 @@ export function CalculatorDiamondSelector({
   const clarity = clarityState ?? clarities[0] ?? null;
 
   useEffect(() => {
+    if (isNone) {
+      onSpecChange("none");
+      return;
+    }
     if (!shape || carat == null || !color || !clarity) {
       onSpecChange(null);
       return;
@@ -127,7 +138,7 @@ export function CalculatorDiamondSelector({
       clarityGrade: clarity,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [origin, shape, carat, color, clarity]);
+  }, [isNone, origin, shape, carat, color, clarity]);
 
   return (
     <div className="mt-6 space-y-5 border-t border-gold-soft pt-6">
@@ -151,7 +162,7 @@ export function CalculatorDiamondSelector({
           </select>
         </div>
 
-        {shapes.length === 0 ? (
+        {isNone ? null : shapes.length === 0 ? (
           <p className="col-span-3 self-end pb-2 text-sm text-ink/60">{t("diamondSpecUnavailable")}</p>
         ) : (
           <>

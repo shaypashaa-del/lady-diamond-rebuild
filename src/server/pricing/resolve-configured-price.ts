@@ -5,6 +5,7 @@ import {
   round2,
   type DiamondSelection,
   type CalculatorDiamondSpec,
+  type CalculatorDiamondChoice,
 } from "@/lib/pricing/engine";
 import { getMetalPrice, refreshGoldPriceIfStale } from "@/server/services/market-prices";
 import { MetalType, type DiamondShape } from "@/generated/prisma/enums";
@@ -23,7 +24,7 @@ export type ResolveConfiguredPriceResult =
       sellingPrice: number;
       materialOptionId: string;
       diamondOptionIds: string[];
-      calculatorDiamondSpec?: CalculatorDiamondSpec;
+      calculatorDiamondSpec?: CalculatorDiamondChoice;
     }
   | { ok: false; reason: string; message: string };
 
@@ -42,14 +43,16 @@ export async function resolveConfiguredPrice(params: {
   productId: string;
   materialOptionId: string;
   diamondOptionIds: string[];
-  // Only used for a product that has hasDiamond=true but no real
-  // ProductDiamondOption rows of its own yet (see AGENTS.md / the calculator
-  // pricelists) — the customer's selection from the same exact-match
-  // shape/carat/color/clarity filter the public diamond calculator uses.
-  // Its resulting price (CalculatorDiamondPrice cost + the calculator's own
-  // 25% margin, computed by estimateCalculatorDiamondPrice) is added as-is
-  // on top of this product's metal-only price — never re-margined again.
-  calculatorDiamondSpec?: CalculatorDiamondSpec | null;
+  // Only used for a product with no real ProductDiamondOption rows of its
+  // own yet (see AGENTS.md / the calculator pricelists) — either a real
+  // selection from the same exact-match shape/carat/color/clarity filter
+  // the public diamond calculator uses (its resulting price — cost + the
+  // calculator's own 25% margin, via estimateCalculatorDiamondPrice — is
+  // added as-is on top of this product's metal-only price, never
+  // re-margined again), or the literal string "none" when the customer has
+  // confirmed this specific piece has no diamond at all (prices metal-only,
+  // same as before this fallback existed).
+  calculatorDiamondSpec?: CalculatorDiamondChoice | null;
 }): Promise<ResolveConfiguredPriceResult> {
   const product = await prisma.product.findUnique({
     where: { id: params.productId },
@@ -69,11 +72,14 @@ export async function resolveConfiguredPrice(params: {
   }
   const metalPrice = await getMetalPrice(material.metalType);
 
-  // This product has no real diamond-option data of its own — the customer
-  // picks a diamond via the calculator's own pricelist filter instead, and
-  // that priced-in-full (cost + 25% margin) number is added as-is to the
-  // metal-only price computed below.
-  const usesCalculatorDiamondFallback = product.hasDiamond && product.diamondOptions.length === 0;
+  // This product has no real diamond-option data of its own — a plain
+  // metal item legitimately has none, so this isn't automatically "missing
+  // data"; the customer either confirms there's no diamond (metal-only
+  // price, same as always) or picks one via the calculator's own pricelist
+  // filter, whose priced-in-full (cost + 25% margin) number is added as-is
+  // to the metal-only price computed below. Either way it's a live,
+  // explicit choice — never guessed.
+  const usesCalculatorDiamondFallback = product.diamondOptions.length === 0;
   if (usesCalculatorDiamondFallback) {
     if (!params.calculatorDiamondSpec) {
       return {
@@ -101,7 +107,17 @@ export async function resolveConfiguredPrice(params: {
       };
     }
 
-    const spec = params.calculatorDiamondSpec;
+    if (params.calculatorDiamondSpec === "none") {
+      return {
+        ok: true,
+        sellingPrice: metalOnly.sellingPrice,
+        materialOptionId: material.id,
+        diamondOptionIds: [],
+        calculatorDiamondSpec: "none",
+      };
+    }
+
+    const spec: CalculatorDiamondSpec = params.calculatorDiamondSpec;
     const calculatorRows = await prisma.calculatorDiamondPrice.findMany({
       where: { diamondType: spec.diamondType, growthMethod: spec.growthMethod, shape: spec.shape as DiamondShape },
     });

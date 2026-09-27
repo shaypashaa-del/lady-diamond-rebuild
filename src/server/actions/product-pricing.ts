@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { computeConfiguredPrice, type MetalSelection, type CalculatorDiamondSpec } from "@/lib/pricing/engine";
+import { computeConfiguredPrice, type MetalSelection, type CalculatorDiamondChoice } from "@/lib/pricing/engine";
 import { getMetalPrice, refreshGoldPriceIfStale } from "@/server/services/market-prices";
 import { resolveConfiguredPrice } from "@/server/pricing/resolve-configured-price";
 import { MetalType } from "@/generated/prisma/enums";
@@ -13,7 +13,7 @@ export type ConfiguredPriceRequest = {
   // Only sent for a product that has no real ProductDiamondOption rows of
   // its own — the customer's pick from the calculator-pricelist diamond
   // filter (see resolveConfiguredPrice).
-  calculatorDiamondSpec?: CalculatorDiamondSpec | null;
+  calculatorDiamondSpec?: CalculatorDiamondChoice | null;
 };
 
 // Customer-facing result — deliberately excludes any cost breakdown (base

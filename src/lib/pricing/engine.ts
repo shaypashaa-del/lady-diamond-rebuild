@@ -243,6 +243,15 @@ export type CalculatorDiamondSpec = {
   clarityGrade: string;
 };
 
+// A product missing real ProductDiamondOption rows doesn't necessarily have
+// a diamond at all (a plain gold band/chain legitimately has none) — so the
+// calculator-pricelist fallback (see resolveConfiguredPrice) needs a THIRD,
+// explicit answer beyond "a real spec" and "not chosen yet": the customer
+// affirmatively saying this piece has no diamond, which prices metal-only,
+// same as it always has. Only "not chosen yet" (undefined/null) blocks
+// Add to Cart — both of these are informed, final answers.
+export type CalculatorDiamondChoice = CalculatorDiamondSpec | "none";
+
 export type CalculatorDiamondPriceLike = {
   diamondType: "NATURAL" | "LAB_GROWN";
   growthMethod: "CVD" | "HPHT" | null;

@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { CalculatorDiamondSpec } from "@/lib/pricing/engine";
+import type { CalculatorDiamondChoice } from "@/lib/pricing/engine";
 
 export type CartLine = {
   key: string; // `${productId}:${variantId ?? "default"}`
@@ -24,7 +24,7 @@ export type CartLine = {
   // fallback (see resolveConfiguredPrice / CalculatorDiamondSelector) —
   // checkout recomputes the price from this spec server-side too, same as
   // it does for materialOptionId/diamondOptionIds.
-  calculatorDiamondSpec?: CalculatorDiamondSpec;
+  calculatorDiamondSpec?: CalculatorDiamondChoice;
 };
 
 type CartState = {

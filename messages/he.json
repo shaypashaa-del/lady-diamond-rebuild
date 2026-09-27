@@ -180,7 +180,8 @@
     "caratLabel": "קראט",
     "colorLabel": "צבע",
     "clarityLabel": "ניקיון",
-    "diamondSpecUnavailable": "אין כרגע נתוני מחיר עבור המקור הזה — נסו את המקור השני."
+    "diamondSpecUnavailable": "אין כרגע נתוני מחיר עבור המקור הזה — נסו את המקור השני.",
+    "origin_none": "ללא יהלום"
   },
   "Category": {
     "kicker": "LADY DIAMOND",

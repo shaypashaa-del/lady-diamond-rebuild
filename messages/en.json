@@ -180,7 +180,8 @@
     "caratLabel": "Carat",
     "colorLabel": "Color",
     "clarityLabel": "Clarity",
-    "diamondSpecUnavailable": "No pricing data is available for this origin yet — try the other origin."
+    "diamondSpecUnavailable": "No pricing data is available for this origin yet — try the other origin.",
+    "origin_none": "No diamond"
   },
   "Category": {
     "kicker": "LADY DIAMOND",

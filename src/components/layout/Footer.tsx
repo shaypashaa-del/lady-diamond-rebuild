@@ -65,8 +65,8 @@ export function Footer() {
       <div className="relative border-t border-paper/10 py-5">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 text-xs text-paper/50 sm:flex-row sm:px-8">
           <p>{t("rights")}</p>
-          <a href="mailto:info@ladydiamondjewels.com" className="transition-colors hover:text-gold-bright" dir="ltr">
-            info@ladydiamondjewels.com
+          <a href="mailto:diana@ladydiamondjewels.com" className="transition-colors hover:text-gold-bright" dir="ltr">
+            diana@ladydiamondjewels.com
           </a>
         </div>
       </div>

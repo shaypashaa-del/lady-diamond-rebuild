@@ -8,7 +8,7 @@ export function organizationSchema() {
     url: SITE_URL,
     logo: `${SITE_URL}/brand/logo.png`,
     telephone: "+972-50-3781589",
-    email: "info@ladydiamondjewels.com",
+    email: "diana@ladydiamondjewels.com",
     address: {
       "@type": "PostalAddress",
       streetAddress: "Bursa Complex, Noam Building, 23 Tuval Street",

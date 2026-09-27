@@ -19,16 +19,23 @@ type LT = { he: string; en: string; ru: string };
 const lt = (he: string, en: string, ru: string): LT => ({ he, en, ru });
 
 const BIZ_NUMBER = "310618715";
-const LAWYER_NOTE = lt(
-  "מסמך זה נכתב כטיוטה מקצועית מפורטת, אך אינו מהווה ייעוץ משפטי. יש להעבירו לאישור עורך/ת דין לפני העלאת האתר לאוויר, ולעדכן את פרטי העסק המדויקים (כולל מספר עוסק מורשה/ח\"פ) בהתאם.",
-  "This document is a detailed professional draft, not legal advice. Have it reviewed by a lawyer before the site goes live, and complete the exact business details (including the business registration number) accordingly.",
-  "Этот документ является подробным профессиональным черновиком, но не юридической консультацией. Перед запуском сайта его должен проверить юрист, а точные реквизиты компании (включая регистрационный номер) должны быть дополнены."
-);
+
+// U+2066/U+2069 (LRI/PDI) isolate the phone number and email from the
+// surrounding Hebrew (RTL) sentence — without them, the bidi algorithm can
+// visually scramble a "+"/"-" digit run embedded in plain RTL text (this is
+// what the owner saw as the phone number displaying reversed on the legal
+// pages, which render this whole block as one plain-text paragraph with no
+// per-substring dir="ltr" element to anchor it, unlike the Footer/contact
+// page which use real dir="ltr"/<bdi> elements and were already correct).
+const LRI = "⁦";
+const PDI = "⁩";
+const PHONE_DISPLAY = `${LRI}+972-50-3781589${PDI}`;
+const EMAIL_DISPLAY = `${LRI}diana@ladydiamondjewels.com${PDI}`;
 
 const BUSINESS_BLOCK = lt(
-  `פרטי העסק: LADY DIAMOND ("החברה"/"אנחנו"). מספר עוסק מורשה: ${BIZ_NUMBER}. כתובת: מתחם בורסה, בניין נועם, רחוב תובל 23, רמת גן. טלפון: 972-50-3781589+. דוא"ל: info@ladydiamondjewels.com.`,
-  `Business details: LADY DIAMOND ("the Company"/"we"). Business registration number (עוסק מורשה): ${BIZ_NUMBER}. Address: Bursa Complex, Noam Building, 23 Tuval Street, Ramat Gan, Israel. Phone: +972-50-3781589. Email: info@ladydiamondjewels.com.`,
-  `Реквизиты компании: LADY DIAMOND («Компания»/«мы»). Регистрационный номер: ${BIZ_NUMBER}. Адрес: Bursa Complex, Noam Building, 23 Tuval Street, Ramat Gan, Israel. Телефон: +972-50-3781589. Эл. почта: info@ladydiamondjewels.com.`
+  `פרטי העסק: LADY DIAMOND ("החברה"/"אנחנו"). מספר עוסק מורשה: ${BIZ_NUMBER}. כתובת: מתחם בורסה, בניין נועם, רחוב תובל 23, רמת גן. טלפון: ${PHONE_DISPLAY}. דוא"ל: ${EMAIL_DISPLAY}.`,
+  `Business details: LADY DIAMOND ("the Company"/"we"). Business registration number (עוסק מורשה): ${BIZ_NUMBER}. Address: Bursa Complex, Noam Building, 23 Tuval Street, Ramat Gan, Israel. Phone: ${PHONE_DISPLAY}. Email: ${EMAIL_DISPLAY}.`,
+  `Реквизиты компании: LADY DIAMOND («Компания»/«мы»). Регистрационный номер: ${BIZ_NUMBER}. Адрес: Bursa Complex, Noam Building, 23 Tuval Street, Ramat Gan, Israel. Телефон: ${PHONE_DISPLAY}. Эл. почта: ${EMAIL_DISPLAY}.`
 );
 
 function join(...parts: LT[]): LT {
@@ -75,8 +82,7 @@ const privacyBody = join(
     "אבטחת מידע: אנו נוקטים אמצעי אבטחה סבירים בהתאם לתקנות אבטחת מידע, אולם אין באפשרותנו להבטיח הגנה מוחלטת מפני כל גישה בלתי מורשית.",
     "Data security: we take reasonable security measures in line with applicable data security regulations, though we cannot guarantee absolute protection against unauthorized access.",
     "Безопасность данных: мы принимаем разумные меры безопасности в соответствии с применимыми нормами защиты данных, однако не можем гарантировать абсолютную защиту от несанкционированного доступа."
-  ),
-  LAWYER_NOTE
+  )
 );
 
 const termsBody = join(
@@ -110,8 +116,7 @@ const termsBody = join(
     "דין וסמכות שיפוט: על תנאים אלו יחולו דיני מדינת ישראל, וכל סכסוך יידון בבתי המשפט המוסמכים באזור מרכז הארץ, מבלי לגרוע מכל זכות שלכם על פי חוק הגנת הצרכן.",
     "Governing law and jurisdiction: these terms are governed by the laws of the State of Israel, and any dispute shall be brought before the competent courts in central Israel, without derogating from any right you have under the Consumer Protection Law.",
     "Применимое право и юрисдикция: настоящие условия регулируются законодательством Государства Израиль, и любой спор будет рассматриваться в компетентных судах центрального округа Израиля, без ущерба для любых ваших прав в соответствии с Законом о защите прав потребителей."
-  ),
-  LAWYER_NOTE
+  )
 );
 
 const returnsBody = join(
@@ -130,8 +135,7 @@ const returnsBody = join(
     "כיצד לבצע החזרה: יש ליצור קשר עם שירות הלקוחות שלנו (פרטים לעיל) לפני משלוח ההחזרה, לצורך תיאום. לאחר קבלת המוצר המוחזר ובדיקתו, יינתן זיכוי כספי לאמצעי התשלום המקורי תוך 14 יום.",
     "How to return an item: please contact our customer service (details above) before sending a return, to coordinate the process. Once the returned item is received and inspected, a refund will be issued to the original payment method within 14 days.",
     "Как вернуть товар: пожалуйста, свяжитесь с нашей службой поддержки (контакты выше) перед отправкой возврата, чтобы согласовать процесс. После получения и проверки возвращённого товара возврат средств будет произведён на первоначальный способ оплаты в течение 14 дней."
-  ),
-  LAWYER_NOTE
+  )
 );
 
 const cookiesBody = join(
@@ -150,8 +154,7 @@ const cookiesBody = join(
     "צד שלישי חריג: בעת בחירת תשלום דרך PayPal בקופה, נטען סקריפט של PayPal עצמו, הכפוף למדיניות הפרטיות והעוגיות של PayPal.",
     "One exception: when you choose to pay via PayPal at checkout, PayPal's own script loads, which is subject to PayPal's own privacy and cookie policies.",
     "Одно исключение: при выборе оплаты через PayPal на кассе загружается собственный скрипт PayPal, на который распространяются собственная политика конфиденциальности и использования файлов cookie PayPal."
-  ),
-  LAWYER_NOTE
+  )
 );
 
 async function upsertPage(slug: string, title: LT, body: LT) {

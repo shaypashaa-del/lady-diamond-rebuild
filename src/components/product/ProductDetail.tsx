@@ -10,6 +10,7 @@ import { useWishlistStore } from "@/lib/wishlist-store";
 import { useMounted } from "@/lib/use-mounted";
 import { cn } from "@/lib/cn";
 import { PriceDropAlert } from "./PriceDropAlert";
+import type { ConfiguredPriceState } from "./ConfigurablePriceSelector";
 
 export type VariantView = { id: string; label: string; price: number; inventory: number };
 export type ProductImageView = { url: string; alt?: string };
@@ -31,6 +32,8 @@ export function ProductDetail({
   variants,
   images = [],
   colorImageOverride = null,
+  configurable = false,
+  configuredPrice = null,
 }: {
   productId: string;
   slug: string;
@@ -51,6 +54,12 @@ export function ProductDetail({
   // shows this specific photo instead of the thumbnail-selected one — only
   // populated for a color that has a real photo of its own.
   colorImageOverride?: string | null;
+  // When true, this product's real price comes entirely from the
+  // material/diamond picker below (ConfigurablePriceSelector) — the
+  // price/salePrice props above are stale placeholders and must never be
+  // shown or sold at. Exactly one price is ever displayed: this one.
+  configurable?: boolean;
+  configuredPrice?: ConfiguredPriceState | null;
 }) {
   const t = useTranslations("Product");
   const router = useRouter();
@@ -70,11 +79,17 @@ export function ProductDetail({
 
   const displayPrice = selectedVariant ? selectedVariant.price : salePrice ?? price;
   const availableInventory = selectedVariant ? selectedVariant.inventory : inventory;
-  const canAdd = (variants.length === 0 || !!selectedVariant) && availableInventory > 0;
+  const configuredOk = configuredPrice?.status === "ok" ? configuredPrice : null;
+  const canAdd =
+    (variants.length === 0 || !!selectedVariant) &&
+    availableInventory > 0 &&
+    (!configurable || configuredOk != null);
 
   function currentLine() {
     return {
-      key: `${slug}:${variantId || "default"}`,
+      key: configurable
+        ? `${slug}:${configuredOk?.materialOptionId ?? "pending"}:${(configuredOk?.diamondOptionIds ?? []).join(",")}`
+        : `${slug}:${variantId || "default"}`,
       productId: slug,
       // `variantId` state doubles as a "default" sentinel for products with
       // no real variants — never forward that literal string as a real
@@ -83,7 +98,14 @@ export function ProductDetail({
       slug,
       name,
       variantLabel: selectedVariant?.label,
-      price: displayPrice,
+      // For a CONFIGURABLE product, the displayed/charged price is always
+      // the live one from the material/diamond picker — never the stale
+      // basePrice/salePrice props. materialOptionId/diamondOptionIds ride
+      // along so checkout can recompute and verify this same price
+      // server-side (see resolveConfiguredPrice) rather than trusting it.
+      price: configurable ? (configuredOk?.sellingPrice ?? 0) : displayPrice,
+      materialOptionId: configurable ? configuredOk?.materialOptionId : undefined,
+      diamondOptionIds: configurable ? configuredOk?.diamondOptionIds : undefined,
       imageUrl: images[0]?.url,
     };
   }
@@ -166,8 +188,20 @@ export function ProductDetail({
         <p className="text-xs uppercase tracking-wide text-gold-deep">{categoryName}</p>
         <h1 className="mt-1 text-2xl font-semibold uppercase tracking-wide text-ink">{name}</h1>
         <span className="gold-rule-start mt-3 w-8" />
-        <div className="mt-3 flex items-center gap-2 text-lg">
-          {salePrice ? (
+        <div className="mt-3 flex items-center gap-2 text-lg" aria-live="polite">
+          {configurable ? (
+            <>
+              {configuredPrice?.status === "ok" && (
+                <span className="font-semibold text-ink">{configuredPrice.sellingPrice.toLocaleString("he-IL")} ₪</span>
+              )}
+              {(configuredPrice == null || configuredPrice.status === "pending") && (
+                <span className="text-base font-normal text-ink/50">{t("updatingPrice")}</span>
+              )}
+              {configuredPrice?.status === "error" && (
+                <span className="text-base font-normal text-ink/60">{configuredPrice.message}</span>
+              )}
+            </>
+          ) : salePrice ? (
             <>
               <span className="text-ink/40 line-through">{price.toFixed(2)} ₪</span>
               <span className="font-semibold text-clay">{displayPrice.toFixed(2)} ₪</span>

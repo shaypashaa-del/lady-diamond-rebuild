@@ -11,6 +11,7 @@ import { paymentProviders, type PaymentMethodId } from "@/server/payments/types"
 import { upsertAddress } from "@/lib/address-service";
 import { emailProvider } from "@/server/email/types";
 import { isValidEmail } from "@/lib/validation";
+import { resolveConfiguredPrice } from "@/server/pricing/resolve-configured-price";
 
 export type CheckoutLine = {
   productId: string; // product slug, resolved to a real id below
@@ -19,6 +20,9 @@ export type CheckoutLine = {
   variantLabel?: string;
   price: number;
   quantity: number;
+  // Only present for a CONFIGURABLE product — see resolveConfiguredPrice.
+  materialOptionId?: string;
+  diamondOptionIds?: string[];
 };
 
 export type CheckoutInput = {
@@ -101,6 +105,40 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
     if (!product) {
       return { error: `מוצר לא נמצא: ${line.productId}` };
     }
+
+    // A CONFIGURABLE product (material/diamond picker) has its price
+    // computed by the pricing engine from the selected options, never from
+    // product.basePrice/salePrice — those are stale placeholders for such a
+    // product. Recompute here server-side from the material/diamond ids the
+    // cart carried, exactly as the product page's live price did, so what
+    // the customer is charged can never be tampered with (or accidentally
+    // desynced) via a client-supplied price.
+    if (product.pricingMode === "CONFIGURABLE") {
+      if (line.quantity > product.inventory) {
+        return { error: `אין מספיק מלאי עבור "${line.name}" (במלאי: ${product.inventory}).` };
+      }
+      if (!line.materialOptionId) {
+        return { error: `נא לבחור אפשרות חומר עבור "${line.name}" לפני ההזמנה.` };
+      }
+      const resolved = await resolveConfiguredPrice({
+        productId: product.id,
+        materialOptionId: line.materialOptionId,
+        diamondOptionIds: line.diamondOptionIds ?? [],
+      });
+      if (!resolved.ok) {
+        return { error: `לא ניתן לחשב מחיר עבור "${line.name}": ${resolved.message}` };
+      }
+      resolvedLines.push({
+        productDbId: product.id,
+        variantId: undefined,
+        name: line.name,
+        variantLabel: line.variantLabel,
+        price: resolved.sellingPrice,
+        quantity: line.quantity,
+      });
+      continue;
+    }
+
     const variant = line.variantId ? product.variants.find((v) => v.id === line.variantId) : null;
     if (line.variantId && !variant) {
       return { error: `הווריאציה שנבחרה עבור "${line.name}" אינה קיימת עוד.` };

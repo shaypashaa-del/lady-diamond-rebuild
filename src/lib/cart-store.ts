@@ -13,6 +13,12 @@ export type CartLine = {
   price: number;
   quantity: number;
   imageUrl?: string;
+  // Only set for a CONFIGURABLE product (material/diamond picker) — the
+  // exact selection `price` above was computed from. Checkout recomputes
+  // the price from these ids server-side (see resolveConfiguredPrice) and
+  // never trusts `price` directly, same as it already does for variants.
+  materialOptionId?: string;
+  diamondOptionIds?: string[];
 };
 
 type CartState = {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { getConfiguredPrice } from "@/server/actions/product-pricing";
 
@@ -56,16 +56,27 @@ function diamondLabel(t: Translator, d: DiamondOption) {
   }`;
 }
 
+export type ConfiguredPriceState =
+  | { status: "pending" }
+  | { status: "ok"; sellingPrice: number; materialOptionId: string; diamondOptionIds: string[] }
+  | { status: "error"; message: string };
+
 export function ConfigurablePriceSelector({
   productId,
   materialOptions,
   diamondOptions,
   onMaterialImageChange,
+  onConfiguredChange,
 }: {
   productId: string;
   materialOptions: MaterialOption[];
   diamondOptions: DiamondOption[];
   onMaterialImageChange?: (imageUrl: string | null) => void;
+  // Reports the live price/selection up to the product page so the ONE
+  // price shown near the title (ProductDetail) — and what actually gets
+  // added to the cart — always matches what's selected here. This
+  // component itself no longer renders its own price.
+  onConfiguredChange?: (state: ConfiguredPriceState) => void;
 }) {
   const [materialId, setMaterialId] = useState(
     materialOptions.find((m) => m.isDefault)?.id ?? materialOptions[0]?.id ?? ""
@@ -73,10 +84,6 @@ export function ConfigurablePriceSelector({
   const [diamondId, setDiamondId] = useState(
     diamondOptions.find((d) => d.isDefault)?.id ?? diamondOptions[0]?.id ?? ""
   );
-  const [result, setResult] = useState<{ ok: true; sellingPrice: number } | { ok: false; message: string } | null>(
-    null
-  );
-  const [isPending, startTransition] = useTransition();
   const t = useTranslations("Product");
 
   const material = materialOptions.find((m) => m.id === materialId);
@@ -92,14 +99,20 @@ export function ConfigurablePriceSelector({
 
   useEffect(() => {
     if (!material) return;
-    startTransition(async () => {
-      const res = await getConfiguredPrice({
-        productId,
-        metal: { metalType: material.metalType, purity: material.purity },
-        diamondOptionIds: diamond ? [diamond.id] : [],
-      });
-      setResult(res);
+    let cancelled = false;
+    onConfiguredChange?.({ status: "pending" });
+    const diamondOptionIds = diamond ? [diamond.id] : [];
+    getConfiguredPrice({ productId, materialOptionId: material.id, diamondOptionIds }).then((res) => {
+      if (cancelled) return;
+      onConfiguredChange?.(
+        res.ok
+          ? { status: "ok", sellingPrice: res.sellingPrice, materialOptionId: material.id, diamondOptionIds }
+          : { status: "error", message: res.message }
+      );
     });
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId, materialId, diamondId]);
 
@@ -122,21 +135,6 @@ export function ConfigurablePriceSelector({
 
   return (
     <div className="mt-6 space-y-5 border-t border-gold-soft pt-6">
-      {/* Price leads, "starting from" framing, since it changes with the
-          selection below it rather than being fixed. */}
-      <div>
-        <p className="text-xs uppercase tracking-wide text-ink/50">
-          {materialOptions.length > 1 || diamondOptions.length > 1 ? t("startingFrom") : t("priceLabel")}
-        </p>
-        <div className="text-3xl font-semibold text-ink" aria-live="polite">
-          {isPending && <span className="text-lg font-normal text-ink/50">{t("updatingPrice")}</span>}
-          {!isPending && result?.ok && `${result.sellingPrice.toLocaleString("he-IL")} ₪`}
-          {!isPending && result && !result.ok && (
-            <span className="text-base font-normal text-ink/60">{result.message}</span>
-          )}
-        </div>
-      </div>
-
       <div>
         <label className="mb-2 block text-sm font-medium text-ink">
           {hasGoldColorSwatches ? t("goldColorLabel") : t("materialLabel")}

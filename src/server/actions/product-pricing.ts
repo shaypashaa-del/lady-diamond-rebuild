@@ -1,13 +1,14 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { computeConfiguredPrice, type DiamondSelection, type MetalSelection } from "@/lib/pricing/engine";
+import { computeConfiguredPrice, type MetalSelection } from "@/lib/pricing/engine";
 import { getMetalPrice, refreshGoldPriceIfStale } from "@/server/services/market-prices";
+import { resolveConfiguredPrice } from "@/server/pricing/resolve-configured-price";
 import { MetalType } from "@/generated/prisma/enums";
 
 export type ConfiguredPriceRequest = {
   productId: string;
-  metal: MetalSelection;
+  materialOptionId: string; // the product's own ProductMaterialOption id the customer selected
   diamondOptionIds: string[]; // ids of the product's own ProductDiamondOption rows the customer selected
 };
 
@@ -18,73 +19,13 @@ export type ConfiguredPriceResponse =
   | { ok: true; sellingPrice: number }
   | { ok: false; message: string };
 
-const MISSING_DATA_MESSAGE_HE: Record<string, string> = {
-  MISSING_METAL_WEIGHT: "התמחור עבור המוצר הזה עדיין בבדיקה.",
-  MISSING_METAL_PRICE: "מחיר השוק הנוכחי אינו זמין כרגע — נסו שוב בעוד מספר דקות.",
-  MISSING_MANUFACTURING_COST: "התמחור עבור המוצר הזה עדיין בבדיקה.",
-  MISSING_DIAMOND_PRICE: "התמחור עבור הבחירה הזו עדיין בבדיקה.",
-  MISSING_FX_RATE: "התמחור עבור הבחירה הזו עדיין בבדיקה.",
-};
-
 // Called from the product page client component whenever the shopper
 // changes their material/diamond selection — recomputes from scratch
-// server-side every time rather than trusting any client-sent price.
+// server-side every time via the same resolver createOrder uses at
+// checkout, rather than trusting any client-sent price.
 export async function getConfiguredPrice(req: ConfiguredPriceRequest): Promise<ConfiguredPriceResponse> {
-  const product = await prisma.product.findUnique({
-    where: { id: req.productId },
-    include: { diamondOptions: true },
-  });
-  if (!product) return { ok: false, message: "המוצר לא נמצא." };
-
-  if (req.metal.metalType === MetalType.GOLD) {
-    await refreshGoldPriceIfStale();
-  }
-  const metalPrice = await getMetalPrice(req.metal.metalType);
-
-  const [diamondPriceEntries, diamondBaseCostRanges] = req.diamondOptionIds.length
-    ? await Promise.all([prisma.diamondPriceEntry.findMany(), prisma.diamondBaseCostRange.findMany()])
-    : [[], []];
-
-  const selectedDiamonds: DiamondSelection[] = product.diamondOptions
-    .filter((d) => req.diamondOptionIds.includes(d.id))
-    .map((d) => ({
-      diamondType: d.diamondType,
-      shape: d.shape,
-      caratWeight: Number(d.caratWeight),
-      colorGrade: d.colorGrade,
-      clarityGrade: d.clarityGrade,
-      fancyColor: d.fancyColor,
-      quantity: d.quantity,
-    }));
-
-  const result = computeConfiguredPrice({
-    metalWeightGrams: product.metalWeightGrams ? Number(product.metalWeightGrams) : null,
-    manufacturingCost: product.manufacturingCost ? Number(product.manufacturingCost) : null,
-    settingCost: product.settingCost ? Number(product.settingCost) : null,
-    otherCost: product.otherCost ? Number(product.otherCost) : null,
-    metalPricePerGram: metalPrice ? Number(metalPrice.pricePerGram) : null,
-    metal: req.metal,
-    diamonds: selectedDiamonds,
-    diamondPriceEntries: diamondPriceEntries.map((e) => ({
-      diamondType: e.diamondType,
-      shape: e.shape,
-      caratMin: Number(e.caratMin),
-      caratMax: Number(e.caratMax),
-      colorGrade: e.colorGrade,
-      clarityGrade: e.clarityGrade,
-      pricePerCarat: Number(e.pricePerCarat),
-    })),
-    diamondBaseCostRanges: diamondBaseCostRanges.map((r) => ({
-      category: r.category,
-      minCostPerCarat: Number(r.minCostPerCarat),
-      maxCostPerCarat: Number(r.maxCostPerCarat),
-      currency: r.currency,
-    })),
-  });
-
-  if (!result.ok) {
-    return { ok: false, message: MISSING_DATA_MESSAGE_HE[result.reason] ?? "התמחור עדיין בבדיקה." };
-  }
+  const result = await resolveConfiguredPrice(req);
+  if (!result.ok) return { ok: false, message: result.message };
   return { ok: true, sellingPrice: result.sellingPrice };
 }
 

@@ -12,13 +12,17 @@ import {
   type DiamondBaseCostRangeLike,
   type CalculatorDiamondPriceLike,
 } from "@/lib/pricing/engine";
+import { PURITY_FRACTION } from "@/lib/pricing/constants";
 
 type Tab = "diamond" | "gold" | "size";
 
-// Retail margin applied on top of the raw material/market cost in the gold
-// calculator (the diamond calculator now uses the real pricing engine's own
-// GROSS_MARGIN via estimateDiamondRetailPrice instead of this constant).
-const RETAIL_MARGIN = 0.2;
+// Retail markup applied on top of the raw material/market cost in the gold
+// calculator ONLY (owner's explicit choice, 2026-09-27) — a flat +25%
+// markup, not the gross-margin division style used elsewhere in the
+// pricing engine (retail = cost / (1 - margin)). Never shown to the
+// customer — only the final retail figure ever renders (see
+// PriceBreakdown below), same as the diamond calculator.
+const GOLD_RETAIL_MARKUP = 0.25;
 
 const GOLD_KARATS = [24, 22, 18, 14, 10, 9] as const;
 
@@ -403,6 +407,13 @@ function DiamondCalculator({
   );
 }
 
+// Maps the calculator's plain karat number to the same purity keys the real
+// pricing engine uses (PURITY_FRACTION in constants.ts) — e.g. 14K = 0.585,
+// the hallmark-certified minimum content, not the raw 14/24 fraction. 10K
+// isn't a purity the catalog actually sells (see GOLD_PURITIES), so it has
+// no entry there; the true 10/24 fraction is used only for that one case.
+const KARAT_PURITY_KEY: Record<number, string> = { 24: "K24", 22: "K22", 18: "K18", 14: "K14", 9: "K9" };
+
 function GoldCalculator({ liveGoldPrice }: { liveGoldPrice: LiveGoldPrice | null }) {
   const t = useTranslations("Calculators");
   const [grams, setGrams] = useState(5);
@@ -413,8 +424,10 @@ function GoldCalculator({ liveGoldPrice }: { liveGoldPrice: LiveGoldPrice | null
   const [pricePerGram24k, setPricePerGram24k] = useState(liveGoldPrice?.pricePerGram24kIls ?? 0);
 
   const { retail } = useMemo(() => {
-    const costValue = Math.round(grams * (karat / 24) * pricePerGram24k);
-    return { cost: costValue, retail: Math.round(costValue * (1 + RETAIL_MARGIN)) };
+    const purityKey = KARAT_PURITY_KEY[karat];
+    const purity = purityKey ? PURITY_FRACTION[purityKey] : karat / 24;
+    const costValue = Math.round(grams * purity * pricePerGram24k);
+    return { cost: costValue, retail: Math.round(costValue * (1 + GOLD_RETAIL_MARKUP)) };
   }, [grams, karat, pricePerGram24k]);
 
   return (

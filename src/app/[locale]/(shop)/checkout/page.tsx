@@ -129,6 +129,7 @@ function CheckoutForm() {
         quantity: l.quantity,
         materialOptionId: l.materialOptionId,
         diamondOptionIds: l.diamondOptionIds,
+        calculatorDiamondSpec: l.calculatorDiamondSpec,
       })),
     });
 

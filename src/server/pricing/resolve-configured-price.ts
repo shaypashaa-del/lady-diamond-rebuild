@@ -1,7 +1,13 @@
 import { prisma } from "@/lib/prisma";
-import { computeConfiguredPrice, type DiamondSelection } from "@/lib/pricing/engine";
+import {
+  computeConfiguredPrice,
+  estimateCalculatorDiamondPrice,
+  round2,
+  type DiamondSelection,
+  type CalculatorDiamondSpec,
+} from "@/lib/pricing/engine";
 import { getMetalPrice, refreshGoldPriceIfStale } from "@/server/services/market-prices";
-import { MetalType } from "@/generated/prisma/enums";
+import { MetalType, type DiamondShape } from "@/generated/prisma/enums";
 
 // The single, authoritative place a CONFIGURABLE product's selling price is
 // computed — called from the client-facing getConfiguredPrice action (for
@@ -12,7 +18,13 @@ import { MetalType } from "@/generated/prisma/enums";
 // to this product, instead of pricing an arbitrary metal/purity combo the
 // product was never configured to sell.
 export type ResolveConfiguredPriceResult =
-  | { ok: true; sellingPrice: number; materialOptionId: string; diamondOptionIds: string[] }
+  | {
+      ok: true;
+      sellingPrice: number;
+      materialOptionId: string;
+      diamondOptionIds: string[];
+      calculatorDiamondSpec?: CalculatorDiamondSpec;
+    }
   | { ok: false; reason: string; message: string };
 
 const MISSING_DATA_MESSAGE_HE: Record<string, string> = {
@@ -23,12 +35,21 @@ const MISSING_DATA_MESSAGE_HE: Record<string, string> = {
   MISSING_MANUFACTURING_COST: "התמחור עבור המוצר הזה עדיין בבדיקה.",
   MISSING_DIAMOND_PRICE: "התמחור עבור הבחירה הזו עדיין בבדיקה.",
   MISSING_FX_RATE: "התמחור עבור הבחירה הזו עדיין בבדיקה.",
+  MISSING_DIAMOND_SELECTION: "נא לבחור את מפרט היהלום.",
 };
 
 export async function resolveConfiguredPrice(params: {
   productId: string;
   materialOptionId: string;
   diamondOptionIds: string[];
+  // Only used for a product that has hasDiamond=true but no real
+  // ProductDiamondOption rows of its own yet (see AGENTS.md / the calculator
+  // pricelists) — the customer's selection from the same exact-match
+  // shape/carat/color/clarity filter the public diamond calculator uses.
+  // Its resulting price (CalculatorDiamondPrice cost + the calculator's own
+  // 25% margin, computed by estimateCalculatorDiamondPrice) is added as-is
+  // on top of this product's metal-only price — never re-margined again.
+  calculatorDiamondSpec?: CalculatorDiamondSpec | null;
 }): Promise<ResolveConfiguredPriceResult> {
   const product = await prisma.product.findUnique({
     where: { id: params.productId },
@@ -43,16 +64,81 @@ export async function resolveConfiguredPrice(params: {
     return { ok: false, reason: "INVALID_MATERIAL", message: MISSING_DATA_MESSAGE_HE.INVALID_MATERIAL };
   }
 
+  if (material.metalType === MetalType.GOLD) {
+    await refreshGoldPriceIfStale();
+  }
+  const metalPrice = await getMetalPrice(material.metalType);
+
+  // This product has no real diamond-option data of its own — the customer
+  // picks a diamond via the calculator's own pricelist filter instead, and
+  // that priced-in-full (cost + 25% margin) number is added as-is to the
+  // metal-only price computed below.
+  const usesCalculatorDiamondFallback = product.hasDiamond && product.diamondOptions.length === 0;
+  if (usesCalculatorDiamondFallback) {
+    if (!params.calculatorDiamondSpec) {
+      return {
+        ok: false,
+        reason: "MISSING_DIAMOND_SELECTION",
+        message: MISSING_DATA_MESSAGE_HE.MISSING_DIAMOND_SELECTION,
+      };
+    }
+    const metalOnly = computeConfiguredPrice({
+      metalWeightGrams: product.metalWeightGrams ? Number(product.metalWeightGrams) : null,
+      manufacturingCost: product.manufacturingCost ? Number(product.manufacturingCost) : null,
+      settingCost: product.settingCost ? Number(product.settingCost) : null,
+      otherCost: product.otherCost ? Number(product.otherCost) : null,
+      metalPricePerGram: metalPrice ? Number(metalPrice.pricePerGram) : null,
+      metal: { metalType: material.metalType, purity: material.purity },
+      diamonds: [],
+      diamondPriceEntries: [],
+      diamondBaseCostRanges: [],
+    });
+    if (!metalOnly.ok) {
+      return {
+        ok: false,
+        reason: metalOnly.reason,
+        message: MISSING_DATA_MESSAGE_HE[metalOnly.reason] ?? "התמחור עדיין בבדיקה.",
+      };
+    }
+
+    const spec = params.calculatorDiamondSpec;
+    const calculatorRows = await prisma.calculatorDiamondPrice.findMany({
+      where: { diamondType: spec.diamondType, growthMethod: spec.growthMethod, shape: spec.shape as DiamondShape },
+    });
+    const diamondEstimate = estimateCalculatorDiamondPrice(
+      spec,
+      calculatorRows.map((r) => ({
+        diamondType: r.diamondType as "NATURAL" | "LAB_GROWN",
+        growthMethod: r.growthMethod,
+        shape: r.shape,
+        caratWeight: Number(r.caratWeight),
+        colorGrade: r.colorGrade,
+        clarityGrade: r.clarityGrade,
+        costPerCaratUsd: Number(r.costPerCaratUsd),
+      }))
+    );
+    if (!diamondEstimate.ok) {
+      return {
+        ok: false,
+        reason: "MISSING_DIAMOND_PRICE",
+        message: MISSING_DATA_MESSAGE_HE.MISSING_DIAMOND_PRICE,
+      };
+    }
+
+    return {
+      ok: true,
+      sellingPrice: round2(metalOnly.sellingPrice + diamondEstimate.retailPrice),
+      materialOptionId: material.id,
+      diamondOptionIds: [],
+      calculatorDiamondSpec: spec,
+    };
+  }
+
   // Silently drop any id that doesn't actually belong to this product,
   // rather than erroring — a stale/tampered id should just not price in,
   // never crash checkout.
   const validDiamondIds = new Set(product.diamondOptions.map((d) => d.id));
   const diamondOptionIds = params.diamondOptionIds.filter((id) => validDiamondIds.has(id));
-
-  if (material.metalType === MetalType.GOLD) {
-    await refreshGoldPriceIfStale();
-  }
-  const metalPrice = await getMetalPrice(material.metalType);
 
   const [diamondPriceEntries, diamondBaseCostRanges] = diamondOptionIds.length
     ? await Promise.all([prisma.diamondPriceEntry.findMany(), prisma.diamondBaseCostRange.findMany()])

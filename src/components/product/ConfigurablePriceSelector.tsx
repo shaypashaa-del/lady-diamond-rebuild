@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { getConfiguredPrice } from "@/server/actions/product-pricing";
+import { CalculatorDiamondSelector } from "./CalculatorDiamondSelector";
+import type { CalculatorDiamondPriceLike, CalculatorDiamondSpec } from "@/lib/pricing/engine";
 
 export type MaterialOption = {
   id: string;
@@ -58,19 +60,32 @@ function diamondLabel(t: Translator, d: DiamondOption) {
 
 export type ConfiguredPriceState =
   | { status: "pending" }
-  | { status: "ok"; sellingPrice: number; materialOptionId: string; diamondOptionIds: string[] }
+  | {
+      status: "ok";
+      sellingPrice: number;
+      materialOptionId: string;
+      diamondOptionIds: string[];
+      calculatorDiamondSpec?: CalculatorDiamondSpec;
+    }
   | { status: "error"; message: string };
 
 export function ConfigurablePriceSelector({
   productId,
   materialOptions,
   diamondOptions,
+  calculatorDiamondPrices,
   onMaterialImageChange,
   onConfiguredChange,
 }: {
   productId: string;
   materialOptions: MaterialOption[];
   diamondOptions: DiamondOption[];
+  // Only passed (non-empty) for a product with hasDiamond=true but no real
+  // ProductDiamondOption rows of its own — see resolveConfiguredPrice and
+  // CalculatorDiamondSelector. When present, the calculator's own
+  // shape/carat/color/clarity pricelist filter is shown instead of (there
+  // is nothing in) the diamondOptions list below.
+  calculatorDiamondPrices?: CalculatorDiamondPriceLike[];
   onMaterialImageChange?: (imageUrl: string | null) => void;
   // Reports the live price/selection up to the product page so the ONE
   // price shown near the title (ProductDetail) — and what actually gets
@@ -89,6 +104,9 @@ export function ConfigurablePriceSelector({
   const material = materialOptions.find((m) => m.id === materialId);
   const diamond = diamondOptions.find((d) => d.id === diamondId);
 
+  const usesCalculatorDiamondFallback = diamondOptions.length === 0 && (calculatorDiamondPrices?.length ?? 0) > 0;
+  const [calculatorDiamondSpec, setCalculatorDiamondSpec] = useState<CalculatorDiamondSpec | null>(null);
+
   // Only overrides the gallery's main photo when this specific color has a
   // real photo of its own (imageUrl set) — otherwise leaves the product's
   // default image showing rather than guessing.
@@ -99,14 +117,32 @@ export function ConfigurablePriceSelector({
 
   useEffect(() => {
     if (!material) return;
+    // The customer hasn't finished picking a diamond spec yet — nothing to
+    // price, and calling the server with an incomplete selection would just
+    // come back as a (confusing) error rather than "still choosing".
+    if (usesCalculatorDiamondFallback && !calculatorDiamondSpec) {
+      onConfiguredChange?.({ status: "pending" });
+      return;
+    }
     let cancelled = false;
     onConfiguredChange?.({ status: "pending" });
     const diamondOptionIds = diamond ? [diamond.id] : [];
-    getConfiguredPrice({ productId, materialOptionId: material.id, diamondOptionIds }).then((res) => {
+    getConfiguredPrice({
+      productId,
+      materialOptionId: material.id,
+      diamondOptionIds,
+      calculatorDiamondSpec,
+    }).then((res) => {
       if (cancelled) return;
       onConfiguredChange?.(
         res.ok
-          ? { status: "ok", sellingPrice: res.sellingPrice, materialOptionId: material.id, diamondOptionIds }
+          ? {
+              status: "ok",
+              sellingPrice: res.sellingPrice,
+              materialOptionId: material.id,
+              diamondOptionIds,
+              calculatorDiamondSpec: calculatorDiamondSpec ?? undefined,
+            }
           : { status: "error", message: res.message }
       );
     });
@@ -114,7 +150,7 @@ export function ConfigurablePriceSelector({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productId, materialId, diamondId]);
+  }, [productId, materialId, diamondId, usesCalculatorDiamondFallback, calculatorDiamondSpec]);
 
   if (materialOptions.length === 0) return null;
 
@@ -185,6 +221,13 @@ export function ConfigurablePriceSelector({
           </div>
         )}
       </div>
+
+      {usesCalculatorDiamondFallback && (
+        <CalculatorDiamondSelector
+          calculatorDiamondPrices={calculatorDiamondPrices ?? []}
+          onSpecChange={setCalculatorDiamondSpec}
+        />
+      )}
 
       {diamondOptions.length > 0 && (
         <div>

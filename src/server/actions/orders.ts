@@ -12,6 +12,7 @@ import { upsertAddress } from "@/lib/address-service";
 import { emailProvider } from "@/server/email/types";
 import { isValidEmail } from "@/lib/validation";
 import { resolveConfiguredPrice } from "@/server/pricing/resolve-configured-price";
+import type { CalculatorDiamondSpec } from "@/lib/pricing/engine";
 
 export type CheckoutLine = {
   productId: string; // product slug, resolved to a real id below
@@ -23,6 +24,10 @@ export type CheckoutLine = {
   // Only present for a CONFIGURABLE product — see resolveConfiguredPrice.
   materialOptionId?: string;
   diamondOptionIds?: string[];
+  // Only present for a product priced via the calculator-pricelist diamond
+  // fallback (no real ProductDiamondOption rows of its own) — see
+  // resolveConfiguredPrice.
+  calculatorDiamondSpec?: CalculatorDiamondSpec;
 };
 
 export type CheckoutInput = {
@@ -124,6 +129,7 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
         productId: product.id,
         materialOptionId: line.materialOptionId,
         diamondOptionIds: line.diamondOptionIds ?? [],
+        calculatorDiamondSpec: line.calculatorDiamondSpec ?? null,
       });
       if (!resolved.ok) {
         return { error: `לא ניתן לחשב מחיר עבור "${line.name}": ${resolved.message}` };

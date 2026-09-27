@@ -172,7 +172,15 @@
     "detailWeight": "משקל",
     "detailQuantity": "כמות אבנים",
     "detailColor": "גוון",
-    "detailClarity": "ניקיון"
+    "detailClarity": "ניקיון",
+    "diamondSpecHeading": "בחרו את מפרט היהלום",
+    "diamondOriginLabel": "מקור היהלום",
+    "origin_natural": "יהלום טבעי",
+    "origin_lab_cvd": "יהלום מעבדה (CVD)",
+    "caratLabel": "קראט",
+    "colorLabel": "צבע",
+    "clarityLabel": "ניקיון",
+    "diamondSpecUnavailable": "אין כרגע נתוני מחיר עבור המקור הזה — נסו את המקור השני."
   },
   "Category": {
     "kicker": "LADY DIAMOND",

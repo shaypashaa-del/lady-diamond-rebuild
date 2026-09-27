@@ -8,6 +8,7 @@ import {
   type DiamondOption,
   type ConfiguredPriceState,
 } from "./ConfigurablePriceSelector";
+import type { CalculatorDiamondPriceLike } from "@/lib/pricing/engine";
 
 // Product pages compose ProductDetail (the image gallery + buy box) and
 // ConfigurablePriceSelector (the material/diamond picker) as siblings, but a
@@ -21,12 +22,14 @@ export function ProductPageInteractive({
   showConfigurable,
   materialOptions,
   diamondOptions,
+  calculatorDiamondPrices,
   ...detailProps
 }: {
   productId: string;
   showConfigurable: boolean;
   materialOptions: MaterialOption[];
   diamondOptions: DiamondOption[];
+  calculatorDiamondPrices?: CalculatorDiamondPriceLike[];
   slug: string;
   name: string;
   shortDescription: string;
@@ -62,6 +65,7 @@ export function ProductPageInteractive({
             productId={productId}
             materialOptions={materialOptions}
             diamondOptions={diamondOptions}
+            calculatorDiamondPrices={calculatorDiamondPrices}
             onMaterialImageChange={setColorImageUrl}
             onConfiguredChange={setConfigured}
           />

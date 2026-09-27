@@ -172,7 +172,15 @@
     "detailWeight": "Weight",
     "detailQuantity": "Stone count",
     "detailColor": "Color",
-    "detailClarity": "Clarity"
+    "detailClarity": "Clarity",
+    "diamondSpecHeading": "Choose your diamond",
+    "diamondOriginLabel": "Diamond origin",
+    "origin_natural": "Natural Diamond",
+    "origin_lab_cvd": "Lab Grown (CVD)",
+    "caratLabel": "Carat",
+    "colorLabel": "Color",
+    "clarityLabel": "Clarity",
+    "diamondSpecUnavailable": "No pricing data is available for this origin yet — try the other origin."
   },
   "Category": {
     "kicker": "LADY DIAMOND",

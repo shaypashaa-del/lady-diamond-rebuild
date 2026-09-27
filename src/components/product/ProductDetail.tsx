@@ -88,7 +88,11 @@ export function ProductDetail({
   function currentLine() {
     return {
       key: configurable
-        ? `${slug}:${configuredOk?.materialOptionId ?? "pending"}:${(configuredOk?.diamondOptionIds ?? []).join(",")}`
+        ? `${slug}:${configuredOk?.materialOptionId ?? "pending"}:${(configuredOk?.diamondOptionIds ?? []).join(",")}:${
+            configuredOk?.calculatorDiamondSpec
+              ? JSON.stringify(configuredOk.calculatorDiamondSpec)
+              : ""
+          }`
         : `${slug}:${variantId || "default"}`,
       productId: slug,
       // `variantId` state doubles as a "default" sentinel for products with
@@ -106,6 +110,7 @@ export function ProductDetail({
       price: configurable ? (configuredOk?.sellingPrice ?? 0) : displayPrice,
       materialOptionId: configurable ? configuredOk?.materialOptionId : undefined,
       diamondOptionIds: configurable ? configuredOk?.diamondOptionIds : undefined,
+      calculatorDiamondSpec: configurable ? configuredOk?.calculatorDiamondSpec : undefined,
       imageUrl: images[0]?.url,
     };
   }

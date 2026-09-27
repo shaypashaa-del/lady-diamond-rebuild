@@ -172,7 +172,15 @@
     "detailWeight": "Вес",
     "detailQuantity": "Количество камней",
     "detailColor": "Цвет",
-    "detailClarity": "Чистота"
+    "detailClarity": "Чистота",
+    "diamondSpecHeading": "Выберите бриллиант",
+    "diamondOriginLabel": "Происхождение бриллианта",
+    "origin_natural": "Натуральный бриллиант",
+    "origin_lab_cvd": "Выращенный в лаборатории (CVD)",
+    "caratLabel": "Карат",
+    "colorLabel": "Цвет",
+    "clarityLabel": "Чистота",
+    "diamondSpecUnavailable": "Для этого происхождения пока нет данных о цене — попробуйте другой вариант."
   },
   "Category": {
     "kicker": "Lady Diamond",

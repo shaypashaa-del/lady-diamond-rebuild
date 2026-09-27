@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getProductBySlug, getRelatedProducts } from "@/server/repositories/catalog";
 import { calculateShipping } from "@/server/services/shipping";
+import { prisma } from "@/lib/prisma";
 import { t as localize, tMediaAlt, type LocalizedText } from "@/lib/i18n-content";
 import { toCardProduct } from "@/lib/catalog-view";
 import type { VariantView } from "@/components/product/ProductDetail";
@@ -89,13 +90,21 @@ export default async function ProductPage({
   const price = Number(product.salePrice ?? product.basePrice);
   const productUrl = `${SITE_URL}${pathFor(locale, `/product/${slug}`)}`;
 
-  const [relatedRaw, tHome, shippingPrice] = await Promise.all([
+  // This product has a diamond but no real ProductDiamondOption rows of its
+  // own yet (a data gap — see AGENTS.md) — the customer picks a diamond via
+  // the same exact-match pricelist filter the public calculator uses
+  // instead (see CalculatorDiamondSelector / resolveConfiguredPrice).
+  const needsCalculatorDiamondFallback =
+    product.pricingMode === "CONFIGURABLE" && product.hasDiamond && product.diamondOptions.length === 0;
+
+  const [relatedRaw, tHome, shippingPrice, calculatorDiamondPrices] = await Promise.all([
     getRelatedProducts(product.id, product.categories[0]?.category.slug),
     getTranslations("Home"),
     // Real admin-configured shipping rules (see /admin/shipping), not a
     // marketing claim — whatever this returns is what checkout actually
     // charges for a single unit of this product.
     calculateShipping(price, "IL"),
+    needsCalculatorDiamondFallback ? prisma.calculatorDiamondPrice.findMany() : Promise.resolve([]),
   ]);
   const related = relatedRaw.map((p) => toCardProduct(p, locale));
 
@@ -130,6 +139,15 @@ export default async function ProductPage({
         showConfigurable={product.pricingMode === "CONFIGURABLE" && product.materialOptions.length > 0}
         materialOptions={product.materialOptions}
         diamondOptions={product.diamondOptions.map((d) => ({ ...d, caratWeight: Number(d.caratWeight) }))}
+        calculatorDiamondPrices={calculatorDiamondPrices.map((r) => ({
+          diamondType: r.diamondType as "NATURAL" | "LAB_GROWN",
+          growthMethod: r.growthMethod,
+          shape: r.shape,
+          caratWeight: Number(r.caratWeight),
+          colorGrade: r.colorGrade,
+          clarityGrade: r.clarityGrade,
+          costPerCaratUsd: Number(r.costPerCaratUsd),
+        }))}
         slug={product.slug}
         name={name}
         shortDescription={description}

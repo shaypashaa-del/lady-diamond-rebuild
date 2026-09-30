@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { getConfiguredPrice } from "@/server/actions/product-pricing";
 import { CalculatorDiamondSelector } from "./CalculatorDiamondSelector";
-import type { CalculatorDiamondPriceLike, CalculatorDiamondChoice } from "@/lib/pricing/engine";
+import type { CalculatorDiamondOption, CalculatorDiamondChoice } from "@/lib/pricing/engine";
 
 export type MaterialOption = {
   id: string;
@@ -85,7 +85,7 @@ export function ConfigurablePriceSelector({
   // CalculatorDiamondSelector. When present, the calculator's own
   // shape/carat/color/clarity pricelist filter is shown instead of (there
   // is nothing in) the diamondOptions list below.
-  calculatorDiamondPrices?: CalculatorDiamondPriceLike[];
+  calculatorDiamondPrices?: CalculatorDiamondOption[];
   onMaterialImageChange?: (imageUrl: string | null) => void;
   // Reports the live price/selection up to the product page so the ONE
   // price shown near the title (ProductDetail) — and what actually gets
@@ -104,8 +104,18 @@ export function ConfigurablePriceSelector({
   const material = materialOptions.find((m) => m.id === materialId);
   const diamond = diamondOptions.find((d) => d.id === diamondId);
 
-  const usesCalculatorDiamondFallback = diamondOptions.length === 0 && (calculatorDiamondPrices?.length ?? 0) > 0;
-  const [calculatorDiamondSpec, setCalculatorDiamondSpec] = useState<CalculatorDiamondChoice | null>(null);
+  const hasPricelist = (calculatorDiamondPrices?.length ?? 0) > 0;
+  // No designed diamond of its own: the pricelist picker IS the diamond choice
+  // (starting on "no diamond"). Has a designed diamond: the customer can still
+  // switch to "a different diamond" from the same pricelist.
+  const usesCalculatorDiamondFallback = diamondOptions.length === 0 && hasPricelist;
+  const [customDiamond, setCustomDiamond] = useState(false);
+  const calculatorMode = usesCalculatorDiamondFallback || (customDiamond && hasPricelist);
+  const [pickedSpec, setPickedSpec] = useState<CalculatorDiamondChoice | null>(null);
+  // A spec reported while the picker was visible must never leak into a
+  // purchase made after switching back to the designed diamond.
+  const calculatorDiamondSpec = calculatorMode ? pickedSpec : null;
+  const designedDiamond = customDiamond ? undefined : diamond;
 
   // Only overrides the gallery's main photo when this specific color has a
   // real photo of its own (imageUrl set) — otherwise leaves the product's
@@ -120,13 +130,13 @@ export function ConfigurablePriceSelector({
     // The customer hasn't finished picking a diamond spec yet — nothing to
     // price, and calling the server with an incomplete selection would just
     // come back as a (confusing) error rather than "still choosing".
-    if (usesCalculatorDiamondFallback && !calculatorDiamondSpec) {
+    if (calculatorMode && !calculatorDiamondSpec) {
       onConfiguredChange?.({ status: "pending" });
       return;
     }
     let cancelled = false;
     onConfiguredChange?.({ status: "pending" });
-    const diamondOptionIds = diamond ? [diamond.id] : [];
+    const diamondOptionIds = !calculatorMode && diamond ? [diamond.id] : [];
     getConfiguredPrice({
       productId,
       materialOptionId: material.id,
@@ -150,7 +160,7 @@ export function ConfigurablePriceSelector({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productId, materialId, diamondId, usesCalculatorDiamondFallback, calculatorDiamondSpec]);
+  }, [productId, materialId, diamondId, calculatorMode, calculatorDiamondSpec]);
 
   if (materialOptions.length === 0) return null;
 
@@ -222,10 +232,11 @@ export function ConfigurablePriceSelector({
         )}
       </div>
 
-      {usesCalculatorDiamondFallback && (
+      {calculatorMode && (
         <CalculatorDiamondSelector
           calculatorDiamondPrices={calculatorDiamondPrices ?? []}
-          onSpecChange={setCalculatorDiamondSpec}
+          onSpecChange={setPickedSpec}
+          allowNone={usesCalculatorDiamondFallback}
         />
       )}
 
@@ -241,7 +252,10 @@ export function ConfigurablePriceSelector({
             // jewelry sites present this exact choice.
             <select
               value={diamondId}
-              onChange={(e) => setDiamondId(e.target.value)}
+              onChange={(e) => {
+                setDiamondId(e.target.value);
+                setCustomDiamond(false);
+              }}
               className="w-full max-w-[220px] border border-gold-soft bg-paper px-4 py-2.5 text-sm text-ink focus:border-gold-bright focus:outline-none"
             >
               {[...diamondOptions]
@@ -258,9 +272,12 @@ export function ConfigurablePriceSelector({
                 <button
                   key={d.id}
                   type="button"
-                  onClick={() => setDiamondId(d.id)}
+                  onClick={() => {
+                    setDiamondId(d.id);
+                    setCustomDiamond(false);
+                  }}
                   className={`rounded-full border px-4 py-2 text-sm transition-colors ${
-                    d.id === diamondId
+                    d.id === diamondId && !customDiamond
                       ? "border-gold-bright bg-ink text-paper"
                       : "border-gold-soft text-ink hover:border-gold-bright"
                   }`}
@@ -270,6 +287,23 @@ export function ConfigurablePriceSelector({
               ))}
             </div>
           )}
+          {hasPricelist && (
+            <button
+              type="button"
+              aria-pressed={customDiamond}
+              onClick={() => {
+                setPickedSpec(null);
+                setCustomDiamond((v) => !v);
+              }}
+              className={`mt-2 rounded-full border px-4 py-2 text-sm transition-colors ${
+                customDiamond
+                  ? "border-gold-bright bg-ink text-paper"
+                  : "border-gold-soft text-ink hover:border-gold-bright"
+              }`}
+            >
+              {t("customDiamondOption")}
+            </button>
+          )}
         </div>
       )}
 
@@ -278,12 +312,12 @@ export function ConfigurablePriceSelector({
       {material && (
         <p className="rounded-lg bg-paper-soft px-4 py-3 text-sm leading-relaxed text-ink/80">
           {t("youAreBuying", {
-            summary: `${materialLabel(t, material)}${diamond ? ` · ${diamondLabel(t, diamond)}` : ""}`,
+            summary: `${materialLabel(t, material)}${designedDiamond ? ` · ${diamondLabel(t, designedDiamond)}` : ""}`,
           })}
         </p>
       )}
 
-      {diamond && (
+      {designedDiamond && (
         <details className="group border border-gold-soft/60 open:border-gold-soft">
           <summary className="cursor-pointer select-none px-4 py-3 text-sm font-medium text-ink marker:content-none">
             <span className="inline-flex items-center gap-1.5">
@@ -293,27 +327,27 @@ export function ConfigurablePriceSelector({
           </summary>
           <dl className="grid grid-cols-2 gap-x-4 gap-y-2 border-t border-gold-soft/60 px-4 py-3 text-sm">
             <dt className="text-ink/50">{t("detailType")}</dt>
-            <dd className="text-ink">{t(`diamondType_${diamond.diamondType}`)}</dd>
+            <dd className="text-ink">{t(`diamondType_${designedDiamond.diamondType}`)}</dd>
             <dt className="text-ink/50">{t("detailShape")}</dt>
-            <dd className="text-ink">{t(`shape_${diamond.shape}`)}</dd>
+            <dd className="text-ink">{t(`shape_${designedDiamond.shape}`)}</dd>
             <dt className="text-ink/50">{t("detailWeight")}</dt>
-            <dd className="text-ink">{t("caratUnit", { weight: diamond.caratWeight })}</dd>
-            {diamond.quantity > 1 && (
+            <dd className="text-ink">{t("caratUnit", { weight: designedDiamond.caratWeight })}</dd>
+            {designedDiamond.quantity > 1 && (
               <>
                 <dt className="text-ink/50">{t("detailQuantity")}</dt>
-                <dd className="text-ink">{diamond.quantity}</dd>
+                <dd className="text-ink">{designedDiamond.quantity}</dd>
               </>
             )}
-            {diamond.colorGrade && (
+            {designedDiamond.colorGrade && (
               <>
                 <dt className="text-ink/50">{t("detailColor")}</dt>
-                <dd className="text-ink">{diamond.colorGrade}</dd>
+                <dd className="text-ink">{designedDiamond.colorGrade}</dd>
               </>
             )}
-            {diamond.clarityGrade && (
+            {designedDiamond.clarityGrade && (
               <>
                 <dt className="text-ink/50">{t("detailClarity")}</dt>
-                <dd className="text-ink">{diamond.clarityGrade}</dd>
+                <dd className="text-ink">{designedDiamond.clarityGrade}</dd>
               </>
             )}
           </dl>

@@ -243,6 +243,12 @@ export type CalculatorDiamondSpec = {
   clarityGrade: string;
 };
 
+// The same rows WITHOUT the wholesale cost — this is the only shape that may
+// ever be sent to a customer's browser (the diamond picker only needs to know
+// which shape/carat/color/clarity combinations exist; the price itself is
+// always computed server-side, and the wholesale $/ct must never leave it).
+export type CalculatorDiamondOption = Omit<CalculatorDiamondPriceLike, "costPerCaratUsd">;
+
 // A product missing real ProductDiamondOption rows doesn't necessarily have
 // a diamond at all (a plain gold band/chain legitimately has none) — so the
 // calculator-pricelist fallback (see resolveConfiguredPrice) needs a THIRD,

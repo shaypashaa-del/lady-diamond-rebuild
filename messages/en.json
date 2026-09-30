@@ -181,7 +181,8 @@
     "colorLabel": "Color",
     "clarityLabel": "Clarity",
     "diamondSpecUnavailable": "No pricing data is available for this origin yet — try the other origin.",
-    "origin_none": "No diamond"
+    "origin_none": "No diamond",
+    "customDiamondOption": "Choose a different diamond"
   },
   "Category": {
     "kicker": "LADY DIAMOND",

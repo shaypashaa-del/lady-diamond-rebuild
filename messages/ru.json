@@ -181,7 +181,8 @@
     "colorLabel": "Цвет",
     "clarityLabel": "Чистота",
     "diamondSpecUnavailable": "Для этого происхождения пока нет данных о цене — попробуйте другой вариант.",
-    "origin_none": "Без бриллианта"
+    "origin_none": "Без бриллианта",
+    "customDiamondOption": "Выбрать другой бриллиант"
   },
   "Category": {
     "kicker": "Lady Diamond",

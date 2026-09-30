@@ -79,7 +79,13 @@ export async function resolveConfiguredPrice(params: {
   // filter, whose priced-in-full (cost + 25% margin) number is added as-is
   // to the metal-only price computed below. Either way it's a live,
   // explicit choice — never guessed.
-  const usesCalculatorDiamondFallback = product.diamondOptions.length === 0;
+  // A product with no designed diamond always goes this way (the customer must
+  // say "none" or pick one); a product that HAS a designed diamond goes this
+  // way only when the customer explicitly chose a different diamond from the
+  // pricelist — otherwise it prices its designed diamond below.
+  const pickedPricelistDiamond =
+    params.calculatorDiamondSpec != null && params.calculatorDiamondSpec !== "none";
+  const usesCalculatorDiamondFallback = product.diamondOptions.length === 0 || pickedPricelistDiamond;
   if (usesCalculatorDiamondFallback) {
     if (!params.calculatorDiamondSpec) {
       return {

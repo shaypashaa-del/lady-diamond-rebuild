@@ -90,15 +90,13 @@ export default async function ProductPage({
   const price = Number(product.salePrice ?? product.basePrice);
   const productUrl = `${SITE_URL}${pathFor(locale, `/product/${slug}`)}`;
 
-  // This product has no real ProductDiamondOption rows of its own yet (a
-  // data gap — see AGENTS.md; `hasDiamond` turns out to be unmaintained and
-  // unusable as a signal here, since it's only ever set true exactly when
-  // real diamond options already exist) — the customer either confirms
-  // there's no diamond or picks one via the same exact-match pricelist
-  // filter the public calculator uses (see CalculatorDiamondSelector /
+  // Every configurable product offers the diamond pricelist picker: a product
+  // with no designed diamond starts on "no diamond" and the customer opts in;
+  // one with a designed diamond can switch to "a different diamond". Only the
+  // available shape/carat/color/clarity combinations are sent to the browser
+  // — never the wholesale cost, which stays server-side (see
   // resolveConfiguredPrice).
-  const needsCalculatorDiamondFallback =
-    product.pricingMode === "CONFIGURABLE" && product.diamondOptions.length === 0;
+  const offersDiamondPricelist = product.pricingMode === "CONFIGURABLE";
 
   const [relatedRaw, tHome, shippingPrice, calculatorDiamondPrices] = await Promise.all([
     getRelatedProducts(product.id, product.categories[0]?.category.slug),
@@ -107,7 +105,11 @@ export default async function ProductPage({
     // marketing claim — whatever this returns is what checkout actually
     // charges for a single unit of this product.
     calculateShipping(price, "IL"),
-    needsCalculatorDiamondFallback ? prisma.calculatorDiamondPrice.findMany() : Promise.resolve([]),
+    offersDiamondPricelist
+      ? prisma.calculatorDiamondPrice.findMany({
+          select: { diamondType: true, growthMethod: true, shape: true, caratWeight: true, colorGrade: true, clarityGrade: true },
+        })
+      : Promise.resolve([]),
   ]);
   const related = relatedRaw.map((p) => toCardProduct(p, locale));
 
@@ -149,7 +151,6 @@ export default async function ProductPage({
           caratWeight: Number(r.caratWeight),
           colorGrade: r.colorGrade,
           clarityGrade: r.clarityGrade,
-          costPerCaratUsd: Number(r.costPerCaratUsd),
         }))}
         slug={product.slug}
         name={name}

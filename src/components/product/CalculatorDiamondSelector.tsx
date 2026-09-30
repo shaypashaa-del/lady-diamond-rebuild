@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import type { CalculatorDiamondPriceLike, CalculatorDiamondChoice } from "@/lib/pricing/engine";
+import type { CalculatorDiamondOption, CalculatorDiamondChoice } from "@/lib/pricing/engine";
 
 // "natural"/"lab_cvd" have real exact-match pricelist data (see
 // estimateCalculatorDiamondPrice / CalculatorDiamondPrice) — the same
@@ -15,7 +15,8 @@ const DIAMOND_ORIGINS = [
   { id: "natural" as const, diamondType: "NATURAL" as const, growthMethod: null },
   { id: "lab_cvd" as const, diamondType: "LAB_GROWN" as const, growthMethod: "CVD" as const },
 ];
-const ORIGINS = [...DIAMOND_ORIGINS, { id: "none" as const }];
+const NONE_ORIGIN = { id: "none" as const };
+const ORIGINS = [...DIAMOND_ORIGINS, NONE_ORIGIN];
 
 const COLOR_ORDER = ["D", "E", "F", "G", "H", "I", "J", "K", "L", "M"];
 const CLARITY_ORDER = ["FL", "IF", "VVS1", "VVS2", "VS1", "VS2", "SI1", "SI2", "I1"];
@@ -30,12 +31,17 @@ const CLARITY_ORDER = ["FL", "IF", "VVS1", "VVS2", "VS1", "VS2", "SI1", "SI2", "
 export function CalculatorDiamondSelector({
   calculatorDiamondPrices,
   onSpecChange,
+  allowNone = true,
 }: {
-  calculatorDiamondPrices: CalculatorDiamondPriceLike[];
+  calculatorDiamondPrices: CalculatorDiamondOption[];
   onSpecChange: (choice: CalculatorDiamondChoice | null) => void;
+  // A product with no diamond of its own starts on "no diamond" (metal-only
+  // price) and the customer opts INTO a diamond; a product that already has
+  // a designed diamond offers only real pricelist origins here.
+  allowNone?: boolean;
 }) {
   const t = useTranslations("Product");
-  const [originId, setOriginId] = useState<(typeof ORIGINS)[number]["id"]>("natural");
+  const [originId, setOriginId] = useState<(typeof ORIGINS)[number]["id"]>(allowNone ? "none" : "natural");
   const isNone = originId === "none";
   const origin = DIAMOND_ORIGINS.find((o) => o.id === originId) ?? DIAMOND_ORIGINS[0];
 
@@ -154,7 +160,7 @@ export function CalculatorDiamondSelector({
             onChange={(e) => setOriginId(e.target.value as typeof originId)}
             className="w-full border border-gold-soft bg-paper px-3 py-2 text-sm text-ink focus:border-gold focus:outline-none"
           >
-            {ORIGINS.map((o) => (
+            {(allowNone ? ORIGINS : DIAMOND_ORIGINS).map((o) => (
               <option key={o.id} value={o.id}>
                 {t(`origin_${o.id}`)}
               </option>

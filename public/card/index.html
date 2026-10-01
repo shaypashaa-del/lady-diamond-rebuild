@@ -90,6 +90,17 @@
   @media (max-width: 399px) { .under .links { grid-template-columns: 1fr; } }
   /* large screens: scale the whole card + controls up proportionally (taller screens get more), softer perspective */
   .stage { perspective: 1900px; }
+  /* share: native sheet on phones, small panel with the usual targets elsewhere */
+  .under .links { position: relative; }
+  .under .links #flip { grid-column: 1 / -1; }
+  .share-panel { position: absolute; left: 0; right: 0; top: calc(100% + 10px); z-index: 20; display: flex; justify-content: center; gap: clamp(4px, 2vw, 14px); padding: 14px 10px 12px; background: rgba(12,10,16,.97); border: 1px solid rgba(215,180,106,.5); border-radius: 18px; box-shadow: 0 18px 44px rgba(0,0,0,.6), inset 0 1px 0 rgba(246,227,176,.12); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .share-panel[hidden] { display: none; }
+  .share-panel > * { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 52px; background: none; border: 0; padding: 0; color: var(--gold); font: 400 10.5px var(--body); letter-spacing: .03em; text-decoration: none; cursor: pointer; }
+  .share-panel svg { width: 38px; height: 38px; padding: 9px; border-radius: 50%; border: 1px solid rgba(215,180,106,.55); stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; transition: background .2s, color .2s, transform .2s; box-sizing: border-box; }
+  .share-panel svg.fill { fill: currentColor; stroke: none; padding: 9px; }
+  .share-panel > *:hover svg, .share-panel > *:focus-visible svg { background: var(--gold); color: var(--ink); transform: translateY(-2px); }
+  .share-panel > *:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 4px; border-radius: 10px; }
+  .share-panel span { color: var(--mist); white-space: nowrap; }
 </style>
 <title>דיאנה | LADY DIAMOND תכשיטים</title>
 <meta name="description" content="כרטיס ביקור של דיאנה, LADY DIAMOND תכשיטי יוקרה משנת 2010. טלפון, אימייל וכתובת.">
@@ -374,7 +385,15 @@
   <div class="links">
     <a class="wa" href="https://wa.me/972503781589?text=%D7%A9%D7%9C%D7%95%D7%9D%20%D7%93%D7%99%D7%90%D7%A0%D7%94%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9E%D7%95%D7%A2%20%D7%A4%D7%A8%D7%98%D7%99%D7%9D%20%D7%A2%D7%9C%20%D7%AA%D7%9B%D7%A9%D7%99%D7%98%D7%99%D7%9D" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg><span>שלחו הודעה בוואטסאפ</span></a>
     <a class="ghost" href="https://ladydiamondjewels.com/" target="_blank" rel="noopener">לאתר החנות</a>
+    <button class="btn ghost" id="share" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="sharePanel">שיתוף הכרטיס</button>
     <button class="btn ghost" id="flip" type="button">הפיכת הכרטיס</button>
+    <div class="share-panel" id="sharePanel" role="menu" aria-label="שיתוף הכרטיס" hidden>
+      <button type="button" role="menuitem" data-share="copy"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span>העתקת קישור</span></button>
+      <a role="menuitem" data-share="wa" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" class="fill"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg><span>וואטסאפ</span></a>
+      <a role="menuitem" data-share="tg" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 3 10.5l6.5 2.2L12 20l3-4.5 4 3z"/></svg><span>טלגרם</span></a>
+      <a role="menuitem" data-share="fb" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 8h2V5h-2.5A3.5 3.5 0 0 0 10 8.5V11H8v3h2v6h3v-6h2.2l.5-3H13V8.8c0-.5.4-.8 1-.8z"/></svg><span>פייסבוק</span></a>
+      <a role="menuitem" data-share="mail"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span>אימייל</span></a>
+    </div>
   </div>
   <div class="hint"><span class="h-mouse">הזיזו את העכבר מעל הכרטיס · לחיצה הופכת אותו</span><span class="h-touch">לחצו על הכרטיס כדי להפוך אותו</span></div>
 </div>
@@ -504,6 +523,37 @@
       document.body.appendChild(a); a.click(); document.body.removeChild(a); say('קובץ איש הקשר נשמר');
     } catch (err) { say('אפשר להעתיק את הפרטים ידנית'); }
   });
+
+
+  /* share the card: native share sheet where the device offers one, otherwise a small panel */
+  (function () {
+    var url = 'https://ladydiamondjewels.com/card', title = 'דיאנה · LADY DIAMOND', text = 'כרטיס הביקור של דיאנה, LADY DIAMOND תכשיטי יוקרה משנת 2010';
+    var btn = document.getElementById('share'), panel = document.getElementById('sharePanel');
+    var enc = encodeURIComponent;
+    panel.querySelector('[data-share="wa"]').href = 'https://wa.me/?text=' + enc(text + ' ' + url);
+    panel.querySelector('[data-share="tg"]').href = 'https://t.me/share/url?url=' + enc(url) + '&text=' + enc(text);
+    panel.querySelector('[data-share="fb"]').href = 'https://www.facebook.com/sharer/sharer.php?u=' + enc(url);
+    panel.querySelector('[data-share="mail"]').href = 'mailto:?subject=' + enc(title) + '&body=' + enc(text + '\n' + url);
+    function setOpen(o) { panel.hidden = !o; btn.setAttribute('aria-expanded', o ? 'true' : 'false'); if (o && window.gsap && !reduce) gsap.fromTo(panel, { y: -8, opacity: 0 }, { y: 0, opacity: 1, duration: .25, ease: 'power2.out', clearProps: 'opacity,transform' }); }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (!panel.hidden) { setOpen(false); return; }
+      if (navigator.share && window.matchMedia('(pointer: coarse)').matches) {
+        navigator.share({ title: title, text: text, url: url }).catch(function (err) { if (!err || err.name !== 'AbortError') setOpen(true); });
+      } else setOpen(true);
+    });
+    panel.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var b = e.target.closest('[data-share="copy"]');
+      if (b) {
+        var done = function (ok) { say(ok ? 'הקישור הועתק' : 'אפשר להעתיק את הקישור ידנית'); setOpen(false); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(function () { done(true); }, function () { done(fallbackCopy(url)); });
+        else done(fallbackCopy(url));
+      } else if (e.target.closest('a')) setOpen(false);
+    });
+    document.addEventListener('click', function () { if (!panel.hidden) setOpen(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !panel.hidden) { setOpen(false); btn.focus(); } });
+  })();
 
   if (!hasG) return; /* page is complete and readable without GSAP */
 

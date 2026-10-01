@@ -71,7 +71,7 @@ export function Header() {
           <span className="shimmer-text-gold text-xs uppercase tracking-[0.4em] sm:text-sm">{t("since")}</span>
         </Link>
 
-        <div className="relative z-10 flex items-center gap-4">
+        <div className="relative z-10 flex items-center gap-6 lg:gap-4">
           <button
             aria-label={t("search")}
             onClick={() => setSearchOpen((v) => !v)}
@@ -93,7 +93,7 @@ export function Header() {
               </span>
             )}
           </Link>
-          <Link href="/cart" aria-label={t("cart")} className="relative text-ink/80 transition-colors hover:text-gold-deep">
+          <Link href="/cart" aria-label={t("cart")} className="relative -m-3 p-3 text-ink/80 transition-colors hover:text-gold-deep">
             <ShoppingBag size={18} />
             {mounted && itemCount > 0 && (
               <span className="absolute -end-2 -top-2 flex h-4 w-4 items-center justify-center border border-gold bg-gold text-[10px] text-white">
@@ -104,7 +104,7 @@ export function Header() {
           <button
             aria-label={t("openMenu")}
             onClick={() => setOpen(true)}
-            className="text-ink transition-colors hover:text-gold-deep lg:hidden"
+            className="-m-3 p-3 text-ink transition-colors hover:text-gold-deep lg:hidden"
           >
             <Menu size={22} />
           </button>
@@ -190,7 +190,7 @@ export function Header() {
               <button
                 aria-label={t("closeMenu")}
                 onClick={() => setOpen(false)}
-                className="text-paper/70 transition-colors hover:text-gold-bright"
+                className="-m-3 p-3 text-paper/70 transition-colors hover:text-gold-bright"
               >
                 <X size={22} />
               </button>

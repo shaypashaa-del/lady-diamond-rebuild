@@ -34,7 +34,7 @@ export function ProductCard({ product }: { product: SampleProduct }) {
   }
 
   return (
-    <div className="group relative flex flex-col">
+    <div className="group relative flex min-w-0 flex-col">
       <div className="relative aspect-[3/4] w-full overflow-hidden placeholder-gradient">
         {product.badge && (
           <span
@@ -85,9 +85,9 @@ export function ProductCard({ product }: { product: SampleProduct }) {
         </Link>
       </div>
 
-      <div className="mt-3 text-center">
-        <p className="text-[11px] uppercase tracking-wide text-gold-deep">{product.category}</p>
-        <Link href={`/product/${product.slug}`} className="block text-sm font-medium uppercase tracking-wide text-ink">
+      <div className="mt-3 min-w-0 text-center">
+        <p className="text-[11px] uppercase tracking-wide text-gold-deep [overflow-wrap:anywhere]">{product.category}</p>
+        <Link href={`/product/${product.slug}`} className="block text-sm font-medium uppercase tracking-wide text-ink [overflow-wrap:anywhere] hyphens-auto">
           {product.name}
         </Link>
         <div className="mt-1 flex items-center justify-center gap-2 text-sm">

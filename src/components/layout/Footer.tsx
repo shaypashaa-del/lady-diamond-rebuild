@@ -54,6 +54,7 @@ export function Footer() {
                     {link.href === "/card" ? (
                       // The business card is a static page outside the locale routes,
                       // so it needs a plain anchor rather than the locale-aware Link.
+                      // eslint-disable-next-line @next/next/no-html-link-for-pages
                       <a href="/card" className="link-underline transition-colors hover:text-paper">
                         {t(link.key)}
                       </a>

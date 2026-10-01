@@ -41,7 +41,7 @@ export function AnnouncementBar({
               dir="ltr"
               className="border border-gold-soft bg-paper px-2 py-1 text-xs"
             />
-            <button type="submit" disabled={pending} className="font-semibold text-gold-bright underline underline-offset-2 disabled:opacity-50">
+            <button type="submit" disabled={pending} className="py-2.5 font-semibold text-gold-bright underline underline-offset-2 disabled:opacity-50">
               {pending ? "..." : displaySubscribe}
             </button>
           </form>
@@ -50,7 +50,7 @@ export function AnnouncementBar({
       ) : (
         <p>
           {displayText}{" "}
-          <button onClick={() => setShowForm(true)} className="font-semibold text-gold-bright underline underline-offset-2">
+          <button onClick={() => setShowForm(true)} className="inline-block py-2.5 font-semibold text-gold-bright underline underline-offset-2">
             {displaySubscribe}
           </button>
         </p>
@@ -59,7 +59,7 @@ export function AnnouncementBar({
       <button
         aria-label="Dismiss announcement"
         onClick={() => setVisible(false)}
-        className="absolute end-3 top-1/2 -translate-y-1/2 text-sm text-paper/60 transition-colors hover:text-paper"
+        className="absolute end-0 top-0 flex h-full min-h-11 w-11 items-center justify-center text-base text-paper/60 transition-colors hover:text-paper"
       >
         ×
       </button>

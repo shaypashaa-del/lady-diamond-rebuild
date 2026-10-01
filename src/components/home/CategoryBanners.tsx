@@ -70,7 +70,7 @@ export function CategoryBanners() {
             <p className="mx-auto mt-4 max-w-xs text-sm text-ink/60">{t("moreCategoriesCopy")}</p>
             <Link
               href="/category/all"
-              className="link-underline mt-4 inline-block text-xs font-semibold uppercase tracking-wide text-gold-deep"
+              className="link-underline mt-2 inline-block py-2 text-xs font-semibold uppercase tracking-wide text-gold-deep"
             >
               {t("findMore")}
             </Link>

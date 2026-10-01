@@ -29,7 +29,7 @@ export function PriceDropAlert({ productId }: { productId: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mt-3 flex items-center gap-1.5 text-xs text-ink/60 underline decoration-gold-soft underline-offset-4 hover:text-ink"
+        className="-my-1 mt-3 flex items-center gap-1.5 py-2.5 text-xs text-ink/60 underline decoration-gold-soft underline-offset-4 hover:text-ink"
       >
         <BellRing size={14} className="text-gold-deep" />
         {t("priceDropCta")}

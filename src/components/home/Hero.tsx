@@ -94,7 +94,7 @@ export function Hero({
               onClick={() => setActive(i)}
               // The visible bar is only 4px tall; this wrapper gives it a
               // comfortable touch target without changing how it looks.
-              className="flex h-8 items-center"
+              className="flex h-8 items-center px-1"
             >
               <span
                 className={`block h-1 transition-all ${

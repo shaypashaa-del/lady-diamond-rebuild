@@ -132,13 +132,13 @@ export function ProductDetail({
   return (
     <div className="mx-auto max-w-5xl px-4 pt-6 sm:px-8">
       <nav aria-label={t("breadcrumb")} className="mb-4 flex items-center gap-1.5 text-xs text-ink/50">
-        <Link href="/" className="hover:text-ink">
+        <Link href="/" className="-my-2 py-2 hover:text-ink">
           {t("breadcrumbHome")}
         </Link>
         {categoryName && (
           <>
             <ChevronLeft size={12} className="rtl:rotate-180" />
-            <Link href={categorySlug ? `/category/${categorySlug}` : "/category/all"} className="hover:text-ink">
+            <Link href={categorySlug ? `/category/${categorySlug}` : "/category/all"} className="-my-2 py-2 hover:text-ink">
               {categoryName}
             </Link>
           </>

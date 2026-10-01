@@ -515,12 +515,12 @@
     var need = Math.max(fi.offsetHeight, bi.offsetHeight) + pad + 6;
     fi.style.height = ''; bi.style.height = '';
     if (need > css) { card.style.aspectRatio = 'auto'; card.style.height = Math.ceil(need) + 'px'; }
-    /* big screens: scale card + controls up so the whole piece still fits one screen (never below 1, never above 1.5) */
+    /* big screens: scale card + controls up so the whole piece still fits one screen (between 0.68 and 1.5) */
     if (innerWidth >= 1000) {
       var last = zs[2].getBoundingClientRect(), bottomPad = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
       var natural = last.bottom + (window.scrollY || 0) + bottomPad;
-      var z = Math.max(1, Math.min(1.5, (innerHeight / natural) * 0.97, (innerWidth - 48) / (card.offsetWidth || 580)));
-      if (z > 1.02) zs.forEach(function (e) { e.style.zoom = z.toFixed(3); });
+      var z = Math.max(0.68, Math.min(1.5, (innerHeight / natural) * 0.97, (innerWidth - 48) / (card.offsetWidth || 580)));
+      if (Math.abs(z - 1) > 0.02) zs.forEach(function (e) { e.style.zoom = z.toFixed(3); });
     }
   }
   fit(); addEventListener('resize', fit);

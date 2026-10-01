@@ -51,9 +51,17 @@ export function Footer() {
               <ul className="mt-4 space-y-3 text-sm text-paper/60">
                 {col.links.map((link) => (
                   <li key={link.key}>
-                    <Link href={link.href} className="link-underline transition-colors hover:text-paper">
-                      {t(link.key)}
-                    </Link>
+                    {link.href === "/card" ? (
+                      // The business card is a static page outside the locale routes,
+                      // so it needs a plain anchor rather than the locale-aware Link.
+                      <a href="/card" className="link-underline transition-colors hover:text-paper">
+                        {t(link.key)}
+                      </a>
+                    ) : (
+                      <Link href={link.href} className="link-underline transition-colors hover:text-paper">
+                        {t(link.key)}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

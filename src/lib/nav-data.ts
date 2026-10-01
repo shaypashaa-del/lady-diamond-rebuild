@@ -30,6 +30,7 @@ export const footerColumns = [
       { key: "shop", href: "/category/all" },
       { key: "contactUs", href: "/contact-us" },
       { key: "trackOrder", href: "/account" },
+      { key: "businessCard", href: "/card" },
     ],
   },
   {

@@ -438,3 +438,10 @@ html.a11y-big-cursor.sparkle-cursor-active,
 html.a11y-big-cursor.sparkle-cursor-active * {
   cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'><path d='M4 2l14 8-6 2-2 6-6-16z' fill='black' stroke='white' stroke-width='1.5'/></svg>") 4 4, auto !important;
 }
+
+/* iOS data-detector links (phone, email, address) must not turn system blue. */
+a[x-apple-data-detectors] {
+  color: inherit !important;
+  font: inherit !important;
+  text-decoration: none !important;
+}

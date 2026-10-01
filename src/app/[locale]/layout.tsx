@@ -68,6 +68,10 @@ export async function generateMetadata({
     metadataBase: new URL(SITE_URL),
     title: { default: t("title"), template: `%s — ${t("title")}` },
     description: t("description"),
+    // Stop iOS/Android from auto-linking phone numbers, emails and addresses
+    // in the default system blue; the real tel:/mailto: links are styled by
+    // the site itself, so every contact detail keeps one consistent colour.
+    formatDetection: { telephone: false, email: false, address: false },
     alternates: {
       canonical: path,
       languages: Object.fromEntries(

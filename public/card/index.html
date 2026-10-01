@@ -125,11 +125,6 @@
   .under .links > a, .under .links > .btn { grid-column: 1 / -1; width: 100%; }
   .under .links a.wa { height: 50px; }
   /* language switch + left-to-right layout for English and Russian */
-  .lang { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); inset-inline-end: 14px; z-index: 40; display: flex; gap: 2px; padding: 3px; direction: ltr; border: 1px solid rgba(215,180,106,.45); border-radius: 999px; background: rgba(12,10,16,.78); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 6px 20px rgba(0,0,0,.4); }
-  .lang button { font: 500 11.5px var(--body); letter-spacing: .06em; color: var(--gold); background: none; border: 0; border-radius: 999px; padding: 0 11px; min-width: 42px; height: 32px; cursor: pointer; transition: background .2s, color .2s; }
-  .lang button:hover { background: rgba(215,180,106,.14); }
-  .lang button[aria-pressed="true"] { background: linear-gradient(120deg, var(--gold-hi), var(--gold) 55%, #b98f45); color: var(--ink); }
-  .lang button:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 2px; }
   html[dir="ltr"] .who, html[dir="ltr"] .back-inner { direction: ltr; }
   .who .name, .b-head .b-name { font-family: "Noto Serif Hebrew", "Bellefair", "Cormorant Garamond", "Frank Ruhl Libre", Georgia, serif; }
 </style>
@@ -332,16 +327,30 @@
   .qr figcaption { max-width: 13ch; text-align: center; text-wrap: balance; line-height: 1.4; }
   .item dd { overflow-wrap: anywhere; }
   .item .copy { white-space: nowrap; }
+  /* language selector, same pattern as the store: globe + current language, opens a short list */
+  .lang { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: 14px; left: auto; inset-inline-end: auto; z-index: 40; direction: ltr; display: block; padding: 0; border: 0; background: none; box-shadow: none; }
+  .lang .lang-btn { display: flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px; min-width: 0; border: 1px solid rgba(215,180,106,.5); border-radius: 999px; background: rgba(12,10,16,.82); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: var(--gold-hi); font: 500 11.5px var(--body); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; transition: border-color .2s, color .2s; }
+  .lang .lang-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(12,10,16,.82); }
+  .lang .lang-btn:focus-visible, .lang-menu button:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 2px; }
+  .lang-menu { position: absolute; top: calc(100% + 6px); right: 0; min-width: 100%; margin: 0; padding: 4px; list-style: none; border: 1px solid rgba(215,180,106,.5); border-radius: 14px; background: rgba(12,10,16,.97); box-shadow: 0 16px 40px rgba(0,0,0,.6); }
+  .lang-menu[hidden] { display: none; }
+  .lang .lang-menu button { display: flex; align-items: center; justify-content: space-between; gap: 14px; width: 100%; height: auto; min-width: 0; padding: 9px 14px; border: 0; border-radius: 10px; background: none; color: var(--gold); font: 400 13px var(--body); letter-spacing: .04em; text-transform: none; text-align: start; white-space: nowrap; cursor: pointer; }
+  .lang .lang-menu button:hover { background: rgba(215,180,106,.12); }
+  .lang .lang-menu button[aria-selected="true"] { color: var(--gold-hi); background: rgba(215,180,106,.16); }
+  .lang .lang-menu button[aria-selected="true"]::after { content: "✓"; font-size: 11px; }
 </style>
 
 </head>
 <body>
 <canvas id="dust" aria-hidden="true"></canvas>
 
-<div class="lang" role="group" aria-label="Language / שפה / Язык">
-  <button type="button" data-lang="he" aria-pressed="true">עברית</button>
-  <button type="button" data-lang="en" aria-pressed="false">EN</button>
-  <button type="button" data-lang="ru" aria-pressed="false">RU</button>
+<div class="lang" id="lang">
+  <button type="button" class="lang-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Language / שפה / Язык"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><span id="langName">עברית</span><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+  <ul class="lang-menu" role="listbox" hidden>
+    <li><button type="button" role="option" data-lang="he" aria-selected="true">עברית</button></li>
+    <li><button type="button" role="option" data-lang="en" aria-selected="false">English</button></li>
+    <li><button type="button" role="option" data-lang="ru" aria-selected="false">Русский</button></li>
+  </ul>
 </div>
 <main class="stage">
   <div class="tilt" id="tilt">
@@ -455,6 +464,7 @@
   var flipped = false;
   var hasG = !!window.gsap;
   var I18N = {"he": {"name": "דיאנה", "role": "תכשיטי יוקרה משנת 2010", "open": "פתוח עכשיו · עד 19:00", "closedToday": "סגור כרגע · נפתח היום ב-9:00", "closedTomorrow": "סגור כרגע · נפתח מחר ב-9:00", "closedSunday": "סגור כרגע · נפתח ביום ראשון ב-9:00", "vcf": "שמירה באנשי קשר", "lblPhone": "טלפון", "lblEmail": "דוא״ל", "lblStudio": "הסטודיו", "lblHours": "שעות פעילות", "addr": "מתחם בורסה, בניין נועם, תובל 23, רמת גן", "addrFull": "מתחם בורסה, בניין נועם, רחוב תובל 23, רמת גן", "hours": "ראשון עד חמישי · 9:00 עד 19:00", "copy": "העתקה", "qrCap": "סרקו לפתיחת הכרטיס", "aCard": "כרטיס ביקור של דיאנה, לחצו כדי להפוך", "aNav": "יצירת קשר מהירה", "aQr": "קוד QR לכרטיס הביקור", "aWaze": "Waze", "aPhone": "טלפון", "aWa": "וואטסאפ", "aIg": "אינסטגרם", "aFb": "פייסבוק", "aTt": "טיקטוק", "aYt": "יוטיוב", "aSite": "האתר", "waCta": "שלחו הודעה בוואטסאפ", "waMsg": "שלום דיאנה, אשמח לשמוע פרטים על תכשיטים", "shop": "לאתר החנות", "share": "שיתוף הכרטיס", "flip": "הפיכת הכרטיס", "hintMouse1": "הזיזו את העכבר מעל הכרטיס", "hintMouse2": "לחיצה הופכת אותו", "hintTouch": "לחצו על הכרטיס כדי להפוך אותו", "shCopy": "העתקת קישור", "shWa": "וואטסאפ", "shTg": "טלגרם", "shFb": "פייסבוק", "shMail": "אימייל", "toastCopied": "הועתק: ", "toastManual": "אפשר לסמן ולהעתיק ידנית", "toastLink": "הקישור הועתק", "toastLinkManual": "אפשר להעתיק את הקישור ידנית", "toastVcf": "קובץ איש הקשר נשמר", "toastVcfFail": "אפשר להעתיק את הפרטים ידנית", "shareText": "כרטיס הביקור של דיאנה, LADY DIAMOND תכשיטי יוקרה משנת 2010", "shareTitle": "דיאנה · LADY DIAMOND", "pageTitle": "דיאנה | LADY DIAMOND תכשיטים", "vN": ";דיאנה;;;", "vFN": "דיאנה - LADY DIAMOND", "vOrg": "LADY DIAMOND תכשיטים", "vAdr": ";;תובל 23, מתחם בורסה, בניין נועם;רמת גן;;;ישראל"}, "en": {"name": "Diana", "role": "Fine jewelry since 2010", "open": "Open now · until 19:00", "closedToday": "Closed · opens today at 9:00", "closedTomorrow": "Closed · opens tomorrow at 9:00", "closedSunday": "Closed · opens Sunday at 9:00", "vcf": "Save contact", "lblPhone": "Phone", "lblEmail": "Email", "lblStudio": "Studio", "lblHours": "Opening hours", "addr": "Bourse District, Noam Building, 23 Tuval St, Ramat Gan", "addrFull": "Bourse District, Noam Building, 23 Tuval St, Ramat Gan, Israel", "hours": "Sunday to Thursday · 9:00 to 19:00", "copy": "Copy", "qrCap": "Scan to open the card", "aCard": "Diana's business card, tap to flip", "aNav": "Quick contact", "aQr": "QR code for the business card", "aWaze": "Waze", "aPhone": "Call", "aWa": "WhatsApp", "aIg": "Instagram", "aFb": "Facebook", "aTt": "TikTok", "aYt": "YouTube", "aSite": "Website", "waCta": "Message on WhatsApp", "waMsg": "Hello Diana, I would like to hear more about your jewelry", "shop": "Visit the store", "share": "Share card", "flip": "Flip card", "hintMouse1": "Move the mouse over the card", "hintMouse2": "Click to flip it", "hintTouch": "Tap the card to flip it", "shCopy": "Copy link", "shWa": "WhatsApp", "shTg": "Telegram", "shFb": "Facebook", "shMail": "Email", "toastCopied": "Copied: ", "toastManual": "Select and copy manually", "toastLink": "Link copied", "toastLinkManual": "Please copy the link manually", "toastVcf": "Contact saved", "toastVcfFail": "Please copy the details manually", "shareText": "Diana's business card, LADY DIAMOND fine jewelry since 2010", "shareTitle": "Diana · LADY DIAMOND", "pageTitle": "Diana | LADY DIAMOND Jewelry", "vN": ";Diana;;;", "vFN": "Diana - LADY DIAMOND", "vOrg": "LADY DIAMOND Jewelry", "vAdr": ";;23 Tuval St, Bourse District, Noam Building;Ramat Gan;;;Israel"}, "ru": {"name": "Диана", "role": "Ювелирные украшения с 2010 года", "open": "Открыто · до 19:00", "closedToday": "Закрыто · откроется сегодня в 9:00", "closedTomorrow": "Закрыто · откроется завтра в 9:00", "closedSunday": "Закрыто · откроется в воскресенье в 9:00", "vcf": "Сохранить контакт", "lblPhone": "Телефон", "lblEmail": "Эл. почта", "lblStudio": "Студия", "lblHours": "Часы работы", "addr": "Район Биржи, здание Ноам, ул. Товаль 23, Рамат-Ган", "addrFull": "Район Биржи, здание Ноам, ул. Товаль 23, Рамат-Ган, Израиль", "hours": "Воскресенье – четверг · 9:00–19:00", "copy": "Копировать", "qrCap": "Сканируйте, чтобы открыть карточку", "aCard": "Визитная карточка Дианы, нажмите, чтобы перевернуть", "aNav": "Быстрая связь", "aQr": "QR-код визитной карточки", "aWaze": "Waze", "aPhone": "Звонок", "aWa": "WhatsApp", "aIg": "Instagram", "aFb": "Facebook", "aTt": "TikTok", "aYt": "YouTube", "aSite": "Сайт", "waCta": "Написать в WhatsApp", "waMsg": "Здравствуйте, Диана! Хочу узнать больше о ваших украшениях", "shop": "Перейти в магазин", "share": "Поделиться карточкой", "flip": "Перевернуть карточку", "hintMouse1": "Наведите курсор на карточку", "hintMouse2": "Нажмите, чтобы перевернуть", "hintTouch": "Нажмите на карточку, чтобы перевернуть", "shCopy": "Копировать ссылку", "shWa": "WhatsApp", "shTg": "Telegram", "shFb": "Facebook", "shMail": "Эл. почта", "toastCopied": "Скопировано: ", "toastManual": "Выделите и скопируйте вручную", "toastLink": "Ссылка скопирована", "toastLinkManual": "Скопируйте ссылку вручную", "toastVcf": "Контакт сохранён", "toastVcfFail": "Скопируйте данные вручную", "shareText": "Визитная карточка Дианы, LADY DIAMOND — ювелирные украшения с 2010 года", "shareTitle": "Диана · LADY DIAMOND", "pageTitle": "Диана | LADY DIAMOND", "vN": ";Диана;;;", "vFN": "Диана - LADY DIAMOND", "vOrg": "LADY DIAMOND Ювелирные украшения", "vAdr": ";;ул. Товаль 23, район Биржи, здание Ноам;Рамат-Ган;;;Израиль"}};
+  var LANG_NAMES = { he: 'עברית', en: 'English', ru: 'Русский' };
   var LANG = 'he';
   try { var qL = new URLSearchParams(location.search).get('lang'), sL = localStorage.getItem('dl_lang'); LANG = I18N[qL] ? qL : (I18N[sL] ? sL : 'he'); } catch (e) {}
   function tr(k) { var d = I18N[LANG]; return d && d[k] != null ? d[k] : I18N.he[k]; }
@@ -629,11 +639,17 @@
     var ca = document.getElementById('copyAddr'); if (ca) ca.setAttribute('data-copy', tr('addrFull'));
     var wa = document.querySelector('.wa'); if (wa) wa.href = 'https://wa.me/972503781589?text=' + encodeURIComponent(tr('waMsg'));
     paintStatus(); paintHint(); refreshShare();
-    document.querySelectorAll('.lang button').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-lang') === l ? 'true' : 'false'); });
+    document.querySelectorAll('.lang-menu [data-lang]').forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-lang') === l ? 'true' : 'false'); });
+    var ln = document.getElementById('langName'); if (ln) ln.textContent = LANG_NAMES[l];
     try { localStorage.setItem('dl_lang', l); } catch (e) {}
     fit();
   }
-  document.querySelectorAll('.lang button').forEach(function (b) { b.addEventListener('click', function (e) { e.stopPropagation(); applyLang(b.getAttribute('data-lang')); }); });
+  var langBox = document.getElementById('lang'), langBtn = langBox.querySelector('.lang-btn'), langMenu = langBox.querySelector('.lang-menu');
+  function setLangOpen(o) { langMenu.hidden = !o; langBtn.setAttribute('aria-expanded', o ? 'true' : 'false'); }
+  langBtn.addEventListener('click', function (e) { e.stopPropagation(); setLangOpen(langMenu.hidden); });
+  langMenu.querySelectorAll('[data-lang]').forEach(function (b) { b.addEventListener('click', function (e) { e.stopPropagation(); applyLang(b.getAttribute('data-lang')); setLangOpen(false); }); });
+  document.addEventListener('click', function () { setLangOpen(false); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setLangOpen(false); });
   applyLang(LANG);
 
   if (!hasG) return; /* page is complete and readable without GSAP */

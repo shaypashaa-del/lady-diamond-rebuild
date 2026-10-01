@@ -327,6 +327,11 @@
   .toast { position: relative; z-index: 3; min-height: 18px; margin-top: -10px; font-size: 12.5px; color: var(--gold-hi); letter-spacing: .06em; }
 
   @media (prefers-reduced-motion: reduce) { .btn, .links a { transition: none; } }
+  /* long translations: tagline may wrap in balanced lines, QR caption stays narrow so the details keep their width */
+  .who .role { white-space: normal; text-wrap: balance; max-width: 15em; line-height: 1.35; }
+  .qr figcaption { max-width: 13ch; text-align: center; text-wrap: balance; line-height: 1.4; }
+  .item dd { overflow-wrap: anywhere; }
+  .item .copy { white-space: nowrap; }
 </style>
 
 </head>

@@ -114,7 +114,7 @@ export async function ProductPricingManager({
             עלות נוספת {preview.otherCost.toFixed(2)} ₪
           </p>
           <p className="mt-1 font-semibold">
-            עלות בסיס: {preview.baseCost.toFixed(2)} ₪ → מחיר מכירה (רווח גולמי 20%):{" "}
+            עלות בסיס: {preview.baseCost.toFixed(2)} ₪ → מחיר מכירה (רווח גולמי 25%):{" "}
             {preview.sellingPrice.toFixed(2)} ₪ (רווח {preview.grossProfit.toFixed(2)} ₪)
           </p>
         </div>

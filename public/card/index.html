@@ -112,6 +112,9 @@
   .under .links .share-panel > a:hover, .under .links .share-panel > button:hover { transform: none; box-shadow: none; filter: none; }
   .who .name { font-size: calc(var(--u, 16px) * 1.75); }
   @media (max-width: 559px) { .front-inner .who .name { font-size: clamp(28px, 8.2vw, 36px); } }
+  /* hint: one line of text at a time, normal word spacing, a small gold diamond as separator */
+  .under .hint { letter-spacing: 0; word-spacing: .12em; font-size: 12.5px; line-height: 1.7; }
+  .under .hint .sep { display: inline-block; width: 4px; height: 4px; background: var(--gold); transform: rotate(45deg); margin: 0 12px; vertical-align: middle; opacity: .8; }
 </style>
 <title>דיאנה | LADY DIAMOND תכשיטים</title>
 <meta name="description" content="כרטיס ביקור של דיאנה, LADY DIAMOND תכשיטי יוקרה משנת 2010. טלפון, אימייל וכתובת.">
@@ -406,7 +409,7 @@
       <a role="menuitem" data-share="mail"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span>אימייל</span></a>
     </div>
   </div>
-  <div class="hint"><span class="h-mouse">הזיזו את העכבר מעל הכרטיס · לחיצה הופכת אותו</span><span class="h-touch">לחצו על הכרטיס כדי להפוך אותו</span></div>
+  <div class="hint" id="hint">הזיזו את העכבר מעל הכרטיס · לחיצה הופכת אותו</div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -564,6 +567,16 @@
     });
     document.addEventListener('click', function () { if (!panel.hidden) setOpen(false); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !panel.hidden) { setOpen(false); btn.focus(); } });
+  })();
+
+
+  /* hint text matches the device: pointer devices hover, touch devices tap */
+  (function () {
+    var hint = document.getElementById('hint');
+    function mouse() { hint.innerHTML = '<span>הזיזו את העכבר מעל הכרטיס</span><i class="sep" aria-hidden="true"></i><span>לחיצה הופכת אותו</span>'; }
+    function touch() { hint.textContent = 'לחצו על הכרטיס כדי להפוך אותו'; }
+    if (window.matchMedia('(hover: none), (pointer: coarse)').matches) touch(); else mouse();
+    window.addEventListener('touchstart', touch, { once: true, passive: true });
   })();
 
   if (!hasG) return; /* page is complete and readable without GSAP */

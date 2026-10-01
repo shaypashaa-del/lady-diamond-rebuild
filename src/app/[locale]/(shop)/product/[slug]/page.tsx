@@ -3,6 +3,7 @@ import { getLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getProductBySlug, getRelatedProducts } from "@/server/repositories/catalog";
+import { getListingPrices } from "@/server/pricing/listing-prices";
 import { calculateShipping } from "@/server/services/shipping";
 import { t as localize, tMediaAlt, type LocalizedText } from "@/lib/i18n-content";
 import { toCardProduct } from "@/lib/catalog-view";
@@ -86,7 +87,8 @@ export default async function ProductPage({
 
   const name = localize(product.name as LocalizedText, locale);
   const description = localize(product.shortDescription as LocalizedText | null, locale);
-  const price = Number(product.salePrice ?? product.basePrice);
+  const livePrice = (await getListingPrices()).get(product.id);
+  const price = livePrice ?? Number(product.salePrice ?? product.basePrice);
   const productUrl = `${SITE_URL}${pathFor(locale, `/product/${slug}`)}`;
 
   // Every configurable product offers the diamond pricelist picker; the list

@@ -183,7 +183,8 @@
     "diamondSpecUnavailable": "Для этого происхождения пока нет данных о цене — попробуйте другой вариант.",
     "origin_none": "Без бриллианта",
     "customDiamondOption": "Выбрать другой бриллиант",
-    "loadingDiamondOptions": "Загрузка вариантов бриллиантов…"
+    "loadingDiamondOptions": "Загрузка вариантов бриллиантов…",
+    "vatIncluded": "Включая НДС 18%"
   },
   "Category": {
     "kicker": "Lady Diamond",

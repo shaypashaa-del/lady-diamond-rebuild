@@ -183,7 +183,8 @@
     "diamondSpecUnavailable": "אין כרגע נתוני מחיר עבור המקור הזה — נסו את המקור השני.",
     "origin_none": "ללא יהלום",
     "customDiamondOption": "בחירת יהלום אחר",
-    "loadingDiamondOptions": "טוען אפשרויות יהלום…"
+    "loadingDiamondOptions": "טוען אפשרויות יהלום…",
+    "vatIncluded": "כולל מע״מ 18%"
   },
   "Category": {
     "kicker": "LADY DIAMOND",

@@ -1,17 +1,18 @@
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
+import { applyLivePrices } from "@/server/pricing/listing-prices";
 
 const cardImageInclude = {
   images: { include: { media: true }, orderBy: { sortOrder: "asc" as const }, take: 1 },
 };
 
-export function getFeaturedProducts() {
-  return prisma.product.findMany({
+export async function getFeaturedProducts() {
+  return applyLivePrices(await prisma.product.findMany({
     where: { status: "PUBLISHED", isFeatured: true },
     include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },
     take: 8,
     orderBy: { createdAt: "desc" },
-  });
+  }));
 }
 
 export const PRODUCTS_PAGE_SIZE = 24;
@@ -28,17 +29,6 @@ export type ProductFilters = {
   inStockOnly?: boolean;
 };
 
-function sortToOrderBy(sort?: ProductSort) {
-  switch (sort) {
-    case "price_asc":
-      return { basePrice: "asc" as const };
-    case "price_desc":
-      return { basePrice: "desc" as const };
-    default:
-      return { createdAt: "desc" as const };
-  }
-}
-
 function filtersToWhere(filters?: ProductFilters) {
   const where: Record<string, unknown> = {};
   if (filters?.minPrice != null || filters?.maxPrice != null) {
@@ -53,19 +43,46 @@ function filtersToWhere(filters?: ProductFilters) {
   return where;
 }
 
-export async function getAllPublishedProducts(page = 1, sort?: ProductSort, filters?: ProductFilters) {
-  const where = { status: "PUBLISHED" as const, ...filtersToWhere(filters) };
-  const [products, totalCount] = await Promise.all([
-    prisma.product.findMany({
-      where,
-      include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },
-      orderBy: sortToOrderBy(sort),
-      skip: (page - 1) * PRODUCTS_PAGE_SIZE,
-      take: PRODUCTS_PAGE_SIZE,
-    }),
-    prisma.product.count({ where }),
-  ]);
-  return { products, totalCount };
+// Price sorting and price filters must use the live price (what the product
+// page shows), not the stale basePrice column, so those requests load the
+// whole matching set, price it, then sort/filter/paginate in memory.
+async function listCards(
+  baseWhere: Record<string, unknown>,
+  page: number,
+  sort?: ProductSort,
+  filters?: ProductFilters
+) {
+  const { minPrice, maxPrice, ...rest } = filters ?? {};
+  const where = { ...baseWhere, ...filtersToWhere(rest) };
+  const include = { variants: true, categories: { include: { category: true } }, ...cardImageInclude };
+  const priceDriven = sort === "price_asc" || sort === "price_desc" || minPrice != null || maxPrice != null;
+  if (!priceDriven) {
+    const [products, totalCount] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        include,
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * PRODUCTS_PAGE_SIZE,
+        take: PRODUCTS_PAGE_SIZE,
+      }),
+      prisma.product.count({ where }),
+    ]);
+    return { products: await applyLivePrices(products), totalCount };
+  }
+  let all = await applyLivePrices(await prisma.product.findMany({ where, include, orderBy: { createdAt: "desc" } }));
+  const shown = (p: (typeof all)[number]) => Number(p.salePrice ?? p.basePrice);
+  if (minPrice != null) all = all.filter((p) => shown(p) >= minPrice);
+  if (maxPrice != null) all = all.filter((p) => shown(p) <= maxPrice);
+  if (sort === "price_asc") all.sort((a, b) => shown(a) - shown(b));
+  if (sort === "price_desc") all.sort((a, b) => shown(b) - shown(a));
+  return {
+    products: all.slice((page - 1) * PRODUCTS_PAGE_SIZE, page * PRODUCTS_PAGE_SIZE),
+    totalCount: all.length,
+  };
+}
+
+export function getAllPublishedProducts(page = 1, sort?: ProductSort, filters?: ProductFilters) {
+  return listCards({ status: "PUBLISHED" }, page, sort, filters);
 }
 
 // Unpaginated on purpose — search matches across he/en/ru name + SKU by
@@ -73,40 +90,32 @@ export async function getAllPublishedProducts(page = 1, sort?: ProductSort, filt
 // not one page of it. Fine while the catalog is small; a Postgres full-text
 // index (tsvector) would be the next step once it grows large enough to
 // matter — do not reuse getAllPublishedProducts's paginated version here.
-export function getAllPublishedProductsForSearch() {
-  return prisma.product.findMany({
-    where: { status: "PUBLISHED" },
-    include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },
-    orderBy: { createdAt: "desc" },
-  });
+export async function getAllPublishedProductsForSearch() {
+  return applyLivePrices(
+    await prisma.product.findMany({
+      where: { status: "PUBLISHED" },
+      include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },
+      orderBy: { createdAt: "desc" },
+    })
+  );
 }
 
 export function getCategoryBySlug(slug: string) {
   return prisma.category.findUnique({ where: { slug }, include: { image: true } });
 }
 
-export async function getProductsByCategorySlug(
+export function getProductsByCategorySlug(
   slug: string,
   page = 1,
   sort?: ProductSort,
   filters?: ProductFilters
 ) {
-  const where = {
-    status: "PUBLISHED" as const,
-    categories: { some: { category: { slug } } },
-    ...filtersToWhere(filters),
-  };
-  const [products, totalCount] = await Promise.all([
-    prisma.product.findMany({
-      where,
-      include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },
-      orderBy: sortToOrderBy(sort),
-      skip: (page - 1) * PRODUCTS_PAGE_SIZE,
-      take: PRODUCTS_PAGE_SIZE,
-    }),
-    prisma.product.count({ where }),
-  ]);
-  return { products, totalCount };
+  return listCards(
+    { status: "PUBLISHED", categories: { some: { category: { slug } } } },
+    page,
+    sort,
+    filters
+  );
 }
 
 export function getAllCategories() {
@@ -130,19 +139,21 @@ export async function getRelatedProducts(
     take,
   });
 
-  if (manual.length > 0) return manual.map((m) => m.related);
+  if (manual.length > 0) return applyLivePrices(manual.map((m) => m.related));
   if (!categorySlug) return [];
 
-  return prisma.product.findMany({
-    where: {
-      status: "PUBLISHED",
-      id: { not: productId },
-      categories: { some: { category: { slug: categorySlug } } },
-    },
-    include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },
-    take,
-    orderBy: { createdAt: "desc" },
-  });
+  return applyLivePrices(
+    await prisma.product.findMany({
+      where: {
+        status: "PUBLISHED",
+        id: { not: productId },
+        categories: { some: { category: { slug: categorySlug } } },
+      },
+      include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },
+      take,
+      orderBy: { createdAt: "desc" },
+    })
+  );
 }
 
 // Wrapped in React's per-request cache() because the product page calls

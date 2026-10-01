@@ -197,7 +197,10 @@ export function ProductDetail({
           {configurable ? (
             <>
               {configuredPrice?.status === "ok" && (
-                <span className="font-semibold text-ink">{configuredPrice.sellingPrice.toLocaleString("he-IL")} ₪</span>
+                <>
+                  <span className="font-semibold text-ink">{configuredPrice.sellingPrice.toLocaleString("he-IL")} ₪</span>
+                  <span className="text-xs font-normal text-ink/50">{t("vatIncluded")}</span>
+                </>
               )}
               {(configuredPrice == null || configuredPrice.status === "pending") && (
                 <span className="text-base font-normal text-ink/50">{t("updatingPrice")}</span>

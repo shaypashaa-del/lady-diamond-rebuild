@@ -8,6 +8,7 @@ import {
   type CalculatorDiamondChoice,
 } from "@/lib/pricing/engine";
 import { getMetalPrice, refreshGoldPriceIfStale } from "@/server/services/market-prices";
+import { VAT_RATE } from "@/lib/pricing/constants";
 import {
   MetalType,
   type DiamondShape,
@@ -103,7 +104,7 @@ async function loadPricelistRow(spec: CalculatorDiamondSpec) {
   return value;
 }
 
-export async function resolveConfiguredPrice(params: {
+async function resolveConfiguredPriceExVat(params: {
   productId: string;
   materialOptionId: string;
   diamondOptionIds: string[];
@@ -285,4 +286,15 @@ export async function resolveConfiguredPrice(params: {
     };
   }
   return { ok: true, sellingPrice: result.sellingPrice, materialOptionId: material.id, diamondOptionIds };
+}
+
+// Every price a customer sees or is charged includes Israeli VAT (18%). The
+// cost/margin formulas above stay VAT-free; VAT is applied exactly once, here,
+// so the live product page and checkout can never disagree.
+export async function resolveConfiguredPrice(
+  params: Parameters<typeof resolveConfiguredPriceExVat>[0]
+): Promise<ResolveConfiguredPriceResult> {
+  const r = await resolveConfiguredPriceExVat(params);
+  if (!r.ok) return r;
+  return { ...r, sellingPrice: round2(r.sellingPrice * (1 + VAT_RATE)) };
 }

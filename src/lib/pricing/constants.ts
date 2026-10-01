@@ -147,3 +147,6 @@ export function resolveDiamondCostCategory(input: {
   if (midColor && midClarity) return "NATURAL_WHITE_GH_VS2";
   return "NATURAL_WHITE_COMMERCIAL";
 }
+
+// Israeli VAT, included in every customer-facing price.
+export const VAT_RATE = 0.18;

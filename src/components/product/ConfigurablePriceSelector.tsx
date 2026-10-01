@@ -41,6 +41,11 @@ function materialLabel(t: Translator, m: MaterialOption) {
   return `${metal} ${t(`purity_${m.purity}`)}`;
 }
 
+const groupKey = (m: MaterialOption) => `${m.metalType}|${m.purity}`;
+function groupLabel(t: Translator, m: MaterialOption) {
+  return `${t(`metal_${m.metalType}`)} ${t(`purity_${m.purity}`)}`;
+}
+
 // A customer sees "0.5ct Round · Natural · Classic" — not raw grade codes
 // like "color G, clarity VS1", which mean nothing to most shoppers. The tier
 // label (see DIAMOND_QUALITY_TIERS) stands in for the technical grades;
@@ -196,7 +201,14 @@ export function ConfigurablePriceSelector({
   // retailers present metal color); silver/platinum and multi-purity
   // choices fall back to labeled pills since a color dot wouldn't make
   // sense for them.
-  const hasGoldColorSwatches = materialOptions.some((m) => m.metalType === "GOLD" && m.goldColor);
+  const metalGroups: { key: string; options: MaterialOption[] }[] = [];
+  for (const m of materialOptions) {
+    const k = groupKey(m);
+    const g = metalGroups.find((x) => x.key === k);
+    if (g) g.options.push(m);
+    else metalGroups.push({ key: k, options: [m] });
+  }
+  const currentGroup = material ? metalGroups.find((g) => g.key === groupKey(material)) : undefined;
 
   // If every diamond option is the same shape and type, the only real
   // choice is carat weight — show a carat dropdown instead of pills that
@@ -209,53 +221,64 @@ export function ConfigurablePriceSelector({
 
   return (
     <div className="mt-6 space-y-5 border-t border-gold-soft pt-6">
-      <div>
-        <label className="mb-2 block text-sm font-medium text-ink">
-          {hasGoldColorSwatches ? t("goldColorLabel") : t("materialLabel")}
-        </label>
-        {hasGoldColorSwatches ? (
-          <div className="flex flex-wrap items-center gap-3">
-            {materialOptions.map((m) => (
-              <button
-                key={m.id}
-                type="button"
-                title={materialLabel(t, m)}
-                aria-label={materialLabel(t, m)}
-                aria-pressed={m.id === materialId}
-                onClick={() => setMaterialId(m.id)}
-                className={`h-8 w-8 rounded-full border-2 transition-transform ${
-                  m.id === materialId ? "border-ink scale-110" : "border-transparent hover:scale-105"
-                }`}
-                style={{
-                  backgroundColor:
-                    m.metalType === "GOLD" && m.goldColor ? GOLD_COLOR_SWATCH[m.goldColor] : "#C0C0C0",
-                }}
-              />
-            ))}
-            <span className="text-sm text-ink/70">
-              {material ? materialLabel(t, material) : ""}
-            </span>
+      <div className="space-y-3">
+        {metalGroups.length > 1 && (
+          <div>
+            <label className="mb-2 block text-sm font-medium text-ink">{t("materialLabel")}</label>
+            <div className="flex flex-wrap gap-2">
+              {metalGroups.map((g) => {
+                const selected = material && groupKey(material) === g.key;
+                return (
+                  <button
+                    key={g.key}
+                    type="button"
+                    aria-pressed={!!selected}
+                    onClick={() => {
+                      // Keep the same gold color when switching purity if the
+                      // new group offers it.
+                      const same = g.options.find((o) => o.goldColor && o.goldColor === material?.goldColor);
+                      setMaterialId((same ?? g.options.find((o) => o.isDefault) ?? g.options[0]).id);
+                    }}
+                    className={`rounded-full border px-4 py-2 text-sm transition-colors ${
+                      selected
+                        ? "border-gold-bright bg-ink text-paper"
+                        : "border-gold-soft text-ink hover:border-gold-bright"
+                    }`}
+                  >
+                    {groupLabel(t, g.options[0])}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        ) : null}
-        {hasGoldColorSwatches && (
-          <p className="mt-2 text-xs text-ink/50">{t("madeToOrderDisclaimer")}</p>
         )}
-        {!hasGoldColorSwatches && (
-          <div className="flex flex-wrap gap-2">
-            {materialOptions.map((m) => (
-              <button
-                key={m.id}
-                type="button"
-                onClick={() => setMaterialId(m.id)}
-                className={`rounded-full border px-4 py-2 text-sm transition-colors ${
-                  m.id === materialId
-                    ? "border-gold-bright bg-ink text-paper"
-                    : "border-gold-soft text-ink hover:border-gold-bright"
-                }`}
-              >
-                {materialLabel(t, m)}
-              </button>
-            ))}
+        {currentGroup && currentGroup.options.filter((m) => m.goldColor).length > 1 && (
+          <div>
+            <label className="mb-2 block text-sm font-medium text-ink">{t("goldColorLabel")}</label>
+            <div className="flex flex-wrap items-center gap-3">
+              {currentGroup.options.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  title={materialLabel(t, m)}
+                  aria-label={materialLabel(t, m)}
+                  aria-pressed={m.id === materialId}
+                  onClick={() => setMaterialId(m.id)}
+                  className={`h-8 w-8 rounded-full border-2 transition-transform ${
+                    m.id === materialId ? "border-ink scale-110" : "border-transparent hover:scale-105"
+                  }`}
+                  style={{ backgroundColor: m.goldColor ? GOLD_COLOR_SWATCH[m.goldColor] : "#C0C0C0" }}
+                />
+              ))}
+              <span className="text-sm text-ink/70">{material ? materialLabel(t, material) : ""}</span>
+            </div>
+            <p className="mt-2 text-xs text-ink/50">{t("madeToOrderDisclaimer")}</p>
+          </div>
+        )}
+        {metalGroups.length <= 1 && !(currentGroup && currentGroup.options.filter((m) => m.goldColor).length > 1) && material && (
+          <div>
+            <label className="mb-1 block text-sm font-medium text-ink">{t("materialLabel")}</label>
+            <span className="text-sm text-ink/70">{materialLabel(t, material)}</span>
           </div>
         )}
       </div>

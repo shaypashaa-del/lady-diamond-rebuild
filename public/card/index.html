@@ -107,6 +107,11 @@
   .b-name .ld { font-size: .66em; margin: 0; vertical-align: baseline; letter-spacing: .3em; }
   .b-name .ld::before { margin-inline-end: 12px; }
 
+  .who { grid-template-columns: auto 1fr auto; }
+  .who .role { white-space: nowrap; letter-spacing: .02em; }
+  .who .ld { letter-spacing: .26em; }
+  @media (max-width: 480px) { .who { grid-template-columns: 1fr 1fr; } .who .role { white-space: normal; } }
+
   /* back: engraved guilloche ground, monogram, labelled details, live status, QR plate */
   .face.back {
     background:

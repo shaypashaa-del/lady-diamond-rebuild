@@ -43,6 +43,11 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Diana's 3D business card is a static page in public/card; /card (and a
+  // trailing slash) serve it.
+  async redirects() {
+    return [{ source: "/card", destination: "/card/index.html", permanent: false }];
+  },
   // The local Postgres dev server (`prisma dev`) accepts far fewer concurrent
   // connections than a real deployment target; capping build worker count keeps
   // total Prisma pool connections (workers × adapter `max`) under that ceiling.

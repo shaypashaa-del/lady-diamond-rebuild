@@ -107,6 +107,11 @@
   .b-head .b-name { --h: clamp(21px, 5.4vw, 28px); letter-spacing: .1em; }
   .b-head .b-name .ld { font-family: var(--latin); }
   @media (max-width: 559px) { .front-inner .who .name { font-size: clamp(25px, 7.4vw, 32px); letter-spacing: .14em; } }
+  /* share panel items are not buttons-with-fill: undo the generic control styling */
+  .under .links .share-panel > a, .under .links .share-panel > button { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: auto; min-height: 0; width: auto; max-width: none; padding: 0; margin: 0; background: none; border: 0; border-radius: 0; box-shadow: none; color: var(--gold); font: 400 10.5px var(--body); letter-spacing: .03em; animation: none; text-shadow: none; transform: none; }
+  .under .links .share-panel > a:hover, .under .links .share-panel > button:hover { transform: none; box-shadow: none; filter: none; }
+  .who .name { font-size: calc(var(--u, 16px) * 1.75); }
+  @media (max-width: 559px) { .front-inner .who .name { font-size: clamp(28px, 8.2vw, 36px); } }
 </style>
 <title>דיאנה | LADY DIAMOND תכשיטים</title>
 <meta name="description" content="כרטיס ביקור של דיאנה, LADY DIAMOND תכשיטי יוקרה משנת 2010. טלפון, אימייל וכתובת.">

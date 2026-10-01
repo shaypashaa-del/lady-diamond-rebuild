@@ -86,16 +86,22 @@ export function Hero({
       <div className="hero-scrim absolute inset-0" />
 
       {SLIDES.length > 1 && (
-        <div className="absolute bottom-6 start-1/2 z-10 flex -translate-x-1/2 gap-2 rtl:translate-x-1/2">
+        <div className="absolute bottom-2 start-1/2 z-10 flex -translate-x-1/2 gap-2 rtl:translate-x-1/2">
           {SLIDES.map((slide, i) => (
             <button
               key={slide.src}
               aria-label={`${i + 1}`}
               onClick={() => setActive(i)}
-              className={`h-1 transition-all ${
-                i === active ? "w-8 bg-gold-bright" : "w-3 bg-paper/40"
-              }`}
-            />
+              // The visible bar is only 4px tall; this wrapper gives it a
+              // comfortable touch target without changing how it looks.
+              className="flex h-8 items-center"
+            >
+              <span
+                className={`block h-1 transition-all ${
+                  i === active ? "w-8 bg-gold-bright" : "w-3 bg-paper/40"
+                }`}
+              />
+            </button>
           ))}
         </div>
       )}

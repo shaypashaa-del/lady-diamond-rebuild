@@ -38,7 +38,7 @@ export function Footer() {
             <Image src="/brand/logo.png" alt={t("brand")} width={72} height={58} className="h-14 w-auto brightness-0 invert" />
             <p className="mt-5 max-w-[26ch] text-sm leading-6 text-paper/60">{t("tagline")}</p>
             <p className="mt-4 text-sm text-paper/50">{t("address")}</p>
-            <a href="tel:+972503781589" className="mt-2 block text-sm text-paper/50 transition-colors hover:text-gold-bright">
+            <a href="tel:+972503781589" className="mt-1 block py-1.5 text-sm text-paper/50 transition-colors hover:text-gold-bright">
               <bdi dir="ltr">+972-50-3781589</bdi>
             </a>
             <p className="mt-1 text-xs text-paper/40">{t("hours")}</p>
@@ -48,18 +48,18 @@ export function Footer() {
             <div key={col.titleKey}>
               <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-bright">{t(col.titleKey)}</h3>
               <span className="mt-3 block h-px w-8 bg-gold-bright/40" />
-              <ul className="mt-4 space-y-3 text-sm text-paper/60">
+              <ul className="mt-3 text-sm text-paper/60">
                 {col.links.map((link) => (
                   <li key={link.key}>
                     {link.href === "/card" ? (
                       // The business card is a static page outside the locale routes,
                       // so it needs a plain anchor rather than the locale-aware Link.
                       // eslint-disable-next-line @next/next/no-html-link-for-pages
-                      <a href="/card" className="link-underline transition-colors hover:text-paper">
+                      <a href="/card" className="link-underline inline-block py-1.5 transition-colors hover:text-paper">
                         {t(link.key)}
                       </a>
                     ) : (
-                      <Link href={link.href} className="link-underline transition-colors hover:text-paper">
+                      <Link href={link.href} className="link-underline inline-block py-1.5 transition-colors hover:text-paper">
                         {t(link.key)}
                       </Link>
                     )}

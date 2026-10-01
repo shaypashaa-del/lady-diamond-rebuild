@@ -40,7 +40,9 @@ export const VALID_PURITIES_FOR_METAL: Record<string, string[]> = {
 
 // Target gross margin on the FINAL selling price (not a markup on cost).
 // Final Selling Price = Base Cost / (1 - GROSS_MARGIN)
-export const GROSS_MARGIN = 0.2;
+// Owner's rule (2026-10-01): 25% profit on everything — gold, silver, labour
+// and diamonds alike — i.e. Final Price = Cost / 0.75.
+export const GROSS_MARGIN = 0.25;
 
 // Margin used ONLY for the public diamond calculator's displayed price
 // (src/app/[locale]/calculators), on top of the raw wholesale $/ct in

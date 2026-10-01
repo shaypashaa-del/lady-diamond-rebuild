@@ -19,18 +19,18 @@ const baseInput: PricingCostInputs = {
 };
 
 describe("computeConfiguredPrice", () => {
-  it("computes 14K gold, no diamond, using Base Cost / 0.80", () => {
+  it("computes 14K gold, no diamond, using Base Cost / 0.75", () => {
     const result = computeConfiguredPrice(baseInput);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     // metalCost = 5g * 0.585 * 300 = 877.5
     expect(result.metalCost).toBeCloseTo(877.5, 2);
     expect(result.baseCost).toBeCloseTo(927.5, 2);
-    // selling = baseCost / 0.8
-    expect(result.sellingPrice).toBeCloseTo(1159.38, 1);
-    expect(result.grossMargin).toBe(0.2);
-    // sanity: gross margin actually is 20% of selling price, not markup
-    expect(result.grossProfit / result.sellingPrice).toBeCloseTo(0.2, 2);
+    // selling = baseCost / 0.75
+    expect(result.sellingPrice).toBeCloseTo(1236.67, 1);
+    expect(result.grossMargin).toBe(0.25);
+    // sanity: gross margin actually is 25% of selling price, not markup
+    expect(result.grossProfit / result.sellingPrice).toBeCloseTo(0.25, 2);
   });
 
   it("never uses a 1.2x markup (which would give a different, wrong number)", () => {

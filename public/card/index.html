@@ -3,7 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<style>html,body{margin:0}</style>
+<style>html,body{margin:0}  /* final overrides (must stay last): centred back header */
+  .b-head { flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: clamp(5px, 1.4vw, 8px); }
+  .b-head .b-id { display: flex; flex-direction: column; align-items: center; width: 100%; }
+  .b-head .b-name { --h: clamp(19px, 4.8vw, 24px); font-size: var(--h); justify-content: center; }
+  .b-head .b-name .ld { font-size: calc(var(--h) * .92); letter-spacing: .22em; }
+  .b-head .b-sub { justify-content: center; }
+  .b-head .b-tools { justify-content: center; width: 100%; }
+</style>
 <title>דיאנה | LADY DIAMOND תכשיטים</title>
 <meta name="description" content="כרטיס ביקור של דיאנה, LADY DIAMOND תכשיטי יוקרה משנת 2010. טלפון, אימייל וכתובת.">
 <link rel="stylesheet" href="fonts.css">

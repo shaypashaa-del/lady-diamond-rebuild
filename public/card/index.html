@@ -37,7 +37,7 @@
     background-image: radial-gradient(ellipse 70% 50% at 50% 38%, #1d1710 0%, transparent 70%);
   }
   #dust { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
-  .stage { position: relative; z-index: 1; width: min(94vw, 580px); perspective: 1400px; margin-top: 4vh; }
+  .stage { position: relative; z-index: 2; width: min(94vw, 580px); perspective: 1400px; margin-top: 4vh; }
   .tilt { transform-style: preserve-3d; will-change: transform; }
   .card {
     position: relative; width: 100%; aspect-ratio: 1.75 / 1;
@@ -114,7 +114,7 @@
   }
   .links a.ghost, .btn.ghost { background: transparent; color: var(--gold); border: 1px solid rgba(215,180,106,.55); box-shadow: none; }
   .btn:hover, .links a:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(215,180,106,.28); }
-  .toast { min-height: 18px; font-size: 12.5px; color: var(--gold-hi); letter-spacing: .06em; }
+  .toast { position: relative; z-index: 3; min-height: 18px; margin-top: -10px; font-size: 12.5px; color: var(--gold-hi); letter-spacing: .06em; }
 
   @media (prefers-reduced-motion: reduce) { .btn, .links a { transition: none; } }
 </style>
@@ -208,8 +208,8 @@
   </div>
   <button class="btn ghost" id="flip" type="button">הפיכת הכרטיס</button>
   <div class="hint">הזיזו את העכבר מעל הכרטיס · לחיצה הופכת אותו</div>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="gsap.min.js"></script>
 <script>
@@ -218,6 +218,8 @@
   var tilt = document.getElementById('tilt');
   var gem = document.getElementById('gem');
   var toast = document.getElementById('toast');
+  var under = document.querySelector('.under');
+  var stageEl = document.querySelector('.stage');
   var sheens = document.querySelectorAll('.sheen');
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var flipped = false;
@@ -241,6 +243,13 @@
   function setFlip(v, instant) {
     flipped = v;
     var target = v ? 180 : 0;
+    /* the buttons under the card slide behind it when it is turned, and come back when it returns */
+    if (hasG) {
+      var sr = stageEl.getBoundingClientRect(), ur = under.getBoundingClientRect();
+      var dy = (sr.top + sr.height / 2) - (ur.top + ur.height / 2) + (gsap.getProperty(under, 'y') || 0);
+      under.style.pointerEvents = v ? 'none' : '';
+      gsap.to(under, { y: v ? dy : 0, scale: v ? .55 : 1, opacity: v ? 0 : 1, duration: v ? .9 : .8, ease: v ? 'power3.in' : 'power3.out', overwrite: 'auto' });
+    } else { under.style.display = v ? 'none' : ''; }
     if (hasG && !instant) gsap.to(card, { rotationY: target, duration: 1.1, ease: 'power3.inOut' });
     else if (hasG) gsap.set(card, { rotationY: target });
     else card.style.transform = 'rotateY(' + target + 'deg)';

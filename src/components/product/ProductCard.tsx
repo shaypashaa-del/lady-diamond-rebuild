@@ -1,5 +1,6 @@
 "use client";
 
+import { formatIls } from "@/lib/format-price";
 import { useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
@@ -92,11 +93,11 @@ export function ProductCard({ product }: { product: SampleProduct }) {
         <div className="mt-1 flex items-center justify-center gap-2 text-sm">
           {product.salePrice ? (
             <>
-              <span className="text-ink/40 line-through">{product.salePrice.toFixed(2)} ₪</span>
-              <span className="font-semibold text-clay">{product.price.toFixed(2)} ₪</span>
+              <span className="text-ink/40 line-through">{formatIls(product.salePrice)} ₪</span>
+              <span className="font-semibold text-clay">{formatIls(product.price)} ₪</span>
             </>
           ) : (
-            <span className="font-semibold text-ink">{product.price.toFixed(2)} ₪</span>
+            <span className="font-semibold text-ink">{formatIls(product.price)} ₪</span>
           )}
         </div>
         {isSold ? (

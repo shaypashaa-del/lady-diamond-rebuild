@@ -1,5 +1,6 @@
 "use client";
 
+import { formatIls } from "@/lib/format-price";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
@@ -78,7 +79,7 @@ export function QuickViewModal({ product, onClose }: { product: SampleProduct; o
           <p className="text-xs uppercase tracking-wide text-gold-deep">{product.category}</p>
           <h2 className="mt-1 text-lg font-semibold uppercase tracking-wide text-ink">{product.name}</h2>
           <span className="gold-rule-start mt-2 w-8" />
-          <p className="mt-2 font-semibold text-ink">{product.price.toFixed(2)} ₪</p>
+          <p className="mt-2 font-semibold text-ink">{formatIls(product.price)} ₪</p>
           {product.blurb && <p className="mt-3 text-sm text-ink/70">{product.blurb}</p>}
 
           {product.hasVariants ? (

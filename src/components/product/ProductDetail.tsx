@@ -1,5 +1,6 @@
 "use client";
 
+import { formatIls } from "@/lib/format-price";
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
@@ -198,7 +199,7 @@ export function ProductDetail({
             <>
               {configuredPrice?.status === "ok" && (
                 <>
-                  <span className="font-semibold text-ink">{configuredPrice.sellingPrice.toLocaleString("he-IL")} ₪</span>
+                  <span className="font-semibold text-ink">{formatIls(configuredPrice.sellingPrice)} ₪</span>
                   <span className="text-xs font-normal text-ink/50">{t("vatIncluded")}</span>
                 </>
               )}
@@ -211,11 +212,11 @@ export function ProductDetail({
             </>
           ) : salePrice ? (
             <>
-              <span className="text-ink/40 line-through">{price.toFixed(2)} ₪</span>
-              <span className="font-semibold text-clay">{displayPrice.toFixed(2)} ₪</span>
+              <span className="text-ink/40 line-through">{formatIls(price)} ₪</span>
+              <span className="font-semibold text-clay">{formatIls(displayPrice)} ₪</span>
             </>
           ) : (
-            <span className="font-semibold text-ink">{displayPrice.toFixed(2)} ₪</span>
+            <span className="font-semibold text-ink">{formatIls(displayPrice)} ₪</span>
           )}
         </div>
 

@@ -3,6 +3,22 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { CalculatorDiamondOption, CalculatorDiamondChoice } from "@/lib/pricing/engine";
+import { getDiamondPricelistOptions } from "@/server/actions/diamond-options";
+import { decodeDiamondOptions } from "@/lib/pricing/diamond-options-codec";
+
+const NO_OPTIONS: CalculatorDiamondOption[] = [];
+
+// One shared request per page view, however many pickers mount.
+let optionsPromise: Promise<CalculatorDiamondOption[]> | null = null;
+function loadOptions() {
+  optionsPromise ??= getDiamondPricelistOptions()
+    .then(decodeDiamondOptions)
+    .catch((e) => {
+      optionsPromise = null;
+      throw e;
+    });
+  return optionsPromise;
+}
 
 // "natural"/"lab_cvd" have real exact-match pricelist data (see
 // estimateCalculatorDiamondPrice / CalculatorDiamondPrice) — the same
@@ -29,11 +45,9 @@ const CLARITY_ORDER = ["FL", "IF", "VVS1", "VVS2", "VS1", "VS2", "SI1", "SI2", "
 // component only ever reports the SELECTION up, never a price it computed
 // itself.
 export function CalculatorDiamondSelector({
-  calculatorDiamondPrices,
   onSpecChange,
   allowNone = true,
 }: {
-  calculatorDiamondPrices: CalculatorDiamondOption[];
   onSpecChange: (choice: CalculatorDiamondChoice | null) => void;
   // A product with no diamond of its own starts on "no diamond" (metal-only
   // price) and the customer opts INTO a diamond; a product that already has
@@ -43,6 +57,27 @@ export function CalculatorDiamondSelector({
   const t = useTranslations("Product");
   const [originId, setOriginId] = useState<(typeof ORIGINS)[number]["id"]>(allowNone ? "none" : "natural");
   const isNone = originId === "none";
+
+  // The combinations are fetched only once the customer opts into a diamond —
+  // never embedded in the page (they are ~1MB and most visitors never open it).
+  const [loadedOptions, setLoadedOptions] = useState<CalculatorDiamondOption[] | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const calculatorDiamondPrices = loadedOptions ?? NO_OPTIONS;
+  const optionsLoading = !isNone && loadedOptions === null && !loadFailed;
+  useEffect(() => {
+    if (isNone || loadedOptions !== null || loadFailed) return;
+    let cancelled = false;
+    loadOptions()
+      .then((rows) => {
+        if (!cancelled) setLoadedOptions(rows);
+      })
+      .catch(() => {
+        if (!cancelled) setLoadFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isNone, loadedOptions, loadFailed]);
   const origin = DIAMOND_ORIGINS.find((o) => o.id === originId) ?? DIAMOND_ORIGINS[0];
 
   const rowsForOrigin = useMemo(
@@ -168,7 +203,9 @@ export function CalculatorDiamondSelector({
           </select>
         </div>
 
-        {isNone ? null : shapes.length === 0 ? (
+        {isNone ? null : optionsLoading ? (
+          <p className="col-span-3 self-end pb-2 text-sm text-ink/60">{t("loadingDiamondOptions")}</p>
+        ) : shapes.length === 0 ? (
           <p className="col-span-3 self-end pb-2 text-sm text-ink/60">{t("diamondSpecUnavailable")}</p>
         ) : (
           <>

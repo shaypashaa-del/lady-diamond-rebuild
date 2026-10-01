@@ -182,7 +182,8 @@
     "clarityLabel": "ניקיון",
     "diamondSpecUnavailable": "אין כרגע נתוני מחיר עבור המקור הזה — נסו את המקור השני.",
     "origin_none": "ללא יהלום",
-    "customDiamondOption": "בחירת יהלום אחר"
+    "customDiamondOption": "בחירת יהלום אחר",
+    "loadingDiamondOptions": "טוען אפשרויות יהלום…"
   },
   "Category": {
     "kicker": "LADY DIAMOND",

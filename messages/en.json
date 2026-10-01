@@ -182,7 +182,8 @@
     "clarityLabel": "Clarity",
     "diamondSpecUnavailable": "No pricing data is available for this origin yet — try the other origin.",
     "origin_none": "No diamond",
-    "customDiamondOption": "Choose a different diamond"
+    "customDiamondOption": "Choose a different diamond",
+    "loadingDiamondOptions": "Loading diamond options…"
   },
   "Category": {
     "kicker": "LADY DIAMOND",

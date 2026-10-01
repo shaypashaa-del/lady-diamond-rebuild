@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getProductBySlug, getRelatedProducts } from "@/server/repositories/catalog";
 import { calculateShipping } from "@/server/services/shipping";
-import { prisma } from "@/lib/prisma";
 import { t as localize, tMediaAlt, type LocalizedText } from "@/lib/i18n-content";
 import { toCardProduct } from "@/lib/catalog-view";
 import type { VariantView } from "@/components/product/ProductDetail";
@@ -90,26 +89,18 @@ export default async function ProductPage({
   const price = Number(product.salePrice ?? product.basePrice);
   const productUrl = `${SITE_URL}${pathFor(locale, `/product/${slug}`)}`;
 
-  // Every configurable product offers the diamond pricelist picker: a product
-  // with no designed diamond starts on "no diamond" and the customer opts in;
-  // one with a designed diamond can switch to "a different diamond". Only the
-  // available shape/carat/color/clarity combinations are sent to the browser
-  // — never the wholesale cost, which stays server-side (see
-  // resolveConfiguredPrice).
+  // Every configurable product offers the diamond pricelist picker; the list
+  // of available combinations is fetched by the browser only when a customer
+  // opens it (see getDiamondPricelistOptions), not embedded in the page.
   const offersDiamondPricelist = product.pricingMode === "CONFIGURABLE";
 
-  const [relatedRaw, tHome, shippingPrice, calculatorDiamondPrices] = await Promise.all([
+  const [relatedRaw, tHome, shippingPrice] = await Promise.all([
     getRelatedProducts(product.id, product.categories[0]?.category.slug),
     getTranslations("Home"),
     // Real admin-configured shipping rules (see /admin/shipping), not a
     // marketing claim — whatever this returns is what checkout actually
     // charges for a single unit of this product.
     calculateShipping(price, "IL"),
-    offersDiamondPricelist
-      ? prisma.calculatorDiamondPrice.findMany({
-          select: { diamondType: true, growthMethod: true, shape: true, caratWeight: true, colorGrade: true, clarityGrade: true },
-        })
-      : Promise.resolve([]),
   ]);
   const related = relatedRaw.map((p) => toCardProduct(p, locale));
 
@@ -144,14 +135,7 @@ export default async function ProductPage({
         showConfigurable={product.pricingMode === "CONFIGURABLE" && product.materialOptions.length > 0}
         materialOptions={product.materialOptions}
         diamondOptions={product.diamondOptions.map((d) => ({ ...d, caratWeight: Number(d.caratWeight) }))}
-        calculatorDiamondPrices={calculatorDiamondPrices.map((r) => ({
-          diamondType: r.diamondType as "NATURAL" | "LAB_GROWN",
-          growthMethod: r.growthMethod,
-          shape: r.shape,
-          caratWeight: Number(r.caratWeight),
-          colorGrade: r.colorGrade,
-          clarityGrade: r.clarityGrade,
-        }))}
+        offersDiamondPricelist={offersDiamondPricelist}
         slug={product.slug}
         name={name}
         shortDescription={description}

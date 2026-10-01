@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { getConfiguredPrice } from "@/server/actions/product-pricing";
 import { CalculatorDiamondSelector } from "./CalculatorDiamondSelector";
-import type { CalculatorDiamondOption, CalculatorDiamondChoice } from "@/lib/pricing/engine";
+import type { CalculatorDiamondChoice } from "@/lib/pricing/engine";
 
 export type MaterialOption = {
   id: string;
@@ -73,7 +73,7 @@ export function ConfigurablePriceSelector({
   productId,
   materialOptions,
   diamondOptions,
-  calculatorDiamondPrices,
+  offersDiamondPricelist = false,
   onMaterialImageChange,
   onConfiguredChange,
 }: {
@@ -85,7 +85,7 @@ export function ConfigurablePriceSelector({
   // CalculatorDiamondSelector. When present, the calculator's own
   // shape/carat/color/clarity pricelist filter is shown instead of (there
   // is nothing in) the diamondOptions list below.
-  calculatorDiamondPrices?: CalculatorDiamondOption[];
+  offersDiamondPricelist?: boolean;
   onMaterialImageChange?: (imageUrl: string | null) => void;
   // Reports the live price/selection up to the product page so the ONE
   // price shown near the title (ProductDetail) — and what actually gets
@@ -104,7 +104,7 @@ export function ConfigurablePriceSelector({
   const material = materialOptions.find((m) => m.id === materialId);
   const diamond = diamondOptions.find((d) => d.id === diamondId);
 
-  const hasPricelist = (calculatorDiamondPrices?.length ?? 0) > 0;
+  const hasPricelist = offersDiamondPricelist;
   // No designed diamond of its own: the pricelist picker IS the diamond choice
   // (starting on "no diamond"). Has a designed diamond: the customer can still
   // switch to "a different diamond" from the same pricelist.
@@ -234,7 +234,6 @@ export function ConfigurablePriceSelector({
 
       {calculatorMode && (
         <CalculatorDiamondSelector
-          calculatorDiamondPrices={calculatorDiamondPrices ?? []}
           onSpecChange={setPickedSpec}
           allowNone={usesCalculatorDiamondFallback}
         />

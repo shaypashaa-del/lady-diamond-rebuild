@@ -112,6 +112,23 @@
   .who .ld { letter-spacing: .26em; }
   @media (max-width: 480px) { .who { grid-template-columns: 1fr 1fr; } .who .role { white-space: normal; } }
 
+  /* alignment pass: gem and wordmark share one centre line; Latin and Hebrew sized to the same optical height; centred back header */
+  .front-inner { direction: ltr; grid-template-columns: 1fr auto; grid-template-rows: 1fr auto; column-gap: clamp(10px, 3vw, 24px); }
+  .front-inner .gem { position: relative; top: auto; right: auto; left: auto; grid-column: 2; grid-row: 1; align-self: center; width: clamp(80px, 27%, 140px); max-width: none; }
+  .front-inner .brand { grid-column: 1; grid-row: 1; align-self: center; padding: 0; text-align: left; }
+  .front-inner .who { grid-column: 1 / -1; grid-row: 2; }
+  .who { --u: clamp(13px, 3.3vw, 16px); }
+  .who .name { font-size: calc(var(--u) * 1.08); }
+  .who .ld { font-size: calc(var(--u) * 1.2); letter-spacing: .24em; }
+  .who .role { font-size: calc(var(--u) * .94); }
+  .b-head { flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: clamp(5px, 1.4vw, 8px); }
+  .b-id { display: flex; flex-direction: column; align-items: center; }
+  .b-name { --h: clamp(19px, 4.8vw, 24px); font-size: var(--h); justify-content: center; }
+  .b-name .ld { font-size: calc(var(--h) * .92); letter-spacing: .22em; }
+  .b-sub { justify-content: center; }
+  .b-tools { justify-content: center; }
+  @media (max-width: 559px) { .front-inner .gem { width: clamp(70px, 28%, 110px); } .front-inner .brand { padding: 0; } }
+
   /* back: engraved guilloche ground, monogram, labelled details, live status, QR plate */
   .face.back {
     background:

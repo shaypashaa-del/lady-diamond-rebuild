@@ -50,6 +50,13 @@
   /* one colour for phone and email everywhere: stop mobile browsers from auto-linking them in system blue */
   a[x-apple-data-detectors] { color: inherit !important; font: inherit !important; text-decoration: none !important; }
   .item dd a, .item dd a:visited, .item dd a:hover, .item dd a:active { color: var(--gold-hi) !important; -webkit-text-fill-color: var(--gold-hi); text-decoration: none; }
+  /* phones: the signature row becomes one centred stack — name, LADY DIAMOND, tagline */
+  @media (max-width: 559px) {
+    .front-inner .who { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 7px; padding-top: 14px; }
+    .front-inner .who .name { font-size: clamp(20px, 6vw, 25px); letter-spacing: .06em; justify-self: auto; align-self: center; }
+    .front-inner .who .ld { font-size: clamp(13px, 3.8vw, 16px); letter-spacing: .3em; padding-inline-start: .3em; align-self: center; grid-column: auto; }
+    .front-inner .who .role { font-size: clamp(11.5px, 3.2vw, 13.5px); letter-spacing: .08em; justify-self: auto; align-self: center; text-align: center; white-space: normal; text-wrap: balance; }
+  }
 </style>
 <title>דיאנה | LADY DIAMOND תכשיטים</title>
 <meta name="description" content="כרטיס ביקור של דיאנה, LADY DIAMOND תכשיטי יוקרה משנת 2010. טלפון, אימייל וכתובת.">

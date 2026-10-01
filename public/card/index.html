@@ -40,7 +40,7 @@
   .stage { position: relative; z-index: 2; width: min(94vw, 580px); perspective: 1400px; margin-top: 4vh; }
   .tilt { transform-style: preserve-3d; will-change: transform; }
   .card {
-    position: relative; width: 100%; aspect-ratio: 1.75 / 1;
+    position: relative; width: 100%; aspect-ratio: 1.5 / 1;
     transform-style: preserve-3d; cursor: pointer; outline: none;
   }
   .card:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 8px; border-radius: 16px; }
@@ -84,7 +84,7 @@
   /* gold glint that sweeps across LADY DIAMOND wherever it appears beside the name */
   .shine { background: linear-gradient(100deg, var(--gold-lo) 0%, var(--gold) 30%, #fff8dc 47%, var(--gold) 64%, var(--gold-lo) 100%); background-size: 260% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: shine 3.4s linear infinite; }
   @keyframes shine { 0% { background-position: 125% 0; } 100% { background-position: -125% 0; } }
-  .ld { display: inline-block; direction: ltr; font-family: var(--latin); font-weight: 600; letter-spacing: .2em; text-transform: uppercase; font-size: .6em; margin-inline-start: .7em; vertical-align: .12em; white-space: nowrap; }
+  .ld { display: inline-block; direction: ltr; font-family: var(--latin); font-weight: 600; letter-spacing: .2em; text-transform: uppercase; font-size: .6em; margin-inline-start: 1.1em; vertical-align: .12em; white-space: nowrap; }
   .who .name { display: flex; align-items: baseline; flex-wrap: wrap; }
   @media (prefers-reduced-motion: reduce) { .shine { animation: none; background-position: 40% 0; } }
 
@@ -104,6 +104,7 @@
   .b-sub { margin-top: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: clamp(10px, 2.5vw, 11.5px); color: var(--mist); letter-spacing: .06em; font-weight: 300; }
   .b-sub .latin { font-family: var(--latin); font-weight: 600; letter-spacing: .26em; color: var(--gold); }
   .b-sub i { width: 4px; height: 4px; background: var(--gold); transform: rotate(45deg); display: inline-block; }
+  .b-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .status { display: flex; align-items: center; gap: 8px; font-size: clamp(10.5px, 2.6vw, 12px); color: var(--gold-hi); letter-spacing: .04em; padding: 5px 11px; border: 1px solid rgba(215,180,106,.4); border-radius: 999px; background: rgba(215,180,106,.06); }
   .status i { width: 7px; height: 7px; border-radius: 50%; background: var(--mist); flex: none; }
   .status.open i { background: #8fd18b; box-shadow: 0 0 0 0 rgba(143,209,139,.6); animation: ping 2.4s infinite; }
@@ -118,11 +119,11 @@
   .item dd bdi { direction: ltr; unicode-bidi: isolate; letter-spacing: .02em; }
   .item .copy, .item > span { grid-column: 2; grid-row: 1 / span 2; }
   .qr { margin: 0; display: none; flex-direction: column; align-items: center; gap: 6px; }
-  .qr .plate { width: clamp(84px, 17vw, 108px); aspect-ratio: 1; padding: 7px; border-radius: 8px; background: linear-gradient(135deg, var(--gold-hi), var(--gold) 55%, #b98f45); box-shadow: 0 8px 22px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.25); }
+  .qr .plate { width: clamp(80px, 15vw, 96px); aspect-ratio: 1; padding: 7px; border-radius: 8px; background: linear-gradient(135deg, var(--gold-hi), var(--gold) 55%, #b98f45); box-shadow: 0 8px 22px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.25); }
   .qr svg { width: 100%; height: 100%; display: block; }
   .qr figcaption { font-size: 9.5px; letter-spacing: .1em; color: var(--mist); }
-  .vcf { font: 500 10.5px var(--body); letter-spacing: .05em; color: var(--gold); background: transparent; border: 1px solid rgba(215,180,106,.5); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
-  .vcf:hover { background: rgba(215,180,106,.12); }
+  .vcf { font: 500 11px var(--body); letter-spacing: .05em; color: var(--ink); background: linear-gradient(120deg, var(--gold-hi), var(--gold) 55%, #b98f45); border: 0; border-radius: 999px; padding: 6px 13px; cursor: pointer; }
+  .vcf:hover { filter: brightness(1.08); }
   .vcf:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 3px; }
   @media (min-width: 560px) { .qr { display: flex; } }
   @media (max-width: 559px) { .card { aspect-ratio: 1 / 1.1; } .front-inner .brand { padding-left: 0; padding-top: 34%; } .gem { width: 36%; } }
@@ -209,7 +210,7 @@
               <div class="b-name">דיאנה<span class="ld shine">Lady Diamond</span></div>
               <div class="b-sub">תכשיטי יוקרה משנת 2010</div>
             </div>
-            <div class="status" id="status" role="status"><i></i><span>בודקת זמינות…</span></div>
+            <div class="b-tools"><div class="status" id="status" role="status"><i></i><span>בודקת זמינות…</span></div><button class="vcf" id="vcf" type="button">שמירה באנשי קשר</button></div>
           </header>
           <div class="b-body">
             <dl class="info">
@@ -221,7 +222,6 @@
             <figure class="qr" aria-label="קוד QR לכרטיס הביקור">
               <div class="plate"><svg id="qr" viewBox="0 0 10 10" role="img" aria-label="קוד QR"></svg></div>
               <figcaption>סרקו לפתיחת הכרטיס</figcaption>
-              <button class="vcf" id="vcf" type="button">שמירה באנשי קשר</button>
             </figure>
           </div>
           <nav class="actions" aria-label="יצירת קשר מהירה">

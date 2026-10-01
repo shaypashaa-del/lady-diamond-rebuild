@@ -52,7 +52,7 @@ export function SocialLinks({
           className={
             variant === "dark"
               ? "flex h-9 w-9 items-center justify-center rounded-full border border-paper/20 text-paper/70 transition-colors hover:border-gold-bright hover:text-gold-bright"
-              : "text-ink/50 transition-colors hover:text-gold-deep"
+              : "-m-3 p-3 text-ink/50 transition-colors hover:text-gold-deep"
           }
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

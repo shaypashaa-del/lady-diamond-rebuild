@@ -48,7 +48,7 @@ export default function LoginPage() {
             className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none"
           />
         </div>
-        <Link href="/reset-password" className="link-underline mb-6 block text-end text-xs text-ink/40">
+        <Link href="/reset-password" className="link-underline mb-4 block py-2 text-end text-xs text-ink/40">
           {t("forgot")}
         </Link>
 
@@ -63,7 +63,7 @@ export default function LoginPage() {
 
       <p className="mt-6 text-center text-sm text-ink/60">
         {t("noAccount")}{" "}
-        <Link href="/register" className="link-underline font-medium text-ink">
+        <Link href="/register" className="link-underline inline-block py-2 font-medium text-ink">
           {t("register")}
         </Link>
       </p>

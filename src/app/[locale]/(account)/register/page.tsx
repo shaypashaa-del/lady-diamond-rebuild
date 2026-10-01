@@ -74,7 +74,7 @@ export default function RegisterPage() {
 
       <p className="mt-6 text-center text-sm text-ink/60">
         {t("haveAccount")}{" "}
-        <Link href="/login" className="link-underline font-medium text-ink">
+        <Link href="/login" className="link-underline inline-block py-2 font-medium text-ink">
           {t("login")}
         </Link>
       </p>

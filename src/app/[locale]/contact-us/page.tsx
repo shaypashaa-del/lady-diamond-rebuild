@@ -74,11 +74,11 @@ export default async function ContactUsPage() {
               <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-deep">{t("info")}</h2>
               <span className="mt-3 block h-px w-8 bg-gold-bright/60" />
               <p className="mt-5 text-sm leading-6 text-ink/70">{t("address")}</p>
-              <a href="tel:+972503781589" className="mt-3 block text-sm text-ink/70 transition-colors hover:text-gold-deep" dir="ltr">
+              <a href="tel:+972503781589" className="mt-1 block py-2 text-sm text-ink/70 transition-colors hover:text-gold-deep" dir="ltr">
                 +972-50-3781589
               </a>
               <p className="mt-2 text-sm text-ink/60">{t("hours")}</p>
-              <a href="mailto:diana@ladydiamondjewels.com" className="mt-3 block text-sm text-ink/70 transition-colors hover:text-gold-deep" dir="ltr">
+              <a href="mailto:diana@ladydiamondjewels.com" className="block py-2 text-sm text-ink/70 transition-colors hover:text-gold-deep" dir="ltr">
                 diana@ladydiamondjewels.com
               </a>
               <SocialLinks className="mt-6 flex items-center gap-4" />

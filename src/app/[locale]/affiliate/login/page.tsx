@@ -42,7 +42,7 @@ export default function AffiliateLoginPage() {
           <label className="mb-1 block text-xs font-medium text-ink/60">{t("password")}</label>
           <input name="password" type="password" required className={inputClass} />
         </div>
-        <Link href="/reset-password" className="mb-6 block text-end text-xs text-ink/50 underline">
+        <Link href="/reset-password" className="mb-4 block py-2 text-end text-xs text-ink/50 underline">
           {tLogin("forgot")}
         </Link>
         <button
@@ -55,7 +55,7 @@ export default function AffiliateLoginPage() {
       </form>
 
       <p className="mt-6 text-center text-sm text-ink/60">
-        <Link href="/affiliate" className="font-medium text-ink underline">
+        <Link href="/affiliate" className="inline-block py-2 font-medium text-ink underline">
           {t("apply")}
         </Link>
       </p>

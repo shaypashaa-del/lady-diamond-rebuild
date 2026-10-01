@@ -3,22 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { CalculatorDiamondOption, CalculatorDiamondChoice } from "@/lib/pricing/engine";
-import { getDiamondPricelistOptions } from "@/server/actions/diamond-options";
-import { decodeDiamondOptions } from "@/lib/pricing/diamond-options-codec";
+import { loadDiamondOptions } from "@/lib/pricing/diamond-options-client";
 
 const NO_OPTIONS: CalculatorDiamondOption[] = [];
-
-// One shared request per page view, however many pickers mount.
-let optionsPromise: Promise<CalculatorDiamondOption[]> | null = null;
-function loadOptions() {
-  optionsPromise ??= getDiamondPricelistOptions()
-    .then(decodeDiamondOptions)
-    .catch((e) => {
-      optionsPromise = null;
-      throw e;
-    });
-  return optionsPromise;
-}
 
 // "natural"/"lab_cvd" have real exact-match pricelist data (see
 // estimateCalculatorDiamondPrice / CalculatorDiamondPrice) — the same
@@ -67,7 +54,7 @@ export function CalculatorDiamondSelector({
   useEffect(() => {
     if (isNone || loadedOptions !== null || loadFailed) return;
     let cancelled = false;
-    loadOptions()
+    loadDiamondOptions()
       .then((rows) => {
         if (!cancelled) setLoadedOptions(rows);
       })

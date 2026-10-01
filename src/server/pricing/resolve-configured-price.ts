@@ -8,7 +8,12 @@ import {
   type CalculatorDiamondChoice,
 } from "@/lib/pricing/engine";
 import { getMetalPrice, refreshGoldPriceIfStale } from "@/server/services/market-prices";
-import { MetalType, type DiamondShape } from "@/generated/prisma/enums";
+import {
+  MetalType,
+  type DiamondShape,
+  type DiamondColorGrade,
+  type DiamondClarityGrade,
+} from "@/generated/prisma/enums";
 
 // The single, authoritative place a CONFIGURABLE product's selling price is
 // computed — called from the client-facing getConfiguredPrice action (for
@@ -67,10 +72,34 @@ export async function resolveConfiguredPrice(params: {
     return { ok: false, reason: "INVALID_MATERIAL", message: MISSING_DATA_MESSAGE_HE.INVALID_MATERIAL };
   }
 
-  if (material.metalType === MetalType.GOLD) {
-    await refreshGoldPriceIfStale();
-  }
-  const metalPrice = await getMetalPrice(material.metalType);
+  // The metal price and (when the customer picked a pricelist diamond) the one
+  // exact pricelist row are independent database round-trips — run them
+  // together instead of one after the other, since this is what a customer is
+  // waiting on every time they change a selection.
+  const pickedSpec =
+    params.calculatorDiamondSpec != null && params.calculatorDiamondSpec !== "none"
+      ? params.calculatorDiamondSpec
+      : null;
+  const [metalPrice, pricelistRow] = await Promise.all([
+    (async () => {
+      if (material.metalType === MetalType.GOLD) {
+        await refreshGoldPriceIfStale();
+      }
+      return getMetalPrice(material.metalType);
+    })(),
+    pickedSpec
+      ? prisma.calculatorDiamondPrice.findFirst({
+          where: {
+            diamondType: pickedSpec.diamondType,
+            growthMethod: pickedSpec.growthMethod,
+            shape: pickedSpec.shape as DiamondShape,
+            caratWeight: pickedSpec.caratWeight,
+            colorGrade: pickedSpec.colorGrade as DiamondColorGrade,
+            clarityGrade: pickedSpec.clarityGrade as DiamondClarityGrade,
+          },
+        })
+      : Promise.resolve(null),
+  ]);
 
   // This product has no real diamond-option data of its own — a plain
   // metal item legitimately has none, so this isn't automatically "missing
@@ -124,20 +153,21 @@ export async function resolveConfiguredPrice(params: {
     }
 
     const spec: CalculatorDiamondSpec = params.calculatorDiamondSpec;
-    const calculatorRows = await prisma.calculatorDiamondPrice.findMany({
-      where: { diamondType: spec.diamondType, growthMethod: spec.growthMethod, shape: spec.shape as DiamondShape },
-    });
     const diamondEstimate = estimateCalculatorDiamondPrice(
       spec,
-      calculatorRows.map((r) => ({
-        diamondType: r.diamondType as "NATURAL" | "LAB_GROWN",
-        growthMethod: r.growthMethod,
-        shape: r.shape,
-        caratWeight: Number(r.caratWeight),
-        colorGrade: r.colorGrade,
-        clarityGrade: r.clarityGrade,
-        costPerCaratUsd: Number(r.costPerCaratUsd),
-      }))
+      pricelistRow
+        ? [
+            {
+              diamondType: pricelistRow.diamondType as "NATURAL" | "LAB_GROWN",
+              growthMethod: pricelistRow.growthMethod,
+              shape: pricelistRow.shape,
+              caratWeight: Number(pricelistRow.caratWeight),
+              colorGrade: pricelistRow.colorGrade,
+              clarityGrade: pricelistRow.clarityGrade,
+              costPerCaratUsd: Number(pricelistRow.costPerCaratUsd),
+            },
+          ]
+        : []
     );
     if (!diamondEstimate.ok) {
       return {

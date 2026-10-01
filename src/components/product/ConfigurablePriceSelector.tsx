@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { getConfiguredPrice } from "@/server/actions/product-pricing";
 import { CalculatorDiamondSelector } from "./CalculatorDiamondSelector";
+import { prefetchDiamondOptions } from "@/lib/pricing/diamond-options-client";
 import type { CalculatorDiamondChoice } from "@/lib/pricing/engine";
 
 export type MaterialOption = {
@@ -116,6 +117,12 @@ export function ConfigurablePriceSelector({
   // purchase made after switching back to the designed diamond.
   const calculatorDiamondSpec = calculatorMode ? pickedSpec : null;
   const designedDiamond = customDiamond ? undefined : diamond;
+
+  // Warm the diamond picker's data in the background so opening it is instant.
+  useEffect(() => {
+    if (!offersDiamondPricelist) return;
+    return prefetchDiamondOptions();
+  }, [offersDiamondPricelist]);
 
   // Only overrides the gallery's main photo when this specific color has a
   // real photo of its own (imageUrl set) — otherwise leaves the product's

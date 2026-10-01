@@ -1,0 +1,18 @@
+{
+  "name": "דיאנה · LADY DIAMOND",
+  "short_name": "LADY DIAMOND",
+  "description": "כרטיס ביקור של דיאנה, LADY DIAMOND תכשיטי יוקרה משנת 2010",
+  "lang": "he",
+  "dir": "rtl",
+  "start_url": "/card/index.html",
+  "scope": "/card/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07060a",
+  "theme_color": "#07060a",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

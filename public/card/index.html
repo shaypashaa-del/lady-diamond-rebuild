@@ -71,6 +71,23 @@
   /* gem and wordmark block share one optical centre line (old top padding removed, shape centred in its box) */
   .front-inner .brand { padding: 0 !important; }
   .front-inner .brand .word { margin: 0; }
+  /* WhatsApp call-to-action: brand green with a soft glow pulse, everything else stays quiet gold */
+  .under .links { grid-template-columns: 1fr 1fr; }
+  .under .links .btn { width: auto; max-width: none; margin: 0; }
+  .under .links a.wa {
+    grid-column: 1 / -1; height: 50px; gap: 11px; position: relative; overflow: hidden; color: #fff; font-size: 15px; font-weight: 600; letter-spacing: .04em;
+    background: linear-gradient(135deg, #3be07f 0%, #25D366 40%, #12904b 100%);
+    box-shadow: 0 8px 24px rgba(37,211,102,.32), inset 0 1px 0 rgba(255,255,255,.4), inset 0 -2px 6px rgba(0,60,25,.28);
+    text-shadow: 0 1px 2px rgba(0,50,20,.35); animation: waPulse 2.8s ease-out infinite;
+  }
+  .under .links a.wa svg { width: 22px; height: 22px; fill: currentColor; flex: none; filter: drop-shadow(0 1px 1px rgba(0,50,20,.3)); }
+  .under .links a.wa::after { content: ""; position: absolute; top: 0; bottom: 0; width: 42%; left: -60%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.38), transparent); transform: skewX(-18deg); animation: waSheen 4.2s ease-in-out infinite 1.2s; pointer-events: none; }
+  .under .links a.wa:hover { transform: translateY(-1px); filter: brightness(1.06); }
+  .under .links a.wa:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+  @keyframes waPulse { 0% { box-shadow: 0 8px 24px rgba(37,211,102,.32), 0 0 0 0 rgba(37,211,102,.55), inset 0 1px 0 rgba(255,255,255,.4), inset 0 -2px 6px rgba(0,60,25,.28); } 70%, 100% { box-shadow: 0 8px 24px rgba(37,211,102,.32), 0 0 0 14px rgba(37,211,102,0), inset 0 1px 0 rgba(255,255,255,.4), inset 0 -2px 6px rgba(0,60,25,.28); } }
+  @keyframes waSheen { 0%, 55% { left: -60%; } 100% { left: 130%; } }
+  @media (prefers-reduced-motion: reduce) { .under .links a.wa, .under .links a.wa::after { animation: none; } }
+  @media (max-width: 399px) { .under .links { grid-template-columns: 1fr; } }
 </style>
 <title>דיאנה | LADY DIAMOND תכשיטים</title>
 <meta name="description" content="כרטיס ביקור של דיאנה, LADY DIAMOND תכשיטי יוקרה משנת 2010. טלפון, אימייל וכתובת.">
@@ -353,10 +370,10 @@
 
 <div class="under">
   <div class="links">
-    <a href="https://wa.me/972503781589" target="_blank" rel="noopener">שלחו הודעה בוואטסאפ</a>
+    <a class="wa" href="https://wa.me/972503781589?text=%D7%A9%D7%9C%D7%95%D7%9D%20%D7%93%D7%99%D7%90%D7%A0%D7%94%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9E%D7%95%D7%A2%20%D7%A4%D7%A8%D7%98%D7%99%D7%9D%20%D7%A2%D7%9C%20%D7%AA%D7%9B%D7%A9%D7%99%D7%98%D7%99%D7%9D" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg><span>שלחו הודעה בוואטסאפ</span></a>
     <a class="ghost" href="https://ladydiamondjewels.com/" target="_blank" rel="noopener">לאתר החנות</a>
+    <button class="btn ghost" id="flip" type="button">הפיכת הכרטיס</button>
   </div>
-  <button class="btn ghost" id="flip" type="button">הפיכת הכרטיס</button>
   <div class="hint"><span class="h-mouse">הזיזו את העכבר מעל הכרטיס · לחיצה הופכת אותו</span><span class="h-touch">לחצו על הכרטיס כדי להפוך אותו</span></div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>

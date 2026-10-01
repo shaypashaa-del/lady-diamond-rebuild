@@ -28,7 +28,14 @@ export type ConfiguredPriceResponse =
 // server-side every time via the same resolver createOrder uses at
 // checkout, rather than trusting any client-sent price.
 export async function getConfiguredPrice(req: ConfiguredPriceRequest): Promise<ConfiguredPriceResponse> {
-  const result = await resolveConfiguredPrice(req);
+  // Pick the fields explicitly: `fresh` (bypass the price caches) is for
+  // checkout only and must never be settable by a browser.
+  const result = await resolveConfiguredPrice({
+    productId: req.productId,
+    materialOptionId: req.materialOptionId,
+    diamondOptionIds: req.diamondOptionIds,
+    calculatorDiamondSpec: req.calculatorDiamondSpec,
+  });
   if (!result.ok) return { ok: false, message: result.message };
   return { ok: true, sellingPrice: result.sellingPrice };
 }

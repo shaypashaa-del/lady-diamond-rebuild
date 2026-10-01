@@ -44,6 +44,65 @@ const MISSING_DATA_MESSAGE_HE: Record<string, string> = {
   MISSING_DIAMOND_SELECTION: "נא לבחור את מפרט היהלום.",
 };
 
+// Short-lived in-memory caches. Computing a price used to cost four or five
+// sequential database round-trips (product, gold-price freshness check, metal
+// price, pricelist row) — about three seconds per click on the product page.
+// Product costs and metal prices change rarely, so the live product page reads
+// them from here for up to 30s; the diamond pricelist (static spreadsheet
+// data) for ten minutes. Checkout passes `fresh: true` and always reads the
+// database, so what a customer is actually charged is never served from cache.
+const PRODUCT_TTL_MS = 30_000;
+const METAL_TTL_MS = 30_000;
+const GOLD_CHECK_EVERY_MS = 60_000;
+const PRICELIST_TTL_MS = 10 * 60_000;
+
+const fetchProductForPricing = (id: string) =>
+  prisma.product.findUnique({ where: { id }, include: { materialOptions: true, diamondOptions: true } });
+type ProductForPricing = NonNullable<Awaited<ReturnType<typeof fetchProductForPricing>>>;
+
+const productCache = new Map<string, { at: number; value: ProductForPricing }>();
+const metalCache = new Map<string, { at: number; value: NonNullable<Awaited<ReturnType<typeof getMetalPrice>>> }>();
+const pricelistCache = new Map<string, { at: number; value: Awaited<ReturnType<typeof prisma.calculatorDiamondPrice.findFirst>> }>();
+let lastGoldCheckAt = 0;
+
+async function loadProduct(id: string, fresh: boolean) {
+  const hit = productCache.get(id);
+  if (!fresh && hit && Date.now() - hit.at < PRODUCT_TTL_MS) return hit.value;
+  const value = await fetchProductForPricing(id);
+  if (value) productCache.set(id, { at: Date.now(), value });
+  return value;
+}
+
+async function loadMetalPrice(metalType: MetalType, fresh: boolean) {
+  if (metalType === MetalType.GOLD && (fresh || Date.now() - lastGoldCheckAt > GOLD_CHECK_EVERY_MS)) {
+    await refreshGoldPriceIfStale();
+    lastGoldCheckAt = Date.now();
+  }
+  const hit = metalCache.get(metalType);
+  if (!fresh && hit && Date.now() - hit.at < METAL_TTL_MS) return hit.value;
+  const value = await getMetalPrice(metalType);
+  if (value) metalCache.set(metalType, { at: Date.now(), value });
+  return value;
+}
+
+async function loadPricelistRow(spec: CalculatorDiamondSpec) {
+  const key = [spec.diamondType, spec.growthMethod, spec.shape, spec.caratWeight, spec.colorGrade, spec.clarityGrade].join("|");
+  const hit = pricelistCache.get(key);
+  if (hit && Date.now() - hit.at < PRICELIST_TTL_MS) return hit.value;
+  const value = await prisma.calculatorDiamondPrice.findFirst({
+    where: {
+      diamondType: spec.diamondType,
+      growthMethod: spec.growthMethod,
+      shape: spec.shape as DiamondShape,
+      caratWeight: spec.caratWeight,
+      colorGrade: spec.colorGrade as DiamondColorGrade,
+      clarityGrade: spec.clarityGrade as DiamondClarityGrade,
+    },
+  });
+  if (value) pricelistCache.set(key, { at: Date.now(), value });
+  return value;
+}
+
 export async function resolveConfiguredPrice(params: {
   productId: string;
   materialOptionId: string;
@@ -58,11 +117,12 @@ export async function resolveConfiguredPrice(params: {
   // confirmed this specific piece has no diamond at all (prices metal-only,
   // same as before this fallback existed).
   calculatorDiamondSpec?: CalculatorDiamondChoice | null;
+  // True at checkout: read everything from the database, never from the
+  // short-lived caches above.
+  fresh?: boolean;
 }): Promise<ResolveConfiguredPriceResult> {
-  const product = await prisma.product.findUnique({
-    where: { id: params.productId },
-    include: { materialOptions: true, diamondOptions: true },
-  });
+  const fresh = params.fresh === true;
+  const product = await loadProduct(params.productId, fresh);
   if (!product) {
     return { ok: false, reason: "MISSING_PRODUCT", message: MISSING_DATA_MESSAGE_HE.MISSING_PRODUCT };
   }
@@ -81,24 +141,8 @@ export async function resolveConfiguredPrice(params: {
       ? params.calculatorDiamondSpec
       : null;
   const [metalPrice, pricelistRow] = await Promise.all([
-    (async () => {
-      if (material.metalType === MetalType.GOLD) {
-        await refreshGoldPriceIfStale();
-      }
-      return getMetalPrice(material.metalType);
-    })(),
-    pickedSpec
-      ? prisma.calculatorDiamondPrice.findFirst({
-          where: {
-            diamondType: pickedSpec.diamondType,
-            growthMethod: pickedSpec.growthMethod,
-            shape: pickedSpec.shape as DiamondShape,
-            caratWeight: pickedSpec.caratWeight,
-            colorGrade: pickedSpec.colorGrade as DiamondColorGrade,
-            clarityGrade: pickedSpec.clarityGrade as DiamondClarityGrade,
-          },
-        })
-      : Promise.resolve(null),
+    loadMetalPrice(material.metalType, fresh),
+    pickedSpec ? loadPricelistRow(pickedSpec) : Promise.resolve(null),
   ]);
 
   // This product has no real diamond-option data of its own — a plain

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { getConfiguredPrice } from "@/server/actions/product-pricing";
 import { CalculatorDiamondSelector } from "./CalculatorDiamondSelector";
@@ -110,6 +110,7 @@ export function ConfigurablePriceSelector({
   // (starting on "no diamond"). Has a designed diamond: the customer can still
   // switch to "a different diamond" from the same pricelist.
   const usesCalculatorDiamondFallback = diamondOptions.length === 0 && hasPricelist;
+  const priceCache = useRef(new Map<string, { at: number; price: number }>());
   const [customDiamond, setCustomDiamond] = useState(false);
   const calculatorMode = usesCalculatorDiamondFallback || (customDiamond && hasPricelist);
   const [pickedSpec, setPickedSpec] = useState<CalculatorDiamondChoice | null>(null);
@@ -141,9 +142,28 @@ export function ConfigurablePriceSelector({
       onConfiguredChange?.({ status: "pending" });
       return;
     }
+    const diamondOptionIds = !calculatorMode && diamond ? [diamond.id] : [];
+    // The price depends on the metal and purity, not on which gold *color* is
+    // picked — so switching yellow/white/rose, or returning to a selection
+    // already priced a moment ago, answers instantly instead of waiting on the
+    // server. Held for two minutes only (the gold price moves), and checkout
+    // always recomputes server-side regardless.
+    const cacheKey = `${material.metalType}|${material.purity}|${
+      calculatorMode ? JSON.stringify(calculatorDiamondSpec) : diamondOptionIds.join(",")
+    }`;
+    const cached = priceCache.current.get(cacheKey);
+    if (cached && Date.now() - cached.at < 120_000) {
+      onConfiguredChange?.({
+        status: "ok",
+        sellingPrice: cached.price,
+        materialOptionId: material.id,
+        diamondOptionIds,
+        calculatorDiamondSpec: calculatorDiamondSpec ?? undefined,
+      });
+      return;
+    }
     let cancelled = false;
     onConfiguredChange?.({ status: "pending" });
-    const diamondOptionIds = !calculatorMode && diamond ? [diamond.id] : [];
     getConfiguredPrice({
       productId,
       materialOptionId: material.id,
@@ -151,6 +171,7 @@ export function ConfigurablePriceSelector({
       calculatorDiamondSpec,
     }).then((res) => {
       if (cancelled) return;
+      if (res.ok) priceCache.current.set(cacheKey, { at: Date.now(), price: res.sellingPrice });
       onConfiguredChange?.(
         res.ok
           ? {

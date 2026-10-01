@@ -130,6 +130,7 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
         materialOptionId: line.materialOptionId,
         diamondOptionIds: line.diamondOptionIds ?? [],
         calculatorDiamondSpec: line.calculatorDiamondSpec ?? null,
+        fresh: true,
       });
       if (!resolved.ok) {
         return { error: `לא ניתן לחשב מחיר עבור "${line.name}": ${resolved.message}` };

@@ -519,7 +519,7 @@
     if (innerWidth >= 1000) {
       var last = zs[2].getBoundingClientRect(), bottomPad = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
       var natural = last.bottom + (window.scrollY || 0) + bottomPad;
-      var z = Math.max(0.68, Math.min(1.5, (innerHeight / natural) * 0.97, (innerWidth - 48) / (card.offsetWidth || 580)));
+      var z = Math.max(0.68, Math.min(1.5, (innerHeight / natural) * 0.93, (innerWidth - 48) / (card.offsetWidth || 580)));
       if (Math.abs(z - 1) > 0.02) zs.forEach(function (e) { e.style.zoom = z.toFixed(3); });
     }
   }

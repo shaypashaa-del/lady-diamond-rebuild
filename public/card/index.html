@@ -97,6 +97,16 @@
   .who .role { justify-self: end; text-align: end; }
   @media (max-width: 480px) { .who { grid-template-columns: 1fr 1fr; } .who .ld { grid-column: 1 / -1; grid-row: 2; padding-top: 4px; } }
 
+  /* one size, one centre line and equal spacing for everything in the front footer row */
+  .who { align-items: center; column-gap: 14px; }
+  .who .name, .who .ld, .who .role { font-size: clamp(13px, 3.3vw, 16px); line-height: 1.2; margin: 0; }
+  .who .name { font-weight: 500; letter-spacing: .04em; }
+  .who .ld { font-size: clamp(13px, 3.3vw, 16px); letter-spacing: .3em; padding-inline-start: .3em; vertical-align: baseline; }
+  .who .role { letter-spacing: .06em; }
+  .b-name { display: flex; align-items: center; gap: 14px; font-size: clamp(19px, 4.8vw, 24px); }
+  .b-name .ld { font-size: .66em; margin: 0; vertical-align: baseline; letter-spacing: .3em; }
+  .b-name .ld::before { margin-inline-end: 12px; }
+
   /* back: engraved guilloche ground, monogram, labelled details, live status, QR plate */
   .face.back {
     background:

@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import "./globals.css";
 import { routing, rtlLocales, type Locale } from "@/i18n/routing";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
+import { getNavCategories } from "@/server/nav-categories";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ReferralCapture } from "@/components/ReferralCapture";
@@ -130,6 +131,7 @@ export default async function LocaleLayout({
 
   const dir = rtlLocales.includes(locale as Locale) ? "rtl" : "ltr";
 
+  const navCategories = await getNavCategories(locale as Locale);
   const announcement = await getContentBlock<AnnouncementBarContent>(CONTENT_KEYS.announcementBar);
 
   return (
@@ -149,9 +151,9 @@ export default async function LocaleLayout({
             href={/^(\/|https:\/\/)/.test(announcement?.linkHref ?? "") ? announcement?.linkHref : undefined}
             subscribeLabel={announcement ? tContent(announcement.linkText, locale as Locale) : undefined}
           />
-          <Header />
+          <Header categories={navCategories} />
           <main className="flex-1">{children}</main>
-          <Footer />
+          <Footer categories={navCategories} />
           <WhatsappButton />
           <SparkleCursor />
           <AccessibilityWidget />

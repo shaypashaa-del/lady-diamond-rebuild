@@ -5,7 +5,7 @@ import { footerColumns } from "@/lib/nav-data";
 import { SocialLinks } from "./SocialLinks";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
-export function Footer() {
+export function Footer({ categories = [] }: { categories?: { slug: string; label: string }[] }) {
   const t = useTranslations("Footer");
 
   return (
@@ -49,18 +49,21 @@ export function Footer() {
               <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-bright">{t(col.titleKey)}</h3>
               <span className="mt-3 block h-px w-8 bg-gold-bright/40" />
               <ul className="mt-3 text-sm text-paper/60">
-                {col.links.map((link) => (
+                {(col.titleKey === "categories" && categories.length > 0
+                  ? categories.map((c) => ({ key: c.slug, href: `/category/${c.slug}`, label: c.label }))
+                  : col.links.map((l) => ({ ...l, label: t(l.key) }))
+                ).map((link) => (
                   <li key={link.key}>
                     {link.href === "/card" ? (
                       // The business card is a static page outside the locale routes,
                       // so it needs a plain anchor rather than the locale-aware Link.
                       // eslint-disable-next-line @next/next/no-html-link-for-pages
                       <a href="/card" className="link-underline inline-block py-1.5 transition-colors hover:text-paper">
-                        {t(link.key)}
+                        {link.label}
                       </a>
                     ) : (
                       <Link href={link.href} className="link-underline inline-block py-1.5 transition-colors hover:text-paper">
-                        {t(link.key)}
+                        {link.label}
                       </Link>
                     )}
                   </li>

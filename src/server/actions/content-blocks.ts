@@ -30,6 +30,10 @@ export type HeroContent = {
   images?: string[];
 };
 
+export type BannerTile = { href: string; image: string; title: LocalizedText; copy: LocalizedText };
+// Slots: 0 = tall left tile, 1 = right top, 2 = right bottom.
+export type HomepageBannersContent = { tiles: (BannerTile | null)[] };
+
 // This one query runs on every single page render (the root layout calls it
 // for the announcement bar), so it's the most likely place to observe a
 // transient dropped connection under load — e.g. `next build`'s parallel
@@ -116,6 +120,43 @@ export async function updateHomepageHero(formData: FormData): Promise<ContentSav
     return { error: "השמירה נכשלה. נסו שוב, ואם זה חוזר פנו אלינו." };
   }
 
+  revalidatePath("/", "layout");
+  revalidatePath("/admin/content");
+  return { saved: true };
+}
+
+export async function updateHomepageBanners(formData: FormData): Promise<ContentSaveResult> {
+  await requireAdminSession();
+  const tiles: (BannerTile | null)[] = [];
+  for (let i = 0; i < 3; i++) {
+    const title = localizedFromForm(formData, `title${i}`);
+    const image = String(formData.get(`image${i}`) ?? "");
+    const hrefRaw = String(formData.get(`href${i}`) ?? "").trim();
+    // An untouched slot (no title, no image, no link) keeps the built-in tile.
+    if (!title.he.trim() && !image && !hrefRaw) {
+      tiles.push(null);
+      continue;
+    }
+    if (!title.he.trim()) return { error: `באנר ${i + 1}: יש למלא כותרת בעברית.` };
+    if (image && !/^\/(brand\/[\w./-]+|api\/media\/[0-9a-f-]{36})$/.test(image)) {
+      return { error: `באנר ${i + 1}: תמונה לא תקינה.` };
+    }
+    if (!image) return { error: `באנר ${i + 1}: יש לבחור תמונה.` };
+    const href = cleanHref(hrefRaw, "/category/all");
+    if (!href) return { error: `באנר ${i + 1}: הקישור חייב להתחיל ב-/ או https://` };
+    tiles.push({ href, image, title, copy: localizedFromForm(formData, `copy${i}`) });
+  }
+  const data: HomepageBannersContent = { tiles };
+  try {
+    await prisma.contentBlock.upsert({
+      where: { key: CONTENT_KEYS.homepageBanners },
+      update: { data },
+      create: { key: CONTENT_KEYS.homepageBanners, data },
+    });
+  } catch (err) {
+    console.error("[admin] updateHomepageBanners failed", err);
+    return { error: "השמירה נכשלה. נסו שוב, ואם זה חוזר פנו אלינו." };
+  }
   revalidatePath("/", "layout");
   revalidatePath("/admin/content");
   return { saved: true };

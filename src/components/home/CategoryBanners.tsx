@@ -48,8 +48,14 @@ function CategoryTile({
   );
 }
 
-export function CategoryBanners() {
+export type BannerOverride = { href: string; image: string; title: string; copy: string } | null;
+
+export function CategoryBanners({ overrides = [] }: { overrides?: BannerOverride[] }) {
   const t = useTranslations("Home");
+  const tile = (i: number, d: { href: string; image: string; title: string; copy: string }) => overrides[i] ?? d;
+  const a = tile(0, { href: "/category/necklaces", image: "/brand/products/necklace-heart-rosegold-halo-box.jpeg", title: t("sophisticatedTitle"), copy: t("sophisticatedCopy") });
+  const b = tile(1, { href: "/category/bracelets", image: "/brand/products/bracelet-tennis-trio.jpeg", title: t("beautyBraceletsTitle"), copy: t("beautyBraceletsCopy") });
+  const c = tile(2, { href: "/category/earrings", image: "/brand/collection/v2-lifestyle-model-emerald-drops.jpeg", title: t("newEarrings"), copy: t("newEarringsCopy") });
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-14 sm:px-8">
@@ -57,10 +63,10 @@ export function CategoryBanners() {
         {/* Left column: one tall image, the "more categories" note below it. */}
         <div className="flex flex-col">
           <CategoryTile
-            href="/category/necklaces"
-            image="/brand/products/necklace-heart-rosegold-halo-box.jpeg"
-            title={t("sophisticatedTitle")}
-            copy={t("sophisticatedCopy")}
+            href={a.href}
+            image={a.image}
+            title={a.title}
+            copy={a.copy}
             findMoreLabel={t("findMore")}
             className="aspect-[3/4] border border-gold-soft"
           />
@@ -82,18 +88,18 @@ export function CategoryBanners() {
             reference layout, built with real categories/copy/photos. */}
         <div className="mt-8 flex flex-col gap-8 sm:mt-16 sm:gap-10">
           <CategoryTile
-            href="/category/bracelets"
-            image="/brand/products/bracelet-tennis-trio.jpeg"
-            title={t("beautyBraceletsTitle")}
-            copy={t("beautyBraceletsCopy")}
+            href={b.href}
+            image={b.image}
+            title={b.title}
+            copy={b.copy}
             findMoreLabel={t("findMore")}
             className="aspect-[4/3] border border-gold-soft"
           />
           <CategoryTile
-            href="/category/earrings"
-            image="/brand/collection/v2-lifestyle-model-emerald-drops.jpeg"
-            title={t("newEarrings")}
-            copy={t("newEarringsCopy")}
+            href={c.href}
+            image={c.image}
+            title={c.title}
+            copy={c.copy}
             findMoreLabel={t("findMore")}
             className="aspect-[3/4] border border-gold-soft"
           />

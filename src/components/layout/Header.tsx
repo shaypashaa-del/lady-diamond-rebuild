@@ -22,9 +22,13 @@ const DrawerDiamondMark = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export function Header() {
+export function Header({ categories = [] }: { categories?: { slug: string; label: string }[] }) {
   const t = useTranslations("Header");
   const tNav = useTranslations("Nav");
+  const megaItems = (fallback: readonly { key: string; href: string }[]) =>
+    categories.length > 0
+      ? categories.map((c) => ({ key: c.slug, href: `/category/${c.slug}`, label: c.label }))
+      : fallback.map((c) => ({ ...c, label: tNav(c.key) }));
   const tSearch = useTranslations("Search");
   const tProduct = useTranslations("Product");
   const router = useRouter();
@@ -131,13 +135,13 @@ export function Header() {
                     <div className="min-w-[240px] border border-gold-soft bg-paper shadow-[0_12px_32px_-12px_rgba(0,0,0,0.18)]">
                       <span className="mx-auto block h-px w-10 translate-y-px bg-gold-bright" />
                       <ul className="py-5">
-                        {item.mega.map((cat) => (
+                        {megaItems(item.mega).map((cat) => (
                           <li key={cat.key}>
                             <Link
                               href={cat.href}
                               className="link-underline mx-6 block border-b border-gold-soft/60 py-3 text-center text-[11px] font-medium uppercase tracking-[0.2em] text-ink/70 transition-colors last:border-b-0 hover:text-gold-deep"
                             >
-                              {tNav(cat.key)}
+                              {cat.label}
                             </Link>
                           </li>
                         ))}
@@ -209,10 +213,10 @@ export function Header() {
                   </Link>
                   {"mega" in item && item.mega && (
                     <ul className="mt-4 space-y-3 border-s border-gold-bright/25 ps-4 text-paper/55">
-                      {item.mega.map((cat) => (
+                      {megaItems(item.mega).map((cat) => (
                         <li key={cat.key}>
                           <Link href={cat.href} onClick={() => setOpen(false)} className="text-xs uppercase tracking-[0.1em] transition-colors hover:text-gold-bright">
-                            {tNav(cat.key)}
+                            {cat.label}
                           </Link>
                         </li>
                       ))}

@@ -2,6 +2,8 @@ import { SavableForm } from "./SavableForm";
 import {
   updateAnnouncementBar,
   updateHomepageHero,
+  updateHomepageBanners,
+  type HomepageBannersContent,
   type AnnouncementBarContent,
   type HeroContent,
 } from "@/server/actions/content-blocks";
@@ -99,6 +101,57 @@ export function HomepageHeroForm({
           className="w-full rounded border border-neutral-300 px-3 py-2 text-sm"
         />
       </div>
+    </SavableForm>
+  );
+}
+
+const BANNER_SLOTS = ["אריח גבוה (שמאל)", "אריח ימני עליון", "אריח ימני תחתון"];
+
+export function HomepageBannersForm({
+  initial,
+  media = [],
+}: {
+  initial: HomepageBannersContent | null;
+  media?: { url: string; filename: string }[];
+}) {
+  const imgs = [
+    ...BRAND_SLIDES.map((url) => ({ url, filename: url.split("/").pop() ?? url })),
+    ...media,
+  ];
+  return (
+    <SavableForm action={updateHomepageBanners} className="rounded-lg border border-neutral-200 bg-white p-6">
+      <h2 className="mb-1 text-sm font-semibold">באנרי הקטגוריות בעמוד הבית</h2>
+      <p className="mb-4 text-xs text-neutral-500">
+        שלושה אריחים. אריח שנשאר ריק לגמרי ממשיך להציג את ברירת המחדל של האתר.
+      </p>
+      {BANNER_SLOTS.map((label, i) => {
+        const cur = initial?.tiles?.[i] ?? null;
+        const list = cur && !imgs.some((m) => m.url === cur.image) ? [{ url: cur.image, filename: cur.image }, ...imgs] : imgs;
+        return (
+          <fieldset key={i} className="mb-5 rounded border border-neutral-200 p-4">
+            <legend className="px-1 text-xs font-semibold">{label}</legend>
+            <LocalizedInput label="כותרת" name={`title${i}`} value={cur?.title} />
+            <LocalizedInput label="טקסט קצר" name={`copy${i}`} value={cur?.copy} />
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <label className="text-xs text-neutral-500">
+                קישור (למשל /category/rings)
+                <input name={`href${i}`} dir="ltr" defaultValue={cur?.href ?? ""} className="mt-1 w-full rounded border border-neutral-300 px-3 py-2 text-sm" />
+              </label>
+              <label className="text-xs text-neutral-500">
+                תמונה
+                <select name={`image${i}`} defaultValue={cur?.image ?? ""} className="mt-1 w-full rounded border border-neutral-300 px-3 py-2 text-sm">
+                  <option value="">ברירת מחדל</option>
+                  {list.map((m) => (
+                    <option key={m.url} value={m.url}>
+                      {m.filename}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </fieldset>
+        );
+      })}
     </SavableForm>
   );
 }

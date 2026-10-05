@@ -10,7 +10,7 @@ import { InstagramSection } from "@/components/home/InstagramSection";
 import { getFeaturedProducts } from "@/server/repositories/catalog";
 import { toCardProduct } from "@/lib/catalog-view";
 import type { Locale } from "@/i18n/routing";
-import { getContentBlock, type HeroContent } from "@/server/actions/content-blocks";
+import { getContentBlock, type HeroContent, type HomepageBannersContent } from "@/server/actions/content-blocks";
 import { CONTENT_KEYS } from "@/lib/content-keys";
 import { t as tContent } from "@/lib/i18n-content";
 
@@ -19,17 +19,20 @@ export default async function Home() {
   const featured = await getFeaturedProducts();
   const cards = featured.map((p) => toCardProduct(p, locale));
   const hero = await getContentBlock<HeroContent>(CONTENT_KEYS.homepageHero);
+  const banners = await getContentBlock<HomepageBannersContent>(CONTENT_KEYS.homepageBanners);
 
-  return <HomeView cards={cards} hero={hero} locale={locale} />;
+  return <HomeView cards={cards} hero={hero} banners={banners} locale={locale} />;
 }
 
 function HomeView({
   cards,
   hero,
+  banners,
   locale,
 }: {
   cards: ReturnType<typeof toCardProduct>[];
   hero: HeroContent | null;
+  banners: HomepageBannersContent | null;
   locale: Locale;
 }) {
   const t = useTranslations("Home");
@@ -46,7 +49,11 @@ function HomeView({
         images={hero?.images}
       />
       <ProductSection kicker={t("latestBeautyKicker")} title={t("latestBeauty")} products={cards.slice(0, half)} />
-      <CategoryBanners />
+      <CategoryBanners
+        overrides={(banners?.tiles ?? []).map((b) =>
+          b ? { href: b.href, image: b.image, title: tContent(b.title, locale), copy: tContent(b.copy, locale) } : null
+        )}
+      />
       <ProductSection kicker={t("newEarringsKicker")} title={t("newEarrings")} products={cards.slice(half)} />
       <NewCollection />
       <EuphoriaSpotlight />

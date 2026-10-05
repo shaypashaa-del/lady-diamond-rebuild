@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { t as localize, type LocalizedText } from "@/lib/i18n-content";
-import { getContentBlock, type AnnouncementBarContent, type HeroContent } from "@/server/actions/content-blocks";
+import { getContentBlock, type AnnouncementBarContent, type HeroContent, type HomepageBannersContent } from "@/server/actions/content-blocks";
 import { CONTENT_KEYS } from "@/lib/content-keys";
-import { AnnouncementBarForm, HomepageHeroForm } from "@/components/admin/ContentBlockForms";
+import { AnnouncementBarForm, HomepageHeroForm, HomepageBannersForm } from "@/components/admin/ContentBlockForms";
 
 const STANDALONE_SLUGS = new Set(["about-us", "contact-us"]);
 
@@ -11,6 +11,7 @@ export default async function AdminContentPage() {
   const pages = await prisma.page.findMany({ orderBy: { slug: "asc" } });
   const announcement = await getContentBlock<AnnouncementBarContent>(CONTENT_KEYS.announcementBar);
   const media = await prisma.mediaAsset.findMany({ orderBy: { createdAt: "desc" }, take: 60, select: { url: true, filename: true } });
+  const banners = await getContentBlock<HomepageBannersContent>(CONTENT_KEYS.homepageBanners);
   const hero = await getContentBlock<HeroContent>(CONTENT_KEYS.homepageHero);
 
   return (
@@ -23,6 +24,7 @@ export default async function AdminContentPage() {
       <div className="mb-8 space-y-6">
         <AnnouncementBarForm initial={announcement} />
         <HomepageHeroForm initial={hero} media={media} />
+        <HomepageBannersForm initial={banners} media={media} />
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white">

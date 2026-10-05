@@ -43,6 +43,7 @@ function HomeView({
         subtitle={hero ? tContent(hero.subtitle, locale) : undefined}
         ctaLabel={hero ? tContent(hero.ctaLabel, locale) : undefined}
         ctaHref={hero?.ctaHref}
+        images={hero?.images}
       />
       <ProductSection kicker={t("latestBeautyKicker")} title={t("latestBeauty")} products={cards.slice(0, half)} />
       <CategoryBanners />

@@ -10,7 +10,7 @@ import { Link } from "@/i18n/navigation";
 // through several images rather than showing one static photo. This
 // reproduces that behavior: a fixed set of real brand photos crossfading
 // on a timer, driven by GSAP instead of a jQuery slider plugin.
-const SLIDES: { src: string; altKey: "heroSlideAlt1" | "heroSlideAlt2" | "heroSlideAlt3" | "heroSlideAlt4" }[] = [
+const DEFAULT_SLIDES: { src: string; altKey: "heroSlideAlt1" | "heroSlideAlt2" | "heroSlideAlt3" | "heroSlideAlt4" }[] = [
   { src: "/brand/hero-heartstone.jpeg", altKey: "heroSlideAlt1" },
   { src: "/brand/hero-slide-necklace.jpeg", altKey: "heroSlideAlt2" },
   { src: "/brand/hero-slide-earring.jpeg", altKey: "heroSlideAlt3" },
@@ -24,14 +24,19 @@ export function Hero({
   subtitle,
   ctaLabel,
   ctaHref,
+  images,
 }: {
   kicker?: string;
   title?: string;
   subtitle?: string;
   ctaLabel?: string;
   ctaHref?: string;
+  images?: string[];
 } = {}) {
   const t = useTranslations("Home");
+  const SLIDES = images && images.length > 0
+    ? images.map((src) => ({ src, altKey: "heroSlideAlt1" as const }))
+    : DEFAULT_SLIDES;
   const [active, setActive] = useState(0);
   const imageRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -42,7 +47,7 @@ export function Hero({
       setActive((prev) => (prev + 1) % SLIDES.length);
     }, SLIDE_DURATION_MS);
     return () => clearInterval(timer);
-  }, []);
+  }, [SLIDES.length]);
 
   useEffect(() => {
     imageRefs.current.forEach((el, i) => {

@@ -26,6 +26,8 @@ export type HeroContent = {
   subtitle: LocalizedText;
   ctaLabel: LocalizedText;
   ctaHref: string;
+  // Slide photos (site paths). Empty/missing = the built-in brand photos.
+  images?: string[];
 };
 
 // This one query runs on every single page render (the root layout calls it
@@ -96,6 +98,11 @@ export async function updateHomepageHero(formData: FormData): Promise<ContentSav
     subtitle: localizedFromForm(formData, "subtitle"),
     ctaLabel: localizedFromForm(formData, "ctaLabel"),
     ctaHref,
+    images: formData
+      .getAll("images")
+      .map(String)
+      .filter((u) => /^\/(brand\/[\w.-]+|api\/media\/[0-9a-f-]{36})$/.test(u))
+      .slice(0, 8),
   };
 
   try {

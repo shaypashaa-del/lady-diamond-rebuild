@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { hashPassword, verifyPasswordSafe } from "@/lib/auth/password";
 import { createSession, destroySession } from "@/lib/auth/session";
-import { isRateLimited, recordAttempt } from "@/lib/auth/rate-limit";
+import { getClientIp, isRateLimited, recordAttempt } from "@/lib/auth/rate-limit";
 import { isValidEmail, truncate } from "@/lib/validation";
 
 export type AuthResult = { error: string } | void;
@@ -56,7 +56,9 @@ export async function loginCustomer(
   const password = String(formData.get("password") ?? "");
 
   const rateLimitKey = `login:${email}`;
-  if (isRateLimited(rateLimitKey)) {
+  // Also per client IP, so one source cannot spray many different emails.
+  const ipKey = `login-ip:${await getClientIp()}`;
+  if (isRateLimited(rateLimitKey) || isRateLimited(ipKey, 20)) {
     return { error: "יותר מדי ניסיונות התחברות. יש לנסות שוב בעוד כמה דקות." };
   }
 
@@ -64,6 +66,7 @@ export async function loginCustomer(
   const passwordOk = await verifyPasswordSafe(password, user?.passwordHash);
   if (!user || !passwordOk) {
     recordAttempt(rateLimitKey);
+    recordAttempt(ipKey);
     return { error: "אימייל או סיסמה שגויים." };
   }
 
@@ -81,7 +84,9 @@ export async function loginAdmin(
   const password = String(formData.get("password") ?? "");
 
   const rateLimitKey = `login:${email}`;
-  if (isRateLimited(rateLimitKey)) {
+  // Also per client IP, so one source cannot spray many different emails.
+  const ipKey = `login-ip:${await getClientIp()}`;
+  if (isRateLimited(rateLimitKey) || isRateLimited(ipKey, 20)) {
     return { error: "יותר מדי ניסיונות התחברות. יש לנסות שוב בעוד כמה דקות." };
   }
 
@@ -94,6 +99,7 @@ export async function loginAdmin(
   const passwordOk = await verifyPasswordSafe(password, user?.passwordHash);
   if (!user || !roleOk || !passwordOk) {
     recordAttempt(rateLimitKey);
+    recordAttempt(ipKey);
     return { error: "אימייל או סיסמה שגויים, או שאין הרשאת ניהול." };
   }
 

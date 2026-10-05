@@ -6,9 +6,24 @@ const EXCLUDED_REVENUE_STATUSES: OrderStatus[] = ["CANCELLED", "REFUNDED"];
 
 export type DateRange = { from: Date; to: Date };
 
+const TZ = "Asia/Jerusalem";
+
+// Midnight (Israel time) of the day containing `d`, as a real instant — the
+// server's own time zone (UTC on most hosts) would shift "today" by hours.
+function startOfDayIsrael(d: Date): Date {
+  const ymd = new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(d); // YYYY-MM-DD
+  const asUtc = new Date(`${ymd}T00:00:00Z`);
+  const parts = new Intl.DateTimeFormat("en-US", { timeZone: TZ, hour: "numeric", hourCycle: "h23", timeZoneName: "shortOffset" }).formatToParts(asUtc);
+  const off = parts.find((p) => p.type === "timeZoneName")?.value ?? "GMT+2"; // e.g. GMT+3
+  const m = /GMT([+-]\d+)(?::(\d+))?/.exec(off);
+  const hours = m ? Number(m[1]) : 2;
+  return new Date(asUtc.getTime() - hours * 3600_000);
+}
+
 export function resolveRangePreset(preset: string | undefined): DateRange {
   const now = new Date();
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfToday = startOfDayIsrael(now);
+  const israelYmd = new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(now).split("-").map(Number);
   const endOfToday = new Date(startOfToday.getTime() + 24 * 60 * 60 * 1000 - 1);
 
   switch (preset) {
@@ -20,12 +35,12 @@ export function resolveRangePreset(preset: string | undefined): DateRange {
     case "7d":
       return { from: new Date(startOfToday.getTime() - 6 * 24 * 60 * 60 * 1000), to: endOfToday };
     case "this_month": {
-      const from = new Date(now.getFullYear(), now.getMonth(), 1);
+      const from = startOfDayIsrael(new Date(Date.UTC(israelYmd[0], israelYmd[1] - 1, 1, 12)));
       return { from, to: endOfToday };
     }
     case "last_month": {
-      const from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-      const to = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+      const from = startOfDayIsrael(new Date(Date.UTC(israelYmd[0], israelYmd[1] - 2, 1, 12)));
+      const to = new Date(startOfDayIsrael(new Date(Date.UTC(israelYmd[0], israelYmd[1] - 1, 1, 12))).getTime() - 1);
       return { from, to };
     }
     case "today":

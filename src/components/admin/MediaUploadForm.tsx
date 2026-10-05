@@ -15,7 +15,8 @@ export function MediaUploadForm() {
     <form action={action} className="mb-8 flex flex-wrap items-end gap-3 rounded-lg border border-neutral-200 bg-white p-5">
       <div>
         <label className="mb-1 block text-xs font-medium text-neutral-500">קובץ תמונה</label>
-        <input name="file" type="file" accept="image/jpeg,image/png,image/webp,image/gif" required className="text-sm" />
+        <input name="file" type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif" required className="text-sm" />
+        <p className="mt-1 text-[11px] text-neutral-400">אפשר לבחור כמה תמונות יחד (עד 20, סה״כ כ-10MB).</p>
       </div>
       <div>
         <label className="mb-1 block text-xs font-medium text-neutral-500">טקסט חלופי (alt)</label>
@@ -40,7 +41,7 @@ export function MediaUploadForm() {
       </button>
       {state && "error" in state && <p className="w-full text-sm text-rose-600">{state.error}</p>}
       {state && "uploaded" in state && (
-        <p className="w-full text-sm text-emerald-700">התמונה הועלתה בהצלחה.</p>
+        <p className="w-full text-sm text-emerald-700">התמונות הועלו בהצלחה.</p>
       )}
     </form>
   );

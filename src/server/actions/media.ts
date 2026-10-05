@@ -5,6 +5,7 @@ import { unlink } from "fs/promises";
 import path from "path";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@/generated/prisma/client";
 import { requireAdminSession } from "@/lib/auth/guards";
 import { sniffImageType, EXTENSION_BY_TYPE } from "@/lib/image-sniff";
 import { saveMediaBlob, deleteMediaBlob } from "@/server/media-store";
@@ -24,40 +25,66 @@ function optionalLocalizedFromForm(formData: FormData, prefix: string) {
 // src/server/media-store.ts): the server's disk is not durable across deploys.
 export async function uploadMedia(formData: FormData) {
   await requireAdminSession();
-  const file = formData.get("file");
+  const files = formData.getAll("file").filter((f): f is File => f instanceof File && f.size > 0);
   const altText = optionalLocalizedFromForm(formData, "altText");
 
-  if (!(file instanceof File)) {
+  if (files.length === 0) {
     return { error: "לא נבחר קובץ." };
   }
-  if (file.size > MAX_SIZE_BYTES) {
-    return { error: "הקובץ גדול מדי (מקסימום 8MB)." };
+  if (files.length > 20) {
+    return { error: "אפשר להעלות עד 20 תמונות בבת אחת." };
   }
 
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const sniffedType = sniffImageType(buffer);
-  const ext = sniffedType && EXTENSION_BY_TYPE[sniffedType];
-  if (!ext) {
-    return { error: "סוג קובץ לא נתמך. יש להעלות JPG, PNG, WEBP או GIF." };
-  }
-
-  const id = randomUUID();
-  try {
-    await saveMediaBlob(id, sniffedType, buffer);
-    await prisma.mediaAsset.create({
-      data: {
-        url: `/api/media/${id}`,
-        filename: file.name,
-        altText,
-      },
-    });
-  } catch (err) {
-    console.error("[admin] uploadMedia failed", err);
-    return { error: "העלאת התמונה נכשלה. נסו שוב, ואם זה חוזר פנו אלינו." };
+  let uploaded = 0;
+  const problems: string[] = [];
+  for (const file of files) {
+    if (file.size > MAX_SIZE_BYTES) {
+      problems.push(`${file.name}: גדול מדי (מקסימום 8MB)`);
+      continue;
+    }
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const sniffedType = sniffImageType(buffer);
+    const ext = sniffedType && EXTENSION_BY_TYPE[sniffedType];
+    if (!ext) {
+      problems.push(`${file.name}: סוג קובץ לא נתמך (JPG, PNG, WEBP או GIF בלבד)`);
+      continue;
+    }
+    const id = randomUUID();
+    try {
+      await saveMediaBlob(id, sniffedType, buffer);
+      await prisma.mediaAsset.create({
+        data: { url: `/api/media/${id}`, filename: file.name, altText },
+      });
+      uploaded += 1;
+    } catch (err) {
+      console.error("[admin] uploadMedia failed", err);
+      problems.push(`${file.name}: ההעלאה נכשלה`);
+    }
   }
 
   revalidatePath("/admin/media");
-  return { uploaded: true as const };
+  if (uploaded === 0) return { error: problems.join(" · ") };
+  return problems.length > 0
+    ? { error: `הועלו ${uploaded} תמונות. לא הועלו: ${problems.join(" · ")}` }
+    : { uploaded: true as const };
+}
+
+// Edit the alt text (shown to search engines and screen readers) of a photo.
+export async function updateMediaAlt(
+  id: string,
+  formData: FormData
+): Promise<{ saved: true } | { error: string }> {
+  await requireAdminSession();
+  const altText = optionalLocalizedFromForm(formData, "altText");
+  try {
+    await prisma.mediaAsset.update({ where: { id }, data: { altText: altText ?? Prisma.JsonNull } });
+  } catch (err) {
+    console.error("[admin] updateMediaAlt failed", err);
+    return { error: "השמירה נכשלה." };
+  }
+  revalidatePath("/admin/media");
+  revalidatePath("/", "layout");
+  return { saved: true };
 }
 
 export type DeleteMediaResult = { error: string } | undefined;

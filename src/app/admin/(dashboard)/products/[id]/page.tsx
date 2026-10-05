@@ -85,7 +85,7 @@ export default async function EditProductPage({
         }))}
         availableMedia={availableMedia.map((m) => ({ id: m.id, filename: m.filename }))}
       />
-      <VariantManager productId={product.id} variants={product.variants} />
+      <VariantManager productId={product.id} variants={product.variants} images={product.images.map((img) => ({ mediaId: img.mediaId, filename: img.media.filename }))} />
       <ProductPricingManager
         productId={product.id}
         pricingMode={product.pricingMode}

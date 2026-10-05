@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 
 // Timeline, in ms.
 const HOLD_MS = 5000; // the full portrait holds, untouched, before fading
+const MOBILE_HOLD_MS = 1500;
+const MOBILE_FADE_MS = 700;
 const FADE_MS = 1800; // the whole photo dissolving away as one, in one motion
 
 // A full-screen entrance: Diana's portrait (her signature is already baked
@@ -17,6 +19,7 @@ export function IntroReveal() {
   const [mounted, setMounted] = useState(false);
   const [fading, setFading] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const [fadeMs, setFadeMs] = useState(FADE_MS);
   const startedRef = useRef(false);
 
   useEffect(() => {
@@ -35,11 +38,17 @@ export function IntroReveal() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
 
-    setTimeout(() => setFading(true), HOLD_MS);
+    // Phones get a much shorter intro: people there are waiting on mobile data.
+    const phone = window.matchMedia("(max-width: 639px)").matches;
+    const hold = phone ? MOBILE_HOLD_MS : HOLD_MS;
+    const fade = phone ? MOBILE_FADE_MS : FADE_MS;
+    setFadeMs(fade);
+
+    setTimeout(() => setFading(true), hold);
     setTimeout(() => {
       setHidden(true);
       document.body.style.overflow = "";
-    }, HOLD_MS + FADE_MS);
+    }, hold + fade);
   }, []);
 
   if (!mounted || hidden) return null;
@@ -50,7 +59,7 @@ export function IntroReveal() {
       className="fixed inset-0 z-[10000] bg-white transition-opacity ease-in-out"
       style={{
         opacity: fading ? 0 : 1,
-        transitionDuration: `${FADE_MS}ms`,
+        transitionDuration: `${fadeMs}ms`,
         // Once the fade starts, this overlay must stop intercepting clicks —
         // it's still mounted (and painted, mid-fade) for the full FADE_MS,
         // and without this a click during that window lands on the overlay

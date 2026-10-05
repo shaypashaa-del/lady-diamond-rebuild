@@ -48,6 +48,16 @@ export function ProductCard({ product }: { product: SampleProduct }) {
             {t(product.badge.toLowerCase() as "sale" | "new" | "sold")}
           </span>
         )}
+        {product.tag && (
+          <span
+            className={cn(
+              "absolute start-2 z-10 bg-gold-deep px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-paper",
+              product.badge ? "top-8" : "top-2"
+            )}
+          >
+            {t(`badge_${product.tag}`)}
+          </span>
+        )}
         {/* Visible by default on touch devices (phones, tablets), which
             have no real hover state to reveal these — only fades in on
             hover for true pointer/desktop screens (lg+). */}

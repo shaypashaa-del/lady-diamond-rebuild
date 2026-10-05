@@ -12,6 +12,7 @@ type ProductWithRelations = {
   inventory: number;
   variants: { id: string }[];
   categories: { category: { name: unknown } }[];
+  extrasBadge?: "NEW" | "BESTSELLER" | "LIMITED";
   images?: { media: { url: string; altText: unknown } }[];
 };
 
@@ -36,6 +37,7 @@ export function toCardProduct(product: ProductWithRelations, locale: Locale): Sa
     salePrice: salePrice ? price : undefined,
     hasVariants: product.variants.length > 0,
     badge,
+    tag: product.extrasBadge,
     blurb: product.shortDescription ? t(product.shortDescription as LocalizedText, locale) : "",
     imageUrl: firstImage?.url,
     imageAlt: firstImage ? tMediaAlt(firstImage.altText, locale) || undefined : undefined,

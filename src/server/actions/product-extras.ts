@@ -50,6 +50,13 @@ export async function updateProductExtras(
   }
   const badgeRaw = String(formData.get("badge") ?? "");
   const badge = (["NEW", "BESTSELLER", "LIMITED"] as const).find((b) => b === badgeRaw);
+  const dateOf = (k: string) => {
+    const v = String(formData.get(k) ?? "").trim();
+    return /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : undefined;
+  };
+  const saleStart = dateOf("saleStart");
+  const saleEnd = dateOf("saleEnd");
+  if (saleStart && saleEnd && saleStart > saleEnd) return { error: "תאריך סיום המבצע לפני תאריך ההתחלה." };
   const gtin = text("gtin");
   if (gtin && !/^\d{8,14}$/.test(gtin)) return { error: "ברקוד (GTIN) חייב להיות 8 עד 14 ספרות." };
 
@@ -71,6 +78,8 @@ export async function updateProductExtras(
     widthMm: f.widthMm,
     heightMm: f.heightMm,
     costPrice: f.costPrice,
+    saleStart,
+    saleEnd,
     supplier: text("supplier"),
     internalNotes: text("internalNotes"),
   };

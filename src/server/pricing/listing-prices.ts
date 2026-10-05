@@ -1,3 +1,4 @@
+import { getAllProductExtras, isSaleActive } from "@/server/product-extras";
 import { prisma } from "@/lib/prisma";
 import { computeConfiguredPrice, round2 } from "@/lib/pricing/engine";
 import { VAT_RATE } from "@/lib/pricing/constants";
@@ -114,9 +115,12 @@ type Priced = { id: string; basePrice: unknown; salePrice: unknown };
 // Swap a configurable product's placeholder price for its live price and drop
 // the placeholder sale price.
 export async function applyLivePrices<T extends Priced>(products: T[]): Promise<T[]> {
-  const prices = await getListingPrices();
+  const [prices, extras] = await Promise.all([getListingPrices(), getAllProductExtras()]);
   return products.map((p) => {
     const live = prices.get(p.id);
-    return live == null ? p : { ...p, basePrice: live, salePrice: null };
+    const ex = extras.get(p.id);
+    const base = live == null ? p : { ...p, basePrice: live, salePrice: null };
+    const scheduled = base.salePrice != null && !isSaleActive(ex) ? { ...base, salePrice: null } : base;
+    return ex?.badge ? { ...scheduled, extrasBadge: ex.badge } : scheduled;
   });
 }

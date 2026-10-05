@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { VAT_RATE } from "@/lib/pricing/constants";
-import { getAllProductExtras } from "@/server/product-extras";
+import { getAllProductExtras, isSaleActive } from "@/server/product-extras";
 import { getSession } from "@/lib/auth/session";
 import { calculateShipping } from "@/server/services/shipping";
 import { calculateCommission } from "@/server/services/commission";
@@ -174,7 +174,7 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
 
     const price = variant
       ? Number(variant.salePrice ?? variant.price)
-      : Number(product.salePrice ?? product.basePrice);
+      : Number((isSaleActive(extrasByProduct.get(product.id)) ? product.salePrice : null) ?? product.basePrice);
 
     resolvedLines.push({
       productDbId: product.id,

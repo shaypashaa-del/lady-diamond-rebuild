@@ -95,6 +95,22 @@ export function ProductExtrasForm({ productId, extras }: { productId: string; ex
           </label>
         </Group>
 
+        <Group
+          title="מבצע מתוזמן"
+          hint="מחיר המבצע של המוצר (בשדה מחיר מבצע) יופעל רק בטווח התאריכים. השאירו ריק כדי שיהיה פעיל תמיד."
+        >
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <label className="text-xs">
+              תחילת מבצע
+              <input name="saleStart" type="date" defaultValue={extras.saleStart ?? ""} className={inputCls} />
+            </label>
+            <label className="text-xs">
+              סיום מבצע (כולל)
+              <input name="saleEnd" type="date" defaultValue={extras.saleEnd ?? ""} className={inputCls} />
+            </label>
+          </div>
+        </Group>
+
         <Group title="משלוח ומידות" hint="נשמר לתיעוד ולחישובי משלוח עתידיים.">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <Num name="shippingWeightGrams" label="משקל משלוח (גרם)" value={extras.shippingWeightGrams} step="0.1" />

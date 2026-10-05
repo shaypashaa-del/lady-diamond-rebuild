@@ -13,7 +13,7 @@ import { ProductSection } from "@/components/home/ProductSection";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { productSchema, breadcrumbSchema } from "@/lib/schema";
 import { SITE_URL } from "@/lib/site-config";
-import { getProductExtras } from "@/server/product-extras";
+import { getProductExtras, isSaleActive } from "@/server/product-extras";
 import { routing, type Locale } from "@/i18n/routing";
 
 // Cache the rendered page for up to 5 minutes instead of hitting Supabase on
@@ -89,7 +89,10 @@ export default async function ProductPage({
   const name = localize(product.name as LocalizedText, locale);
   const description = localize(product.shortDescription as LocalizedText | null, locale);
   const livePrice = (await getListingPrices()).get(product.id);
-  const price = livePrice ?? Number(product.salePrice ?? product.basePrice);
+  const extras = await getProductExtras(product.id);
+  const saleOn = isSaleActive(extras);
+  const activeSale = saleOn && product.salePrice != null ? Number(product.salePrice) : null;
+  const price = livePrice ?? activeSale ?? Number(product.basePrice);
   const productUrl = `${SITE_URL}${pathFor(locale, `/product/${slug}`)}`;
 
   // Every configurable product offers the diamond pricelist picker; the list
@@ -113,7 +116,6 @@ export default async function ProductPage({
       : product.inventory;
   const firstImage = product.images[0]?.media.url;
 
-  const extras = await getProductExtras(product.id);
   const sections = (["warranty", "care", "certificate"] as const)
     .map((key) => ({ key, body: localize(extras[key] as LocalizedText | undefined, locale) }))
     .filter((x) => x.body);
@@ -164,7 +166,7 @@ export default async function ProductPage({
         shortDescription={description}
         description={localize(product.description as LocalizedText | null, locale)}
         price={Number(product.basePrice)}
-        salePrice={product.salePrice != null ? Number(product.salePrice) : undefined}
+        salePrice={activeSale ?? undefined}
         inventory={product.inventory}
         extras={extrasView}
         sku={product.sku ?? undefined}

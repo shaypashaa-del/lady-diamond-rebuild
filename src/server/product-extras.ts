@@ -24,7 +24,19 @@ export type ProductExtras = {
   costPrice?: number;
   supplier?: string;
   internalNotes?: string;
+  // Scheduled sale: the product's sale price applies only inside this window
+  // (ISO dates, YYYY-MM-DD, Israel time). Either end may be left open.
+  saleStart?: string;
+  saleEnd?: string;
 };
+
+export function isSaleActive(extras: ProductExtras | undefined, now = new Date()): boolean {
+  if (!extras || (!extras.saleStart && !extras.saleEnd)) return true;
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jerusalem" }).format(now);
+  if (extras.saleStart && today < extras.saleStart) return false;
+  if (extras.saleEnd && today > extras.saleEnd) return false;
+  return true;
+}
 
 let ready: Promise<void> | null = null;
 

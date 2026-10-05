@@ -6,6 +6,7 @@ export type SampleProduct = {
   salePrice?: number;
   hasVariants?: boolean;
   badge?: "New" | "Sale" | "Sold";
+  tag?: "NEW" | "BESTSELLER" | "LIMITED";
   blurb: string;
   imageUrl?: string;
   imageAlt?: string;

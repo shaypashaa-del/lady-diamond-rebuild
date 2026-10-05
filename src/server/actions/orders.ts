@@ -401,11 +401,36 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
     });
   }
 
+  // Itemised confirmation to the customer, and a copy to the store so a new
+  // order is never missed. A failed mail is logged by the provider and must
+  // not fail the (already created) order.
+  const itemLines = resolvedLines
+    .map((l) => `• ${l.name}${l.variantLabel ? ` (${l.variantLabel})` : ""} × ${l.quantity} — ${(l.price * l.quantity).toFixed(2)} ₪`)
+    .join("\n");
+  const summary = [
+    `מספר הזמנה: ${orderNumber}`,
+    "",
+    itemLines,
+    "",
+    `סכום ביניים: ${subtotal.toFixed(2)} ₪`,
+    ...(discount > 0 ? [`הנחה: -${discount.toFixed(2)} ₪`] : []),
+    `משלוח: ${shipping.toFixed(2)} ₪`,
+    `סה"כ לתשלום (כולל מע"מ): ${total.toFixed(2)} ₪`,
+  ].join("\n");
+  const a = input.billingAddress;
   await emailProvider.send({
     to: input.email,
     subject: `אישור הזמנה ${orderNumber} — LADY DIAMOND`,
-    text: `תודה על ההזמנה! מספר הזמנה: ${orderNumber}. סה"כ: ${total.toFixed(2)} ₪.\n\n${paymentInit.instructions}`,
+    text: `תודה על ההזמנה!\n\n${summary}\n\n${paymentInit.instructions}\n\nשאלות? פשוט השיבו למייל זה או כתבו לנו בוואטסאפ.`,
   });
+  const notifyTo = process.env.ORDER_NOTIFY_EMAIL || process.env.EMAIL_REPLY_TO || "diana@ladydiamondjewels.com";
+  if (notifyTo.toLowerCase() !== input.email.trim().toLowerCase()) {
+    await emailProvider.send({
+      to: notifyTo,
+      subject: `הזמנה חדשה ${orderNumber} — ${total.toFixed(2)} ₪`,
+      text: `התקבלה הזמנה חדשה באתר.\n\n${summary}\n\nלקוח: ${input.email}\nאמצעי תשלום: ${input.paymentMethod}\nכתובת: ${[a.street, a.city, a.country].filter(Boolean).join(", ")}`,
+    });
+  }
 
   return { orderNumber, total, instructions: paymentInit.instructions };
 }

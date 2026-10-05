@@ -24,6 +24,7 @@ export async function getProductsBySlugs(slugs: string[]) {
     basePrice: live.get(p.id) ?? Number(p.basePrice),
     salePrice: live.has(p.id) ? null : p.salePrice != null ? Number(p.salePrice) : null,
     inventory: p.inventory,
+    needsOptions: live.has(p.id),
     variants: p.variants.map((v) => ({ id: v.id })),
     categories: p.categories.map((c) => ({ category: { name: c.category.name } })),
     images: p.images.map((img) => ({ media: { url: img.media.url, altText: img.media.altText } })),

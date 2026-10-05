@@ -121,6 +121,9 @@ export async function applyLivePrices<T extends Priced>(products: T[]): Promise<
     const ex = extras.get(p.id);
     const base = live == null ? p : { ...p, basePrice: live, salePrice: null };
     const scheduled = base.salePrice != null && !isSaleActive(ex) ? { ...base, salePrice: null } : base;
-    return ex?.badge ? { ...scheduled, extrasBadge: ex.badge } : scheduled;
+    // A product that needs a choice before it can be bought (material picker,
+    // sizes) must send the shopper to its page, never add straight to the cart.
+    const needsOptions = live != null || (ex?.sizes?.length ?? 0) > 0;
+    return { ...scheduled, ...(ex?.badge ? { extrasBadge: ex.badge } : {}), ...(needsOptions ? { needsOptions: true } : {}) };
   });
 }

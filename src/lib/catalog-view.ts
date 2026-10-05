@@ -12,6 +12,7 @@ type ProductWithRelations = {
   inventory: number;
   variants: { id: string }[];
   categories: { category: { name: unknown } }[];
+  needsOptions?: boolean;
   extrasBadge?: "NEW" | "BESTSELLER" | "LIMITED";
   images?: { media: { url: string; altText: unknown } }[];
 };
@@ -35,7 +36,7 @@ export function toCardProduct(product: ProductWithRelations, locale: Locale): Sa
     category: categoryName,
     price: salePrice ?? price,
     salePrice: salePrice ? price : undefined,
-    hasVariants: product.variants.length > 0,
+    hasVariants: product.variants.length > 0 || product.needsOptions === true,
     badge,
     tag: product.extrasBadge,
     blurb: product.shortDescription ? t(product.shortDescription as LocalizedText, locale) : "",

@@ -28,6 +28,7 @@ function readProductForm(formData: FormData) {
   const inventory = Math.max(0, Math.floor(Number(formData.get("inventory") || 0)));
   const weightGramsRaw = formData.get("weightGrams");
   const weightGrams = weightGramsRaw ? Math.max(0, Math.round(Number(weightGramsRaw))) : null;
+  const pricingMode = String(formData.get("pricingMode")) === "CONFIGURABLE" ? ("CONFIGURABLE" as const) : ("FLAT" as const);
   const status = String(formData.get("status")) as ProductStatus;
   const isFeatured = formData.get("isFeatured") === "on";
   const sku = String(formData.get("sku") ?? "") || null;
@@ -50,6 +51,7 @@ function readProductForm(formData: FormData) {
     weightGrams,
     status,
     isFeatured,
+    pricingMode,
     categoryId,
     tagIds,
     relatedIds,
@@ -80,7 +82,9 @@ const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 function validateProductData(d: ReturnType<typeof readProductForm>): string | null {
   if (!SLUG_RE.test(d.slug)) return "כתובת (slug) חייבת להיות באנגלית קטנה, ספרות ומקפים בלבד (למשל gold-ring).";
   if (!d.name.he.trim()) return "יש למלא שם מוצר בעברית.";
-  if (!Number.isFinite(d.basePrice)) return "מחיר רגיל לא תקין.";
+  if (!Number.isFinite(d.basePrice)) return "מחיר לא תקין.";
+  if (d.pricingMode === "FLAT" && d.basePrice <= 0) return "בתמחור ידני יש להזין מחיר גדול מ-0.";
+  if (d.salePrice !== null && d.pricingMode === "FLAT" && d.salePrice >= d.basePrice) return "מחיר מבצע חייב להיות נמוך מהמחיר הרגיל.";
   if (d.salePrice !== null && !Number.isFinite(d.salePrice)) return "מחיר מבצע לא תקין.";
   if (!Number.isFinite(d.inventory)) return "מלאי לא תקין.";
   if (d.weightGrams !== null && !Number.isFinite(d.weightGrams)) return "משקל לא תקין.";
@@ -128,6 +132,7 @@ export async function createProduct(
         weightGrams: data.weightGrams,
         status: data.status,
         isFeatured: data.isFeatured,
+        pricingMode: "FLAT",
       },
     });
   } catch (err) {
@@ -158,13 +163,23 @@ export async function updateProduct(
 
   const existing = await prisma.product.findUnique({
     where: { id },
-    select: { slug: true, basePrice: true, salePrice: true },
+    select: { slug: true, basePrice: true, salePrice: true, metalWeightGrams: true, manufacturingCost: true, _count: { select: { materialOptions: true } } },
   });
+
+  if (data.pricingMode === "CONFIGURABLE" && existing) {
+    if (!existing.metalWeightGrams || existing.manufacturingCost === null || existing._count.materialOptions === 0) {
+      return {
+        error:
+          "כדי לעבור לתמחור אוטומטי יש קודם להזין משקל מתכת, עלות ייצור ולפחות אפשרות חומר אחת בחלק \"תמחור\" בהמשך העמוד ולשמור שם. עד אז בחרו תמחור ידני.",
+      };
+    }
+  }
 
   try {
     await prisma.product.update({
       where: { id },
       data: {
+        pricingMode: data.pricingMode,
         slug: data.slug,
         name: data.name,
         shortDescription: data.shortDescription,
@@ -312,4 +327,34 @@ export async function duplicateProduct(id: string) {
   }
 
   revalidatePath("/admin/products");
+}
+
+// Quick price edit from the products list (manual-priced products only).
+export async function quickUpdateProductPrice(
+  id: string,
+  formData: FormData
+): Promise<{ saved: true } | { error: string }> {
+  await requireAdminSession();
+  const basePrice = Number(formData.get("basePrice"));
+  const salePriceRaw = String(formData.get("salePrice") ?? "").trim();
+  const salePrice = salePriceRaw === "" ? null : Number(salePriceRaw);
+  if (!Number.isFinite(basePrice) || basePrice <= 0) return { error: "יש להזין מחיר גדול מ-0." };
+  if (salePrice !== null && (!Number.isFinite(salePrice) || salePrice <= 0 || salePrice >= basePrice)) {
+    return { error: "מחיר מבצע חייב להיות נמוך מהמחיר הרגיל (או ריק)." };
+  }
+
+  const product = await prisma.product.findUnique({ where: { id }, select: { slug: true, pricingMode: true } });
+  if (!product) return { error: "המוצר לא נמצא." };
+  if (product.pricingMode === "CONFIGURABLE") return { error: "מוצר זה מתומחר אוטומטית. עברו לתמחור ידני בעריכת המוצר." };
+
+  try {
+    await prisma.product.update({ where: { id }, data: { basePrice, salePrice } });
+  } catch (err) {
+    console.error("[admin] quickUpdateProductPrice failed", err);
+    return { error: "השמירה נכשלה. נסו שוב." };
+  }
+
+  revalidatePath("/admin/products");
+  revalidateProductPage(product.slug);
+  return { saved: true };
 }

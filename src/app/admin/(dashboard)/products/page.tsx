@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { deleteProduct, duplicateProduct } from "@/server/actions/products";
+import { deleteProduct, duplicateProduct, quickUpdateProductPrice } from "@/server/actions/products";
+import { SavableForm } from "@/components/admin/SavableForm";
 import { t as localize, type LocalizedText } from "@/lib/i18n-content";
 import { AdminPager } from "@/components/admin/AdminPager";
 import { getListingPrices } from "@/server/pricing/listing-prices";
@@ -75,9 +76,47 @@ export default async function AdminProductsPage({
                   {p.categories[0] ? localize(p.categories[0].category.name as LocalizedText, "he") : "—"}
                 </td>
                 <td className="px-4 py-3">
-                  {p.pricingMode === "CONFIGURABLE" && livePrices.has(p.id)
-                    ? `${formatIls(livePrices.get(p.id)!)} ₪`
-                    : `${Number(p.basePrice).toFixed(2)} ₪`}
+                  {p.pricingMode === "CONFIGURABLE" ? (
+                    <div>
+                      <div>{livePrices.has(p.id) ? `${formatIls(livePrices.get(p.id)!)} ₪` : "—"}</div>
+                      <Link href={`/admin/products/${p.id}`} className="text-xs text-neutral-500 underline">
+                        אוטומטי, עריכת תמחור
+                      </Link>
+                    </div>
+                  ) : (
+                    <SavableForm
+                      action={quickUpdateProductPrice.bind(null, p.id)}
+                      className="flex flex-col gap-1"
+                      submitLabel="שמירה"
+                      buttonClassName="w-fit rounded bg-neutral-900 px-2 py-1 text-xs font-medium text-white disabled:opacity-50"
+                    >
+                      <div className="flex items-center gap-1">
+                        <input
+                          name="basePrice"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          defaultValue={Number(p.basePrice)}
+                          aria-label="מחיר"
+                          className="w-24 rounded border border-neutral-300 px-2 py-1 text-sm"
+                        />
+                        <span className="text-xs text-neutral-500">₪</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <input
+                          name="salePrice"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          defaultValue={p.salePrice != null ? Number(p.salePrice) : ""}
+                          placeholder="מבצע"
+                          aria-label="מחיר מבצע"
+                          className="w-24 rounded border border-neutral-300 px-2 py-1 text-xs"
+                        />
+                        <span className="text-xs text-neutral-500">₪ מבצע</span>
+                      </div>
+                    </SavableForm>
+                  )}
                 </td>
                 <td className="px-4 py-3">{p.inventory}</td>
                 <td className="px-4 py-3">{statusLabels[p.status]}</td>

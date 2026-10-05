@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { deleteProduct, duplicateProduct } from "@/server/actions/products";
 import { t as localize, type LocalizedText } from "@/lib/i18n-content";
 import { AdminPager } from "@/components/admin/AdminPager";
+import { getListingPrices } from "@/server/pricing/listing-prices";
+import { formatIls } from "@/lib/format-price";
 
 const PAGE_SIZE = 50;
 
@@ -31,6 +33,9 @@ export default async function AdminProductsPage({
     prisma.product.count(),
   ]);
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  // Configurable products are priced from metal/diamond/costs; show the price
+  // the shop really charges (VAT included), not the unused placeholder.
+  const livePrices = await getListingPrices();
 
   return (
     <div>
@@ -69,7 +74,11 @@ export default async function AdminProductsPage({
                 <td className="px-4 py-3 text-neutral-500">
                   {p.categories[0] ? localize(p.categories[0].category.name as LocalizedText, "he") : "—"}
                 </td>
-                <td className="px-4 py-3">{Number(p.basePrice).toFixed(2)} ₪</td>
+                <td className="px-4 py-3">
+                  {p.pricingMode === "CONFIGURABLE" && livePrices.has(p.id)
+                    ? `${formatIls(livePrices.get(p.id)!)} ₪`
+                    : `${Number(p.basePrice).toFixed(2)} ₪`}
+                </td>
                 <td className="px-4 py-3">{p.inventory}</td>
                 <td className="px-4 py-3">{statusLabels[p.status]}</td>
                 <td className="px-4 py-3">{p.isFeatured ? "כן" : "—"}</td>

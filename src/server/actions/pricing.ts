@@ -36,7 +36,10 @@ function enumOrNull<T extends string>(value: FormDataEntryValue | null, allowed:
 
 // ---- Product-level pricing settings ----
 
-export async function updateProductPricingSettings(productId: string, formData: FormData) {
+export async function updateProductPricingSettings(
+  productId: string,
+  formData: FormData
+): Promise<{ saved: true } | { error: string }> {
   await requireAdminSession();
 
   const pricingMode =
@@ -52,20 +55,37 @@ export async function updateProductPricingSettings(productId: string, formData: 
     return Number.isFinite(n) && n >= 0 ? n : null;
   };
 
-  await prisma.product.update({
-    where: { id: productId },
-    data: {
-      pricingMode,
-      hasDiamond,
-      metalWeightGrams: num("metalWeightGrams"),
-      manufacturingCost: num("manufacturingCost"),
-      settingCost: num("settingCost"),
-      otherCost: num("otherCost"),
-    },
-  });
+  const metalWeightGrams = num("metalWeightGrams");
+  const manufacturingCost = num("manufacturingCost");
+  // A configurable product without a metal weight and a manufacturing cost
+  // cannot be priced: the shop would show "pricing under review" and the
+  // product could not be bought, so refuse the save with a clear reason.
+  if (pricingMode === PricingMode.CONFIGURABLE) {
+    if (!metalWeightGrams || metalWeightGrams <= 0) return { error: "בתמחור לפי בחירת לקוח חובה למלא משקל מתכת (גרם)." };
+    if (manufacturingCost === null) return { error: "בתמחור לפי בחירת לקוח חובה למלא עלות ייצור." };
+  }
+
+  try {
+    await prisma.product.update({
+      where: { id: productId },
+      data: {
+        pricingMode,
+        hasDiamond,
+        metalWeightGrams,
+        manufacturingCost,
+        settingCost: num("settingCost"),
+        otherCost: num("otherCost"),
+      },
+    });
+  } catch (err) {
+    console.error("[admin] updateProductPricingSettings failed", err);
+    return { error: "השמירה נכשלה. נסו שוב, ואם זה חוזר פנו אלינו." };
+  }
 
   revalidatePath(`/admin/products/${productId}`);
+  revalidatePath("/admin/products");
   await revalidateProductPageById(productId);
+  return { saved: true };
 }
 
 // ---- Material options (per product) ----

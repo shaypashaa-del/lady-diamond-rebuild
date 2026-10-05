@@ -6,6 +6,7 @@ import { VariantManager } from "@/components/admin/VariantManager";
 import { ProductImagesManager } from "@/components/admin/ProductImagesManager";
 import { ProductPricingManager } from "@/components/admin/ProductPricingManager";
 import type { LocalizedText } from "@/lib/i18n-content";
+import { getListingPrices } from "@/server/pricing/listing-prices";
 
 export default async function EditProductPage({
   params,
@@ -38,6 +39,8 @@ export default async function EditProductPage({
 
   if (!product) notFound();
 
+  const computedPrice = product.pricingMode === "CONFIGURABLE" ? ((await getListingPrices()).get(product.id) ?? null) : null;
+
   const usedMediaIds = new Set(product.images.map((img) => img.mediaId));
   const availableMedia = allMedia.filter((m) => !usedMediaIds.has(m.id));
 
@@ -64,6 +67,8 @@ export default async function EditProductPage({
           weightGrams: product.weightGrams,
           status: product.status,
           isFeatured: product.isFeatured,
+          pricingMode: product.pricingMode,
+          computedPrice,
           categoryId: product.categories[0]?.categoryId,
           tagIds: product.tags.map((t) => t.tagId),
           relatedIds: product.relatedTo.map((r) => r.relatedId),

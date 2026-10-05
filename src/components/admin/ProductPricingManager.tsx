@@ -6,6 +6,8 @@ import {
   updateProductPricingSettings,
 } from "@/server/actions/pricing";
 import { getConfiguredPriceBreakdownForAdmin } from "@/server/actions/product-pricing";
+import { SavableForm } from "./SavableForm";
+import { VAT_RATE } from "@/lib/pricing/constants";
 import { DIAMOND_QUALITY_TIERS, PURITY_LABEL, VALID_PURITIES_FOR_METAL } from "@/lib/pricing/constants";
 import type {
   DiamondCertification,
@@ -114,13 +116,22 @@ export async function ProductPricingManager({
             עלות נוספת {preview.otherCost.toFixed(2)} ₪
           </p>
           <p className="mt-1 font-semibold">
-            עלות בסיס: {preview.baseCost.toFixed(2)} ₪ → מחיר מכירה (רווח גולמי 25%):{" "}
+            עלות בסיס: {preview.baseCost.toFixed(2)} ₪ → מחיר מכירה לפני מע״מ (רווח גולמי 25%):{" "}
             {preview.sellingPrice.toFixed(2)} ₪ (רווח {preview.grossProfit.toFixed(2)} ₪)
+          </p>
+          <p className="mt-1 font-semibold">
+            המחיר שהלקוח רואה באתר (כולל מע״מ {Math.round(VAT_RATE * 100)}%):{" "}
+            {(Math.round(preview.sellingPrice * (1 + VAT_RATE) * 100) / 100).toFixed(2)} ₪
           </p>
         </div>
       )}
 
-      <form action={updateProductPricingSettings.bind(null, productId)} className="mb-6 space-y-3">
+      <SavableForm
+        action={updateProductPricingSettings.bind(null, productId)}
+        className="mb-6 space-y-3"
+        submitLabel="שמירת הגדרות תמחור"
+        buttonClassName="rounded bg-neutral-900 px-3 py-2 text-xs font-medium text-white hover:bg-neutral-800 disabled:opacity-50"
+      >
         <label className="flex items-center gap-2 text-xs">
           <input
             type="checkbox"
@@ -181,10 +192,7 @@ export async function ProductPricingManager({
             />
           </label>
         </div>
-        <button type="submit" className="rounded bg-neutral-900 px-3 py-2 text-xs font-medium text-white hover:bg-neutral-800">
-          שמירת הגדרות תמחור
-        </button>
-      </form>
+      </SavableForm>
 
       {/* Material options */}
       <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-600">אפשרויות חומר</h3>

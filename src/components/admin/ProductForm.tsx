@@ -22,6 +22,8 @@ type ProductFormValues = {
   weightGrams?: number | null;
   status?: string;
   isFeatured?: boolean;
+  pricingMode?: string;
+  computedPrice?: number | null;
   categoryId?: string;
   tagIds?: string[];
   relatedIds?: string[];
@@ -117,6 +119,26 @@ export function ProductForm({
       <LocalizedInput label="תיאור מלא" name="description" value={initial?.description ?? undefined} textarea />
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {initial?.pricingMode === "CONFIGURABLE" ? (
+          <div className="col-span-2 rounded border border-gold-soft bg-amber-50 p-3 text-xs text-neutral-700">
+            <input type="hidden" name="basePrice" value={initial?.basePrice ?? 0} />
+            <input type="hidden" name="salePrice" value={initial?.salePrice ?? ""} />
+            <p className="font-semibold text-neutral-900">מחיר המוצר מחושב אוטומטית</p>
+            <p className="mt-1">
+              המחיר באתר נקבע לפי מחיר הזהב/הכסף והיהלום, משקל המתכת ועלויות הייצור, ולכן אין כאן שדה מחיר.
+              {initial?.computedPrice != null && (
+                <>
+                  {" "}המחיר הנוכחי (כולל מע״מ):{" "}
+                  <strong>
+                    {initial.computedPrice.toLocaleString("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₪
+                  </strong>
+                </>
+              )}
+            </p>
+            <p className="mt-1">כדי לשנות את המחיר: ערכו את משקל המתכת ועלויות הייצור/השיבוץ בחלק &quot;תמחור&quot; בהמשך העמוד.</p>
+          </div>
+        ) : (
+          <>
         <div>
           <label className="mb-1 block text-xs font-medium text-neutral-500">מחיר רגיל (₪)</label>
           <input
@@ -138,6 +160,8 @@ export function ProductForm({
             className="w-full rounded border border-neutral-300 px-3 py-2 text-sm"
           />
         </div>
+          </>
+        )}
         <div>
           <label className="mb-1 block text-xs font-medium text-neutral-500">SKU</label>
           <input

@@ -74,7 +74,7 @@ export const smtpEmailProvider: EmailProvider = {
         secure: port === 465,
         auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
       });
-      await transport.sendMail({
+      const info = await transport.sendMail({
         from: process.env.EMAIL_FROM || process.env.SMTP_USER,
         to: message.to,
         replyTo: process.env.EMAIL_REPLY_TO || "diana@ladydiamondjewels.com",
@@ -82,6 +82,7 @@ export const smtpEmailProvider: EmailProvider = {
         text: message.text,
         html: toHtml(message.text),
       });
+      console.log(`[email] SMTP sent to=${message.to} subject="${message.subject}" accepted=${JSON.stringify(info.accepted)} rejected=${JSON.stringify(info.rejected)} response="${info.response}"`);
     } catch (err) {
       console.error(`[email] SMTP sending failed to=${message.to}`, err);
     }

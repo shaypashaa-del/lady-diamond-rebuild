@@ -39,8 +39,8 @@ export default function AdminForgotPasswordPage() {
               </div>
             )}
             <p className="text-xs text-neutral-400">
-              לא הגיע מייל? עדיין לא חובר ספק דוא&quot;ל אמיתי למערכת — הקישור נרשם בלוגים של השרת
-              (hPanel → Runtime logs).
+              לא הגיע מייל? בדקו בתיקיית הספאם. אם עדיין לא, ייתכן שהגדרות הדוא&quot;ל בשרת שגויות —
+              שגיאת השליחה נרשמת בלוגים (hPanel → Runtime logs).
             </p>
           </div>
         ) : (

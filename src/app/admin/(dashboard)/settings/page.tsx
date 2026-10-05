@@ -1,5 +1,6 @@
 import { getSetting } from "@/server/actions/settings";
 import { SETTINGS_KEYS } from "@/lib/settings-keys";
+import { EmailTestForm } from "@/components/admin/EmailTestForm";
 import { SettingsForm } from "@/components/admin/SettingsForm";
 
 export default async function AdminSettingsPage() {
@@ -19,6 +20,7 @@ export default async function AdminSettingsPage() {
         autoApprove={autoApprove}
         preventSelfReferral={preventSelfReferral}
       />
+      <EmailTestForm />
     </div>
   );
 }

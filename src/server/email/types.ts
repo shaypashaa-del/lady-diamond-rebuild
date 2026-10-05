@@ -60,6 +60,37 @@ export const resendEmailProvider: EmailProvider = {
   },
 };
 
+// Sends through any SMTP mailbox (e.g. the hosting provider's own
+// diana@ladydiamondjewels.com mailbox) — no third-party account needed.
+// Like Resend above: a failure is logged, never thrown.
+export const smtpEmailProvider: EmailProvider = {
+  async send(message) {
+    try {
+      const { createTransport } = await import("nodemailer");
+      const port = Number(process.env.SMTP_PORT || 465);
+      const transport = createTransport({
+        host: process.env.SMTP_HOST,
+        port,
+        secure: port === 465,
+        auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+      });
+      await transport.sendMail({
+        from: process.env.EMAIL_FROM || process.env.SMTP_USER,
+        to: message.to,
+        replyTo: process.env.EMAIL_REPLY_TO || "diana@ladydiamondjewels.com",
+        subject: message.subject,
+        text: message.text,
+        html: toHtml(message.text),
+      });
+    } catch (err) {
+      console.error(`[email] SMTP sending failed to=${message.to}`, err);
+    }
+  },
+};
+
+// Resend if its key is set, else SMTP if configured, else just log.
 export const emailProvider: EmailProvider = process.env.RESEND_API_KEY
   ? resendEmailProvider
-  : consoleEmailProvider;
+  : process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS
+    ? smtpEmailProvider
+    : consoleEmailProvider;

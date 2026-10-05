@@ -1,5 +1,7 @@
 "use server";
 
+import { round2 } from "@/lib/pricing/engine";
+import { describeOptions } from "@/lib/line-options";
 import { cookies } from "next/headers";
 import { randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
@@ -21,6 +23,7 @@ export type CheckoutLine = {
   variantId?: string;
   name: string;
   variantLabel?: string;
+  options?: { size?: string; engraving?: string; giftWrap?: boolean };
   price: number;
   quantity: number;
   // Only present for a CONFIGURABLE product — see resolveConfiguredPrice.
@@ -127,6 +130,27 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
       return { error: `כמות מקסימום להזמנה של "${line.name}": ${extras.maxQty}.` };
     }
 
+    // Personalisation (size / engraving / gift wrap): validated against what
+    // the admin enabled for this product, and the fees added here, so the
+    // client can neither skip a required size nor under-pay the add-ons.
+    const opt = line.options ?? {};
+    const sizes = extras.sizes ?? [];
+    if (sizes.length > 0 && (!opt.size || !sizes.includes(opt.size))) {
+      return { error: `נא לבחור מידה תקפה עבור "${line.name}".` };
+    }
+    const engravingText = extras.engraving ? (opt.engraving ?? "").trim() : "";
+    if (engravingText.length > (extras.engravingMaxLen ?? 30)) {
+      return { error: `טקסט החריטה של "${line.name}" ארוך מדי.` };
+    }
+    const wrap = !!(extras.giftWrap && opt.giftWrap);
+    const optionFee = (engravingText ? extras.engravingFee ?? 0 : 0) + (wrap ? extras.giftWrapFee ?? 0 : 0);
+    const optionLabel = describeOptions({
+      size: sizes.length ? opt.size : undefined,
+      engraving: engravingText || undefined,
+      giftWrap: wrap || undefined,
+    });
+    const joinLabel = (l?: string) => [l, optionLabel].filter(Boolean).join(" · ") || undefined;
+
     // A CONFIGURABLE product (material/diamond picker) has its price
     // computed by the pricing engine from the selected options, never from
     // product.basePrice/salePrice — those are stale placeholders for such a
@@ -156,8 +180,8 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
         backorder,
         variantId: undefined,
         name: line.name,
-        variantLabel: line.variantLabel,
-        price: resolved.sellingPrice,
+        variantLabel: joinLabel(line.variantLabel),
+        price: round2(resolved.sellingPrice + optionFee),
         quantity: line.quantity,
       });
       continue;
@@ -181,8 +205,8 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
       backorder,
       variantId: variant?.id,
       name: line.name,
-      variantLabel: line.variantLabel,
-      price,
+      variantLabel: joinLabel(line.variantLabel),
+      price: round2(price + optionFee),
       quantity: line.quantity,
     });
   }

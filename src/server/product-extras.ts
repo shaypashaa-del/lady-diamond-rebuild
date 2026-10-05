@@ -26,6 +26,14 @@ export type ProductExtras = {
   internalNotes?: string;
   // Scheduled sale: the product's sale price applies only inside this window
   // (ISO dates, YYYY-MM-DD, Israel time). Either end may be left open.
+  // Personalisation: ring/size choices (comma list entered by the admin),
+  // engraving and gift wrap. Fees are final VAT-inclusive prices per unit.
+  sizes?: string[];
+  engraving?: boolean;
+  engravingFee?: number;
+  engravingMaxLen?: number;
+  giftWrap?: boolean;
+  giftWrapFee?: number;
   saleStart?: string;
   saleEnd?: string;
 };

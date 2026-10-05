@@ -15,6 +15,12 @@ import type { ConfiguredPriceState } from "./ConfigurablePriceSelector";
 
 export type ProductExtrasView = {
   badge?: string;
+  sizes?: string[];
+  engraving?: boolean;
+  engravingFee?: number;
+  engravingMaxLen?: number;
+  giftWrap?: boolean;
+  giftWrapFee?: number;
   minQty?: number;
   maxQty?: number;
   allowBackorder?: boolean;
@@ -85,6 +91,18 @@ export function ProductDetail({
   const [quantity, setQuantity] = useState(minQty);
   const [added, setAdded] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
+  const [size, setSize] = useState("");
+  const [engravingText, setEngravingText] = useState("");
+  const [giftWrap, setGiftWrap] = useState(false);
+  const needsSize = (extras?.sizes?.length ?? 0) > 0;
+  const engravingOn = !!extras?.engraving && engravingText.trim() !== "";
+  const optionFees =
+    (engravingOn ? extras?.engravingFee ?? 0 : 0) + (giftWrap && extras?.giftWrap ? extras?.giftWrapFee ?? 0 : 0);
+  const options = {
+    size: needsSize ? size : undefined,
+    engraving: engravingOn ? engravingText.trim() : undefined,
+    giftWrap: giftWrap && extras?.giftWrap ? true : undefined,
+  };
 
   const selectedVariant = useMemo(
     () => variants.find((v) => v.id === variantId),
@@ -100,10 +118,11 @@ export function ProductDetail({
     (variants.length === 0 || !!selectedVariant) &&
     (availableInventory > 0 || backorder) &&
     quantity >= minQty &&
+    (!needsSize || size !== "") &&
     (!configurable || configuredOk != null);
 
   function currentLine() {
-    return {
+    const line = {
       key: configurable
         ? `${slug}:${configuredOk?.materialOptionId ?? "pending"}:${(configuredOk?.diamondOptionIds ?? []).join(",")}:${
             configuredOk?.calculatorDiamondSpec
@@ -111,6 +130,7 @@ export function ProductDetail({
               : ""
           }`
         : `${slug}:${variantId || "default"}`,
+      options,
       productId: slug,
       // `variantId` state doubles as a "default" sentinel for products with
       // no real variants — never forward that literal string as a real
@@ -124,12 +144,14 @@ export function ProductDetail({
       // basePrice/salePrice props. materialOptionId/diamondOptionIds ride
       // along so checkout can recompute and verify this same price
       // server-side (see resolveConfiguredPrice) rather than trusting it.
-      price: configurable ? (configuredOk?.sellingPrice ?? 0) : displayPrice,
+      price: (configurable ? (configuredOk?.sellingPrice ?? 0) : displayPrice) + optionFees,
       materialOptionId: configurable ? configuredOk?.materialOptionId : undefined,
       diamondOptionIds: configurable ? configuredOk?.diamondOptionIds : undefined,
       calculatorDiamondSpec: configurable ? configuredOk?.calculatorDiamondSpec : undefined,
       imageUrl: images[0]?.url,
     };
+    const optKey = [options.size, options.engraving, options.giftWrap ? "gift" : ""].join("|");
+    return { ...line, key: optKey === "||" ? line.key : `${line.key}::${optKey}` };
   }
 
   function handleAddToCart() {
@@ -263,6 +285,50 @@ export function ProductDetail({
                 </option>
               ))}
             </select>
+          </div>
+        )}
+
+        {(needsSize || extras?.engraving || extras?.giftWrap) && (
+          <div className="mt-6 space-y-4">
+            {needsSize && (
+              <div>
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-ink/60">{t("size")}</label>
+                <select
+                  value={size}
+                  onChange={(e) => setSize(e.target.value)}
+                  className="w-full border border-gold-soft px-3 py-2 text-sm text-ink focus:border-gold focus:outline-none"
+                >
+                  <option value="">{t("chooseSize")}</option>
+                  {extras!.sizes!.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            {extras?.engraving && (
+              <div>
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-ink/60">
+                  {t("engraving")}
+                  {extras.engravingFee ? ` (+${formatIls(extras.engravingFee)} ₪)` : ""}
+                </label>
+                <input
+                  value={engravingText}
+                  maxLength={extras.engravingMaxLen ?? 30}
+                  onChange={(e) => setEngravingText(e.target.value)}
+                  placeholder={t("engravingPlaceholder", { count: extras.engravingMaxLen ?? 30 })}
+                  className="w-full border border-gold-soft px-3 py-2 text-sm text-ink focus:border-gold focus:outline-none"
+                />
+              </div>
+            )}
+            {extras?.giftWrap && (
+              <label className="flex items-center gap-2 text-sm text-ink">
+                <input type="checkbox" checked={giftWrap} onChange={(e) => setGiftWrap(e.target.checked)} />
+                {t("giftWrap")}
+                {extras.giftWrapFee ? ` (+${formatIls(extras.giftWrapFee)} ₪)` : ""}
+              </label>
+            )}
           </div>
         )}
 

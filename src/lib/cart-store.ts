@@ -25,6 +25,9 @@ export type CartLine = {
   // checkout recomputes the price from this spec server-side too, same as
   // it does for materialOptionId/diamondOptionIds.
   calculatorDiamondSpec?: CalculatorDiamondChoice;
+  // Personalisation chosen on the product page. `price` already includes the
+  // fees; checkout re-validates and re-prices them server-side.
+  options?: { size?: string; engraving?: string; giftWrap?: boolean };
 };
 
 type CartState = {

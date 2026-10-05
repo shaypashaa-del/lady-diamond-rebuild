@@ -121,6 +121,12 @@ export default async function ProductPage({
     .filter((x) => x.body);
   const extrasView = {
     badge: extras.badge,
+    sizes: extras.sizes,
+    engraving: extras.engraving,
+    engravingFee: extras.engravingFee,
+    engravingMaxLen: extras.engravingMaxLen,
+    giftWrap: extras.giftWrap,
+    giftWrapFee: extras.giftWrapFee,
     minQty: extras.minQty,
     maxQty: extras.maxQty,
     allowBackorder: extras.allowBackorder,

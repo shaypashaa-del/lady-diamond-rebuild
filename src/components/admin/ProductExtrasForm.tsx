@@ -96,6 +96,31 @@ export function ProductExtrasForm({ productId, extras }: { productId: string; ex
         </Group>
 
         <Group
+          title="התאמה אישית"
+          hint="מידות, חריטה ועטיפת מתנה. התוספות הן מחיר סופי כולל מע״מ ליחידה (0 או ריק = ללא תוספת מחיר)."
+        >
+          <label className="mb-3 block text-xs">
+            מידות זמינות (מופרדות בפסיק, למשל 10,11,12,13). ריק = אין בחירת מידה
+            <input name="sizes" dir="ltr" defaultValue={(extras.sizes ?? []).join(", ")} className={inputCls} />
+          </label>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <label className="flex items-center gap-2 text-xs">
+              <input type="checkbox" name="engraving" defaultChecked={extras.engraving} />
+              אפשר חריטה
+            </label>
+            <Num name="engravingFee" label="תוספת חריטה (₪)" value={extras.engravingFee} step="0.01" />
+            <Num name="engravingMaxLen" label="מקסימום תווים לחריטה" value={extras.engravingMaxLen} />
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <label className="flex items-center gap-2 text-xs">
+              <input type="checkbox" name="giftWrap" defaultChecked={extras.giftWrap} />
+              אפשר עטיפת מתנה
+            </label>
+            <Num name="giftWrapFee" label="תוספת עטיפה (₪)" value={extras.giftWrapFee} step="0.01" />
+          </div>
+        </Group>
+
+        <Group
           title="מבצע מתוזמן"
           hint="מחיר המבצע של המוצר (בשדה מחיר מבצע) יופעל רק בטווח התאריכים. השאירו ריק כדי שיהיה פעיל תמיד."
         >

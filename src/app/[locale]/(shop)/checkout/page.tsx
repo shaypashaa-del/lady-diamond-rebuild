@@ -1,5 +1,6 @@
 "use client";
 
+import { describeOptions } from "@/lib/line-options";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -125,6 +126,7 @@ function CheckoutForm() {
         variantId: l.variantId,
         name: l.name,
         variantLabel: l.variantLabel,
+        options: l.options,
         price: l.price,
         quantity: l.quantity,
         materialOptionId: l.materialOptionId,
@@ -211,7 +213,7 @@ function CheckoutForm() {
           <div className="border border-gold-soft p-5">
             {lines.map((l) => (
               <div key={l.key} className="flex justify-between py-2 text-sm">
-                <span>{l.name}{l.variantLabel ? ` — ${l.variantLabel}` : ""} × {l.quantity}</span>
+                <span>{l.name}{l.variantLabel ? ` — ${l.variantLabel}` : ""}{l.options ? ` (${describeOptions(l.options)})` : ""} × {l.quantity}</span>
                 <span>{(l.price * l.quantity).toFixed(2)} ₪</span>
               </div>
             ))}

@@ -33,6 +33,9 @@ export async function updateProductExtras(
     maxQty: num("maxQty", true),
     leadTimeDays: num("leadTimeDays", true),
     lowStockThreshold: num("lowStockThreshold", true),
+    engravingFee: num("engravingFee"),
+    engravingMaxLen: num("engravingMaxLen", true),
+    giftWrapFee: num("giftWrapFee"),
     shippingWeightGrams: num("shippingWeightGrams"),
     lengthMm: num("lengthMm"),
     widthMm: num("widthMm"),
@@ -57,6 +60,11 @@ export async function updateProductExtras(
   const saleStart = dateOf("saleStart");
   const saleEnd = dateOf("saleEnd");
   if (saleStart && saleEnd && saleStart > saleEnd) return { error: "תאריך סיום המבצע לפני תאריך ההתחלה." };
+  const sizes = String(formData.get("sizes") ?? "")
+    .split(/[,\n]/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (sizes.length > 40 || sizes.some((s) => s.length > 20)) return { error: "רשימת המידות ארוכה או לא תקינה." };
   const gtin = text("gtin");
   if (gtin && !/^\d{8,14}$/.test(gtin)) return { error: "ברקוד (GTIN) חייב להיות 8 עד 14 ספרות." };
 
@@ -78,6 +86,12 @@ export async function updateProductExtras(
     widthMm: f.widthMm,
     heightMm: f.heightMm,
     costPrice: f.costPrice,
+    sizes: sizes.length ? Array.from(new Set(sizes)) : undefined,
+    engraving: formData.get("engraving") === "on" || undefined,
+    engravingFee: f.engravingFee,
+    engravingMaxLen: f.engravingMaxLen,
+    giftWrap: formData.get("giftWrap") === "on" || undefined,
+    giftWrapFee: f.giftWrapFee,
     saleStart,
     saleEnd,
     supplier: text("supplier"),

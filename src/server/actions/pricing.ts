@@ -369,3 +369,33 @@ export async function setMaterialOptionManualPrice(
   await revalidateProductPageById(productId);
   return { saved: true };
 }
+
+// ---- Photo shown when a material option is selected ----
+
+export async function setMaterialOptionImage(
+  optionId: string,
+  productId: string,
+  formData: FormData
+): Promise<{ saved: true } | { error: string }> {
+  await requireAdminSession();
+  const url = String(formData.get("imageUrl") ?? "").trim();
+  const option = await prisma.productMaterialOption.findFirst({ where: { id: optionId, productId }, select: { id: true } });
+  if (!option) return { error: "האפשרות לא נמצאה." };
+  if (url) {
+    // Only a photo already attached to this product can be chosen.
+    const attached = await prisma.productImage.findFirst({
+      where: { productId, media: { url } },
+      select: { id: true },
+    });
+    if (!attached) return { error: "אפשר לבחור רק תמונה ששויכה למוצר." };
+  }
+  try {
+    await prisma.productMaterialOption.update({ where: { id: optionId }, data: { imageUrl: url || null } });
+  } catch (err) {
+    console.error("[admin] setMaterialOptionImage failed", err);
+    return { error: "השמירה נכשלה. נסו שוב." };
+  }
+  revalidatePath(`/admin/products/${productId}`);
+  await revalidateProductPageById(productId);
+  return { saved: true };
+}

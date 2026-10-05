@@ -67,8 +67,11 @@ export function productSchema(product: {
   price: number;
   currency?: string;
   url: string;
-  availability: "InStock" | "OutOfStock";
+  availability: "InStock" | "OutOfStock" | "PreOrder";
   image?: string;
+  brand?: string;
+  gtin?: string;
+  mpn?: string;
 }) {
   return {
     "@context": "https://schema.org",
@@ -76,6 +79,9 @@ export function productSchema(product: {
     name: product.name,
     description: product.description,
     sku: product.sku ?? undefined,
+    brand: product.brand ? { "@type": "Brand", name: product.brand } : undefined,
+    gtin: product.gtin,
+    mpn: product.mpn,
     image: product.image,
     offers: {
       "@type": "Offer",

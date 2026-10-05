@@ -4,6 +4,7 @@ import {
   deleteDiamondOption,
   deleteMaterialOption,
   setMaterialOptionManualPrice,
+  setMaterialOptionImage,
   updateProductPricingSettings,
 } from "@/server/actions/pricing";
 import { getConfiguredPriceBreakdownForAdmin } from "@/server/actions/product-pricing";
@@ -29,6 +30,7 @@ type MaterialOptionRow = {
   purity: MetalPurity;
   goldColor: GoldColor | null;
   isDefault: boolean;
+  imageUrl?: string | null;
 };
 
 type DiamondOptionRow = {
@@ -66,7 +68,9 @@ export async function ProductPricingManager({
   hasDiamond,
   materialOptions,
   diamondOptions,
+  productImages = [],
 }: {
+  productImages?: { url: string; filename: string }[];
   productId: string;
   pricingMode: PricingMode;
   metalWeightGrams: unknown;
@@ -209,6 +213,7 @@ export async function ProductPricingManager({
               <th className="py-2 font-medium">גוון</th>
               <th className="py-2 font-medium">ברירת מחדל</th>
               <th className="py-2 font-medium">מחיר ידני (₪, כולל מע״מ)</th>
+              <th className="py-2 font-medium">תמונה לאפשרות</th>
               <th className="py-2 font-medium"></th>
             </tr>
           </thead>
@@ -237,6 +242,27 @@ export async function ProductPricingManager({
                       className="w-28 rounded border border-neutral-300 px-2 py-1 text-sm"
                     />
                   </SavableForm>
+                </td>
+                <td className="py-2">
+                  {productImages.length === 0 ? (
+                    <span className="text-xs text-neutral-400">אין תמונות במוצר</span>
+                  ) : (
+                    <SavableForm
+                      action={setMaterialOptionImage.bind(null, m.id, productId)}
+                      className="flex items-center gap-2"
+                      submitLabel="שמירה"
+                      buttonClassName="rounded bg-neutral-900 px-2 py-1 text-xs font-medium text-white disabled:opacity-50"
+                    >
+                      <select name="imageUrl" defaultValue={m.imageUrl ?? ""} aria-label="תמונה לאפשרות" className="w-36 rounded border border-neutral-300 px-2 py-1 text-xs">
+                        <option value="">ברירת מחדל</option>
+                        {productImages.map((img) => (
+                          <option key={img.url} value={img.url}>
+                            {img.filename}
+                          </option>
+                        ))}
+                      </select>
+                    </SavableForm>
+                  )}
                 </td>
                 <td className="py-2">
                   <form action={deleteMaterialOption.bind(null, m.id, productId)}>

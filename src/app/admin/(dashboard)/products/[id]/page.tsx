@@ -7,6 +7,8 @@ import { ProductImagesManager } from "@/components/admin/ProductImagesManager";
 import { ProductPricingManager } from "@/components/admin/ProductPricingManager";
 import type { LocalizedText } from "@/lib/i18n-content";
 import { getListingPrices } from "@/server/pricing/listing-prices";
+import { ProductExtrasForm } from "@/components/admin/ProductExtrasForm";
+import { getProductExtras } from "@/server/product-extras";
 
 export default async function EditProductPage({
   params,
@@ -39,6 +41,7 @@ export default async function EditProductPage({
 
   if (!product) notFound();
 
+  const extras = await getProductExtras(product.id, true);
   const computedPrice = product.pricingMode === "CONFIGURABLE" ? ((await getListingPrices()).get(product.id) ?? null) : null;
 
   const usedMediaIds = new Set(product.images.map((img) => img.mediaId));
@@ -93,7 +96,9 @@ export default async function EditProductPage({
         hasDiamond={product.hasDiamond}
         materialOptions={product.materialOptions}
         diamondOptions={product.diamondOptions}
+        productImages={product.images.map((img) => ({ url: img.media.url, filename: img.media.filename }))}
       />
+      <ProductExtrasForm productId={product.id} extras={extras} />
     </div>
   );
 }

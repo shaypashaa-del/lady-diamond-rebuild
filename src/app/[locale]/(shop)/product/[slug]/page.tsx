@@ -13,6 +13,7 @@ import { ProductSection } from "@/components/home/ProductSection";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { productSchema, breadcrumbSchema } from "@/lib/schema";
 import { SITE_URL } from "@/lib/site-config";
+import { getProductExtras } from "@/server/product-extras";
 import { routing, type Locale } from "@/i18n/routing";
 
 // Cache the rendered page for up to 5 minutes instead of hitting Supabase on
@@ -112,6 +113,23 @@ export default async function ProductPage({
       : product.inventory;
   const firstImage = product.images[0]?.media.url;
 
+  const extras = await getProductExtras(product.id);
+  const sections = (["warranty", "care", "certificate"] as const)
+    .map((key) => ({ key, body: localize(extras[key] as LocalizedText | undefined, locale) }))
+    .filter((x) => x.body);
+  const extrasView = {
+    badge: extras.badge,
+    minQty: extras.minQty,
+    maxQty: extras.maxQty,
+    allowBackorder: extras.allowBackorder,
+    leadTimeDays: extras.leadTimeDays,
+    lowStockLeft:
+      extras.lowStockThreshold && totalInventory > 0 && totalInventory <= extras.lowStockThreshold
+        ? totalInventory
+        : null,
+    sections,
+  };
+
   return (
     <>
       <JsonLd
@@ -122,7 +140,10 @@ export default async function ProductPage({
             sku: product.sku,
             price,
             url: productUrl,
-            availability: totalInventory > 0 ? "InStock" : "OutOfStock",
+            availability: totalInventory > 0 ? "InStock" : extras.allowBackorder ? "PreOrder" : "OutOfStock",
+            brand: extras.brand,
+            gtin: extras.gtin,
+            mpn: extras.mpn,
             image: firstImage ? `${SITE_URL}${firstImage}` : undefined,
           }),
           breadcrumbSchema([
@@ -145,6 +166,7 @@ export default async function ProductPage({
         price={Number(product.basePrice)}
         salePrice={product.salePrice != null ? Number(product.salePrice) : undefined}
         inventory={product.inventory}
+        extras={extrasView}
         sku={product.sku ?? undefined}
         weightGrams={product.weightGrams}
         categoryName={categoryName}

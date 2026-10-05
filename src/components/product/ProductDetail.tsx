@@ -13,6 +13,16 @@ import { cn } from "@/lib/cn";
 import { PriceDropAlert } from "./PriceDropAlert";
 import type { ConfiguredPriceState } from "./ConfigurablePriceSelector";
 
+export type ProductExtrasView = {
+  badge?: string;
+  minQty?: number;
+  maxQty?: number;
+  allowBackorder?: boolean;
+  leadTimeDays?: number;
+  lowStockLeft?: number | null;
+  sections: { key: "warranty" | "care" | "certificate"; body: string }[];
+};
+
 export type VariantView = { id: string; label: string; price: number; inventory: number };
 export type ProductImageView = { url: string; alt?: string };
 
@@ -35,7 +45,9 @@ export function ProductDetail({
   colorImageOverride = null,
   configurable = false,
   configuredPrice = null,
+  extras,
 }: {
+  extras?: ProductExtrasView;
   productId: string;
   slug: string;
   name: string;
@@ -69,7 +81,8 @@ export function ProductDetail({
   const isWishlisted = useWishlistStore((s) => s.has(slug));
   const mounted = useMounted();
   const [variantId, setVariantId] = useState<string | "">(variants.length ? "" : "default");
-  const [quantity, setQuantity] = useState(1);
+  const minQty = extras?.minQty ?? 1;
+  const [quantity, setQuantity] = useState(minQty);
   const [added, setAdded] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
 
@@ -80,10 +93,13 @@ export function ProductDetail({
 
   const displayPrice = selectedVariant ? selectedVariant.price : salePrice ?? price;
   const availableInventory = selectedVariant ? selectedVariant.inventory : inventory;
+  const backorder = !!extras?.allowBackorder;
+  const maxQty = Math.min(extras?.maxQty ?? Infinity, backorder ? Infinity : availableInventory);
   const configuredOk = configuredPrice?.status === "ok" ? configuredPrice : null;
   const canAdd =
     (variants.length === 0 || !!selectedVariant) &&
-    availableInventory > 0 &&
+    (availableInventory > 0 || backorder) &&
+    quantity >= minQty &&
     (!configurable || configuredOk != null);
 
   function currentLine() {
@@ -191,6 +207,11 @@ export function ProductDetail({
       </div>
 
       <div>
+        {extras?.badge && (
+          <span className="mb-2 inline-block bg-ink px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-bright">
+            {t(`badge_${extras.badge}`)}
+          </span>
+        )}
         <p className="text-xs uppercase tracking-wide text-gold-deep">{categoryName}</p>
         <h1 className="mt-1 text-2xl font-semibold uppercase tracking-wide text-ink">{name}</h1>
         <span className="gold-rule-start mt-3 w-8" />
@@ -231,7 +252,7 @@ export function ProductDetail({
               value={variantId}
               onChange={(e) => {
                 setVariantId(e.target.value);
-                setQuantity(1);
+                setQuantity(minQty);
               }}
               className="w-full border border-gold-soft px-3 py-2 text-sm text-ink focus:border-gold focus:outline-none"
             >
@@ -245,10 +266,21 @@ export function ProductDetail({
           </div>
         )}
 
+        {(extras?.lowStockLeft || (backorder && availableInventory <= 0) || extras?.minQty || extras?.maxQty) && (
+          <ul className="mt-4 space-y-1 text-xs text-ink/70">
+            {extras?.lowStockLeft ? <li className="font-medium text-clay">{t("lowStockLeft", { count: extras.lowStockLeft })}</li> : null}
+            {backorder && availableInventory <= 0 ? (
+              <li>{extras?.leadTimeDays ? t("backorderNote", { days: extras.leadTimeDays }) : t("backorderNoteNoDays")}</li>
+            ) : null}
+            {extras?.minQty && extras.minQty > 1 ? <li>{t("minQtyNote", { count: extras.minQty })}</li> : null}
+            {extras?.maxQty ? <li>{t("maxQtyNote", { count: extras.maxQty })}</li> : null}
+          </ul>
+        )}
+
         <div className="mt-6 flex items-center gap-4">
           <div className="flex items-center border border-gold-soft">
             <button
-              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+              onClick={() => setQuantity((q) => Math.max(minQty, q - 1))}
               className="px-3 py-2 text-sm text-ink hover:text-gold-deep"
               aria-label={t("decreaseQty")}
             >
@@ -256,8 +288,8 @@ export function ProductDetail({
             </button>
             <span className="w-8 text-center text-sm text-ink">{quantity}</span>
             <button
-              onClick={() => setQuantity((q) => Math.min(availableInventory, q + 1))}
-              disabled={quantity >= availableInventory}
+              onClick={() => setQuantity((q) => Math.min(maxQty, q + 1))}
+              disabled={quantity >= maxQty}
               className="px-3 py-2 text-sm text-ink hover:text-gold-deep disabled:cursor-not-allowed disabled:text-ink/30"
               aria-label={t("increaseQty")}
             >
@@ -326,6 +358,13 @@ export function ProductDetail({
             <p className="text-sm text-ink/70">{description}</p>
           </div>
         )}
+
+        {extras?.sections.map((sec) => (
+          <div key={sec.key} className="mt-6 border-t border-gold-soft pt-6">
+            <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/60">{t(sec.key)}</h2>
+            <p className="whitespace-pre-line text-sm text-ink/70">{sec.body}</p>
+          </div>
+        ))}
       </div>
       </div>
     </div>

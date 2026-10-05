@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { VAT_RATE } from "@/lib/pricing/constants";
+import { getAllProductExtras } from "@/server/product-extras";
 import { getSession } from "@/lib/auth/session";
 import { calculateShipping } from "@/server/services/shipping";
 import { calculateCommission } from "@/server/services/commission";
@@ -103,13 +104,27 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
     variantLabel?: string;
     price: number;
     quantity: number;
+    backorder?: boolean;
   };
   const resolvedLines: ResolvedLine[] = [];
+
+  const extrasByProduct = await getAllProductExtras(true);
 
   for (const line of input.lines) {
     const product = productBySlug.get(line.productId);
     if (!product) {
       return { error: `מוצר לא נמצא: ${line.productId}` };
+    }
+
+    // Order rules set per product in the admin (minimum / maximum quantity,
+    // pre-order allowed when out of stock). Enforced here, never only in the UI.
+    const extras = extrasByProduct.get(product.id) ?? {};
+    const backorder = extras.allowBackorder === true;
+    if (extras.minQty && line.quantity < extras.minQty) {
+      return { error: `כמות מינימום להזמנה של "${line.name}": ${extras.minQty}.` };
+    }
+    if (extras.maxQty && line.quantity > extras.maxQty) {
+      return { error: `כמות מקסימום להזמנה של "${line.name}": ${extras.maxQty}.` };
     }
 
     // A CONFIGURABLE product (material/diamond picker) has its price
@@ -120,7 +135,7 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
     // the customer is charged can never be tampered with (or accidentally
     // desynced) via a client-supplied price.
     if (product.pricingMode === "CONFIGURABLE") {
-      if (line.quantity > product.inventory) {
+      if (!backorder && line.quantity > product.inventory) {
         return { error: `אין מספיק מלאי עבור "${line.name}" (במלאי: ${product.inventory}).` };
       }
       if (!line.materialOptionId) {
@@ -138,6 +153,7 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
       }
       resolvedLines.push({
         productDbId: product.id,
+        backorder,
         variantId: undefined,
         name: line.name,
         variantLabel: line.variantLabel,
@@ -152,7 +168,7 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
       return { error: `הווריאציה שנבחרה עבור "${line.name}" אינה קיימת עוד.` };
     }
     const availableInventory = variant ? variant.inventory : product.inventory;
-    if (line.quantity > availableInventory) {
+    if (!backorder && line.quantity > availableInventory) {
       return { error: `אין מספיק מלאי עבור "${line.name}" (במלאי: ${availableInventory}).` };
     }
 
@@ -162,6 +178,7 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
 
     resolvedLines.push({
       productDbId: product.id,
+      backorder,
       variantId: variant?.id,
       name: line.name,
       variantLabel: line.variantLabel,
@@ -282,7 +299,13 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
             data: { inventory: { decrement: line.quantity } },
           });
           if (result.count === 0) {
-            throw new Error(`אין מספיק מלאי עבור "${line.name}".`);
+            // A pre-order product (admin: "allow order without stock") may
+            // sell past zero: take whatever stock is left, never go negative.
+            if (line.backorder) {
+              await tx.product.updateMany({ where: { id: line.productDbId }, data: { inventory: 0 } });
+            } else {
+              throw new Error(`אין מספיק מלאי עבור "${line.name}".`);
+            }
           }
         }
       }

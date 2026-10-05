@@ -186,7 +186,18 @@
     "origin_none": "No diamond",
     "customDiamondOption": "Choose a different diamond",
     "loadingDiamondOptions": "Loading diamond options…",
-    "vatIncluded": "Incl. 18% VAT"
+    "vatIncluded": "Incl. 18% VAT",
+    "badge_NEW": "New",
+    "badge_BESTSELLER": "Best seller",
+    "badge_LIMITED": "Limited edition",
+    "warranty": "Warranty",
+    "care": "Care instructions",
+    "certificate": "Certificate and stone details",
+    "lowStockLeft": "Only {count} left",
+    "backorderNote": "Available to pre-order · ships within {days} days",
+    "backorderNoteNoDays": "Available to pre-order",
+    "minQtyNote": "Minimum order quantity: {count}",
+    "maxQtyNote": "Maximum {count} per order"
   },
   "Category": {
     "kicker": "LADY DIAMOND",

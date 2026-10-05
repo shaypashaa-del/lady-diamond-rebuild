@@ -186,7 +186,18 @@
     "origin_none": "ללא יהלום",
     "customDiamondOption": "בחירת יהלום אחר",
     "loadingDiamondOptions": "טוען אפשרויות יהלום…",
-    "vatIncluded": "כולל מע״מ 18%"
+    "vatIncluded": "כולל מע״מ 18%",
+    "badge_NEW": "חדש",
+    "badge_BESTSELLER": "רב מכר",
+    "badge_LIMITED": "מהדורה מוגבלת",
+    "warranty": "אחריות",
+    "care": "הוראות טיפול",
+    "certificate": "תעודה ופרטי אבן",
+    "lowStockLeft": "נותרו {count} יחידות בלבד",
+    "backorderNote": "זמין בהזמנה מראש · אספקה תוך {days} ימים",
+    "backorderNoteNoDays": "זמין בהזמנה מראש",
+    "minQtyNote": "כמות מינימום להזמנה: {count}",
+    "maxQtyNote": "מקסימום {count} יחידות להזמנה"
   },
   "Category": {
     "kicker": "LADY DIAMOND",

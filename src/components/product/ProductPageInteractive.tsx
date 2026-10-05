@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ProductDetail, type VariantView, type ProductImageView } from "./ProductDetail";
+import { ProductDetail, type VariantView, type ProductImageView, type ProductExtrasView } from "./ProductDetail";
 import {
   ConfigurablePriceSelector,
   type MaterialOption,
@@ -36,6 +36,7 @@ export function ProductPageInteractive({
   price: number;
   salePrice?: number;
   inventory: number;
+  extras?: ProductExtrasView;
   sku?: string;
   weightGrams?: number | null;
   categoryName: string;

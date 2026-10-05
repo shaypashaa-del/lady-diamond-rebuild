@@ -186,7 +186,18 @@
     "origin_none": "Без бриллианта",
     "customDiamondOption": "Выбрать другой бриллиант",
     "loadingDiamondOptions": "Загрузка вариантов бриллиантов…",
-    "vatIncluded": "Включая НДС 18%"
+    "vatIncluded": "Включая НДС 18%",
+    "badge_NEW": "Новинка",
+    "badge_BESTSELLER": "Хит продаж",
+    "badge_LIMITED": "Ограниченная серия",
+    "warranty": "Гарантия",
+    "care": "Уход",
+    "certificate": "Сертификат и данные камня",
+    "lowStockLeft": "Осталось всего {count}",
+    "backorderNote": "Доступно по предзаказу · отправка в течение {days} дн.",
+    "backorderNoteNoDays": "Доступно по предзаказу",
+    "minQtyNote": "Минимальное количество: {count}",
+    "maxQtyNote": "Не более {count} шт. в заказе"
   },
   "Category": {
     "kicker": "Lady Diamond",

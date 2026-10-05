@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { updatePage } from "@/server/actions/pages";
 import type { LocalizedText } from "@/lib/i18n-content";
+import { SavableForm } from "@/components/admin/SavableForm";
 
 function LocalizedField({
   label,
@@ -44,22 +45,28 @@ export default async function EditPagePage({
   const page = await prisma.page.findUnique({ where: { id } });
   if (!page) notFound();
 
+  const isAbout = page.slug === "about-us";
+  const body = page.body as unknown as Record<string, LocalizedText> & LocalizedText;
+
   return (
     <div>
-      <h1 className="mb-2 text-xl font-semibold">עריכת עמוד: {page.slug}</h1>
-      <p className="mb-6 text-sm text-neutral-500">
-        זהו טיוטת תוכן ראשונית — אינה מהווה ייעוץ משפטי. יש להעביר לבדיקת עורך דין לפני עליית האתר.
-      </p>
-      <form action={updatePage.bind(null, page.id)} className="max-w-3xl">
+      <h1 className="mb-6 text-xl font-semibold">עריכת עמוד: {page.slug}</h1>
+      <SavableForm
+        action={updatePage.bind(null, page.id)}
+        className="max-w-3xl"
+        buttonClassName="rounded bg-neutral-900 px-6 py-2.5 text-sm font-medium text-white hover:bg-neutral-800 disabled:opacity-50"
+        submitLabel="שמירת שינויים"
+      >
         <LocalizedField label="כותרת" name="title" value={page.title as LocalizedText} />
-        <LocalizedField label="תוכן" name="body" value={page.body as LocalizedText} textarea />
-        <button
-          type="submit"
-          className="rounded bg-neutral-900 px-6 py-2.5 text-sm font-medium text-white hover:bg-neutral-800"
-        >
-          שמירת שינויים
-        </button>
-      </form>
+        {isAbout ? (
+          <>
+            <LocalizedField label="הסיפור" name="story" value={body?.story} textarea />
+            <LocalizedField label="ציטוט" name="quote" value={body?.quote} textarea />
+          </>
+        ) : (
+          <LocalizedField label="תוכן" name="body" value={page.body as LocalizedText} textarea />
+        )}
+      </SavableForm>
     </div>
   );
 }

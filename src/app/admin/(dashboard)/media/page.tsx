@@ -30,8 +30,8 @@ export default async function AdminMediaPage({
     <div>
       <h1 className="mb-2 text-xl font-semibold">מדיה</h1>
       <p className="mb-6 text-sm text-neutral-500">
-        תמונות מועלות נשמרות מקומית בסביבת הפיתוח. בפריסה אמיתית יש להחליף באחסון קבצים
-        אמיתי (S3, Cloudinary וכו&apos;).
+        תמונות שמועלות כאן נשמרות במסד הנתונים ומוצגות באתר מיד, והן אינן נמחקות בפריסה
+        מחדש. מקסימום 8MB לתמונה (JPG, PNG, WEBP או GIF).
       </p>
 
       <MediaUploadForm />

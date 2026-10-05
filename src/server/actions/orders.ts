@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
+import { VAT_RATE } from "@/lib/pricing/constants";
 import { getSession } from "@/lib/auth/session";
 import { calculateShipping } from "@/server/services/shipping";
 import { calculateCommission } from "@/server/services/commission";
@@ -311,6 +312,8 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
           subtotal,
           discountTotal: discount,
           shippingTotal: shipping,
+          // Prices (and shipping) are VAT-inclusive: record the VAT contained in the total.
+          taxTotal: Math.round((total - total / (1 + VAT_RATE)) * 100) / 100,
           total,
           couponId: coupon?.id,
           affiliateId: validAffiliate?.id,
@@ -338,7 +341,9 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
   }
 
   if (validAffiliate) {
-    const commissionAmount = await calculateCommission(validAffiliate, subtotal - discount);
+    // Commission is earned on the sale net of VAT (prices include 18% VAT).
+    const netOfVat = (subtotal - discount) / (1 + VAT_RATE);
+    const commissionAmount = Math.min(await calculateCommission(validAffiliate, netOfVat), netOfVat);
     await prisma.commission.create({
       data: {
         affiliateId: validAffiliate.id,

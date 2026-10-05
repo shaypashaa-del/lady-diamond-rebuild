@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/auth/guards";
+import { revalidateProductPageById } from "@/server/revalidate-product";
 
 function localizedFromForm(formData: FormData, prefix: string) {
   return {
@@ -32,10 +33,12 @@ export async function addVariant(productId: string, formData: FormData) {
   });
 
   revalidatePath(`/admin/products/${productId}`);
+  await revalidateProductPageById(productId);
 }
 
 export async function deleteVariant(id: string, productId: string) {
   await requireAdminSession();
   await prisma.productVariant.delete({ where: { id } });
   revalidatePath(`/admin/products/${productId}`);
+  await revalidateProductPageById(productId);
 }

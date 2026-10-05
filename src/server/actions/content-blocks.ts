@@ -6,6 +6,14 @@ import type { LocalizedText } from "@/lib/i18n-content";
 import { CONTENT_KEYS } from "@/lib/content-keys";
 import { requireAdminSession } from "@/lib/auth/guards";
 
+export type ContentSaveResult = { saved: true } | { error: string };
+
+// A link target must be a site path, an anchor, or an http(s) URL.
+function cleanHref(raw: string, fallback: string): string | null {
+  const v = raw.trim() || fallback;
+  return /^(\/|#|https?:\/\/)/.test(v) ? v : null;
+}
+
 export type AnnouncementBarContent = {
   text: LocalizedText;
   linkText: LocalizedText;
@@ -48,40 +56,60 @@ function localizedFromForm(formData: FormData, prefix: string): LocalizedText {
   };
 }
 
-export async function updateAnnouncementBar(formData: FormData) {
+export async function updateAnnouncementBar(formData: FormData): Promise<ContentSaveResult> {
   await requireAdminSession();
+  const text = localizedFromForm(formData, "text");
+  if (!text.he.trim()) return { error: "יש למלא את הטקסט בעברית." };
+  const linkHref = cleanHref(String(formData.get("linkHref") ?? ""), "#");
+  if (!linkHref) return { error: "הקישור חייב להתחיל ב-/ או # או https://" };
   const data: AnnouncementBarContent = {
-    text: localizedFromForm(formData, "text"),
+    text,
     linkText: localizedFromForm(formData, "linkText"),
-    linkHref: String(formData.get("linkHref") ?? "#"),
+    linkHref,
   };
 
-  await prisma.contentBlock.upsert({
-    where: { key: CONTENT_KEYS.announcementBar },
-    update: { data },
-    create: { key: CONTENT_KEYS.announcementBar, data },
-  });
+  try {
+    await prisma.contentBlock.upsert({
+      where: { key: CONTENT_KEYS.announcementBar },
+      update: { data },
+      create: { key: CONTENT_KEYS.announcementBar, data },
+    });
+  } catch (err) {
+    console.error("[admin] updateAnnouncementBar failed", err);
+    return { error: "השמירה נכשלה. נסו שוב, ואם זה חוזר פנו אלינו." };
+  }
 
   revalidatePath("/", "layout");
   revalidatePath("/admin/content");
+  return { saved: true };
 }
 
-export async function updateHomepageHero(formData: FormData) {
+export async function updateHomepageHero(formData: FormData): Promise<ContentSaveResult> {
   await requireAdminSession();
+  const title = localizedFromForm(formData, "title");
+  if (!title.he.trim()) return { error: "יש למלא כותרת ראשית בעברית." };
+  const ctaHref = cleanHref(String(formData.get("ctaHref") ?? ""), "/category/all");
+  if (!ctaHref) return { error: "הקישור חייב להתחיל ב-/ או # או https://" };
   const data: HeroContent = {
     kicker: localizedFromForm(formData, "kicker"),
-    title: localizedFromForm(formData, "title"),
+    title,
     subtitle: localizedFromForm(formData, "subtitle"),
     ctaLabel: localizedFromForm(formData, "ctaLabel"),
-    ctaHref: String(formData.get("ctaHref") ?? "/category/all"),
+    ctaHref,
   };
 
-  await prisma.contentBlock.upsert({
-    where: { key: CONTENT_KEYS.homepageHero },
-    update: { data },
-    create: { key: CONTENT_KEYS.homepageHero, data },
-  });
+  try {
+    await prisma.contentBlock.upsert({
+      where: { key: CONTENT_KEYS.homepageHero },
+      update: { data },
+      create: { key: CONTENT_KEYS.homepageHero, data },
+    });
+  } catch (err) {
+    console.error("[admin] updateHomepageHero failed", err);
+    return { error: "השמירה נכשלה. נסו שוב, ואם זה חוזר פנו אלינו." };
+  }
 
-  revalidatePath("/");
+  revalidatePath("/", "layout");
   revalidatePath("/admin/content");
+  return { saved: true };
 }

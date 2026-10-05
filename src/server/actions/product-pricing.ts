@@ -5,6 +5,7 @@ import { computeConfiguredPrice, type MetalSelection, type CalculatorDiamondChoi
 import { getMetalPrice, refreshGoldPriceIfStale } from "@/server/services/market-prices";
 import { resolveConfiguredPrice } from "@/server/pricing/resolve-configured-price";
 import { MetalType } from "@/generated/prisma/enums";
+import { requireAdminSession } from "@/lib/auth/guards";
 
 export type ConfiguredPriceRequest = {
   productId: string;
@@ -44,6 +45,9 @@ export async function getConfiguredPrice(req: ConfiguredPriceRequest): Promise<C
 // the product's *default* material/diamond selection, used on the admin
 // product screen and the Phase-23 report. Never called from customer code.
 export async function getConfiguredPriceBreakdownForAdmin(productId: string) {
+  // Exported from a "use server" file, so it is reachable as an endpoint:
+  // the cost/margin breakdown must never be served to a non-admin.
+  await requireAdminSession();
   const product = await prisma.product.findUnique({
     where: { id: productId },
     include: { materialOptions: true, diamondOptions: true },

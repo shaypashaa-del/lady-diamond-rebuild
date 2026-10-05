@@ -53,6 +53,10 @@ const nextConfig: NextConfig = {
   // total Prisma pool connections (workers × adapter `max`) under that ceiling.
   experimental: {
     cpus: 2,
+    // Server Actions reject request bodies over 1 MB by default, which made
+    // every photo upload above 1 MB fail before the action even ran. The
+    // upload action itself enforces the real 8 MB image limit.
+    serverActions: { bodySizeLimit: "10mb" },
   },
   // Hides the "N" dev-mode build/route indicator badge during local
   // development (it never appears in production regardless).

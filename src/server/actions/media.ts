@@ -1,14 +1,14 @@
 "use server";
 
 import { randomUUID } from "crypto";
-import { writeFile, unlink } from "fs/promises";
+import { unlink } from "fs/promises";
 import path from "path";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/auth/guards";
 import { sniffImageType, EXTENSION_BY_TYPE } from "@/lib/image-sniff";
+import { saveMediaBlob, deleteMediaBlob } from "@/server/media-store";
 
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 const MAX_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
 
 function optionalLocalizedFromForm(formData: FormData, prefix: string) {
@@ -20,12 +20,8 @@ function optionalLocalizedFromForm(formData: FormData, prefix: string) {
   return value.he || value.en || value.ru ? value : undefined;
 }
 
-// NOTE: stores files on local disk under public/uploads. Fine for development
-// and single-instance deployments, but a real production deployment (multiple
-// server instances, ephemeral filesystems like most serverless platforms)
-// needs real object storage (S3, Cloudinary, etc.) instead — swap this
-// function's body for an upload to that provider; nothing else needs to
-// change since callers only depend on the returned MediaAsset shape.
+// Photos are stored in the database and served from /api/media/<id> (see
+// src/server/media-store.ts): the server's disk is not durable across deploys.
 export async function uploadMedia(formData: FormData) {
   await requireAdminSession();
   const file = formData.get("file");
@@ -45,16 +41,20 @@ export async function uploadMedia(formData: FormData) {
     return { error: "סוג קובץ לא נתמך. יש להעלות JPG, PNG, WEBP או GIF." };
   }
 
-  const filename = `${randomUUID()}${ext}`;
-  await writeFile(path.join(UPLOAD_DIR, filename), buffer);
-
-  await prisma.mediaAsset.create({
-    data: {
-      url: `/uploads/${filename}`,
-      filename: file.name,
-      altText,
-    },
-  });
+  const id = randomUUID();
+  try {
+    await saveMediaBlob(id, sniffedType, buffer);
+    await prisma.mediaAsset.create({
+      data: {
+        url: `/api/media/${id}`,
+        filename: file.name,
+        altText,
+      },
+    });
+  } catch (err) {
+    console.error("[admin] uploadMedia failed", err);
+    return { error: "העלאת התמונה נכשלה. נסו שוב, ואם זה חוזר פנו אלינו." };
+  }
 
   revalidatePath("/admin/media");
   return { uploaded: true as const };
@@ -81,7 +81,11 @@ export async function deleteMedia(id: string): Promise<DeleteMediaResult> {
 
   await prisma.mediaAsset.delete({ where: { id } });
 
-  if (media.url.startsWith("/uploads/")) {
+  if (media.url.startsWith("/api/media/")) {
+    await deleteMediaBlob(media.url.slice("/api/media/".length)).catch(() => {
+      // already gone — nothing to do
+    });
+  } else if (media.url.startsWith("/uploads/")) {
     await unlink(path.join(process.cwd(), "public", media.url)).catch(() => {
       // file already missing — nothing to do
     });

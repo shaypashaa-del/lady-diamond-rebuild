@@ -1,6 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { addProductImage, removeProductImage } from "@/server/actions/product-images";
+import {
+  addProductImage,
+  removeProductImage,
+  moveProductImage,
+  setPrimaryProductImage,
+} from "@/server/actions/product-images";
 
 type ImageRow = { id: string; media: { id: string; url: string; filename: string } };
 type MediaOption = { id: string; filename: string };
@@ -19,23 +24,49 @@ export function ProductImagesManager({
       <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide">תמונות מוצר</h2>
 
       {images.length > 0 && (
-        <div className="mb-4 flex flex-wrap gap-3">
-          {images.map((img) => (
-            <div key={img.id} className="relative">
-              <div className="relative h-24 w-24 overflow-hidden rounded border border-neutral-200 bg-neutral-100">
-                <Image src={img.media.url} alt={img.media.filename} fill sizes="96px" className="object-cover" />
+        <>
+          <p className="mb-2 text-xs text-neutral-500">
+            התמונה הראשונה היא תמונת המוצר הראשית (בכרטיס ובראש העמוד). אפשר לסדר מחדש עם החצים.
+          </p>
+          <div className="mb-4 flex flex-wrap gap-3">
+            {images.map((img, index) => (
+              <div key={img.id} className="relative w-24">
+                <div className="relative h-24 w-24 overflow-hidden rounded border border-neutral-200 bg-neutral-100">
+                  <Image src={img.media.url} alt={img.media.filename} fill sizes="96px" className="object-cover" />
+                  {index === 0 && (
+                    <span className="absolute start-1 top-1 rounded bg-neutral-900 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                      ראשית
+                    </span>
+                  )}
+                </div>
+                <div className="mt-1 flex items-center justify-between text-xs">
+                  <form action={moveProductImage.bind(null, img.id, productId, "earlier")}>
+                    <button type="submit" disabled={index === 0} aria-label="הזזה אחורה" className="px-1.5 py-0.5 disabled:opacity-30">
+                      →
+                    </button>
+                  </form>
+                  <form action={moveProductImage.bind(null, img.id, productId, "later")}>
+                    <button type="submit" disabled={index === images.length - 1} aria-label="הזזה קדימה" className="px-1.5 py-0.5 disabled:opacity-30">
+                      ←
+                    </button>
+                  </form>
+                </div>
+                {index !== 0 && (
+                  <form action={setPrimaryProductImage.bind(null, img.id, productId)}>
+                    <button type="submit" className="mt-0.5 w-full text-xs text-neutral-700 hover:underline">
+                      הפוך לראשית
+                    </button>
+                  </form>
+                )}
+                <form action={removeProductImage.bind(null, img.id, productId)}>
+                  <button type="submit" className="mt-0.5 w-full text-xs text-rose-600 hover:underline">
+                    הסרה
+                  </button>
+                </form>
               </div>
-              <form action={removeProductImage.bind(null, img.id, productId)}>
-                <button
-                  type="submit"
-                  className="mt-1 w-full text-xs text-rose-600 hover:underline"
-                >
-                  הסרה
-                </button>
-              </form>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </>
       )}
 
       {availableMedia.length > 0 ? (

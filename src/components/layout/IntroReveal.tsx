@@ -11,10 +11,8 @@ const FADE_MS = 1800; // the whole photo dissolving away as one, in one motion
 // A full-screen entrance: Diana's portrait (her signature is already baked
 // into this photo) holds intact for a beat, then the entire image fades
 // away as a single smooth dissolve (no tiles, no cuts, no visible seam) to
-// reveal the site underneath. Plays on every full page load (not just
-// once per session — a one-time-per-tab gate here proved confusing during
-// testing, since revisiting the same tab silently skipped it) and is
-// skipped entirely under prefers-reduced-motion.
+// reveal the site underneath. Plays on the first page load of each
+// browser session only, and is skipped entirely under prefers-reduced-motion.
 export function IntroReveal() {
   const [mounted, setMounted] = useState(false);
   const [fading, setFading] = useState(false);
@@ -29,6 +27,14 @@ export function IntroReveal() {
     if (startedRef.current) return;
     if (typeof window === "undefined") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Only the first entry of a visit: once seen in this browser session, later
+    // page loads go straight to the site. (Storage can be blocked: then it plays.)
+    try {
+      if (window.sessionStorage.getItem("ld_intro_seen") === "1") return;
+      window.sessionStorage.setItem("ld_intro_seen", "1");
+    } catch {
+      // ignore
+    }
     startedRef.current = true;
 
     document.body.style.overflow = "hidden";

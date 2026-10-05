@@ -3,6 +3,7 @@ import { computeConfiguredPrice, round2 } from "@/lib/pricing/engine";
 import { VAT_RATE } from "@/lib/pricing/constants";
 import { getMetalPrice, refreshGoldPriceIfStale } from "@/server/services/market-prices";
 import { MetalType } from "@/generated/prisma/enums";
+import { getAllManualPrices } from "@/server/pricing/manual-option-prices";
 
 // The price a product's page opens on (default metal, designed diamond if it
 // has one, otherwise no diamond), VAT included — computed live from the same
@@ -51,10 +52,16 @@ async function compute(): Promise<Map<string, number>> {
     currency: r.currency,
   }));
 
+  const manualPrices = await getAllManualPrices();
   const out = new Map<string, number>();
   for (const p of products) {
     const material = p.materialOptions.find((m) => m.isDefault) ?? p.materialOptions[0];
     if (!material) continue;
+    const manual = manualPrices.get(material.id);
+    if (manual !== undefined && manual > 0) {
+      out.set(p.id, round2(manual));
+      continue;
+    }
     const mp = metalPrices[material.metalType as keyof typeof metalPrices];
     const d = p.diamondOptions.find((x) => x.isDefault) ?? p.diamondOptions[0];
     const r = computeConfiguredPrice({

@@ -7,6 +7,7 @@ import { ProductStatus } from "@/generated/prisma/enums";
 import { requireAdminSession } from "@/lib/auth/guards";
 import { revalidateProductPage } from "@/server/revalidate-product";
 import { notifyPriceDropSubscribers } from "@/server/actions/price-drop";
+import { getAllManualPrices } from "@/server/pricing/manual-option-prices";
 
 function localizedFromForm(formData: FormData, prefix: string) {
   return {
@@ -167,7 +168,10 @@ export async function updateProduct(
   });
 
   if (data.pricingMode === "CONFIGURABLE" && existing) {
-    if (!existing.metalWeightGrams || existing.manufacturingCost === null || existing._count.materialOptions === 0) {
+    const optionRows = await prisma.productMaterialOption.findMany({ where: { productId: id }, select: { id: true } });
+    const manual = await getAllManualPrices(true);
+    const allManual = optionRows.length > 0 && optionRows.every((o) => manual.has(o.id));
+    if (!allManual && (!existing.metalWeightGrams || existing.manufacturingCost === null || existing._count.materialOptions === 0)) {
       return {
         error:
           "כדי לעבור לתמחור אוטומטי יש קודם להזין משקל מתכת, עלות ייצור ולפחות אפשרות חומר אחת בחלק \"תמחור\" בהמשך העמוד ולשמור שם. עד אז בחרו תמחור ידני.",

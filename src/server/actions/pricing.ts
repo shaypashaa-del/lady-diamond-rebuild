@@ -23,6 +23,7 @@ import {
 import { setManualMetalPrice } from "@/server/services/market-prices";
 import { DIAMOND_QUALITY_TIERS, VALID_PURITIES_FOR_METAL } from "@/lib/pricing/constants";
 import { revalidateProductPage } from "@/server/revalidate-product";
+import { getAllManualPrices, setManualOptionPrice } from "@/server/pricing/manual-option-prices";
 
 async function revalidateProductPageById(productId: string) {
   const product = await prisma.product.findUnique({ where: { id: productId }, select: { slug: true } });
@@ -61,8 +62,15 @@ export async function updateProductPricingSettings(
   // cannot be priced: the shop would show "pricing under review" and the
   // product could not be bought, so refuse the save with a clear reason.
   if (pricingMode === PricingMode.CONFIGURABLE) {
-    if (!metalWeightGrams || metalWeightGrams <= 0) return { error: "בתמחור לפי בחירת לקוח חובה למלא משקל מתכת (גרם)." };
-    if (manufacturingCost === null) return { error: "בתמחור לפי בחירת לקוח חובה למלא עלות ייצור." };
+    // Weight and cost are not needed when every material option has a
+    // hand-entered price (the formula is never used for those).
+    const options = await prisma.productMaterialOption.findMany({ where: { productId }, select: { id: true } });
+    const manual = await getAllManualPrices(true);
+    const allManual = options.length > 0 && options.every((o) => manual.has(o.id));
+    if (!allManual) {
+      if (!metalWeightGrams || metalWeightGrams <= 0) return { error: "בתמחור לפי בחירת לקוח חובה למלא משקל מתכת (גרם), או להזין מחיר ידני לכל אפשרות חומר." };
+      if (manufacturingCost === null) return { error: "בתמחור לפי בחירת לקוח חובה למלא עלות ייצור, או להזין מחיר ידני לכל אפשרות חומר." };
+    }
   }
 
   try {
@@ -328,4 +336,36 @@ export async function setManualMetalPriceAction(formData: FormData) {
 
   await setManualMetalPrice({ metalType, pricePerGram, source, sourceUrl });
   revalidatePath("/admin/pricing/metals");
+}
+
+// ---- Hand-entered price for one material option ----
+
+export async function setMaterialOptionManualPrice(
+  optionId: string,
+  productId: string,
+  formData: FormData
+): Promise<{ saved: true } | { error: string }> {
+  await requireAdminSession();
+  const raw = String(formData.get("price") ?? "").trim();
+  let price: number | null = null;
+  if (raw !== "") {
+    price = Number(raw);
+    if (!Number.isFinite(price) || price <= 0) {
+      return { error: "יש להזין מחיר גדול מ-0, או להשאיר ריק כדי לחזור לחישוב אוטומטי." };
+    }
+  }
+  const option = await prisma.productMaterialOption.findFirst({ where: { id: optionId, productId }, select: { id: true } });
+  if (!option) return { error: "האפשרות לא נמצאה." };
+
+  try {
+    await setManualOptionPrice(optionId, productId, price);
+  } catch (err) {
+    console.error("[admin] setMaterialOptionManualPrice failed", err);
+    return { error: "השמירה נכשלה. נסו שוב, ואם זה חוזר פנו אלינו." };
+  }
+
+  revalidatePath(`/admin/products/${productId}`);
+  revalidatePath("/admin/products");
+  await revalidateProductPageById(productId);
+  return { saved: true };
 }

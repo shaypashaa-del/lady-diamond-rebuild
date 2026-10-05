@@ -9,6 +9,7 @@ import {
 } from "@/lib/pricing/engine";
 import { getMetalPrice, refreshGoldPriceIfStale } from "@/server/services/market-prices";
 import { VAT_RATE } from "@/lib/pricing/constants";
+import { getAllManualPrices } from "@/server/pricing/manual-option-prices";
 import {
   MetalType,
   type DiamondShape,
@@ -291,10 +292,38 @@ async function resolveConfiguredPriceExVat(params: {
 // Every price a customer sees or is charged includes Israeli VAT (18%). The
 // cost/margin formulas above stay VAT-free; VAT is applied exactly once, here,
 // so the live product page and checkout can never disagree.
+//
+// A hand-entered price for the chosen material option (admin: product ->
+// pricing -> material options) is already the final VAT-included price and
+// replaces the formula for the product's own selection (designed diamond, or
+// "no diamond"). A diamond picked from the pricelist is still added by the
+// formula, and a manual price also lets a product with no cost data be sold.
 export async function resolveConfiguredPrice(
   params: Parameters<typeof resolveConfiguredPriceExVat>[0]
 ): Promise<ResolveConfiguredPriceResult> {
   const r = await resolveConfiguredPriceExVat(params);
+  const spec = params.calculatorDiamondSpec;
+  const ownSelection = spec == null || spec === "none";
+
+  const useManual =
+    ownSelection &&
+    (r.ok
+      ? r.calculatorDiamondSpec === undefined || r.calculatorDiamondSpec === "none"
+      : r.reason !== "MISSING_DIAMOND_SELECTION" && r.reason !== "INVALID_MATERIAL" && r.reason !== "MISSING_PRODUCT");
+
+  if (useManual) {
+    const manual = (await getAllManualPrices(params.fresh === true)).get(params.materialOptionId);
+    if (manual !== undefined && manual > 0) {
+      return {
+        ok: true,
+        sellingPrice: round2(manual),
+        materialOptionId: params.materialOptionId,
+        diamondOptionIds: r.ok ? r.diamondOptionIds : [],
+        calculatorDiamondSpec: r.ok ? r.calculatorDiamondSpec : spec === "none" ? "none" : undefined,
+      };
+    }
+  }
+
   if (!r.ok) return r;
   return { ...r, sellingPrice: round2(r.sellingPrice * (1 + VAT_RATE)) };
 }

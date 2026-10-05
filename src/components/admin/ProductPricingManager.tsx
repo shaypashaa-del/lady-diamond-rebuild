@@ -3,10 +3,12 @@ import {
   addMaterialOption,
   deleteDiamondOption,
   deleteMaterialOption,
+  setMaterialOptionManualPrice,
   updateProductPricingSettings,
 } from "@/server/actions/pricing";
 import { getConfiguredPriceBreakdownForAdmin } from "@/server/actions/product-pricing";
 import { SavableForm } from "./SavableForm";
+import { getAllManualPrices } from "@/server/pricing/manual-option-prices";
 import { VAT_RATE } from "@/lib/pricing/constants";
 import { DIAMOND_QUALITY_TIERS, PURITY_LABEL, VALID_PURITIES_FOR_METAL } from "@/lib/pricing/constants";
 import type {
@@ -75,7 +77,9 @@ export async function ProductPricingManager({
   materialOptions: MaterialOptionRow[];
   diamondOptions: DiamondOptionRow[];
 }) {
-  const missingCore = metalWeightGrams == null || manufacturingCost == null;
+  const manualPrices = await getAllManualPrices(true);
+  const allManual = materialOptions.length > 0 && materialOptions.every((m) => manualPrices.has(m.id));
+  const missingCore = (metalWeightGrams == null || manufacturingCost == null) && !allManual;
   const missingOptions = materialOptions.length === 0;
   const canBeConfigurable = !missingCore && !missingOptions;
 
@@ -204,6 +208,7 @@ export async function ProductPricingManager({
               <th className="py-2 font-medium">טוהר</th>
               <th className="py-2 font-medium">גוון</th>
               <th className="py-2 font-medium">ברירת מחדל</th>
+              <th className="py-2 font-medium">מחיר ידני (₪, כולל מע״מ)</th>
               <th className="py-2 font-medium"></th>
             </tr>
           </thead>
@@ -214,6 +219,25 @@ export async function ProductPricingManager({
                 <td className="py-2">{PURITY_LABEL[m.purity]}</td>
                 <td className="py-2">{m.goldColor ? GOLD_COLOR_LABEL[m.goldColor] : "—"}</td>
                 <td className="py-2">{m.isDefault ? "✓" : ""}</td>
+                <td className="py-2">
+                  <SavableForm
+                    action={setMaterialOptionManualPrice.bind(null, m.id, productId)}
+                    className="flex items-center gap-2"
+                    submitLabel="שמירה"
+                    buttonClassName="rounded bg-neutral-900 px-2 py-1 text-xs font-medium text-white disabled:opacity-50"
+                  >
+                    <input
+                      name="price"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      defaultValue={manualPrices.has(m.id) ? manualPrices.get(m.id) : ""}
+                      placeholder="אוטומטי"
+                      aria-label="מחיר ידני"
+                      className="w-28 rounded border border-neutral-300 px-2 py-1 text-sm"
+                    />
+                  </SavableForm>
+                </td>
                 <td className="py-2">
                   <form action={deleteMaterialOption.bind(null, m.id, productId)}>
                     <button type="submit" className="text-xs text-rose-600 hover:underline">
@@ -226,6 +250,9 @@ export async function ProductPricingManager({
           </tbody>
         </table>
       )}
+      <p className="mb-3 text-xs text-neutral-500">
+        אפשר להזין לכל אפשרות חומר מחיר ידני סופי (כולל מע״מ): הוא גובר על החישוב עבור המוצר כפי שהוא (עם היהלום שלו או בלי יהלום). השארת השדה ריק = חישוב אוטומטי. יהלום שהלקוח בוחר מהמחירון ממשיך להתווסף לפי המחירון.
+      </p>
       <form action={addMaterialOption.bind(null, productId)} className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-5">
         <select name="metalType" className="border border-neutral-300 px-2 py-2 text-xs" required>
           <option value="">מתכת…</option>

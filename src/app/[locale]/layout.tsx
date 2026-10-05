@@ -146,6 +146,7 @@ export default async function LocaleLayout({
           <ReferralCapture />
           <AnnouncementBar
             text={announcement ? tContent(announcement.text, locale as Locale) : undefined}
+            href={/^(\/|https:\/\/)/.test(announcement?.linkHref ?? "") ? announcement?.linkHref : undefined}
             subscribeLabel={announcement ? tContent(announcement.linkText, locale as Locale) : undefined}
           />
           <Header />

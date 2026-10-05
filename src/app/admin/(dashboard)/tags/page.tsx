@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import { deleteTag } from "@/server/actions/tags";
+import { deleteTag, updateTag } from "@/server/actions/tags";
 import { t as localize, type LocalizedText } from "@/lib/i18n-content";
+import { SavableForm } from "@/components/admin/SavableForm";
 import { CreateTagForm } from "@/components/admin/CreateTagForm";
 import { ConfirmDeleteForm } from "@/components/admin/ConfirmDeleteForm";
 
@@ -29,6 +30,14 @@ export default async function AdminTagsPage() {
                 <td className="px-4 py-3 font-medium">{localize(tag.name as LocalizedText, "he")}</td>
                 <td className="px-4 py-3">{tag._count.products}</td>
                 <td className="px-4 py-3">
+                  <details className="mb-2">
+                    <summary className="cursor-pointer text-xs underline">עריכה</summary>
+                    <SavableForm action={updateTag.bind(null, tag.id)} className="mt-2 w-56 space-y-1" buttonClassName="rounded bg-neutral-900 px-3 py-1.5 text-xs text-white disabled:opacity-50">
+                      {(["he", "en", "ru"] as const).map((l) => (
+                        <input key={l} name={`name_${l}`} defaultValue={(tag.name as Record<string, string>)?.[l] ?? ""} placeholder={l} required={l === "he"} className="w-full rounded border border-neutral-300 px-2 py-1.5 text-xs" />
+                      ))}
+                    </SavableForm>
+                  </details>
                   <ConfirmDeleteForm
                     action={deleteTag.bind(null, tag.id)}
                     className="text-xs text-rose-600 hover:underline"

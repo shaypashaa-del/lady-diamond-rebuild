@@ -44,3 +44,26 @@ export async function toggleShippingRule(id: string, isActive: boolean) {
   await prisma.shippingRule.update({ where: { id }, data: { isActive } });
   revalidatePath("/admin/shipping");
 }
+
+export async function updateShippingRule(
+  id: string,
+  formData: FormData
+): Promise<{ saved: true } | { error: string }> {
+  await requireAdminSession();
+  const name = String(formData.get("name") ?? "").trim();
+  if (!name) return { error: "יש להזין שם." };
+  const price = Number(formData.get("price") ?? 0);
+  if (!Number.isFinite(price) || price < 0) return { error: "מחיר לא תקין." };
+  const minRaw = String(formData.get("minOrderValue") ?? "").trim();
+  const min = minRaw === "" ? null : Number(minRaw);
+  if (min !== null && (!Number.isFinite(min) || min < 0)) return { error: "סכום מינימום לא תקין." };
+  const country = String(formData.get("country") ?? "").trim().toUpperCase() || null;
+  try {
+    await prisma.shippingRule.update({ where: { id }, data: { name, price, minOrderValue: min, country } });
+  } catch (err) {
+    console.error("[admin] updateShippingRule failed", err);
+    return { error: "השמירה נכשלה." };
+  }
+  revalidatePath("/admin/shipping");
+  return { saved: true };
+}

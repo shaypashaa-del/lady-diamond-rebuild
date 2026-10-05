@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { toggleCoupon } from "@/server/actions/coupons";
+import { toggleCoupon, updateCoupon } from "@/server/actions/coupons";
+import { SavableForm } from "@/components/admin/SavableForm";
 import { CreateCouponForm } from "@/components/admin/CreateCouponForm";
 import { DeleteCouponButton } from "@/components/admin/DeleteCouponButton";
 
@@ -48,6 +49,18 @@ export default async function AdminCouponsPage() {
                   </form>
                 </td>
                 <td className="px-4 py-3">
+                  <details className="mb-2">
+                    <summary className="cursor-pointer text-xs underline">עריכה</summary>
+                    <SavableForm action={updateCoupon.bind(null, c.id)} className="mt-2 w-56 space-y-1" buttonClassName="rounded bg-neutral-900 px-3 py-1.5 text-xs text-white disabled:opacity-50">
+                      <select name="discountType" defaultValue={c.discountType} className="w-full rounded border border-neutral-300 px-2 py-1.5 text-xs">
+                        <option value="PERCENTAGE">אחוז</option>
+                        <option value="FIXED">סכום קבוע (₪)</option>
+                      </select>
+                      <input name="discountValue" type="number" step="0.01" min="0" defaultValue={Number(c.discountValue)} aria-label="ערך הנחה" className="w-full rounded border border-neutral-300 px-2 py-1.5 text-xs" />
+                      <input name="usageLimit" type="number" min="1" defaultValue={c.usageLimit ?? ""} placeholder="מגבלת שימושים" className="w-full rounded border border-neutral-300 px-2 py-1.5 text-xs" />
+                      <input name="expiresAt" type="date" defaultValue={c.expiresAt ? c.expiresAt.toISOString().slice(0, 10) : ""} aria-label="תפוגה" className="w-full rounded border border-neutral-300 px-2 py-1.5 text-xs" />
+                    </SavableForm>
+                  </details>
                   <DeleteCouponButton id={c.id} />
                 </td>
               </tr>

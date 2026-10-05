@@ -71,3 +71,32 @@ export async function deleteCoupon(id: string): Promise<DeleteCouponResult> {
   await prisma.coupon.delete({ where: { id } });
   revalidatePath("/admin/coupons");
 }
+
+export async function updateCoupon(
+  id: string,
+  formData: FormData
+): Promise<{ saved: true } | { error: string }> {
+  await requireAdminSession();
+  const discountValue = Number(formData.get("discountValue"));
+  const type = String(formData.get("discountType"));
+  if (type !== "PERCENTAGE" && type !== "FIXED") return { error: "סוג הנחה לא תקין." };
+  if (!Number.isFinite(discountValue) || discountValue < 0) return { error: "ערך ההנחה לא תקין." };
+  if (type === "PERCENTAGE" && discountValue > 100) return { error: "אחוז הנחה לא יכול להיות מעל 100%." };
+  const limitRaw = String(formData.get("usageLimit") ?? "").trim();
+  const usageLimit = limitRaw === "" ? null : Math.floor(Number(limitRaw));
+  if (usageLimit !== null && (!Number.isFinite(usageLimit) || usageLimit < 1)) return { error: "מגבלת שימושים לא תקינה." };
+  const expRaw = String(formData.get("expiresAt") ?? "").trim();
+  const expiresAt = expRaw ? new Date(expRaw) : null;
+  if (expiresAt && Number.isNaN(expiresAt.getTime())) return { error: "תאריך תפוגה לא תקין." };
+  try {
+    await prisma.coupon.update({
+      where: { id },
+      data: { discountType: type as DiscountType, discountValue, usageLimit, expiresAt },
+    });
+  } catch (err) {
+    console.error("[admin] updateCoupon failed", err);
+    return { error: "השמירה נכשלה." };
+  }
+  revalidatePath("/admin/coupons");
+  return { saved: true };
+}

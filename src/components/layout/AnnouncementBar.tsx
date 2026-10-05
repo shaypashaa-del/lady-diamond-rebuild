@@ -7,9 +7,12 @@ import { subscribeToNewsletter, type NewsletterResult } from "@/server/actions/n
 export function AnnouncementBar({
   text,
   subscribeLabel,
+  href,
 }: {
   text?: string;
   subscribeLabel?: string;
+  // When the admin sets a link, the bar links there instead of opening the newsletter form.
+  href?: string;
 }) {
   const t = useTranslations("Announcement");
   const [visible, setVisible] = useState(true);
@@ -50,9 +53,15 @@ export function AnnouncementBar({
       ) : (
         <p>
           {displayText}{" "}
-          <button onClick={() => setShowForm(true)} className="inline-block py-2.5 font-semibold text-gold-bright underline underline-offset-2">
-            {displaySubscribe}
-          </button>
+          {href ? (
+            <a href={href} className="inline-block py-2.5 font-semibold text-gold-bright underline underline-offset-2">
+              {displaySubscribe}
+            </a>
+          ) : (
+            <button onClick={() => setShowForm(true)} className="inline-block py-2.5 font-semibold text-gold-bright underline underline-offset-2">
+              {displaySubscribe}
+            </button>
+          )}
         </p>
       )}
       {state && "error" in state && <p className="text-rose-400">{state.error}</p>}

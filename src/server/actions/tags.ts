@@ -46,3 +46,30 @@ export async function deleteTag(id: string) {
   await prisma.tag.delete({ where: { id } });
   revalidatePath("/admin/tags");
 }
+
+export async function updateTag(
+  id: string,
+  formData: FormData
+): Promise<{ saved: true } | { error: string }> {
+  await requireAdminSession();
+  const he = String(formData.get("name_he") ?? "").trim();
+  if (!he) return { error: "יש להזין שם בעברית." };
+  try {
+    await prisma.tag.update({
+      where: { id },
+      data: {
+        name: {
+          he,
+          en: String(formData.get("name_en") ?? "").trim() || undefined,
+          ru: String(formData.get("name_ru") ?? "").trim() || undefined,
+        },
+      },
+    });
+  } catch (err) {
+    console.error("[admin] updateTag failed", err);
+    return { error: "השמירה נכשלה." };
+  }
+  revalidatePath("/admin/tags");
+  revalidatePath("/", "layout");
+  return { saved: true };
+}

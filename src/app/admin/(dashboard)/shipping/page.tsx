@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { deleteShippingRule, toggleShippingRule } from "@/server/actions/shipping";
+import { deleteShippingRule, toggleShippingRule, updateShippingRule } from "@/server/actions/shipping";
+import { SavableForm } from "@/components/admin/SavableForm";
 import { CreateShippingRuleForm } from "@/components/admin/CreateShippingRuleForm";
 
 const typeLabels: Record<string, string> = {
@@ -41,6 +42,15 @@ export default async function AdminShippingPage() {
                   </form>
                 </td>
                 <td className="px-4 py-3">
+                  <details className="mb-2">
+                    <summary className="cursor-pointer text-xs underline">עריכה</summary>
+                    <SavableForm action={updateShippingRule.bind(null, r.id)} className="mt-2 w-56 space-y-1" buttonClassName="rounded bg-neutral-900 px-3 py-1.5 text-xs text-white disabled:opacity-50">
+                      <input name="name" defaultValue={r.name} required aria-label="שם" className="w-full rounded border border-neutral-300 px-2 py-1.5 text-xs" />
+                      <input name="price" type="number" step="0.01" min="0" defaultValue={Number(r.price)} aria-label="מחיר" className="w-full rounded border border-neutral-300 px-2 py-1.5 text-xs" />
+                      <input name="minOrderValue" type="number" step="0.01" min="0" defaultValue={r.minOrderValue != null ? Number(r.minOrderValue) : ""} placeholder="סכום מינימום" className="w-full rounded border border-neutral-300 px-2 py-1.5 text-xs" />
+                      <input name="country" dir="ltr" defaultValue={r.country ?? ""} placeholder="מדינה (IL)" className="w-full rounded border border-neutral-300 px-2 py-1.5 text-xs" />
+                    </SavableForm>
+                  </details>
                   <form action={deleteShippingRule.bind(null, r.id)}>
                     <button type="submit" className="text-xs text-rose-600 hover:underline">
                       מחיקה

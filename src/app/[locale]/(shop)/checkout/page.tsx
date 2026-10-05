@@ -213,7 +213,7 @@ function CheckoutForm() {
           <div className="border border-gold-soft p-5">
             {lines.map((l) => (
               <div key={l.key} className="flex justify-between py-2 text-sm">
-                <span>{l.name}{l.variantLabel ? ` — ${l.variantLabel}` : ""}{l.options ? ` (${describeOptions(l.options)})` : ""} × {l.quantity}</span>
+                <span>{l.name}{l.variantLabel ? ` — ${l.variantLabel}` : ""}{describeOptions(l.options) ? ` (${describeOptions(l.options)})` : ""} × {l.quantity}</span>
                 <span>{(l.price * l.quantity).toFixed(2)} ₪</span>
               </div>
             ))}

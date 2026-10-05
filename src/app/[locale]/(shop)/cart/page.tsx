@@ -63,7 +63,7 @@ export default function CartPage() {
                   {line.name}
                 </Link>
                 {line.variantLabel && <p className="text-xs text-ink/50">{line.variantLabel}</p>}
-                {line.options && <p className="text-xs text-ink/50">{describeOptions(line.options)}</p>}
+                {describeOptions(line.options) && <p className="text-xs text-ink/50">{describeOptions(line.options)}</p>}
                 <p className="mt-1 text-sm text-ink">{line.price.toFixed(2)} ₪</p>
               </div>
               <div className="flex w-full items-center justify-between gap-4 ps-24 sm:w-auto sm:justify-start sm:ps-0">

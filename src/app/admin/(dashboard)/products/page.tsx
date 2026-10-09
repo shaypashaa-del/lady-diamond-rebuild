@@ -26,7 +26,11 @@ export default async function AdminProductsPage({
 
   const [products, totalCount] = await Promise.all([
     prisma.product.findMany({
-      include: { categories: { include: { category: true } } },
+      include: {
+        categories: { include: { category: true } },
+        // The photo the shop shows on the product card: first by display order.
+        images: { include: { media: true }, orderBy: { sortOrder: "asc" }, take: 1 },
+      },
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
@@ -54,6 +58,7 @@ export default async function AdminProductsPage({
         <table className="w-full text-sm">
           <thead className="border-b border-neutral-200 bg-neutral-50 text-right text-xs text-neutral-500">
             <tr>
+              <th className="w-20 px-4 py-3 font-medium">תמונה</th>
               <th className="px-4 py-3 font-medium">שם</th>
               <th className="px-4 py-3 font-medium">קטגוריה</th>
               <th className="px-4 py-3 font-medium">מחיר</th>
@@ -66,6 +71,21 @@ export default async function AdminProductsPage({
           <tbody>
             {products.map((p) => (
               <tr key={p.id} className="border-b border-neutral-100 last:border-0">
+                <td className="px-4 py-3">
+                  <Link href={`/admin/products/${p.id}`} className="block h-16 w-16 overflow-hidden rounded border border-neutral-200 bg-neutral-100">
+                    {p.images[0] ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={p.images[0].media.url}
+                        alt={localize(p.name as LocalizedText, "he")}
+                        loading="lazy"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span className="flex h-full items-center justify-center text-[10px] text-neutral-400">אין תמונה</span>
+                    )}
+                  </Link>
+                </td>
                 <td className="px-4 py-3">
                   <Link href={`/admin/products/${p.id}`} className="block font-medium hover:underline">
                     {localize(p.name as LocalizedText, "he")}
@@ -142,7 +162,7 @@ export default async function AdminProductsPage({
             ))}
             {products.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-neutral-400">
+                <td colSpan={8} className="px-4 py-8 text-center text-neutral-400">
                   אין מוצרים עדיין.
                 </td>
               </tr>

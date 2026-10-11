@@ -62,7 +62,12 @@ const nextConfig: NextConfig = {
   // development (it never appears in production regardless).
   devIndicators: false,
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      // The business card is a static page: without this, browsers keep an old copy
+      // for hours (heuristic caching) and visitors miss updates. no-cache = always revalidate.
+      { source: "/card/:path*", headers: [{ key: "Cache-Control", value: "no-cache" }] },
+    ];
   },
 };
 

@@ -242,7 +242,7 @@ export function ProductDetail({
             <>
               {configuredPrice?.status === "ok" && (
                 <>
-                  <span className="font-semibold text-ink">{formatIls(configuredPrice.sellingPrice)} ₪</span>
+                  <span className="price font-semibold text-ink">{formatIls(configuredPrice.sellingPrice)} ₪</span>
                   <span className="text-xs font-normal text-ink/50">{t("vatIncluded")}</span>
                 </>
               )}
@@ -255,11 +255,11 @@ export function ProductDetail({
             </>
           ) : salePrice ? (
             <>
-              <span className="text-ink/40 line-through">{formatIls(price)} ₪</span>
-              <span className="font-semibold text-clay">{formatIls(displayPrice)} ₪</span>
+              <span className="price text-ink/40 line-through">{formatIls(price)} ₪</span>
+              <span className="price font-semibold text-clay">{formatIls(displayPrice)} ₪</span>
             </>
           ) : (
-            <span className="font-semibold text-ink">{formatIls(displayPrice)} ₪</span>
+            <span className="price font-semibold text-ink">{formatIls(displayPrice)} ₪</span>
           )}
         </div>
 

@@ -34,7 +34,7 @@ export function ProductCard({ product }: { product: SampleProduct }) {
   }
 
   return (
-    <div className="group relative flex min-w-0 flex-col">
+    <div className="reveal-on-view group relative flex min-w-0 flex-col">
       <div className="relative aspect-[3/4] w-full overflow-hidden placeholder-gradient">
         {product.badge && (
           <span
@@ -103,11 +103,11 @@ export function ProductCard({ product }: { product: SampleProduct }) {
         <div className="mt-1 flex items-center justify-center gap-2 text-sm">
           {product.salePrice ? (
             <>
-              <span className="text-ink/40 line-through">{formatIls(product.salePrice)} ₪</span>
-              <span className="font-semibold text-clay">{formatIls(product.price)} ₪</span>
+              <span className="price text-ink/40 line-through">{formatIls(product.salePrice)} ₪</span>
+              <span className="price font-semibold text-clay">{formatIls(product.price)} ₪</span>
             </>
           ) : (
-            <span className="font-semibold text-ink">{formatIls(product.price)} ₪</span>
+            <span className="price font-semibold text-ink">{formatIls(product.price)} ₪</span>
           )}
         </div>
         {isSold ? (

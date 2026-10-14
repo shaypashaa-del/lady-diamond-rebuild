@@ -445,3 +445,101 @@ a[x-apple-data-detectors] {
   font: inherit !important;
   text-decoration: none !important;
 }
+
+/* =========================================================================
+   Typography system (one family, Rubik, across he / en / ru)
+   ========================================================================= */
+html {
+  font-kerning: normal;
+  font-feature-settings: "kern", "liga", "calt";
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
+}
+@layer base {
+  body {
+    line-height: 1.65;
+    font-variant-numeric: lining-nums;
+  }
+  /* Hebrew sits taller on the line than Latin: give it more air. */
+  html[lang="he"] body {
+    line-height: 1.75;
+  }
+}
+
+/* Headings: balanced lines (no lonely last word), tight but even rhythm. */
+/* In @layer base so any Tailwind utility on a heading (size, weight, leading)
+   still wins; these are only the defaults. */
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 500;
+    line-height: 1.18;
+    letter-spacing: -0.005em;
+  }
+  html[lang="he"] :is(h1, h2, h3, h4) {
+    line-height: 1.25;
+    letter-spacing: 0;
+  }
+}
+h1,
+h2,
+h3,
+h4 {
+  text-wrap: balance;
+}
+/* Body copy: avoid orphans and widows in paragraphs and lists. */
+p,
+li,
+dd,
+figcaption {
+  text-wrap: pretty;
+}
+
+/* Hebrew has no capitals, and wide tracking pulls its letters apart and hurts
+   readability. Keep the wide-tracked look for Latin and Cyrillic only; the
+   fixed Latin brand wordmarks (dir="ltr" / .font-display) are left alone. */
+html[lang="he"] :where(h1, h2, h3, h4, p, span, a, button, li, label, dt, dd, th, td, legend, summary, small):not(.font-display):not([dir="ltr"]):not(.ld) {
+  letter-spacing: 0.01em;
+}
+
+/* Prices and quantities: same-width digits so columns and totals line up. */
+.price,
+.tabular-nums {
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* ---- Smart motion: scroll-driven, no JavaScript ---------------------------
+   Progressive enhancement: browsers without scroll-driven animations simply
+   show the content, and users who prefer reduced motion get none of it. */
+@keyframes rule-draw {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal-on-view {
+      animation: rise-in linear both;
+      animation-timeline: view();
+      animation-range: entry 4% entry 48%;
+    }
+    body:not(.bg-neutral-50) main h2 {
+      animation: rise-in linear both;
+      animation-timeline: view();
+      animation-range: entry 4% entry 55%;
+    }
+    .gold-rule,
+    .gold-rule-start {
+      animation: rule-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 8% entry 70%;
+    }
+  }
+}

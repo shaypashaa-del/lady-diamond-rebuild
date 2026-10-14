@@ -65,6 +65,5 @@ Use `curl -sL <url>` against the live site, or the in-app browser:
 7. `npx tsc --noEmit`, `npx eslint src`, `npx vitest run` pass.
 
 ## Known gaps (verify before relying on, fix when touching nearby code)
-- `websiteSchema` declares a SearchAction target `/?s={search_term_string}`, but the real search page is `/search?q=`. Fix the target to `${SITE_URL}/search?q={search_term_string}`.
 - No review/rating data exists, so there are no rich-result stars. Do not fake them.
 - Product `seoTitle` / `seoDescription` are empty for most products, so the generated fallbacks are in use; filling them per product in admin is the cheapest SEO win.

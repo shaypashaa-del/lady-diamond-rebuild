@@ -66,4 +66,4 @@ Use `curl -sL <url>` against the live site, or the in-app browser:
 
 ## Known gaps (verify before relying on, fix when touching nearby code)
 - No review/rating data exists, so there are no rich-result stars. Do not fake them.
-- Product `seoTitle` / `seoDescription` are empty for most products, so the generated fallbacks are in use; filling them per product in admin is the cheapest SEO win.
+- Measured 2026-10-15: rendered product titles are 74-103 characters because the layout template appends the long site title to every page title (Google shows about 60), and meta descriptions average about 50 characters (aim for 120-155). Draft replacements are in `seo-drafts.csv`; making product/category titles `absolute` stops the suffix.

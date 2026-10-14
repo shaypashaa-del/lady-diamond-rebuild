@@ -1,3 +1,5 @@
+import "server-only";
+
 // Payment abstraction: the store never talks to a specific gateway directly.
 // Today only manual offline methods exist (matching the live site's actual
 // Bank Transfer / Cash on Delivery setup — see AUDIT.md section 12). A real

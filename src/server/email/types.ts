@@ -1,3 +1,5 @@
+import "server-only";
+
 // Email abstraction: the app never talks to a specific mail provider
 // directly. When RESEND_API_KEY is set, mail goes out through Resend;
 // otherwise (local dev, or a deployment without a key) it only logs what

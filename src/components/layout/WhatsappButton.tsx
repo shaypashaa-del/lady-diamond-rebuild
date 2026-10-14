@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useFloatingAvoid } from "@/lib/use-floating-avoid";
 
 const CYCLE_MS = 4500;
 
@@ -15,6 +16,7 @@ const CYCLE_MS = 4500;
 export function WhatsappButton() {
   const t = useTranslations("Whatsapp");
   const [step, setStep] = useState(0);
+  const avoid = useFloatingAvoid();
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -28,7 +30,7 @@ export function WhatsappButton() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={t("chatWithUs")}
-      className="fixed bottom-4 right-4 z-40 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-gold-bright bg-ink shadow-[0_6px_20px_-4px_rgba(0,0,0,0.35)] transition-transform hover:scale-105 sm:bottom-5 sm:right-5 sm:h-[60px] sm:w-[60px]"
+      className={`fixed bottom-4 right-4 z-40 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-gold-bright bg-ink shadow-[0_6px_20px_-4px_rgba(0,0,0,0.35)] transition-transform hover:scale-105 sm:bottom-5 sm:right-5 sm:h-[60px] sm:w-[60px] ${avoid ? "pointer-events-none translate-y-6 opacity-0" : ""}`}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img

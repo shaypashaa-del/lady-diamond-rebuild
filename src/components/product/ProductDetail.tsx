@@ -343,6 +343,7 @@ export function ProductDetail({
           </ul>
         )}
 
+        <div data-fab-avoid>
         <div className="mt-6 flex items-center gap-4">
           <div className="flex items-center border border-gold-soft">
             <button
@@ -396,6 +397,7 @@ export function ProductDetail({
           >
             {t("buyWithPaypal")}
           </button>
+        </div>
         </div>
 
         {shippingPrice != null && (

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Accessibility, X, Plus, Minus, RotateCcw } from "lucide-react";
+import { useFloatingAvoid } from "@/lib/use-floating-avoid";
 
 const STORAGE_KEY = "ld-a11y-settings";
 const FONT_STEPS = [100, 112, 124, 136] as const;
@@ -50,6 +51,7 @@ function applyToDocument(s: Settings) {
 export function AccessibilityWidget() {
   const t = useTranslations("Accessibility");
   const [open, setOpen] = useState(false);
+  const avoid = useFloatingAvoid();
   // Read localStorage lazily, in the initializer rather than an effect —
   // this component's settings-driven UI (the panel below) only ever
   // renders after a user click on `open`, never during the initial
@@ -98,7 +100,7 @@ export function AccessibilityWidget() {
         onClick={() => setOpen((v) => !v)}
         aria-label={t("openLabel")}
         aria-expanded={open}
-        className="fixed bottom-4 left-4 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-gold-soft bg-ink text-paper shadow-[0_6px_20px_-4px_rgba(0,0,0,0.3)] transition-transform hover:scale-105 sm:bottom-5 sm:left-5 sm:h-14 sm:w-14"
+        className={`fixed bottom-4 left-4 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-gold-soft bg-ink text-paper shadow-[0_6px_20px_-4px_rgba(0,0,0,0.3)] transition-all hover:scale-105 sm:bottom-5 sm:left-5 sm:h-14 sm:w-14 ${avoid && !open ? "pointer-events-none translate-y-6 opacity-0" : ""}`}
       >
         <Accessibility size={26} />
       </button>

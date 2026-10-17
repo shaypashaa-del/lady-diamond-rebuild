@@ -1,3 +1,4 @@
+import { ttlMemo } from "@/lib/ttl-memo";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { applyLivePrices } from "@/server/pricing/listing-prices";
@@ -124,7 +125,7 @@ export function getAllCategories() {
 
 // Prefers manually-curated relations (set by admin on the product form);
 // falls back to same-category products when none are set.
-export async function getRelatedProducts(
+async function loadRelatedProducts(
   productId: string,
   categorySlug: string | undefined,
   take = 4
@@ -162,7 +163,7 @@ export async function getRelatedProducts(
 // Adding materialOptions/diamondOptions here made each round-trip heavier,
 // which is what made the pre-existing double-fetch noticeably slow enough
 // to make clicking a product feel unresponsive.
-export const getProductBySlug = cache((slug: string) => {
+const loadProductBySlug = (slug: string) => {
   // `findFirst`, not `findUnique`, because adding the `status` filter turns
   // this into a non-unique where clause — otherwise a DRAFT product's page
   // would still render for anyone who knows or guesses its slug, even though
@@ -177,4 +178,12 @@ export const getProductBySlug = cache((slug: string) => {
       diamondOptions: { where: { active: true }, orderBy: { sortOrder: "asc" } },
     },
   });
-});
+};
+// Product pages are the busiest route and the database is remote: keep the
+// product (with photos and options) in memory for a minute, refreshed in the
+// background. Checkout always re-reads prices and stock itself.
+const memoProductBySlug = ttlMemo(loadProductBySlug, 60_000, { swr: true });
+export const getProductBySlug = cache((slug: string) => memoProductBySlug(slug));
+
+
+export const getRelatedProducts = ttlMemo(loadRelatedProducts, 60_000, { swr: true });

@@ -1,3 +1,4 @@
+import { ttlMemo } from "@/lib/ttl-memo";
 import { prisma } from "@/lib/prisma";
 
 export type ShippingRuleLike = {
@@ -35,11 +36,14 @@ export function pickShippingPrice(
 
 // Admin manages rules at /admin/shipping — see ShippingRule in schema.prisma
 // for the supported types.
+const activeShippingRules = ttlMemo(
+  () => prisma.shippingRule.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
+  30_000,
+  { swr: true }
+);
+
 export async function calculateShipping(subtotal: number, country: string): Promise<number> {
-  const rules = await prisma.shippingRule.findMany({
-    where: { isActive: true },
-    orderBy: { sortOrder: "asc" },
-  });
+  const rules = await activeShippingRules();
 
   return pickShippingPrice(rules, subtotal, country);
 }

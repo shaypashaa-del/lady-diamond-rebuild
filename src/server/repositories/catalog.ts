@@ -182,11 +182,11 @@ const loadProductBySlug = (slug: string) => {
 // Product pages are the busiest route and the database is remote: keep the
 // product (with photos and options) in memory for a minute, refreshed in the
 // background. Checkout always re-reads prices and stock itself.
-const memoProductBySlug = ttlMemo(loadProductBySlug, 60_000, { swr: true });
+const memoProductBySlug = ttlMemo("product-by-slug", loadProductBySlug, 60_000, { swr: true });
 export const getProductBySlug = cache((slug: string) => memoProductBySlug(slug));
 
 
-export const getRelatedProducts = ttlMemo(loadRelatedProducts, 60_000, { swr: true });
+export const getRelatedProducts = ttlMemo("related-products", loadRelatedProducts, 60_000, { swr: true });
 
 // Called once after the server starts: loads every published product into the
 // in-memory cache so even a visitor's first click on a product is fast.

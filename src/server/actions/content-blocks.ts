@@ -55,7 +55,7 @@ async function loadContentBlock(key: string): Promise<unknown> {
   throw lastError;
 }
 
-const memoLoadContentBlock = ttlMemo(loadContentBlock, 15_000);
+const memoLoadContentBlock = ttlMemo("content-block", loadContentBlock, 15_000);
 
 // Read on every page render (announcement bar, hero), so it is memoised for a
 // few seconds per server process; admin edits show up within that window.

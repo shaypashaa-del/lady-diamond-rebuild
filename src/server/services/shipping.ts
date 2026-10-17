@@ -37,6 +37,7 @@ export function pickShippingPrice(
 // Admin manages rules at /admin/shipping — see ShippingRule in schema.prisma
 // for the supported types.
 const activeShippingRules = ttlMemo(
+  "shipping-rules",
   () => prisma.shippingRule.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
   30_000,
   { swr: true }

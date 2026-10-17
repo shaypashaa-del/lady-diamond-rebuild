@@ -26,4 +26,4 @@ async function loadNavCategories(locale: Locale): Promise<NavCategoryItem[]> {
   }
 }
 
-export const getNavCategories = ttlMemo(loadNavCategories, 20_000);
+export const getNavCategories = ttlMemo("nav-categories", loadNavCategories, 20_000);

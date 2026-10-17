@@ -12,8 +12,12 @@ import { getAllManualPrices } from "@/server/pricing/manual-option-prices";
 // the homepage always shows the same number as the page it links to. The
 // `basePrice` column on a configurable product is only a stale placeholder.
 const TTL_MS = 60_000;
-let cached: { at: number; value: Map<string, number> } | null = null;
-let inflight: Promise<Map<string, number>> | null = null;
+// Held on globalThis so the start-up warm-up (a separate bundle) and the page
+// routes share one copy.
+const shared = globalThis as unknown as {
+  __listingPrices?: { cached: { at: number; value: Map<string, number> } | null; inflight: Promise<Map<string, number>> | null };
+};
+const state = (shared.__listingPrices ??= { cached: null, inflight: null });
 
 async function compute(): Promise<Map<string, number>> {
   await refreshGoldPriceIfStale();
@@ -98,23 +102,23 @@ async function compute(): Promise<Map<string, number>> {
 // background. Only the very first request after a restart ever waits for the
 // full computation (all products + metal/diamond tables + a gold price check).
 export async function getListingPrices(): Promise<Map<string, number>> {
-  const stale = !cached || Date.now() - cached.at >= TTL_MS;
+  const stale = !state.cached || Date.now() - state.cached.at >= TTL_MS;
   if (stale) {
-    inflight ??= compute()
+    state.inflight ??= compute()
       .then((value) => {
-        cached = { at: Date.now(), value };
+        state.cached = { at: Date.now(), value };
         return value;
       })
       .finally(() => {
-        inflight = null;
+        state.inflight = null;
       });
   }
-  if (cached) {
-    if (stale) inflight?.catch(() => undefined); // background refresh; keep serving the old prices
-    return cached.value;
+  if (state.cached) {
+    if (stale) state.inflight?.catch(() => undefined); // background refresh; keep serving the old prices
+    return state.cached.value;
   }
   try {
-    return await inflight!;
+    return await state.inflight!;
   } catch {
     return new Map();
   }

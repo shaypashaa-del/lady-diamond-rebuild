@@ -88,8 +88,14 @@ export default async function ProductPage({
 
   const name = localize(product.name as LocalizedText, locale);
   const description = localize(product.shortDescription as LocalizedText | null, locale);
-  const livePrice = (await getListingPrices()).get(product.id);
-  const extras = await getProductExtras(product.id);
+  // Independent reads run together instead of one after another.
+  const [listingPrices, extras, relatedRaw, tHome] = await Promise.all([
+    getListingPrices(),
+    getProductExtras(product.id),
+    getRelatedProducts(product.id, product.categories[0]?.category.slug),
+    getTranslations("Home"),
+  ]);
+  const livePrice = listingPrices.get(product.id);
   const saleOn = isSaleActive(extras);
   const activeSale = saleOn && product.salePrice != null ? Number(product.salePrice) : null;
   const price = livePrice ?? activeSale ?? Number(product.basePrice);
@@ -100,14 +106,10 @@ export default async function ProductPage({
   // opens it (see getDiamondPricelistOptions), not embedded in the page.
   const offersDiamondPricelist = product.pricingMode === "CONFIGURABLE";
 
-  const [relatedRaw, tHome, shippingPrice] = await Promise.all([
-    getRelatedProducts(product.id, product.categories[0]?.category.slug),
-    getTranslations("Home"),
-    // Real admin-configured shipping rules (see /admin/shipping), not a
-    // marketing claim — whatever this returns is what checkout actually
-    // charges for a single unit of this product.
-    calculateShipping(price, "IL"),
-  ]);
+  // Real admin-configured shipping rules (see /admin/shipping), not a
+  // marketing claim — whatever this returns is what checkout actually
+  // charges for a single unit of this product.
+  const shippingPrice = await calculateShipping(price, "IL");
   const related = relatedRaw.map((p) => toCardProduct(p, locale));
 
   const totalInventory =

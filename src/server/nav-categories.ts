@@ -1,13 +1,14 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
 import { t as localize, type LocalizedText } from "@/lib/i18n-content";
+import { ttlMemo } from "@/lib/ttl-memo";
 import type { Locale } from "@/i18n/routing";
 
 export type NavCategoryItem = { slug: string; label: string };
 
 // Top-level categories managed in the admin (name, order, new ones) drive the
 // shop menu and the footer. Empty or unavailable = fall back to the built-in list.
-export async function getNavCategories(locale: Locale): Promise<NavCategoryItem[]> {
+async function loadNavCategories(locale: Locale): Promise<NavCategoryItem[]> {
   try {
     const rows = await prisma.category.findMany({
       where: { parentId: null },
@@ -24,3 +25,5 @@ export async function getNavCategories(locale: Locale): Promise<NavCategoryItem[
     return [];
   }
 }
+
+export const getNavCategories = ttlMemo(loadNavCategories, 20_000);

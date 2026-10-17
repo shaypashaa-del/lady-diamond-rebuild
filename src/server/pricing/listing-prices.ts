@@ -93,20 +93,30 @@ async function compute(): Promise<Map<string, number>> {
   return out;
 }
 
+// Stale-while-revalidate: once prices have been computed, every request gets
+// them instantly; when they are older than the TTL they are refreshed in the
+// background. Only the very first request after a restart ever waits for the
+// full computation (all products + metal/diamond tables + a gold price check).
 export async function getListingPrices(): Promise<Map<string, number>> {
-  if (cached && Date.now() - cached.at < TTL_MS) return cached.value;
-  inflight ??= compute()
-    .then((value) => {
-      cached = { at: Date.now(), value };
-      return value;
-    })
-    .finally(() => {
-      inflight = null;
-    });
+  const stale = !cached || Date.now() - cached.at >= TTL_MS;
+  if (stale) {
+    inflight ??= compute()
+      .then((value) => {
+        cached = { at: Date.now(), value };
+        return value;
+      })
+      .finally(() => {
+        inflight = null;
+      });
+  }
+  if (cached) {
+    if (stale) inflight?.catch(() => undefined); // background refresh; keep serving the old prices
+    return cached.value;
+  }
   try {
-    return await inflight;
+    return await inflight!;
   } catch {
-    return cached?.value ?? new Map();
+    return new Map();
   }
 }
 

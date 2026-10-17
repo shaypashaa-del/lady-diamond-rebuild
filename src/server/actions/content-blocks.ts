@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { ttlMemo } from "@/lib/ttl-memo";
 import type { LocalizedText } from "@/lib/i18n-content";
 import { CONTENT_KEYS } from "@/lib/content-keys";
 import { requireAdminSession } from "@/lib/auth/guards";
@@ -40,18 +41,26 @@ export type HomepageBannersContent = { tiles: (BannerTile | null)[] };
 // static-generation workers racing against the local dev database's small
 // connection pool. A couple of quick retries absorb that without failing
 // the whole page.
-export async function getContentBlock<T>(key: string): Promise<T | null> {
+async function loadContentBlock(key: string): Promise<unknown> {
   let lastError: unknown;
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
       const row = await prisma.contentBlock.findUnique({ where: { key } });
-      return row ? (row.data as T) : null;
+      return row ? row.data : null;
     } catch (error) {
       lastError = error;
       await new Promise((resolve) => setTimeout(resolve, 150 * (attempt + 1)));
     }
   }
   throw lastError;
+}
+
+const memoLoadContentBlock = ttlMemo(loadContentBlock, 15_000);
+
+// Read on every page render (announcement bar, hero), so it is memoised for a
+// few seconds per server process; admin edits show up within that window.
+export async function getContentBlock<T>(key: string): Promise<T | null> {
+  return (await memoLoadContentBlock(key)) as T | null;
 }
 
 function localizedFromForm(formData: FormData, prefix: string): LocalizedText {

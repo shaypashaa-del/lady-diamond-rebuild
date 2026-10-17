@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { getConfiguredPrice } from "@/server/actions/product-pricing";
 import { CalculatorDiamondSelector } from "./CalculatorDiamondSelector";
@@ -80,6 +80,7 @@ export function ConfigurablePriceSelector({
   materialOptions,
   diamondOptions,
   offersDiamondPricelist = false,
+  initialPrice,
   onMaterialImageChange,
   onConfiguredChange,
 }: {
@@ -92,6 +93,10 @@ export function ConfigurablePriceSelector({
   // shape/carat/color/clarity pricelist filter is shown instead of (there
   // is nothing in) the diamondOptions list below.
   offersDiamondPricelist?: boolean;
+  // The price of the default selection, already computed on the server for this
+  // page view. Shown at once, so the price and the buy buttons are ready on first
+  // paint instead of waiting for a round trip.
+  initialPrice?: number;
   onMaterialImageChange?: (imageUrl: string | null) => void;
   // Reports the live price/selection up to the product page so the ONE
   // price shown near the title (ProductDetail) — and what actually gets
@@ -115,7 +120,15 @@ export function ConfigurablePriceSelector({
   // (starting on "no diamond"). Has a designed diamond: the customer can still
   // switch to "a different diamond" from the same pricelist.
   const usesCalculatorDiamondFallback = diamondOptions.length === 0 && hasPricelist;
-  const priceCache = useRef(new Map<string, { at: number; price: number }>());
+  const [priceCache] = useState(() => {
+    const map = new Map<string, { at: number; price: number }>();
+    const m0 = materialOptions.find((m) => m.isDefault) ?? materialOptions[0];
+    const d0 = diamondOptions.find((d) => d.isDefault) ?? diamondOptions[0];
+    if (initialPrice && m0 && !(diamondOptions.length === 0 && offersDiamondPricelist)) {
+      map.set(`${m0.id}|${d0 ? d0.id : ""}`, { at: Date.now(), price: initialPrice });
+    }
+    return map;
+  });
   const [customDiamond, setCustomDiamond] = useState(false);
   const calculatorMode = usesCalculatorDiamondFallback || (customDiamond && hasPricelist);
   const [pickedSpec, setPickedSpec] = useState<CalculatorDiamondChoice | null>(null);
@@ -153,10 +166,10 @@ export function ConfigurablePriceSelector({
     // already priced a moment ago, answers instantly instead of waiting on the
     // server. Held for two minutes only (the gold price moves), and checkout
     // always recomputes server-side regardless.
-    const cacheKey = `${material.metalType}|${material.purity}|${
+    const cacheKey = `${material.id}|${
       calculatorMode ? JSON.stringify(calculatorDiamondSpec) : diamondOptionIds.join(",")
     }`;
-    const cached = priceCache.current.get(cacheKey);
+    const cached = priceCache.get(cacheKey);
     if (cached && Date.now() - cached.at < 120_000) {
       onConfiguredChange?.({
         status: "ok",
@@ -176,7 +189,7 @@ export function ConfigurablePriceSelector({
       calculatorDiamondSpec,
     }).then((res) => {
       if (cancelled) return;
-      if (res.ok) priceCache.current.set(cacheKey, { at: Date.now(), price: res.sellingPrice });
+      if (res.ok) priceCache.set(cacheKey, { at: Date.now(), price: res.sellingPrice });
       onConfiguredChange?.(
         res.ok
           ? {

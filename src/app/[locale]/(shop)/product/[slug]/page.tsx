@@ -169,6 +169,7 @@ export default async function ProductPage({
         materialOptions={product.materialOptions}
         diamondOptions={product.diamondOptions.map((d) => ({ ...d, caratWeight: Number(d.caratWeight) }))}
         offersDiamondPricelist={offersDiamondPricelist}
+        initialPrice={livePrice}
         slug={product.slug}
         name={name}
         shortDescription={description}

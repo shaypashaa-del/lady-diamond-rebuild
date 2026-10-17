@@ -22,6 +22,7 @@ export function ProductPageInteractive({
   materialOptions,
   diamondOptions,
   offersDiamondPricelist,
+  initialPrice,
   ...detailProps
 }: {
   productId: string;
@@ -29,6 +30,7 @@ export function ProductPageInteractive({
   materialOptions: MaterialOption[];
   diamondOptions: DiamondOption[];
   offersDiamondPricelist?: boolean;
+  initialPrice?: number;
   slug: string;
   name: string;
   shortDescription: string;
@@ -66,6 +68,7 @@ export function ProductPageInteractive({
             materialOptions={materialOptions}
             diamondOptions={diamondOptions}
             offersDiamondPricelist={offersDiamondPricelist}
+            initialPrice={initialPrice}
             onMaterialImageChange={setColorImageUrl}
             onConfiguredChange={setConfigured}
           />

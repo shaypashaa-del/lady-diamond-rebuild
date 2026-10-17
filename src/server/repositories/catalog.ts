@@ -187,3 +187,25 @@ export const getProductBySlug = cache((slug: string) => memoProductBySlug(slug))
 
 
 export const getRelatedProducts = ttlMemo(loadRelatedProducts, 60_000, { swr: true });
+
+// Called once after the server starts: loads every published product into the
+// in-memory cache so even a visitor's first click on a product is fast.
+export async function warmProductCache() {
+  const rows = await prisma.product.findMany({
+    where: { status: "PUBLISHED" },
+    select: { slug: true },
+    orderBy: { createdAt: "desc" },
+  });
+  const queue = rows.map((r) => r.slug);
+  const worker = async () => {
+    for (let slug = queue.shift(); slug; slug = queue.shift()) {
+      try {
+        const p = await memoProductBySlug(slug);
+        if (p) await getRelatedProducts(p.id, p.categories[0]?.category.slug);
+      } catch {
+        // a failed warm-up only means that product loads on first visit
+      }
+    }
+  };
+  await Promise.all([worker(), worker(), worker()]);
+}

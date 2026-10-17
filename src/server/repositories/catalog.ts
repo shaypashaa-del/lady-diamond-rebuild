@@ -7,7 +7,7 @@ const cardImageInclude = {
   images: { include: { media: true }, orderBy: { sortOrder: "asc" as const }, take: 1 },
 };
 
-export async function getFeaturedProducts() {
+async function loadFeaturedProducts() {
   return applyLivePrices(await prisma.product.findMany({
     where: { status: "PUBLISHED", isFeatured: true },
     include: { variants: true, categories: { include: { category: true } }, ...cardImageInclude },
@@ -15,6 +15,10 @@ export async function getFeaturedProducts() {
     orderBy: { createdAt: "desc" },
   }));
 }
+
+// Home and shop are the busiest pages and the database is remote: cache their
+// product lists in memory, refreshed in the background (see ttl-memo.ts).
+export const getFeaturedProducts = ttlMemo("featured-products", loadFeaturedProducts, 45_000, { swr: true });
 
 export const PRODUCTS_PAGE_SIZE = 24;
 
@@ -47,7 +51,7 @@ function filtersToWhere(filters?: ProductFilters) {
 // Price sorting and price filters must use the live price (what the product
 // page shows), not the stale basePrice column, so those requests load the
 // whole matching set, price it, then sort/filter/paginate in memory.
-async function listCards(
+async function loadCards(
   baseWhere: Record<string, unknown>,
   page: number,
   sort?: ProductSort,
@@ -82,6 +86,8 @@ async function listCards(
   };
 }
 
+const listCards = ttlMemo("list-cards", loadCards, 45_000, { swr: true });
+
 export function getAllPublishedProducts(page = 1, sort?: ProductSort, filters?: ProductFilters) {
   return listCards({ status: "PUBLISHED" }, page, sort, filters);
 }
@@ -91,7 +97,7 @@ export function getAllPublishedProducts(page = 1, sort?: ProductSort, filters?: 
 // not one page of it. Fine while the catalog is small; a Postgres full-text
 // index (tsvector) would be the next step once it grows large enough to
 // matter — do not reuse getAllPublishedProducts's paginated version here.
-export async function getAllPublishedProductsForSearch() {
+async function loadAllPublishedProductsForSearch() {
   return applyLivePrices(
     await prisma.product.findMany({
       where: { status: "PUBLISHED" },
@@ -101,8 +107,16 @@ export async function getAllPublishedProductsForSearch() {
   );
 }
 
+export const getAllPublishedProductsForSearch = ttlMemo("search-catalog", loadAllPublishedProductsForSearch, 60_000, { swr: true });
+
+const memoCategoryBySlug = ttlMemo(
+  "category-by-slug",
+  (slug: string) => prisma.category.findUnique({ where: { slug }, include: { image: true } }),
+  60_000,
+  { swr: true }
+);
 export function getCategoryBySlug(slug: string) {
-  return prisma.category.findUnique({ where: { slug }, include: { image: true } });
+  return memoCategoryBySlug(slug);
 }
 
 export function getProductsByCategorySlug(
@@ -207,5 +221,15 @@ export async function warmProductCache() {
       }
     }
   };
-  await Promise.all([worker(), worker(), worker()]);
+  // Home, the shop (page 1 of every category) and the search catalogue.
+  const cats = await prisma.category.findMany({ select: { slug: true } });
+  const noFilters = { inStockOnly: false };
+  await Promise.all([
+    getFeaturedProducts(),
+    getAllPublishedProductsForSearch(),
+    getAllPublishedProducts(1, "newest", noFilters),
+    ...cats.map((c) => getCategoryBySlug(c.slug)),
+    ...cats.map((c) => getProductsByCategorySlug(c.slug, 1, "newest", noFilters)),
+  ].map((p) => p.catch(() => undefined)));
+  await Promise.all([worker(), worker(), worker(), worker()]);
 }

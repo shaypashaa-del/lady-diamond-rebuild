@@ -15,11 +15,13 @@ import { CONTENT_KEYS } from "@/lib/content-keys";
 import { t as tContent } from "@/lib/i18n-content";
 
 export default async function Home() {
-  const locale = (await getLocale()) as Locale;
-  const featured = await getFeaturedProducts();
+  const [locale, featured, hero, banners] = await Promise.all([
+    getLocale() as Promise<Locale>,
+    getFeaturedProducts(),
+    getContentBlock<HeroContent>(CONTENT_KEYS.homepageHero),
+    getContentBlock<HomepageBannersContent>(CONTENT_KEYS.homepageBanners),
+  ]);
   const cards = featured.map((p) => toCardProduct(p, locale));
-  const hero = await getContentBlock<HeroContent>(CONTENT_KEYS.homepageHero);
-  const banners = await getContentBlock<HomepageBannersContent>(CONTENT_KEYS.homepageBanners);
 
   return <HomeView cards={cards} hero={hero} banners={banners} locale={locale} />;
 }

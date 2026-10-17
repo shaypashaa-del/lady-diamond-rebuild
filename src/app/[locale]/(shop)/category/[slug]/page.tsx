@@ -98,9 +98,11 @@ export default async function CategoryPage({
     inStockOnly: inStock === "1",
   };
 
-  const locale = (await getLocale()) as Locale;
-  const tNav = await getTranslations("Nav");
-  const tCat = await getTranslations("Category");
+  const [locale, tNav, tCat] = await Promise.all([
+    getLocale() as Promise<Locale>,
+    getTranslations("Nav"),
+    getTranslations("Category"),
+  ]);
 
   let title: string;
   let products;

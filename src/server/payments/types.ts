@@ -53,13 +53,25 @@ export const cashOnDeliveryProvider: PaymentProvider = {
 // here actually charges a card or requests a Bit payment. Swap the body of
 // `init` for a real gateway call once that account exists; checkout/order
 // code doesn't need to change.
+// Bit to the shop's phone number: the customer pays in the Bit app to the number
+// below and puts the order number in the note; the order stays PENDING until the
+// owner sees the payment and marks it paid in admin. No gateway account needed.
+// BIT_PHONE (server env) overrides the number; by default it is the shop's public
+// business phone shown on the site.
+const DEFAULT_BIT_PHONE = "050-3781589";
+
 export const bitProvider: PaymentProvider = {
   id: "bit",
   label: "ביט",
-  async init(_orderTotal, orderNumber) {
+  async init(orderTotal, orderNumber) {
+    const phone = (process.env.BIT_PHONE || DEFAULT_BIT_PHONE).trim();
+    const amount = orderTotal.toLocaleString("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     return {
       immediatelyPaid: false,
-      instructions: `ניצור איתך קשר בקרוב לשליחת בקשת תשלום בביט עבור הזמנה ${orderNumber}. ההזמנה תישלח רק לאחר קבלת התשלום.`,
+      instructions:
+        `לתשלום בביט: פתחו את אפליקציית ביט, בחרו "העברת כסף" ושלחו ${amount} ₪ למספר ${phone} (LADY DIAMOND). ` +
+        `בהערה לתשלום כתבו את מספר ההזמנה ${orderNumber}. ` +
+        `ההזמנה תישלח לאחר שנאשר את קבלת התשלום (בדרך כלל באותו יום עסקים).`,
     };
   },
 };

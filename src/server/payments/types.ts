@@ -25,13 +25,30 @@ export interface PaymentProvider {
   init(orderTotal: number, orderNumber: string, meta?: Record<string, string>): Promise<PaymentInitResult>;
 }
 
+// Bank details shown to customers come from server env (BANK_HOLDER, BANK_NAME,
+// BANK_BRANCH, BANK_ACCOUNT) so they can be changed without a code change. Until
+// they are set, customers are told they will receive the details from the shop.
+function bankDetailsText(): string {
+  const holder = process.env.BANK_HOLDER?.trim();
+  const bank = process.env.BANK_NAME?.trim();
+  const branch = process.env.BANK_BRANCH?.trim();
+  const account = process.env.BANK_ACCOUNT?.trim();
+  if (!holder || !bank || !branch || !account) return "";
+  return `פרטי החשבון: ${holder}, ${bank}, סניף ${branch}, חשבון ${account}. `;
+}
+
 export const bankTransferProvider: PaymentProvider = {
   id: "bank_transfer",
   label: "העברה בנקאית",
-  async init(_orderTotal, orderNumber) {
+  async init(orderTotal, orderNumber) {
+    const amount = orderTotal.toLocaleString("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const details = bankDetailsText();
     return {
       immediatelyPaid: false,
-      instructions: `יש להעביר את הסכום לחשבון הבנק שלנו ולציין את מספר ההזמנה ${orderNumber} כאסמכתא. ההזמנה תישלח רק לאחר קבלת התשלום.`,
+      instructions:
+        `להשלמת ההזמנה יש להעביר ${amount} ₪ בהעברה בנקאית. ` +
+        (details || "פרטי החשבון יישלחו אליך בהודעה בדקות הקרובות. ") +
+        `יש לציין את מספר ההזמנה ${orderNumber} כאסמכתא. ההזמנה תישלח לאחר קבלת התשלום.`,
     };
   },
 };

@@ -48,7 +48,7 @@ function CheckoutForm() {
   const clear = useCartStore((s) => s.clear);
 
   const requestedMethod = searchParams.get("pm");
-  const validMethods: PaymentMethodId[] = ["bank_transfer", "cash_on_delivery", "bit", "credit_card", "paypal"];
+  const validMethods: PaymentMethodId[] = ["bank_transfer", "cash_on_delivery", "bit", "paybox", "credit_card", "paypal"];
   const initialMethod = validMethods.includes(requestedMethod as PaymentMethodId)
     ? (requestedMethod as PaymentMethodId)
     : "bank_transfer";
@@ -265,6 +265,15 @@ function CheckoutForm() {
                 onChange={() => setPaymentMethod("bit")}
               />
               {t("bit")}
+            </label>
+            <label className="flex items-center gap-2 border border-gold-soft p-3 text-sm">
+              <input
+                type="radio"
+                name="paymentMethodChoice"
+                checked={paymentMethod === "paybox"}
+                onChange={() => setPaymentMethod("paybox")}
+              />
+              {t("paybox")}
             </label>
             <label className="flex items-center gap-2 border border-gold-soft p-3 text-sm">
               <input

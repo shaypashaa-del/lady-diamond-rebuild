@@ -6,7 +6,7 @@ import "server-only";
 // gateway (Israeli or international) can be added later by implementing this
 // same interface; nothing in checkout/order code needs to change.
 
-export type PaymentMethodId = "bank_transfer" | "cash_on_delivery" | "bit" | "credit_card" | "paypal";
+export type PaymentMethodId = "bank_transfer" | "cash_on_delivery" | "bit" | "paybox" | "credit_card" | "paypal";
 
 export type PaymentInitResult = {
   // Whether the order should be marked PAID immediately (never true for
@@ -87,6 +87,28 @@ export const bitProvider: PaymentProvider = {
       immediatelyPaid: false,
       instructions:
         `לתשלום בביט: פתחו את אפליקציית ביט, בחרו "העברת כסף" ושלחו ${amount} ₪ למספר ${phone} (LADY DIAMOND). ` +
+        `בהערה לתשלום כתבו את מספר ההזמנה ${orderNumber}. ` +
+        `ההזמנה תישלח לאחר שנאשר את קבלת התשלום (בדרך כלל באותו יום עסקים).`,
+    };
+  },
+};
+
+// PayBox to the shop's phone number, same manual flow as Bit: the customer pays in
+// the PayBox app and writes the order number in the note; the owner confirms the
+// payment in admin. PAYBOX_PHONE (server env) is the number customers pay to; until
+// it is set they are told the payment details will be sent to them.
+export const payboxProvider: PaymentProvider = {
+  id: "paybox",
+  label: "PayBox",
+  async init(orderTotal, orderNumber) {
+    const phone = process.env.PAYBOX_PHONE?.trim();
+    const amount = orderTotal.toLocaleString("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return {
+      immediatelyPaid: false,
+      instructions:
+        (phone
+          ? `לתשלום ב-PayBox: פתחו את אפליקציית PayBox ושלחו ${amount} ₪ למספר ${phone} (LADY DIAMOND). `
+          : `לתשלום ב-PayBox (${amount} ₪) נשלח אליך בקשת תשלום או פרטי תשלום בהודעה בדקות הקרובות. `) +
         `בהערה לתשלום כתבו את מספר ההזמנה ${orderNumber}. ` +
         `ההזמנה תישלח לאחר שנאשר את קבלת התשלום (בדרך כלל באותו יום עסקים).`,
     };
@@ -180,6 +202,7 @@ export const paymentProviders: Record<PaymentMethodId, PaymentProvider> = {
   bank_transfer: bankTransferProvider,
   cash_on_delivery: cashOnDeliveryProvider,
   bit: bitProvider,
+  paybox: payboxProvider,
   credit_card: creditCardProvider,
   paypal: paypalProvider,
 };

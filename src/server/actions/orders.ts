@@ -418,14 +418,14 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
     `סה"כ לתשלום (כולל מע"מ): ${total.toFixed(2)} ₪`,
   ].join("\n");
   const a = input.billingAddress;
-  await emailProvider.send({
+  void emailProvider.send({
     to: input.email,
     subject: `אישור הזמנה ${orderNumber} — LADY DIAMOND`,
     text: `תודה על ההזמנה!\n\n${summary}\n\n${paymentInit.instructions}\n\nשאלות? פשוט השיבו למייל זה או כתבו לנו בוואטסאפ.`,
   });
   const notifyTo = process.env.ORDER_NOTIFY_EMAIL || process.env.EMAIL_REPLY_TO || "diana@ladydiamondjewels.com";
   if (notifyTo.toLowerCase() !== input.email.trim().toLowerCase()) {
-    await emailProvider.send({
+    void emailProvider.send({
       to: notifyTo,
       subject: `הזמנה חדשה ${orderNumber} — ${total.toFixed(2)} ₪`,
       text: `התקבלה הזמנה חדשה באתר.\n\n${summary}\n\nלקוח: ${input.email}\nאמצעי תשלום: ${input.paymentMethod}\nכתובת: ${[a.street, a.city, a.country].filter(Boolean).join(", ")}`,

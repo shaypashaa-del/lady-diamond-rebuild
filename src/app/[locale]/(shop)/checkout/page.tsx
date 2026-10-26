@@ -330,7 +330,10 @@ function CheckoutForm() {
             <input
               type="checkbox"
               checked={agreed}
-              onChange={(e) => setAgreed(e.target.checked)}
+              onChange={(e) => {
+                setAgreed(e.target.checked);
+                if (e.target.checked) setError(null);
+              }}
               className="mt-0.5 h-4 w-4 accent-gold-bright"
             />
             <ConsentText />

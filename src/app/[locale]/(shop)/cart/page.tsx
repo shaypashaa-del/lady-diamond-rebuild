@@ -117,12 +117,18 @@ export default function CartPage() {
           >
             {t("proceedToCheckout")}
           </Link>
-          <div className="mt-3 flex items-center gap-3">
+          <div className="mt-3 flex items-center gap-2">
             <Link
               href="/checkout?pm=bit"
               className="flex-1 border border-gold-soft py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-ink transition-colors hover:border-gold"
             >
               {t("buyWithBit")}
+            </Link>
+            <Link
+              href="/checkout?pm=paybox"
+              className="flex-1 border border-gold-soft px-1 py-2.5 text-center text-[11px] font-semibold uppercase tracking-normal text-ink transition-colors hover:border-gold"
+            >
+              {t("buyWithPaybox")}
             </Link>
             <Link
               href="/checkout?pm=paypal"

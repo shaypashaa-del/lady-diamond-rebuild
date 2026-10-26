@@ -1,5 +1,6 @@
 "use client";
 
+import { BUSINESS_PHONE } from "@/lib/site-config";
 import { describeOptions } from "@/lib/line-options";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -60,16 +61,28 @@ function CheckoutForm() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [savedAddress, setSavedAddress] = useState<AddressData | null>(null);
   const [addressLoaded, setAddressLoaded] = useState(false);
   const [preview, setPreview] = useState<CheckoutPreview | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const errorRef = useRef<HTMLParagraphElement>(null);
+  const showError = (msg: string) => {
+    setError(msg);
+    // The message sits next to the order button; bring it into view (on phones the
+    // customer is at the bottom of a long form and would otherwise see nothing).
+    setTimeout(() => errorRef.current?.scrollIntoView({ block: "center", behavior: "smooth" }), 50);
+  };
 
   useEffect(() => {
     getMyAddress().then((addr) => {
       setSavedAddress(addr);
       if (addr?.country) setCountry(addr.country);
     }).finally(() => setAddressLoaded(true));
+    // The saved address is only a convenience: never leave the customer on a
+    // blank page if that lookup is slow.
+    const giveUp = setTimeout(() => setAddressLoaded(true), 2500);
+    return () => clearTimeout(giveUp);
   }, []);
 
   const subtotal = lines.reduce((sum, l) => sum + l.price * l.quantity, 0);
@@ -138,7 +151,7 @@ function CheckoutForm() {
     setSubmitting(false);
 
     if ("error" in result) {
-      setError(result.error);
+      showError(result.error);
       return;
     }
 
@@ -182,15 +195,13 @@ function CheckoutForm() {
         <p className="mb-6 text-sm text-clay">{t("couponInvalid")}</p>
       )}
 
-      {error && <p className="mb-6 border border-clay/30 bg-clay/10 px-3 py-2 text-sm text-clay">{error}</p>}
-
       <form ref={formRef} action={handleSubmit} className="grid grid-cols-1 gap-10 sm:grid-cols-2">
         <div>
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide">{t("billingDetails")}</h2>
           <div className="space-y-4">
-            <input name="fullName" placeholder={t("fullName")} aria-label={t("fullName")} defaultValue={savedAddress?.fullName} required className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
-            <input name="email" type="email" placeholder={t("email")} aria-label={t("email")} required className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
-            <input name="phone" placeholder={t("phone")} aria-label={t("phone")} defaultValue={savedAddress?.phone} className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
+            <input name="fullName" autoComplete="name" placeholder={t("fullName")} aria-label={t("fullName")} defaultValue={savedAddress?.fullName} required className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
+            <input name="email" type="email" inputMode="email" autoComplete="email" placeholder={t("email")} aria-label={t("email")} required className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
+            <input name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder={t("phone")} aria-label={t("phone")} defaultValue={savedAddress?.phone} required className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
             <input
               name="country"
               placeholder={t("country")}
@@ -200,10 +211,10 @@ function CheckoutForm() {
               onChange={(e) => setCountry(e.target.value)}
               className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none"
             />
-            <input name="city" placeholder={t("city")} aria-label={t("city")} defaultValue={savedAddress?.city} required className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
-            <input name="street" placeholder={t("street")} aria-label={t("street")} defaultValue={savedAddress?.street} required className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
+            <input name="city" autoComplete="address-level2" placeholder={t("city")} aria-label={t("city")} defaultValue={savedAddress?.city} required className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
+            <input name="street" autoComplete="street-address" placeholder={t("street")} aria-label={t("street")} defaultValue={savedAddress?.street} required className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
             <input name="apartment" placeholder={t("apartment")} aria-label={t("apartment")} defaultValue={savedAddress?.apartment} className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
-            <input name="zip" placeholder={t("zip")} aria-label={t("zip")} defaultValue={savedAddress?.zip} className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
+            <input name="zip" inputMode="numeric" autoComplete="postal-code" placeholder={t("zip")} aria-label={t("zip")} defaultValue={savedAddress?.zip} className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
             <textarea name="orderNotes" placeholder={t("orderNotes")} aria-label={t("orderNotes")} rows={3} className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
           </div>
         </div>
@@ -295,6 +306,26 @@ function CheckoutForm() {
             </label>
           </div>
 
+          {(paymentMethod === "paybox" || paymentMethod === "bit") && (
+            <div className="mt-4 border border-gold-bright/60 bg-gold-soft/20 p-4 text-sm text-ink">
+              <p className="font-semibold">{paymentMethod === "paybox" ? t("payboxTitle") : t("bitTitle")}</p>
+              <p className="mt-2 text-ink/80">{t("phoneTransferHint", { amount: total.toFixed(2) })}</p>
+              <div className="mt-3 flex items-center gap-3">
+                <span dir="ltr" className="text-lg font-semibold tracking-wide">{BUSINESS_PHONE}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard?.writeText(BUSINESS_PHONE.replace(/-/g, "")).then(() => setCopied(true)).catch(() => undefined);
+                  }}
+                  className="border border-gold-bright px-3 py-1.5 text-xs font-semibold hover:bg-gold-bright"
+                >
+                  {copied ? t("copied") : t("copyNumber")}
+                </button>
+              </div>
+              <p className="mt-3 text-xs text-ink/60">{t("orderNumberAfter")}</p>
+            </div>
+          )}
+
           <label className="mt-6 flex items-start gap-2 text-xs text-ink/70">
             <input
               type="checkbox"
@@ -305,14 +336,28 @@ function CheckoutForm() {
             <ConsentText />
           </label>
 
+          {error && (
+            <p ref={errorRef} role="alert" className="mt-4 border border-clay/30 bg-clay/10 px-3 py-2 text-sm text-clay">
+              {error}
+            </p>
+          )}
+
           {paymentMethod === "paypal" ? (
             <div className="mt-4">
-              <PayPalButton total={total} disabled={submitting || !agreed} onApproved={handlePaypalApproved} onError={setError} />
+              <PayPalButton total={total} disabled={submitting || !agreed} onApproved={handlePaypalApproved} onError={showError} />
             </div>
           ) : (
             <button
               type="submit"
-              disabled={submitting || !agreed}
+              disabled={submitting}
+              onClick={(e) => {
+                // Not disabled when the terms box is unticked: a silently greyed-out
+                // button looks broken. Explain what is missing instead.
+                if (!agreed) {
+                  e.preventDefault();
+                  showError(t("mustAgree"));
+                }
+              }}
               className="mt-4 w-full border border-gold-bright bg-ink py-3 text-xs font-semibold uppercase tracking-wide text-paper hover:bg-gold-bright disabled:opacity-50"
             >
               {submitting ? t("placing") : t("placeOrder")}

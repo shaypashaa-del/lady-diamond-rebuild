@@ -1,4 +1,5 @@
 import "server-only";
+import { BUSINESS_PHONE } from "@/lib/site-config";
 
 // Payment abstraction: the store never talks to a specific gateway directly.
 // Today only manual offline methods exist (matching the live site's actual
@@ -75,7 +76,7 @@ export const cashOnDeliveryProvider: PaymentProvider = {
 // owner sees the payment and marks it paid in admin. No gateway account needed.
 // BIT_PHONE (server env) overrides the number; by default it is the shop's public
 // business phone shown on the site.
-const DEFAULT_BIT_PHONE = "050-3781589";
+const DEFAULT_BIT_PHONE = BUSINESS_PHONE;
 
 export const bitProvider: PaymentProvider = {
   id: "bit",
@@ -95,20 +96,18 @@ export const bitProvider: PaymentProvider = {
 
 // PayBox to the shop's phone number, same manual flow as Bit: the customer pays in
 // the PayBox app and writes the order number in the note; the owner confirms the
-// payment in admin. PAYBOX_PHONE (server env) is the number customers pay to; until
-// it is set they are told the payment details will be sent to them.
+// payment in admin. PAYBOX_PHONE (server env) overrides the number; by default it is
+// the shop's public business phone shown on the site.
 export const payboxProvider: PaymentProvider = {
   id: "paybox",
   label: "PayBox",
   async init(orderTotal, orderNumber) {
-    const phone = process.env.PAYBOX_PHONE?.trim();
+    const phone = (process.env.PAYBOX_PHONE || DEFAULT_BIT_PHONE).trim();
     const amount = orderTotal.toLocaleString("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     return {
       immediatelyPaid: false,
       instructions:
-        (phone
-          ? `לתשלום ב-PayBox: פתחו את אפליקציית PayBox ושלחו ${amount} ₪ למספר ${phone} (LADY DIAMOND). `
-          : `לתשלום ב-PayBox (${amount} ₪) נשלח אליך בקשת תשלום או פרטי תשלום בהודעה בדקות הקרובות. `) +
+        `לתשלום ב-PayBox: פתחו את אפליקציית PayBox ושלחו ${amount} ₪ למספר ${phone} (LADY DIAMOND). ` +
         `בהערה לתשלום כתבו את מספר ההזמנה ${orderNumber}. ` +
         `ההזמנה תישלח לאחר שנאשר את קבלת התשלום (בדרך כלל באותו יום עסקים).`,
     };

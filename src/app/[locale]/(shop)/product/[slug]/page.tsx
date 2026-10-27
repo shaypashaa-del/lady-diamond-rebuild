@@ -149,7 +149,7 @@ export default async function ProductPage({
             name,
             description,
             sku: product.sku,
-            price,
+            price: product.pricingMode === "CONFIGURABLE" && livePrice === undefined ? undefined : price,
             url: productUrl,
             availability: totalInventory > 0 ? "InStock" : extras.allowBackorder ? "PreOrder" : "OutOfStock",
             brand: extras.brand,

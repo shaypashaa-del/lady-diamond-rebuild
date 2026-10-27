@@ -64,7 +64,7 @@ export function productSchema(product: {
   name: string;
   description: string;
   sku?: string | null;
-  price: number;
+  price?: number;
   currency?: string;
   url: string;
   availability: "InStock" | "OutOfStock" | "PreOrder";
@@ -83,12 +83,16 @@ export function productSchema(product: {
     gtin: product.gtin,
     mpn: product.mpn,
     image: product.image,
-    offers: {
-      "@type": "Offer",
-      url: product.url,
-      priceCurrency: product.currency ?? "ILS",
-      price: product.price.toFixed(2),
-      availability: `https://schema.org/${product.availability}`,
-    },
+    // No offer when the product has no price yet (nothing true to say about it).
+    offers:
+      product.price == null
+        ? undefined
+        : {
+            "@type": "Offer",
+            url: product.url,
+            priceCurrency: product.currency ?? "ILS",
+            price: product.price.toFixed(2),
+            availability: `https://schema.org/${product.availability}`,
+          },
   };
 }

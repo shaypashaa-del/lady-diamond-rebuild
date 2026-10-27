@@ -87,8 +87,8 @@ export async function ProductPricingManager({
 
       {missingManual.length > 0 && (
         <div className="mb-4 rounded border border-amber-300 bg-amber-50 p-3 text-xs text-amber-800">
-          <p className="font-semibold">חסר מחיר ידני ב-{missingManual.length} אפשרויות. עד שתזין, האתר עדיין מחשב להן מחיר אוטומטית.</p>
-          <p className="mt-1">אפשר לקבוע את כל המחירים הנוכחיים בלחיצה אחת ברשימת המוצרים (&quot;קבע את כל המחירים לידניים&quot;).</p>
+          <p className="font-semibold">חסר מחיר ב-{missingManual.length} אפשרויות.</p>
+          <p className="mt-1">עד שתזין להן מחיר, האתר מציג למוצר &quot;מחיר בפנייה&quot; ולא ניתן לקנות את האפשרות הזו.</p>
         </div>
       )}
 

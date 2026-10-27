@@ -82,3 +82,11 @@ export async function setManualOptionPrice(
   }
   allCache = null;
 }
+
+// Admin "reset all prices": removes every hand-entered list and sale price.
+export async function clearAllManualPrices(): Promise<number> {
+  await ensureTable();
+  const n = await prisma.$executeRaw`DELETE FROM "ManualOptionPrice"`;
+  allCache = null;
+  return Number(n);
+}

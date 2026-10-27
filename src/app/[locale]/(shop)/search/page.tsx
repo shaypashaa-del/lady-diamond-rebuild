@@ -67,8 +67,10 @@ export default async function SearchPage({
     const haystack = [name.he, name.en, name.ru, p.sku].filter(Boolean).join(" ").toLowerCase();
     if (!haystack.includes(query)) return false;
     const price = Number(p.salePrice ?? p.basePrice);
-    if (minPrice != null && price < minPrice) return false;
-    if (maxPrice != null && price > maxPrice) return false;
+    // Products without a price are not matched by a price filter.
+    const noPrice = (p as { priceOnRequest?: boolean }).priceOnRequest === true;
+    if (minPrice != null && (noPrice || price < minPrice)) return false;
+    if (maxPrice != null && (noPrice || price > maxPrice)) return false;
     if (inStockOnly && p.inventory <= 0) return false;
     return true;
   });

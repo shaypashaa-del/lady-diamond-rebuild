@@ -1,9 +1,6 @@
 import { getAllProductExtras, isSaleActive } from "@/server/product-extras";
 import { prisma } from "@/lib/prisma";
-import { computeConfiguredPrice, round2 } from "@/lib/pricing/engine";
-import { VAT_RATE } from "@/lib/pricing/constants";
-import { getMetalPrice, refreshGoldPriceIfStale } from "@/server/services/market-prices";
-import { MetalType } from "@/generated/prisma/enums";
+import { round2 } from "@/lib/pricing/engine";
 import { getAllManualPrices, getAllManualSalePrices } from "@/server/pricing/manual-option-prices";
 
 // The price a product's page opens on (default metal, designed diamond if it
@@ -20,83 +17,31 @@ const shared = globalThis as unknown as {
 };
 const state = (shared.__listingPrices2 ??= { cached: null, inflight: null });
 
+// Manual-only pricing: a product's page price is the hand-entered price of its default
+// material option. A product with no hand-entered price has no price (it is shown as
+// "price on request" and cannot be bought until a price is entered).
 async function compute(): Promise<Computed> {
-  await refreshGoldPriceIfStale();
-  const [products, gold, silver, platinum, diamondPriceEntries, diamondBaseCostRanges] = await Promise.all([
+  const [products, manualPrices, manualSales] = await Promise.all([
     prisma.product.findMany({
       where: { status: "PUBLISHED", pricingMode: "CONFIGURABLE" },
       select: {
         id: true,
-        metalWeightGrams: true,
-        manufacturingCost: true,
-        settingCost: true,
-        otherCost: true,
-        materialOptions: { where: { active: true }, orderBy: { sortOrder: "asc" } },
-        diamondOptions: true,
+        materialOptions: { where: { active: true }, orderBy: { sortOrder: "asc" }, select: { id: true, isDefault: true } },
       },
     }),
-    getMetalPrice(MetalType.GOLD),
-    getMetalPrice(MetalType.SILVER),
-    getMetalPrice(MetalType.PLATINUM),
-    prisma.diamondPriceEntry.findMany(),
-    prisma.diamondBaseCostRange.findMany(),
+    getAllManualPrices(),
+    getAllManualSalePrices(),
   ]);
-  const metalPrices = { GOLD: gold, SILVER: silver, PLATINUM: platinum } as const;
-  const entries = diamondPriceEntries.map((e) => ({
-    diamondType: e.diamondType,
-    shape: e.shape,
-    caratMin: Number(e.caratMin),
-    caratMax: Number(e.caratMax),
-    colorGrade: e.colorGrade,
-    clarityGrade: e.clarityGrade,
-    pricePerCarat: Number(e.pricePerCarat),
-  }));
-  const ranges = diamondBaseCostRanges.map((r) => ({
-    category: r.category,
-    minCostPerCarat: Number(r.minCostPerCarat),
-    maxCostPerCarat: Number(r.maxCostPerCarat),
-    currency: r.currency,
-  }));
-
-  const [manualPrices, manualSales] = await Promise.all([getAllManualPrices(), getAllManualSalePrices()]);
   const out = new Map<string, number>();
   const sales = new Map<string, number>();
   for (const p of products) {
     const material = p.materialOptions.find((m) => m.isDefault) ?? p.materialOptions[0];
     if (!material) continue;
     const manual = manualPrices.get(material.id);
-    if (manual !== undefined && manual > 0) {
-      out.set(p.id, round2(manual));
-      const sale = manualSales.get(material.id);
-      if (sale !== undefined && sale > 0 && sale < manual) sales.set(p.id, round2(sale));
-      continue;
-    }
-    const mp = metalPrices[material.metalType as keyof typeof metalPrices];
-    const d = p.diamondOptions.find((x) => x.isDefault) ?? p.diamondOptions[0];
-    const r = computeConfiguredPrice({
-      metalWeightGrams: p.metalWeightGrams ? Number(p.metalWeightGrams) : null,
-      manufacturingCost: p.manufacturingCost ? Number(p.manufacturingCost) : null,
-      settingCost: p.settingCost ? Number(p.settingCost) : null,
-      otherCost: p.otherCost ? Number(p.otherCost) : null,
-      metalPricePerGram: mp ? Number(mp.pricePerGram) : null,
-      metal: { metalType: material.metalType, purity: material.purity },
-      diamonds: d
-        ? [
-            {
-              diamondType: d.diamondType,
-              shape: d.shape,
-              caratWeight: Number(d.caratWeight),
-              colorGrade: d.colorGrade,
-              clarityGrade: d.clarityGrade,
-              fancyColor: d.fancyColor,
-              quantity: d.quantity,
-            },
-          ]
-        : [],
-      diamondPriceEntries: entries,
-      diamondBaseCostRanges: ranges,
-    });
-    if (r.ok) out.set(p.id, round2(r.sellingPrice * (1 + VAT_RATE)));
+    if (manual === undefined || !(manual > 0)) continue;
+    out.set(p.id, round2(manual));
+    const sale = manualSales.get(material.id);
+    if (sale !== undefined && sale > 0 && sale < manual) sales.set(p.id, round2(sale));
   }
   return { prices: out, sales };
 }
@@ -149,7 +94,7 @@ export async function getListingPrices(): Promise<Map<string, number>> {
   return new Map([...info].map(([id, v]) => [id, v.price]));
 }
 
-type Priced = { id: string; basePrice: unknown; salePrice: unknown };
+type Priced = { id: string; basePrice: unknown; salePrice: unknown; pricingMode?: string };
 
 // Swap a configurable product's placeholder price for its live price (and its
 // hand-entered sale, if running).
@@ -158,11 +103,17 @@ export async function applyLivePrices<T extends Priced>(products: T[]): Promise<
   return products.map((p) => {
     const live = info.get(p.id);
     const ex = extras.get(p.id);
-    const base = live == null ? p : { ...p, basePrice: live.list ?? live.price, salePrice: live.list != null ? live.price : null };
+    // A configurable product with no hand-entered price has no price at all.
+    const noPrice = live == null && p.pricingMode === "CONFIGURABLE";
+    const base = noPrice
+      ? { ...p, basePrice: 0, salePrice: null }
+      : live == null
+        ? p
+        : { ...p, basePrice: live.list ?? live.price, salePrice: live.list != null ? live.price : null };
     const scheduled = base.salePrice != null && !isSaleActive(ex) ? { ...base, salePrice: null } : base;
     // A product that needs a choice before it can be bought (material picker,
     // sizes) must send the shopper to its page, never add straight to the cart.
     const needsOptions = live != null || (ex?.sizes?.length ?? 0) > 0;
-    return { ...scheduled, ...(ex?.badge ? { extrasBadge: ex.badge } : {}), ...(needsOptions ? { needsOptions: true } : {}) };
+    return { ...scheduled, ...(ex?.badge ? { extrasBadge: ex.badge } : {}), ...(needsOptions || noPrice ? { needsOptions: true } : {}), ...(noPrice ? { priceOnRequest: true } : {}) };
   });
 }

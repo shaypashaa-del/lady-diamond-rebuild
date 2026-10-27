@@ -121,6 +121,7 @@
     "increaseQty": "Увеличить количество",
     "buyWithBit": "Купить через Bit",
     "buyWithPaybox": "Купить через PayBox",
+    "priceOnRequest": "Цена по запросу",
     "buyWithCard": "Оплата картой",
     "buyWithPaypal": "Купить через PayPal",
     "breadcrumb": "Навигационная цепочка",

@@ -23,8 +23,7 @@ import {
 import { setManualMetalPrice } from "@/server/services/market-prices";
 import { DIAMOND_QUALITY_TIERS, VALID_PURITIES_FOR_METAL } from "@/lib/pricing/constants";
 import { revalidateProductPage } from "@/server/revalidate-product";
-import { getAllManualPrices, setManualOptionPrice } from "@/server/pricing/manual-option-prices";
-import { resolveConfiguredPrice } from "@/server/pricing/resolve-configured-price";
+import { clearAllManualPrices, setManualOptionPrice } from "@/server/pricing/manual-option-prices";
 
 async function revalidateProductPageById(productId: string) {
   const product = await prisma.product.findUnique({ where: { id: productId }, select: { slug: true } });
@@ -86,58 +85,23 @@ export async function updateProductPricingSettings(
   return { saved: true };
 }
 
-// ---- One-time move to hand-entered prices ----
-// Stores, for every material option that has no hand-entered price yet, the price the
-// shop shows today (VAT included) as its manual price. Prices on the site do not change;
-// from then on they only change when edited by hand. Safe to run again: options that
-// already have a manual price are never touched. Works in batches so each call is short.
-export type FreezeResult = { processed: number; total: number; frozen: number; skipped: number; failed: string[] };
-
-export async function freezeAutoPricesToManual(offset: number): Promise<FreezeResult | { error: string }> {
+// ---- Reset all prices ----
+// Removes every hand-entered list and sale price. Afterwards the shop shows every
+// configurable product as "price on request" and none can be bought until prices are
+// entered again. Requires the admin to type the confirmation word.
+export async function resetAllPrices(confirmText: string): Promise<{ saved: true; removed: number } | { error: string }> {
   await requireAdminSession();
-  const BATCH = 8;
-  const products = await prisma.product.findMany({
-    where: { pricingMode: PricingMode.CONFIGURABLE },
-    orderBy: { id: "asc" },
-    select: {
-      id: true,
-      name: true,
-      materialOptions: { where: { active: true }, select: { id: true } },
-      diamondOptions: { where: { active: true }, orderBy: { sortOrder: "asc" }, select: { id: true, isDefault: true } },
-    },
-  });
-  const slice = products.slice(offset, offset + BATCH);
-  const manual = await getAllManualPrices(true);
-  let frozen = 0;
-  let skipped = 0;
-  const failed: string[] = [];
-
-  for (const p of slice) {
-    const designed = p.diamondOptions.find((d) => d.isDefault) ?? p.diamondOptions[0];
-    for (const o of p.materialOptions) {
-      if (manual.has(o.id)) {
-        skipped += 1;
-        continue;
-      }
-      const r = await resolveConfiguredPrice({
-        productId: p.id,
-        materialOptionId: o.id,
-        diamondOptionIds: designed ? [designed.id] : [],
-        calculatorDiamondSpec: null,
-      });
-      if (!r.ok || !(r.sellingPrice > 0)) {
-        const label = typeof p.name === "object" && p.name ? ((p.name as { he?: string }).he ?? p.id) : p.id;
-        failed.push(`${label}: ${r.ok ? "מחיר 0" : r.message}`);
-        continue;
-      }
-      await setManualOptionPrice(o.id, p.id, r.sellingPrice);
-      frozen += 1;
-    }
+  if (confirmText.trim() !== "איפוס") return { error: 'כדי לאפס יש להקליד בדיוק את המילה "איפוס".' };
+  let removed: number;
+  try {
+    removed = await clearAllManualPrices();
+  } catch (err) {
+    console.error("[admin] resetAllPrices failed", err);
+    return { error: "האיפוס נכשל. נסו שוב." };
   }
-
   revalidatePath("/admin/products");
-  if (offset + BATCH >= products.length) revalidatePath("/", "layout");
-  return { processed: Math.min(offset + BATCH, products.length), total: products.length, frozen, skipped, failed };
+  revalidatePath("/", "layout");
+  return { saved: true, removed };
 }
 
 // ---- Material options (per product) ----

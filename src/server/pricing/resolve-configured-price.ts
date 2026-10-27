@@ -336,6 +336,15 @@ export async function resolveConfiguredPrice(
     }
   }
 
+  // Hand-entered prices only: no manual price for this option means no price yet.
+  if (useManual) {
+    return {
+      ok: false,
+      reason: "NO_MANUAL_PRICE",
+      message: "המחיר למוצר הזה יעודכן בקרוב. אפשר לפנות אלינו ונשמח לעזור.",
+    };
+  }
+
   if (!r.ok) return r;
   return { ...r, sellingPrice: round2(r.sellingPrice * (1 + VAT_RATE)) };
 }

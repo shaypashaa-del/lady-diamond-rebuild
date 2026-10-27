@@ -75,11 +75,14 @@ async function loadCards(
     return { products: await applyLivePrices(products), totalCount };
   }
   let all = await applyLivePrices(await prisma.product.findMany({ where, include, orderBy: { createdAt: "desc" } }));
-  const shown = (p: (typeof all)[number]) => Number(p.salePrice ?? p.basePrice);
-  if (minPrice != null) all = all.filter((p) => shown(p) >= minPrice);
-  if (maxPrice != null) all = all.filter((p) => shown(p) <= maxPrice);
-  if (sort === "price_asc") all.sort((a, b) => shown(a) - shown(b));
-  if (sort === "price_desc") all.sort((a, b) => shown(b) - shown(a));
+  const onRequest = (p: (typeof all)[number]) => (p as { priceOnRequest?: boolean }).priceOnRequest === true;
+  // Products without a price are not matched by a price filter and sort last.
+  const shown = (p: (typeof all)[number]) => (onRequest(p) ? Number.POSITIVE_INFINITY : Number(p.salePrice ?? p.basePrice));
+  if (minPrice != null) all = all.filter((p) => !onRequest(p) && shown(p) >= minPrice);
+  if (maxPrice != null) all = all.filter((p) => !onRequest(p) && shown(p) <= maxPrice);
+  const cmp = (a: number, b: number) => (a === b ? 0 : a < b ? -1 : 1);
+  if (sort === "price_asc") all.sort((a, b) => cmp(shown(a), shown(b)));
+  if (sort === "price_desc") all.sort((a, b) => (onRequest(a) ? 1 : onRequest(b) ? -1 : cmp(shown(b), shown(a))));
   return {
     products: all.slice((page - 1) * PRODUCTS_PAGE_SIZE, page * PRODUCTS_PAGE_SIZE),
     totalCount: all.length,

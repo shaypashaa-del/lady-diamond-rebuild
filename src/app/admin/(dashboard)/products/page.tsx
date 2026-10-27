@@ -6,7 +6,7 @@ import { t as localize, type LocalizedText } from "@/lib/i18n-content";
 import { AdminPager } from "@/components/admin/AdminPager";
 import { getListingPrices } from "@/server/pricing/listing-prices";
 import { formatIls } from "@/lib/format-price";
-import { FreezePricesPanel } from "@/components/admin/FreezePricesPanel";
+import { ResetPricesPanel } from "@/components/admin/ResetPricesPanel";
 
 const PAGE_SIZE = 50;
 
@@ -55,7 +55,7 @@ export default async function AdminProductsPage({
         </Link>
       </div>
 
-      <FreezePricesPanel />
+      <ResetPricesPanel />
 
       <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white">
         <table className="w-full text-sm">

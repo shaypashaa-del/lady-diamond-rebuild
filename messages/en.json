@@ -121,6 +121,7 @@
     "increaseQty": "Increase quantity",
     "buyWithBit": "Buy with Bit",
     "buyWithPaybox": "Buy with PayBox",
+    "priceOnRequest": "Price on request",
     "buyWithCard": "Pay by credit card",
     "buyWithPaypal": "Buy with PayPal",
     "breadcrumb": "Breadcrumb",

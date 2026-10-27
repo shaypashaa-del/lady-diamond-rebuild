@@ -101,7 +101,9 @@ export function ProductCard({ product }: { product: SampleProduct }) {
           {product.name}
         </Link>
         <div className="mt-1 flex items-center justify-center gap-2 text-sm">
-          {product.salePrice ? (
+          {product.priceOnRequest ? (
+            <span className="text-ink/60">{t("priceOnRequest")}</span>
+          ) : product.salePrice ? (
             <>
               <span className="price text-ink/40 line-through">{formatIls(product.salePrice)} ₪</span>
               <span className="price font-semibold text-clay">{formatIls(product.price)} ₪</span>

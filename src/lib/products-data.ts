@@ -4,6 +4,8 @@ export type SampleProduct = {
   category: string;
   price: number;
   salePrice?: number;
+  // Configurable product with no hand-entered price yet: shown as "price on request".
+  priceOnRequest?: boolean;
   hasVariants?: boolean;
   badge?: "New" | "Sale" | "Sold";
   tag?: "NEW" | "BESTSELLER" | "LIMITED";

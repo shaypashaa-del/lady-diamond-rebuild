@@ -18,7 +18,7 @@ export default async function AdminShippingPage() {
       <h1 className="mb-6 text-xl font-semibold">הגדרות משלוח</h1>
 
       <div className="mb-8 overflow-x-auto rounded-lg border border-neutral-200 bg-white">
-        <table className="w-full text-sm">
+        <table className="admin-cards w-full text-sm">
           <thead className="border-b border-neutral-200 bg-neutral-50 text-right text-xs text-neutral-500">
             <tr>
               <th className="px-4 py-3 font-medium">שם</th>
@@ -31,17 +31,17 @@ export default async function AdminShippingPage() {
           <tbody>
             {rules.map((r) => (
               <tr key={r.id} className="border-b border-neutral-100 last:border-0">
-                <td className="px-4 py-3 font-medium">{r.name}</td>
-                <td className="px-4 py-3">{typeLabels[r.type]}</td>
-                <td className="px-4 py-3">{Number(r.price).toFixed(2)} ₪</td>
-                <td className="px-4 py-3">
+                <td data-full="" className="px-4 py-3 font-medium">{r.name}</td>
+                <td data-label="סוג" className="px-4 py-3">{typeLabels[r.type]}</td>
+                <td data-label="מחיר" className="px-4 py-3">{Number(r.price).toFixed(2)} ₪</td>
+                <td data-label="פעיל" className="px-4 py-3">
                   <form action={toggleShippingRule.bind(null, r.id, !r.isActive)}>
                     <button type="submit" className={r.isActive ? "text-emerald-600" : "text-neutral-400"}>
                       {r.isActive ? "פעיל" : "כבוי"}
                     </button>
                   </form>
                 </td>
-                <td className="px-4 py-3">
+                <td data-full="" className="px-4 py-3">
                   <details className="mb-2">
                     <summary className="cursor-pointer text-xs underline">עריכה</summary>
                     <SavableForm action={updateShippingRule.bind(null, r.id)} className="mt-2 w-56 space-y-1" buttonClassName="rounded bg-neutral-900 px-3 py-1.5 text-xs text-white disabled:opacity-50">

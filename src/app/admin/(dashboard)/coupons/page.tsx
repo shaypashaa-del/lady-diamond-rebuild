@@ -18,7 +18,7 @@ export default async function AdminCouponsPage() {
       <h1 className="mb-6 text-xl font-semibold">קופונים</h1>
 
       <div className="mb-8 overflow-x-auto rounded-lg border border-neutral-200 bg-white">
-        <table className="w-full text-sm">
+        <table className="admin-cards w-full text-sm">
           <thead className="border-b border-neutral-200 bg-neutral-50 text-right text-xs text-neutral-500">
             <tr>
               <th className="px-4 py-3 font-medium">קוד</th>
@@ -32,23 +32,23 @@ export default async function AdminCouponsPage() {
           <tbody>
             {coupons.map((c) => (
               <tr key={c.id} className="border-b border-neutral-100 last:border-0">
-                <td className="px-4 py-3 font-medium" dir="ltr">{c.code}</td>
-                <td className="px-4 py-3">
+                <td data-full="" className="px-4 py-3 font-medium" dir="ltr">{c.code}</td>
+                <td data-label="הנחה" className="px-4 py-3">
                   {c.discountType === "PERCENTAGE" ? `${Number(c.discountValue)}%` : `${Number(c.discountValue)} ₪`}
                 </td>
-                <td className="px-4 py-3">
+                <td data-label="שימושים" className="px-4 py-3">
                   {c.usageCount}
                   {c.usageLimit != null ? ` / ${c.usageLimit}` : ""}
                 </td>
-                <td className="px-4 py-3">{c.affiliate?.user.name ?? "—"}</td>
-                <td className="px-4 py-3">
+                <td data-label="שותף" className="px-4 py-3">{c.affiliate?.user.name ?? "—"}</td>
+                <td data-label="פעיל" className="px-4 py-3">
                   <form action={toggleCoupon.bind(null, c.id, !c.isActive)}>
                     <button type="submit" className={c.isActive ? "text-emerald-600" : "text-neutral-400"}>
                       {c.isActive ? "פעיל" : "כבוי"}
                     </button>
                   </form>
                 </td>
-                <td className="px-4 py-3">
+                <td data-full="" className="px-4 py-3">
                   <details className="mb-2">
                     <summary className="cursor-pointer text-xs underline">עריכה</summary>
                     <SavableForm action={updateCoupon.bind(null, c.id)} className="mt-2 w-56 space-y-1" buttonClassName="rounded bg-neutral-900 px-3 py-1.5 text-xs text-white disabled:opacity-50">

@@ -57,7 +57,7 @@ export default async function AdminCustomersPage({
       </form>
 
       <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white">
-        <table className="w-full text-sm">
+        <table className="admin-cards w-full text-sm">
           <thead className="border-b border-neutral-200 bg-neutral-50 text-right text-xs text-neutral-500">
             <tr>
               <th className="px-4 py-3 font-medium">שם</th>
@@ -73,16 +73,16 @@ export default async function AdminCustomersPage({
               const totalSpent = c.orders.reduce((sum, o) => sum + Number(o.total), 0);
               return (
                 <tr key={c.id} className="border-b border-neutral-100 last:border-0">
-                  <td className="px-4 py-3 font-medium">
+                  <td data-full="" className="px-4 py-3 font-medium">
                     <Link href={`/admin/customers/${c.id}`} className="block hover:underline">
                       {c.name}
                     </Link>
                   </td>
-                  <td className="px-4 py-3" dir="ltr">{c.email}</td>
-                  <td className="px-4 py-3" dir="ltr">{c.phone ?? "—"}</td>
-                  <td className="px-4 py-3">{c._count.orders}</td>
-                  <td className="px-4 py-3">{totalSpent.toFixed(2)} ₪</td>
-                  <td className="px-4 py-3 text-neutral-500">
+                  <td data-label="אימייל" className="px-4 py-3" dir="ltr">{c.email}</td>
+                  <td data-label="טלפון" className="px-4 py-3" dir="ltr">{c.phone ?? "—"}</td>
+                  <td data-label="הזמנות" className="px-4 py-3">{c._count.orders}</td>
+                  <td data-label="סה״כ רכישות" className="px-4 py-3">{totalSpent.toFixed(2)} ₪</td>
+                  <td data-label="נרשם בתאריך" className="px-4 py-3 text-neutral-500">
                     {c.createdAt.toLocaleDateString("he-IL")}
                   </td>
                 </tr>

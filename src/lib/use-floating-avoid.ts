@@ -34,11 +34,14 @@ export function useFloatingAvoid(): boolean {
     // Client-rendered content appears a moment after navigation.
     const mo = new MutationObserver(scan);
     mo.observe(document.body, { childList: true, subtree: true });
-    phone.addEventListener("change", update);
+    // Older iOS Safari only has the legacy addListener API.
+    if (phone.addEventListener) phone.addEventListener("change", update);
+    else (phone as unknown as { addListener: (cb: () => void) => void }).addListener(update);
     return () => {
       io.disconnect();
       mo.disconnect();
-      phone.removeEventListener("change", update);
+      if (phone.removeEventListener) phone.removeEventListener("change", update);
+      else (phone as unknown as { removeListener: (cb: () => void) => void }).removeListener(update);
       visible.clear();
       setAvoid(false);
     };

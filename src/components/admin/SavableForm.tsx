@@ -12,11 +12,13 @@ export function SavableForm({
   action,
   className,
   children,
+  id,
   submitLabel = "שמירה",
   buttonClassName = "rounded bg-neutral-900 px-4 py-2 text-xs font-semibold text-white disabled:opacity-50",
 }: {
   action: (formData: FormData) => Promise<SaveResult>;
   className?: string;
+  id?: string;
   children: React.ReactNode;
   submitLabel?: string;
   buttonClassName?: string;
@@ -26,7 +28,7 @@ export function SavableForm({
     undefined
   );
   return (
-    <form action={formAction} className={className}>
+    <form id={id} action={formAction} className={className}>
       {children}
       <div className="flex items-center gap-3">
         <button type="submit" disabled={pending} className={buttonClassName}>

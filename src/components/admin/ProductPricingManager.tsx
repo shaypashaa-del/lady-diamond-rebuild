@@ -3,7 +3,7 @@ import {
   addMaterialOption,
   deleteDiamondOption,
   deleteMaterialOption,
-  setMaterialOptionManualPrice,
+  saveAllOptionPrices,
   setMaterialOptionImage,
   updateProductPricingSettings,
 } from "@/server/actions/pricing";
@@ -79,7 +79,7 @@ export async function ProductPricingManager({
   const missingManual = materialOptions.filter((m) => !manualPrices.has(m.id));
 
   return (
-    <div className="mt-10 max-w-3xl border-t border-neutral-200 pt-6">
+    <div id="prices" className="mt-10 max-w-3xl scroll-mt-6 border-t border-neutral-200 pt-6">
       <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide">מחירים ואפשרויות חומר (הזנה ידנית)</h2>
       <p className="mb-4 text-xs text-neutral-500">
         המחיר של כל אפשרות חומר מוזן ידנית, כמחיר סופי ללקוח כולל מע״מ. אין חישוב אוטומטי לפי מחיר זהב או יהלום.
@@ -107,6 +107,19 @@ export async function ProductPricingManager({
       {/* Material options */}
       <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-600">אפשרויות חומר</h3>
       {materialOptions.length > 0 && (
+        <SavableForm
+          id="option-prices-form"
+          action={saveAllOptionPrices.bind(null, productId)}
+          className="mb-3 rounded border border-gold-soft bg-amber-50 p-3"
+          submitLabel="שמירת כל המחירים"
+          buttonClassName="rounded bg-neutral-900 px-4 py-2 text-xs font-semibold text-white hover:bg-neutral-800 disabled:opacity-50"
+        >
+          <p className="mb-2 text-xs text-neutral-700">
+            ערכו את מחירי המחירון והמבצע בטבלה למטה, ואז לחצו כאן על &quot;שמירת כל המחירים&quot;. כפתור זה שומר את כל האפשרויות יחד.
+          </p>
+        </SavableForm>
+      )}
+      {materialOptions.length > 0 && (
         <table className="mb-4 w-full text-sm">
           <thead className="border-b border-neutral-200 text-right text-xs text-neutral-500">
             <tr>
@@ -127,14 +140,10 @@ export async function ProductPricingManager({
                 <td className="py-2">{m.goldColor ? GOLD_COLOR_LABEL[m.goldColor] : "—"}</td>
                 <td className="py-2">{m.isDefault ? "✓" : ""}</td>
                 <td className="py-2">
-                  <SavableForm
-                    action={setMaterialOptionManualPrice.bind(null, m.id, productId)}
-                    className="flex items-center gap-2"
-                    submitLabel="שמירה"
-                    buttonClassName="rounded bg-neutral-900 px-2 py-1 text-xs font-medium text-white disabled:opacity-50"
-                  >
+                  <div className="flex items-center gap-2">
                     <input
-                      name="price"
+                      name={`price_${m.id}`}
+                      form="option-prices-form"
                       type="number"
                       step="0.01"
                       min="0"
@@ -144,7 +153,8 @@ export async function ProductPricingManager({
                       className="w-24 rounded border border-neutral-300 px-2 py-1 text-sm"
                     />
                     <input
-                      name="salePrice"
+                      name={`salePrice_${m.id}`}
+                      form="option-prices-form"
                       type="number"
                       step="0.01"
                       min="0"
@@ -153,7 +163,7 @@ export async function ProductPricingManager({
                       aria-label="מחיר מבצע"
                       className="w-24 rounded border border-rose-300 px-2 py-1 text-sm"
                     />
-                  </SavableForm>
+                  </div>
                 </td>
                 <td className="py-2">
                   {productImages.length === 0 ? (
@@ -187,6 +197,15 @@ export async function ProductPricingManager({
             ))}
           </tbody>
         </table>
+      )}
+      {materialOptions.length > 0 && (
+        <button
+          type="submit"
+          form="option-prices-form"
+          className="mb-4 rounded bg-neutral-900 px-4 py-2 text-xs font-semibold text-white hover:bg-neutral-800"
+        >
+          שמירת כל המחירים
+        </button>
       )}
       <p className="mb-3 text-xs text-neutral-500">
         הזן לכל אפשרות חומר את מחיר המחירון (כולל מע״מ), ואם יש מבצע, גם את מחיר המבצע (נמוך יותר). בלי מבצע הלקוח רואה את מחיר המחירון; עם מבצע הוא רואה את מחיר המחירון מחוק ואת מחיר המבצע, ומשלם את מחיר המבצע. מבצע מתוזמן (תאריכים) מוגדר ב&quot;פרטי מסחר נוספים&quot;. המחיר הוא עבור המוצר כפי שהוא (עם היהלום שלו או בלי). אם הלקוח בוחר יהלום אחר מהמחירון, התוספת שלו עדיין מחושבת לפי המחירון.

@@ -139,7 +139,7 @@ export function ProductForm({
                 </>
               )}
             </p>
-            <p className="mt-1">שנו את המחיר בשדה &quot;מחיר ידני&quot; ליד האפשרות ושמרו.</p>
+            <p className="mt-1">שנו את המחירים בטבלה ולחצו שם על <strong>&quot;שמירת כל המחירים&quot;</strong> (הכפתור כאן שומר רק את פרטי המוצר). <a href="#prices" className="underline">מעבר לטבלת המחירים ↓</a></p>
           </div>
         ) : (
           <>

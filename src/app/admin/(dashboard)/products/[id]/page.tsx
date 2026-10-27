@@ -55,7 +55,7 @@ export default async function EditProductPage({
         categories={categories.map((c) => ({ id: c.id, name: c.name as LocalizedText }))}
         tags={tags.map((t) => ({ id: t.id, name: t.name as LocalizedText }))}
         relatedOptions={otherProducts.map((p) => ({ id: p.id, name: p.name as LocalizedText }))}
-        submitLabel="שמירת שינויים"
+        submitLabel="שמירת פרטי המוצר"
         initial={{
           slug: product.slug,
           name: product.name as LocalizedText,

@@ -422,6 +422,49 @@ export async function setMaterialOptionManualPrice(
   return { saved: true };
 }
 
+// Saves the list and sale price of EVERY material option of a product in one go (one
+// button on the product screen). Fields are named price_<optionId> / salePrice_<optionId>.
+export async function saveAllOptionPrices(
+  productId: string,
+  formData: FormData
+): Promise<{ saved: true } | { error: string }> {
+  await requireAdminSession();
+  const options = await prisma.productMaterialOption.findMany({ where: { productId }, select: { id: true } });
+  if (options.length === 0) return { error: "אין אפשרויות חומר במוצר." };
+
+  const toSave: { id: string; price: number | null; sale: number | null }[] = [];
+  for (const o of options) {
+    if (!formData.has(`price_${o.id}`)) continue;
+    const raw = String(formData.get(`price_${o.id}`) ?? "").trim();
+    const saleRaw = String(formData.get(`salePrice_${o.id}`) ?? "").trim();
+    let price: number | null = null;
+    let sale: number | null = null;
+    if (raw !== "") {
+      price = Number(raw);
+      if (!Number.isFinite(price) || price <= 0) return { error: "מחיר מחירון חייב להיות גדול מ-0 (או ריק)." };
+    }
+    if (saleRaw !== "") {
+      sale = Number(saleRaw);
+      if (!Number.isFinite(sale) || sale <= 0) return { error: "מחיר מבצע חייב להיות גדול מ-0 (או ריק)." };
+      if (price === null) return { error: "כדי להגדיר מחיר מבצע יש להזין קודם מחיר מחירון לאותה אפשרות." };
+      if (sale >= price) return { error: "מחיר המבצע חייב להיות נמוך ממחיר המחירון." };
+    }
+    toSave.push({ id: o.id, price, sale });
+  }
+
+  try {
+    for (const t of toSave) await setManualOptionPrice(t.id, productId, t.price, t.sale);
+  } catch (err) {
+    console.error("[admin] saveAllOptionPrices failed", err);
+    return { error: "השמירה נכשלה. נסו שוב, ואם זה חוזר פנו אלינו." };
+  }
+
+  revalidatePath(`/admin/products/${productId}`);
+  revalidatePath("/admin/products");
+  await revalidateProductPageById(productId);
+  return { saved: true };
+}
+
 // ---- Photo shown when a material option is selected ----
 
 export async function setMaterialOptionImage(

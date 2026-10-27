@@ -135,10 +135,10 @@ export async function ProductPricingManager({
           <tbody>
             {materialOptions.map((m) => (
               <tr key={m.id} className="border-b border-neutral-100 last:border-0">
-                <td data-label="מתכת" className="py-2">{METAL_LABEL[m.metalType]}</td>
-                <td data-label="טוהר" className="py-2">{PURITY_LABEL[m.purity]}</td>
-                <td data-label="גוון" className="py-2">{m.goldColor ? GOLD_COLOR_LABEL[m.goldColor] : "—"}</td>
-                <td data-label="ברירת מחדל" className="py-2">{m.isDefault ? "✓" : ""}</td>
+                <td data-compact="" data-label="מתכת" className="py-2">{METAL_LABEL[m.metalType]}</td>
+                <td data-compact="" data-label="טוהר" className="py-2">{PURITY_LABEL[m.purity]}</td>
+                <td data-compact="" data-label="גוון" className="py-2">{m.goldColor ? GOLD_COLOR_LABEL[m.goldColor] : "—"}</td>
+                <td data-compact="" data-label="ברירת מחדל" className="py-2">{m.isDefault ? "✓" : ""}</td>
                 <td data-full="" className="py-2">
                   <div className="flex items-center gap-2">
                     <input

@@ -627,6 +627,16 @@ html[lang="he"] :where(h1, h2, h3, h4, p, span, a, button, li, label, dt, dd, th
     font-size: 0.7rem;
     color: rgb(115 115 115);
   }
+  /* Short facts (metal, purity, colour, default) sit side by side on one line. */
+  .admin-shell .admin-cards td[data-compact],
+  .admin-shell table.admin-cards td[data-compact] {
+    display: inline-flex;
+    padding-inline-end: 0.75rem !important;
+    font-weight: 500;
+  }
+  .admin-shell .admin-cards td[data-compact]::before {
+    display: none;
+  }
   .admin-shell .admin-cards td[data-full],
   .admin-shell table.admin-cards td[data-full] {
     display: block;

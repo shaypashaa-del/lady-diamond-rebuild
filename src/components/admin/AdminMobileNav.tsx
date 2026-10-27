@@ -35,21 +35,21 @@ export function AdminMobileNav({ items, name, logout }: { items: Item[]; name: s
 
   return (
     <div className="md:hidden">
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-neutral-200 bg-white px-4 py-3">
+      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-[#d7b46a]/40 bg-[#0d0d0d] px-4 py-3 text-[#f4ecd8]">
         <div>
-          <p className="text-sm font-semibold tracking-wide">LADY DIAMOND</p>
-          <p className="text-[11px] text-neutral-400">ניהול החנות</p>
+          <p className="text-sm font-light uppercase tracking-[0.3em] text-[#d7b46a]">LADY DIAMOND</p>
+          <p className="text-[11px] text-[#cdbf9c]">ניהול החנות</p>
         </div>
         <button
           type="button"
           onClick={() => setOpen(true)}
           aria-label="פתיחת תפריט"
-          className="flex h-11 w-11 items-center justify-center rounded border border-neutral-300"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-[#d7b46a]/60"
         >
           <span aria-hidden className="space-y-1">
-            <span className="block h-0.5 w-5 bg-neutral-800" />
-            <span className="block h-0.5 w-5 bg-neutral-800" />
-            <span className="block h-0.5 w-5 bg-neutral-800" />
+            <span className="block h-px w-5 bg-[#d7b46a]" />
+            <span className="block h-px w-5 bg-[#d7b46a]" />
+            <span className="block h-px w-5 bg-[#d7b46a]" />
           </span>
         </button>
       </header>
@@ -68,7 +68,7 @@ export function AdminMobileNav({ items, name, logout }: { items: Item[]; name: s
               <Link
                 key={item.href}
                 href={item.href}
-                className={`rounded px-3 py-3 text-sm ${active(item.href) ? "bg-neutral-900 text-white" : "text-neutral-700 hover:bg-neutral-100"}`}
+                className={`rounded px-3 py-3 text-sm ${active(item.href) ? "bg-[#0d0d0d] text-[#d7b46a]" : "text-neutral-700 hover:bg-neutral-100"}`}
               >
                 {item.label}
               </Link>
@@ -87,15 +87,15 @@ export function AdminMobileNav({ items, name, logout }: { items: Item[]; name: s
 
       <nav
         aria-label="ניווט מהיר"
-        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t border-neutral-200 bg-white pb-[env(safe-area-inset-bottom)]"
+        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t border-[#d7b46a]/40 bg-[#0d0d0d] pb-[env(safe-area-inset-bottom)]"
       >
         {bottom.map((b) => (
           <Link
             key={b.href}
             href={b.href}
             className={`flex min-h-14 items-center justify-center px-1 text-center text-xs font-medium ${
-              active(b.href) && b.href !== "/admin/products/new" ? "text-neutral-900 underline underline-offset-4" : "text-neutral-600"
-            } ${b.href === "/admin/products/new" ? "bg-neutral-900 text-white" : ""}`}
+              active(b.href) && b.href !== "/admin/products/new" ? "text-[#d7b46a] underline underline-offset-4" : "text-[#cdbf9c]"
+            } ${b.href === "/admin/products/new" ? "bg-gradient-to-b from-[#d7b46a] to-[#b08d3c] font-semibold text-[#0d0d0d]" : ""}`}
           >
             {b.label}
           </Link>

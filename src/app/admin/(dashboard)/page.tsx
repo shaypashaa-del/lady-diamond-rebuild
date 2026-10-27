@@ -1,6 +1,55 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getDashboardAnalytics, resolveRangePreset } from "@/server/repositories/analytics";
+import { requireAdminSession } from "@/lib/auth/guards";
+import { getListingPrices } from "@/server/pricing/listing-prices";
+import { StudioHome, type Group } from "@/components/admin/StudioHome";
+
+const ORDER_STATUS: Record<string, string> = {
+  PENDING: "ממתינה",
+  PROCESSING: "בטיפול",
+  SHIPPED: "נשלחה",
+  COMPLETED: "הושלמה",
+  CANCELLED: "בוטלה",
+  REFUNDED: "זוכתה",
+};
+
+const STUDIO_GROUPS: Group[] = [
+  {
+    title: "מוצרים",
+    tiles: [
+      { href: "/admin/products/new", label: "הוספת מוצר", hint: "מוצר חדש בכמה שדות", icon: "plus" },
+      { href: "/admin/products", label: "מוצרים ומחירים", hint: "עריכה, מחירים ומבצעים", icon: "tag" },
+      { href: "/admin/media", label: "תמונות", hint: "העלאה מהטלפון", icon: "image" },
+      { href: "/admin/categories", label: "קטגוריות", hint: "שמות, סדר ותמונה", icon: "grid" },
+    ],
+  },
+  {
+    title: "מכירות",
+    tiles: [
+      { href: "/admin/orders", label: "הזמנות", hint: "אישור תשלום ומשלוח", icon: "bag" },
+      { href: "/admin/coupons", label: "קופונים", hint: "הנחות וקודים", icon: "ticket" },
+      { href: "/admin/shipping", label: "משלוחים", hint: "מחיר ותנאים", icon: "truck" },
+      { href: "/admin/customers", label: "לקוחות", hint: "רשימה והיסטוריה", icon: "users" },
+    ],
+  },
+  {
+    title: "האתר",
+    tiles: [
+      { href: "/admin/content", label: "באנרים ותוכן", hint: "עמוד הבית, הודעה עליונה, עמודים", icon: "sparkle" },
+      { href: "/admin/tags", label: "תגיות", hint: "סיווג מוצרים", icon: "tag" },
+      { href: "/admin/messages", label: "הודעות", hint: "פניות מהאתר", icon: "chat" },
+      { href: "/admin/settings", label: "הגדרות", hint: "מייל ושותפים", icon: "gear" },
+    ],
+  },
+  {
+    title: "שותפים",
+    tiles: [
+      { href: "/admin/affiliates", label: "שותפים", hint: "אישור ורמות", icon: "users" },
+      { href: "/admin/commissions", label: "עמלות", hint: "אישור ותשלום", icon: "coins" },
+    ],
+  },
+];
 
 const RANGE_OPTIONS = [
   { value: "today", label: "היום" },
@@ -19,6 +68,16 @@ export default async function AdminDashboard({
   const { range: rangeParam } = await searchParams;
   const range = rangeParam ?? "30d";
   const dateRange = resolveRangePreset(range);
+
+  const session = await requireAdminSession();
+  const [todayStats, pendingOrders, recentOrders, publishedConfigurable, pricedNow] = await Promise.all([
+    getDashboardAnalytics(resolveRangePreset("today")),
+    prisma.order.count({ where: { status: { in: ["PENDING", "PROCESSING"] } } }),
+    prisma.order.findMany({ orderBy: { createdAt: "desc" }, take: 4, select: { id: true, orderNumber: true, total: true, status: true, createdAt: true } }),
+    prisma.product.count({ where: { status: "PUBLISHED", pricingMode: "CONFIGURABLE" } }),
+    getListingPrices().then((m) => m.size),
+  ]);
+  const unpriced = Math.max(0, publishedConfigurable - pricedNow);
 
   const [productCount, categoryCount, orderCount, customerCount, analytics] = await Promise.all([
     prisma.product.count(),
@@ -47,7 +106,24 @@ export default async function AdminDashboard({
 
   return (
     <div>
-      <h1 className="mb-6 text-xl font-semibold">לוח בקרה</h1>
+      <StudioHome
+        name={session.name?.split(" ")[0] ?? "דיאנה"}
+        kpis={[
+          { label: "הזמנות ממתינות", value: pendingOrders, href: "/admin/orders", tone: "alert" },
+          { label: "הכנסות היום", value: Math.round(todayStats.revenue), suffix: "₪", href: "/admin/orders" },
+          { label: "מוצרים בלי מחיר", value: unpriced, href: "/admin/products", tone: "alert" },
+        ]}
+        groups={STUDIO_GROUPS}
+        recent={recentOrders.map((o) => ({
+          id: o.id,
+          number: o.orderNumber,
+          total: Number(o.total).toFixed(2),
+          status: ORDER_STATUS[o.status] ?? o.status,
+          when: o.createdAt.toLocaleDateString("he-IL"),
+        }))}
+      />
+
+      <h1 className="mb-6 mt-12 text-xl font-semibold">ניתוח מפורט</h1>
 
       <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {totals.map((c) => (

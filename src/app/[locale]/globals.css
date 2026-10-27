@@ -646,3 +646,10 @@ html[lang="he"] :where(h1, h2, h3, h4, p, span, a, button, li, label, dt, dd, th
     max-width: 9rem;
   }
 }
+
+/* Admin: a soft entrance for every screen (respects reduced motion). */
+@media (prefers-reduced-motion: no-preference) {
+  .admin-shell main > * {
+    animation: rise-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}

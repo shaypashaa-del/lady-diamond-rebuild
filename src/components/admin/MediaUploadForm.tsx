@@ -2,12 +2,19 @@
 
 import { useActionState } from "react";
 import { uploadMedia } from "@/server/actions/media";
+import { shrinkImage } from "@/lib/resize-image";
 
 type UploadResult = { error: string } | { uploaded: true } | undefined;
 
 export function MediaUploadForm() {
   const [state, action, pending] = useActionState<UploadResult, FormData>(
-    async (_prev, formData) => uploadMedia(formData),
+    async (_prev, formData) => {
+      // Phone photos are big: shrink them in the browser first so the upload fits and is quick.
+      const files = formData.getAll("file").filter((f): f is File => f instanceof File);
+      formData.delete("file");
+      for (const f of files) formData.append("file", await shrinkImage(f));
+      return uploadMedia(formData);
+    },
     undefined
   );
 
@@ -16,7 +23,7 @@ export function MediaUploadForm() {
       <div>
         <label className="mb-1 block text-xs font-medium text-neutral-500">קובץ תמונה</label>
         <input name="file" type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif" required className="text-sm" />
-        <p className="mt-1 text-[11px] text-neutral-400">אפשר לבחור כמה תמונות יחד (עד 20, סה״כ כ-10MB).</p>
+        <p className="mt-1 text-[11px] text-neutral-400">אפשר לבחור כמה תמונות יחד (עד 20; תמונות גדולות מוקטנות אוטומטית).</p>
       </div>
       <div>
         <label className="mb-1 block text-xs font-medium text-neutral-500">טקסט חלופי (alt)</label>

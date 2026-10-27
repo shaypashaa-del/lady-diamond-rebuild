@@ -567,6 +567,27 @@ html[lang="he"] :where(h1, h2, h3, h4, p, span, a, button, li, label, dt, dd, th
   .admin-shell h1 {
     font-size: 1.25rem;
   }
+  /* A long option name must never widen the page. */
+  .admin-shell select,
+  .admin-shell input,
+  .admin-shell textarea {
+    max-width: 100%;
+    min-width: 0;
+  }
+  .admin-shell form {
+    min-width: 0;
+  }
+  /* Row actions (edit / duplicate / delete): bigger, spaced apart. */
+  .admin-shell .admin-cards td[data-full] a,
+  .admin-shell .admin-cards td[data-full] button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 0.5rem;
+  }
+  .admin-shell .admin-cards td[data-full] .flex {
+    gap: 0.75rem;
+  }
   .admin-shell .admin-cards table,
   .admin-shell table.admin-cards {
     display: block;

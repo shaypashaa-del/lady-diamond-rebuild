@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ProductPhotoUpload } from "./ProductPhotoUpload";
 import {
   addProductImage,
   removeProductImage,
@@ -69,9 +70,11 @@ export function ProductImagesManager({
         </>
       )}
 
+      <ProductPhotoUpload productId={productId} />
+
       {availableMedia.length > 0 ? (
         <form action={addProductImage.bind(null, productId)} className="flex gap-2">
-          <select name="mediaId" className="flex-1 border border-neutral-300 px-3 py-2 text-sm">
+          <select name="mediaId" className="min-w-0 flex-1 border border-neutral-300 px-3 py-2 text-sm">
             {availableMedia.map((m) => (
               <option key={m.id} value={m.id}>
                 {m.filename}

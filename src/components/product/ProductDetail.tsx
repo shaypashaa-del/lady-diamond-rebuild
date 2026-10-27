@@ -161,7 +161,7 @@ export function ProductDetail({
     setTimeout(() => setAdded(false), 2000);
   }
 
-  function handleBuyNow(method: "bit" | "paybox" | "paypal") {
+  function handleBuyNow(method: "bit" | "paybox" | "credit_card" | "paypal") {
     if (!canAdd) return;
     addLine(currentLine(), quantity);
     router.push(`/checkout?pm=${method}`);
@@ -387,13 +387,20 @@ export function ProductDetail({
           </button>
         </div>
 
-        <div className="mt-3 grid grid-cols-3 gap-2">
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
           <button
             onClick={() => handleBuyNow("bit")}
             disabled={!canAdd}
             className="flex-1 border border-gold-soft px-1 py-2.5 text-[11px] font-semibold uppercase tracking-normal text-ink transition-colors hover:border-gold disabled:cursor-not-allowed disabled:opacity-40"
           >
             {t("buyWithBit")}
+          </button>
+          <button
+            onClick={() => handleBuyNow("credit_card")}
+            disabled={!canAdd}
+            className="flex-1 border border-gold-soft px-1 py-2.5 text-[11px] font-semibold uppercase tracking-normal text-ink transition-colors hover:border-gold disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {t("buyWithCard")}
           </button>
           <button
             onClick={() => handleBuyNow("paybox")}

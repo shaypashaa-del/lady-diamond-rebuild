@@ -155,7 +155,7 @@ export function ProductForm({
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-neutral-500">מחיר מבצע (₪)</label>
+          <label className="mb-1 block text-xs font-medium text-neutral-500">מחיר מבצע (₪) <span className="font-normal text-neutral-400">— לא חובה</span></label>
           <input
             name="salePrice"
             type="number"

@@ -115,7 +115,7 @@ export async function ProductPricingManager({
           buttonClassName="rounded bg-neutral-900 px-4 py-2 text-xs font-semibold text-white hover:bg-neutral-800 disabled:opacity-50"
         >
           <p className="mb-2 text-xs text-neutral-700">
-            ערכו את מחירי המחירון והמבצע בטבלה למטה, ואז לחצו כאן על &quot;שמירת כל המחירים&quot;. כפתור זה שומר את כל האפשרויות יחד.
+            ערכו את מחירי המחירון בטבלה למטה (מחיר מבצע הוא לא חובה), ואז לחצו על &quot;שמירת כל המחירים&quot;. כפתור זה שומר את כל האפשרויות יחד.
           </p>
         </SavableForm>
       )}
@@ -127,7 +127,7 @@ export async function ProductPricingManager({
               <th className="py-2 font-medium">טוהר</th>
               <th className="py-2 font-medium">גוון</th>
               <th className="py-2 font-medium">ברירת מחדל</th>
-              <th className="py-2 font-medium">מחיר מחירון / מחיר מבצע (₪, כולל מע״מ)</th>
+              <th className="py-2 font-medium">מחיר מחירון (₪, כולל מע״מ)<span className="mx-1 text-neutral-300">|</span><span className="font-normal text-neutral-400">מחיר מבצע, לא חובה</span></th>
               <th className="py-2 font-medium">תמונה לאפשרות</th>
               <th className="py-2 font-medium"></th>
             </tr>
@@ -159,9 +159,9 @@ export async function ProductPricingManager({
                       step="0.01"
                       min="0"
                       defaultValue={manualSales.has(m.id) ? manualSales.get(m.id) : ""}
-                      placeholder="מבצע"
+                      placeholder="לא חובה"
                       aria-label="מחיר מבצע"
-                      className="w-24 rounded border border-rose-300 px-2 py-1 text-sm"
+                      className="w-24 rounded border border-dashed border-neutral-300 bg-neutral-50 px-2 py-1 text-sm"
                     />
                   </div>
                 </td>
@@ -208,7 +208,7 @@ export async function ProductPricingManager({
         </button>
       )}
       <p className="mb-3 text-xs text-neutral-500">
-        הזן לכל אפשרות חומר את מחיר המחירון (כולל מע״מ), ואם יש מבצע, גם את מחיר המבצע (נמוך יותר). בלי מבצע הלקוח רואה את מחיר המחירון; עם מבצע הוא רואה את מחיר המחירון מחוק ואת מחיר המבצע, ומשלם את מחיר המבצע. מבצע מתוזמן (תאריכים) מוגדר ב&quot;פרטי מסחר נוספים&quot;. המחיר הוא עבור המוצר כפי שהוא (עם היהלום שלו או בלי). אם הלקוח בוחר יהלום אחר מהמחירון, התוספת שלו עדיין מחושבת לפי המחירון.
+        הזן לכל אפשרות חומר את מחיר המחירון (כולל מע״מ), ואם יש מבצע, אפשר להוסיף גם מחיר מבצע (נמוך יותר). מחיר מבצע הוא אופציונלי לגמרי: אפשר להשאיר אותו ריק. בלי מבצע הלקוח רואה את מחיר המחירון; עם מבצע הוא רואה את מחיר המחירון מחוק ואת מחיר המבצע, ומשלם את מחיר המבצע. מבצע מתוזמן (תאריכים) מוגדר ב&quot;פרטי מסחר נוספים&quot;. המחיר הוא עבור המוצר כפי שהוא (עם היהלום שלו או בלי). אם הלקוח בוחר יהלום אחר מהמחירון, התוספת שלו עדיין מחושבת לפי המחירון.
       </p>
       <form action={addMaterialOption.bind(null, productId)} className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-5">
         <select name="metalType" className="border border-neutral-300 px-2 py-2 text-xs" required>

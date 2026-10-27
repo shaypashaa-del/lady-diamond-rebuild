@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 import type { LocalizedText } from "@/lib/i18n-content";
 import type { ProductFormResult } from "@/server/actions/products";
 
@@ -80,7 +80,7 @@ export function ProductForm({
   const selectedTagIds = new Set(initial?.tagIds ?? []);
   const selectedRelatedIds = new Set(initial?.relatedIds ?? []);
   const [state, formAction, pending] = useActionState(action, undefined);
-  const [mode, setMode] = useState<"CONFIGURABLE" | "FLAT">(initial?.pricingMode === "CONFIGURABLE" ? "CONFIGURABLE" : "FLAT");
+  const mode: "CONFIGURABLE" | "FLAT" = initial?.pricingMode === "CONFIGURABLE" ? "CONFIGURABLE" : "FLAT";
 
   return (
     <form action={formAction} className="max-w-3xl space-y-6">
@@ -119,31 +119,17 @@ export function ProductForm({
       <LocalizedInput label="תיאור קצר" name="shortDescription" value={initial?.shortDescription ?? undefined} textarea />
       <LocalizedInput label="תיאור מלא" name="description" value={initial?.description ?? undefined} textarea />
 
-      <fieldset className="rounded border border-neutral-200 p-3">
-        <legend className="px-1 text-xs font-medium text-neutral-500">איך נקבע המחיר?</legend>
-        <input type="hidden" name="pricingMode" value={mode} />
-        <label className="mb-2 flex items-start gap-2 text-sm">
-          <input type="radio" name="pricingModeChoice" checked={mode === "FLAT"} onChange={() => setMode("FLAT")} className="mt-1" />
-          <span>
-            <strong>ידני</strong> — אני מזין את המחיר הסופי ללקוח (כולל מע״מ). המחיר שאזין הוא המחיר באתר, בלי חישוב.
-          </span>
-        </label>
-        <label className="flex items-start gap-2 text-sm">
-          <input type="radio" name="pricingModeChoice" checked={mode === "CONFIGURABLE"} onChange={() => setMode("CONFIGURABLE")} className="mt-1" />
-          <span>
-            <strong>אוטומטי</strong> — לפי מחיר הזהב/הכסף והיהלום, משקל המתכת והעלויות (הלקוח בוחר מתכת ויהלום).
-          </span>
-        </label>
-      </fieldset>
+      {/* Prices are entered by hand; the mode is only kept as stored (new products are manual). */}
+      <input type="hidden" name="pricingMode" value={mode} />
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {mode === "CONFIGURABLE" ? (
           <div className="col-span-2 rounded border border-gold-soft bg-amber-50 p-3 text-xs text-neutral-700">
             <input type="hidden" name="basePrice" value={initial?.basePrice ?? 0} />
             <input type="hidden" name="salePrice" value={initial?.salePrice ?? ""} />
-            <p className="font-semibold text-neutral-900">מחיר המוצר מחושב אוטומטית</p>
+            <p className="font-semibold text-neutral-900">המחיר נקבע לכל אפשרות חומר (ידנית)</p>
             <p className="mt-1">
-              המחיר באתר נקבע לפי מחיר הזהב/הכסף והיהלום, משקל המתכת ועלויות הייצור, ולכן אין כאן שדה מחיר.
+              למוצר הזה כמה אפשרויות חומר, ולכן המחיר מוזן לכל אפשרות בטבלה &quot;מחירים ואפשרויות חומר&quot; בהמשך העמוד.
               {initial?.computedPrice != null && (
                 <>
                   {" "}המחיר הנוכחי (כולל מע״מ):{" "}
@@ -153,7 +139,7 @@ export function ProductForm({
                 </>
               )}
             </p>
-            <p className="mt-1">כדי לשנות את המחיר: ערכו את משקל המתכת ועלויות הייצור/השיבוץ בחלק &quot;תמחור&quot; בהמשך העמוד.</p>
+            <p className="mt-1">שנו את המחיר בשדה &quot;מחיר ידני&quot; ליד האפשרות ושמרו.</p>
           </div>
         ) : (
           <>

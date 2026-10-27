@@ -24,6 +24,7 @@ import { setManualMetalPrice } from "@/server/services/market-prices";
 import { DIAMOND_QUALITY_TIERS, VALID_PURITIES_FOR_METAL } from "@/lib/pricing/constants";
 import { revalidateProductPage } from "@/server/revalidate-product";
 import { getAllManualPrices, setManualOptionPrice } from "@/server/pricing/manual-option-prices";
+import { resolveConfiguredPrice } from "@/server/pricing/resolve-configured-price";
 
 async function revalidateProductPageById(productId: string) {
   const product = await prisma.product.findUnique({ where: { id: productId }, select: { slug: true } });
@@ -43,48 +44,37 @@ export async function updateProductPricingSettings(
 ): Promise<{ saved: true } | { error: string }> {
   await requireAdminSession();
 
-  const pricingMode =
-    String(formData.get("pricingMode")) === PricingMode.CONFIGURABLE
-      ? PricingMode.CONFIGURABLE
-      : PricingMode.FLAT;
+  // Pricing is entered by hand now: the product page only sends "has diamond".
+  // The pricing mode and the old cost inputs are left untouched unless a (legacy)
+  // form sends them.
   const hasDiamond = formData.get("hasDiamond") === "on";
+  const data: {
+    hasDiamond: boolean;
+    pricingMode?: PricingMode;
+    metalWeightGrams?: number | null;
+    manufacturingCost?: number | null;
+    settingCost?: number | null;
+    otherCost?: number | null;
+  } = { hasDiamond };
 
-  const num = (key: string) => {
-    const raw = formData.get(key);
-    if (!raw || String(raw).trim() === "") return null;
-    const n = Number(raw);
-    return Number.isFinite(n) && n >= 0 ? n : null;
-  };
-
-  const metalWeightGrams = num("metalWeightGrams");
-  const manufacturingCost = num("manufacturingCost");
-  // A configurable product without a metal weight and a manufacturing cost
-  // cannot be priced: the shop would show "pricing under review" and the
-  // product could not be bought, so refuse the save with a clear reason.
-  if (pricingMode === PricingMode.CONFIGURABLE) {
-    // Weight and cost are not needed when every material option has a
-    // hand-entered price (the formula is never used for those).
-    const options = await prisma.productMaterialOption.findMany({ where: { productId }, select: { id: true } });
-    const manual = await getAllManualPrices(true);
-    const allManual = options.length > 0 && options.every((o) => manual.has(o.id));
-    if (!allManual) {
-      if (!metalWeightGrams || metalWeightGrams <= 0) return { error: "בתמחור לפי בחירת לקוח חובה למלא משקל מתכת (גרם), או להזין מחיר ידני לכל אפשרות חומר." };
-      if (manufacturingCost === null) return { error: "בתמחור לפי בחירת לקוח חובה למלא עלות ייצור, או להזין מחיר ידני לכל אפשרות חומר." };
-    }
+  if (formData.has("pricingMode") || formData.has("manufacturingCost")) {
+    const pricingMode =
+      String(formData.get("pricingMode")) === PricingMode.CONFIGURABLE ? PricingMode.CONFIGURABLE : PricingMode.FLAT;
+    const num = (key: string) => {
+      const raw = formData.get(key);
+      if (!raw || String(raw).trim() === "") return null;
+      const n = Number(raw);
+      return Number.isFinite(n) && n >= 0 ? n : null;
+    };
+    data.pricingMode = pricingMode;
+    data.metalWeightGrams = num("metalWeightGrams");
+    data.manufacturingCost = num("manufacturingCost");
+    data.settingCost = num("settingCost");
+    data.otherCost = num("otherCost");
   }
 
   try {
-    await prisma.product.update({
-      where: { id: productId },
-      data: {
-        pricingMode,
-        hasDiamond,
-        metalWeightGrams,
-        manufacturingCost,
-        settingCost: num("settingCost"),
-        otherCost: num("otherCost"),
-      },
-    });
+    await prisma.product.update({ where: { id: productId }, data });
   } catch (err) {
     console.error("[admin] updateProductPricingSettings failed", err);
     return { error: "השמירה נכשלה. נסו שוב, ואם זה חוזר פנו אלינו." };
@@ -94,6 +84,60 @@ export async function updateProductPricingSettings(
   revalidatePath("/admin/products");
   await revalidateProductPageById(productId);
   return { saved: true };
+}
+
+// ---- One-time move to hand-entered prices ----
+// Stores, for every material option that has no hand-entered price yet, the price the
+// shop shows today (VAT included) as its manual price. Prices on the site do not change;
+// from then on they only change when edited by hand. Safe to run again: options that
+// already have a manual price are never touched. Works in batches so each call is short.
+export type FreezeResult = { processed: number; total: number; frozen: number; skipped: number; failed: string[] };
+
+export async function freezeAutoPricesToManual(offset: number): Promise<FreezeResult | { error: string }> {
+  await requireAdminSession();
+  const BATCH = 8;
+  const products = await prisma.product.findMany({
+    where: { pricingMode: PricingMode.CONFIGURABLE },
+    orderBy: { id: "asc" },
+    select: {
+      id: true,
+      name: true,
+      materialOptions: { where: { active: true }, select: { id: true } },
+      diamondOptions: { where: { active: true }, orderBy: { sortOrder: "asc" }, select: { id: true, isDefault: true } },
+    },
+  });
+  const slice = products.slice(offset, offset + BATCH);
+  const manual = await getAllManualPrices(true);
+  let frozen = 0;
+  let skipped = 0;
+  const failed: string[] = [];
+
+  for (const p of slice) {
+    const designed = p.diamondOptions.find((d) => d.isDefault) ?? p.diamondOptions[0];
+    for (const o of p.materialOptions) {
+      if (manual.has(o.id)) {
+        skipped += 1;
+        continue;
+      }
+      const r = await resolveConfiguredPrice({
+        productId: p.id,
+        materialOptionId: o.id,
+        diamondOptionIds: designed ? [designed.id] : [],
+        calculatorDiamondSpec: null,
+      });
+      if (!r.ok || !(r.sellingPrice > 0)) {
+        const label = typeof p.name === "object" && p.name ? ((p.name as { he?: string }).he ?? p.id) : p.id;
+        failed.push(`${label}: ${r.ok ? "מחיר 0" : r.message}`);
+        continue;
+      }
+      await setManualOptionPrice(o.id, p.id, r.sellingPrice);
+      frozen += 1;
+    }
+  }
+
+  revalidatePath("/admin/products");
+  if (offset + BATCH >= products.length) revalidatePath("/", "layout");
+  return { processed: Math.min(offset + BATCH, products.length), total: products.length, frozen, skipped, failed };
 }
 
 // ---- Material options (per product) ----

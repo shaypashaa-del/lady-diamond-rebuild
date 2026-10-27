@@ -7,10 +7,8 @@ import {
   setMaterialOptionImage,
   updateProductPricingSettings,
 } from "@/server/actions/pricing";
-import { getConfiguredPriceBreakdownForAdmin } from "@/server/actions/product-pricing";
 import { SavableForm } from "./SavableForm";
 import { getAllManualPrices } from "@/server/pricing/manual-option-prices";
-import { VAT_RATE } from "@/lib/pricing/constants";
 import { DIAMOND_QUALITY_TIERS, PURITY_LABEL, VALID_PURITIES_FOR_METAL } from "@/lib/pricing/constants";
 import type {
   DiamondCertification,
@@ -60,11 +58,6 @@ const DIAMOND_TYPE_LABEL: Record<DiamondType, string> = {
 
 export async function ProductPricingManager({
   productId,
-  pricingMode,
-  metalWeightGrams,
-  manufacturingCost,
-  settingCost,
-  otherCost,
   hasDiamond,
   materialOptions,
   diamondOptions,
@@ -82,124 +75,32 @@ export async function ProductPricingManager({
   diamondOptions: DiamondOptionRow[];
 }) {
   const manualPrices = await getAllManualPrices(true);
-  const allManual = materialOptions.length > 0 && materialOptions.every((m) => manualPrices.has(m.id));
-  const missingCore = (metalWeightGrams == null || manufacturingCost == null) && !allManual;
-  const missingOptions = materialOptions.length === 0;
-  const canBeConfigurable = !missingCore && !missingOptions;
-
-  const preview = pricingMode === "CONFIGURABLE" && canBeConfigurable
-    ? await getConfiguredPriceBreakdownForAdmin(productId)
-    : null;
+  const missingManual = materialOptions.filter((m) => !manualPrices.has(m.id));
 
   return (
     <div className="mt-10 max-w-3xl border-t border-neutral-200 pt-6">
-      <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide">תמחור דינמי וחומרים</h2>
+      <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide">מחירים ואפשרויות חומר (הזנה ידנית)</h2>
       <p className="mb-4 text-xs text-neutral-500">
-        כברירת מחדל המוצר משתמש במחיר הקבוע (basePrice) כרגיל. הפעלת &quot;תמחור לפי בחירת לקוח&quot; תציג
-        ללקוח בורר חומר/יהלום בעמוד המוצר, והמחיר יחושב אוטומטית — רק לאחר שכל הנתונים הנדרשים הוזנו.
+        המחיר של כל אפשרות חומר מוזן ידנית, כמחיר סופי ללקוח כולל מע״מ. אין חישוב אוטומטי לפי מחיר זהב או יהלום.
       </p>
 
-      {(missingCore || missingOptions) && (
+      {missingManual.length > 0 && (
         <div className="mb-4 rounded border border-amber-300 bg-amber-50 p-3 text-xs text-amber-800">
-          <p className="font-semibold">נתוני תמחור חסרים — לא ניתן להפעיל תמחור דינמי עדיין:</p>
-          <ul className="mt-1 list-inside list-disc">
-            {metalWeightGrams == null && <li>משקל מתכת (גרם)</li>}
-            {manufacturingCost == null && <li>עלות ייצור</li>}
-            {missingOptions && <li>אין ולו אפשרות חומר אחת מוגדרת</li>}
-          </ul>
-        </div>
-      )}
-
-      {preview && !preview.ok && (
-        <div className="mb-4 rounded border border-amber-300 bg-amber-50 p-3 text-xs text-amber-800">
-          תמחור לא זמין כרגע: {preview.reason}
-        </div>
-      )}
-      {preview && preview.ok && (
-        <div className="mb-4 rounded border border-emerald-300 bg-emerald-50 p-3 text-xs text-emerald-900">
-          <p className="font-semibold">תצוגה מקדימה (לפי אפשרות ברירת המחדל):</p>
-          <p className="mt-1">
-            עלות מתכת {preview.metalCost.toFixed(2)} ₪ · עלות יהלום {preview.diamondCost.toFixed(2)} ₪ · עלות
-            ייצור {preview.manufacturingCost.toFixed(2)} ₪ · עלות שיבוץ {preview.settingCost.toFixed(2)} ₪ ·
-            עלות נוספת {preview.otherCost.toFixed(2)} ₪
-          </p>
-          <p className="mt-1 font-semibold">
-            עלות בסיס: {preview.baseCost.toFixed(2)} ₪ → מחיר מכירה לפני מע״מ (רווח גולמי 25%):{" "}
-            {preview.sellingPrice.toFixed(2)} ₪ (רווח {preview.grossProfit.toFixed(2)} ₪)
-          </p>
-          <p className="mt-1 font-semibold">
-            המחיר שהלקוח רואה באתר (כולל מע״מ {Math.round(VAT_RATE * 100)}%):{" "}
-            {(Math.round(preview.sellingPrice * (1 + VAT_RATE) * 100) / 100).toFixed(2)} ₪
-          </p>
+          <p className="font-semibold">חסר מחיר ידני ב-{missingManual.length} אפשרויות. עד שתזין, האתר עדיין מחשב להן מחיר אוטומטית.</p>
+          <p className="mt-1">אפשר לקבוע את כל המחירים הנוכחיים בלחיצה אחת ברשימת המוצרים (&quot;קבע את כל המחירים לידניים&quot;).</p>
         </div>
       )}
 
       <SavableForm
         action={updateProductPricingSettings.bind(null, productId)}
         className="mb-6 space-y-3"
-        submitLabel="שמירת הגדרות תמחור"
+        submitLabel="שמירה"
         buttonClassName="rounded bg-neutral-900 px-3 py-2 text-xs font-medium text-white hover:bg-neutral-800 disabled:opacity-50"
       >
         <label className="flex items-center gap-2 text-xs">
-          <input
-            type="checkbox"
-            name="pricingMode"
-            value="CONFIGURABLE"
-            defaultChecked={pricingMode === "CONFIGURABLE"}
-            disabled={!canBeConfigurable && pricingMode !== "CONFIGURABLE"}
-          />
-          תמחור לפי בחירת לקוח (במקום מחיר קבוע)
-        </label>
-        <label className="flex items-center gap-2 text-xs">
           <input type="checkbox" name="hasDiamond" defaultChecked={hasDiamond} />
-          המוצר כולל יהלום
+          המוצר כולל יהלום (מציג ללקוח בחירת יהלום)
         </label>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <label className="text-xs">
-            משקל מתכת (גרם)
-            <input
-              name="metalWeightGrams"
-              type="number"
-              step="0.001"
-              min="0"
-              defaultValue={metalWeightGrams != null ? String(metalWeightGrams) : ""}
-              className="mt-1 w-full border border-neutral-300 px-2 py-2"
-            />
-          </label>
-          <label className="text-xs">
-            עלות ייצור (₪)
-            <input
-              name="manufacturingCost"
-              type="number"
-              step="0.01"
-              min="0"
-              defaultValue={manufacturingCost != null ? String(manufacturingCost) : ""}
-              className="mt-1 w-full border border-neutral-300 px-2 py-2"
-            />
-          </label>
-          <label className="text-xs">
-            עלות שיבוץ (₪)
-            <input
-              name="settingCost"
-              type="number"
-              step="0.01"
-              min="0"
-              defaultValue={settingCost != null ? String(settingCost) : ""}
-              className="mt-1 w-full border border-neutral-300 px-2 py-2"
-            />
-          </label>
-          <label className="text-xs">
-            עלות נוספת (₪)
-            <input
-              name="otherCost"
-              type="number"
-              step="0.01"
-              min="0"
-              defaultValue={otherCost != null ? String(otherCost) : ""}
-              className="mt-1 w-full border border-neutral-300 px-2 py-2"
-            />
-          </label>
-        </div>
       </SavableForm>
 
       {/* Material options */}
@@ -237,7 +138,7 @@ export async function ProductPricingManager({
                       step="0.01"
                       min="0"
                       defaultValue={manualPrices.has(m.id) ? manualPrices.get(m.id) : ""}
-                      placeholder="אוטומטי"
+                      placeholder="הזן מחיר"
                       aria-label="מחיר ידני"
                       className="w-28 rounded border border-neutral-300 px-2 py-1 text-sm"
                     />
@@ -277,7 +178,7 @@ export async function ProductPricingManager({
         </table>
       )}
       <p className="mb-3 text-xs text-neutral-500">
-        אפשר להזין לכל אפשרות חומר מחיר ידני סופי (כולל מע״מ): הוא גובר על החישוב עבור המוצר כפי שהוא (עם היהלום שלו או בלי יהלום). השארת השדה ריק = חישוב אוטומטי. יהלום שהלקוח בוחר מהמחירון ממשיך להתווסף לפי המחירון.
+        הזן לכל אפשרות חומר את המחיר הסופי (כולל מע״מ). הוא המחיר שהלקוח רואה וגם משלם עבור המוצר כפי שהוא (עם היהלום שלו או בלי). אם הלקוח בוחר יהלום אחר מהמחירון, התוספת שלו עדיין מחושבת לפי המחירון.
       </p>
       <form action={addMaterialOption.bind(null, productId)} className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-5">
         <select name="metalType" className="border border-neutral-300 px-2 py-2 text-xs" required>

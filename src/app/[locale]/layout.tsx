@@ -97,6 +97,7 @@ export async function generateMetadata({
     // the page — appleWebApp controls Safari's behavior specifically, since
     // iOS only partially honors the web manifest (auto-linked separately via
     // the src/app/manifest.ts file convention).
+    manifest: "/manifest.webmanifest",
     appleWebApp: {
       capable: true,
       title: "LADY DIAMOND",

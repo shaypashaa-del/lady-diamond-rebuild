@@ -1,6 +1,6 @@
 "use client";
 
-import { BANK_DETAILS, BUSINESS_PHONE } from "@/lib/site-config";
+import { BANK_DETAILS, BUSINESS_PHONE, PAYPAL_EMAIL } from "@/lib/site-config";
 import { describeOptions } from "@/lib/line-options";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -39,6 +39,10 @@ export default function CheckoutPage() {
     </Suspense>
   );
 }
+
+// The PayPal button (automatic payment) only works with a real PayPal client id; until
+// then PayPal is a direct payment to the shop owner's PayPal email (see paypalProvider).
+const PAYPAL_SDK_ENABLED = !!process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID && !process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID.startsWith("sb");
 
 function CheckoutForm() {
   const t = useTranslations("Checkout");
@@ -324,6 +328,26 @@ function CheckoutForm() {
             </div>
           )}
 
+          {paymentMethod === "paypal" && !PAYPAL_SDK_ENABLED && (
+            <div className="mt-4 border border-gold-bright/60 bg-gold-soft/20 p-4 text-sm text-ink">
+              <p className="font-semibold">{t("paypalTitle")}</p>
+              <p className="mt-2 text-ink/80">{t("paypalHint", { amount: total.toFixed(2) })}</p>
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <span dir="ltr" className="break-all text-base font-semibold">{PAYPAL_EMAIL}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard?.writeText(PAYPAL_EMAIL).then(() => setCopied(true)).catch(() => undefined);
+                  }}
+                  className="border border-gold-bright px-3 py-1.5 text-xs font-semibold hover:bg-gold-bright"
+                >
+                  {copied ? t("copied") : t("copyEmail")}
+                </button>
+              </div>
+              <p className="mt-3 text-xs text-ink/60">{t("orderNumberAfterPaypal")}</p>
+            </div>
+          )}
+
           {(paymentMethod === "paybox" || paymentMethod === "bit") && (
             <div className="mt-4 border border-gold-bright/60 bg-gold-soft/20 p-4 text-sm text-ink">
               <p className="font-semibold">{paymentMethod === "paybox" ? t("payboxTitle") : t("bitTitle")}</p>
@@ -363,7 +387,7 @@ function CheckoutForm() {
             </p>
           )}
 
-          {paymentMethod === "paypal" ? (
+          {paymentMethod === "paypal" && PAYPAL_SDK_ENABLED ? (
             <div className="mt-4">
               <PayPalButton total={total} disabled={submitting || !agreed} onApproved={handlePaypalApproved} onError={showError} />
             </div>

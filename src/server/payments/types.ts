@@ -1,5 +1,5 @@
 import "server-only";
-import { BANK_DETAILS, BUSINESS_PHONE } from "@/lib/site-config";
+import { BANK_DETAILS, BUSINESS_PHONE, PAYPAL_EMAIL } from "@/lib/site-config";
 
 // Payment abstraction: the store never talks to a specific gateway directly.
 // Today only manual offline methods exist (matching the live site's actual
@@ -158,7 +158,18 @@ export const paypalProvider: PaymentProvider = {
   async init(orderTotal, orderNumber, meta) {
     const paypalOrderId = meta?.paypalOrderId;
     if (!paypalOrderId) {
-      return { immediatelyPaid: false, instructions: `לא התקבל אישור תשלום מ-PayPal עבור הזמנה ${orderNumber}.` };
+      // Direct payment to the shop's PayPal account: the customer sends the amount to
+      // the owner's PayPal email, who confirms it in admin. (The automatic PayPal
+      // button below is used only when a real PayPal client id + secret are configured.)
+      const email = (process.env.PAYPAL_EMAIL || PAYPAL_EMAIL).trim();
+      const amount = orderTotal.toLocaleString("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return {
+        immediatelyPaid: false,
+        instructions:
+          `לתשלום ב-PayPal: היכנסו לחשבון ה-PayPal שלכם ושלחו ${amount} ₪ לכתובת ${email} (בחרו באפשרות תשלום עבור מוצרים ושירותים). ` +
+          `בהערה לתשלום כתבו את מספר ההזמנה ${orderNumber}. ` +
+          `ההזמנה תישלח לאחר שנאשר את קבלת התשלום (בדרך כלל באותו יום עסקים).`,
+      };
     }
 
     const token = await getPaypalAccessToken();

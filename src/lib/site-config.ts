@@ -15,3 +15,7 @@ export const BANK_DETAILS = {
   branch: "851",
   account: "35498488",
 } as const;
+
+// PayPal account customers pay to directly (shown at checkout and in the order mail).
+// PAYPAL_EMAIL in the server env overrides it.
+export const PAYPAL_EMAIL = "diana.isra777@gmail.com";

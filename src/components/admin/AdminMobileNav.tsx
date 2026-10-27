@@ -35,7 +35,7 @@ export function AdminMobileNav({ items, name, logout }: { items: Item[]; name: s
 
   return (
     <div className="md:hidden">
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-[#d7b46a]/40 bg-[#0d0d0d] px-4 py-3 text-[#f4ecd8]">
+      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-[#d7b46a]/40 bg-[#0d0d0d] px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] text-[#f4ecd8]">
         <div>
           <p className="text-sm font-light uppercase tracking-[0.3em] text-[#d7b46a]">LADY DIAMOND</p>
           <p className="text-[11px] text-[#cdbf9c]">ניהול החנות</p>

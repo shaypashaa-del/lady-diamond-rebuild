@@ -1,8 +1,23 @@
-import type { Viewport } from "next";
+import type { Metadata, Viewport } from "next";
 import "../[locale]/globals.css";
 
 // The admin is a light interface: never let a phone in dark mode turn it black.
-export const viewport: Viewport = { colorScheme: "light", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = {
+  colorScheme: "light",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#0d0d0d",
+};
+
+// Title for the tab / home-screen icon, never indexed, and installable as its own app.
+export const metadata: Metadata = {
+  title: "ניהול · LADY DIAMOND",
+  robots: { index: false, follow: false },
+  manifest: "/admin/manifest.webmanifest",
+  appleWebApp: { capable: true, title: "ניהול", statusBarStyle: "black-translucent" },
+  icons: { apple: "/icons/icon-192.png" },
+};
 
 // Admin reads/writes live data on every request — never statically cache it.
 export const dynamic = "force-dynamic";

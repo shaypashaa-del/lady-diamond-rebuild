@@ -69,6 +69,8 @@ export type ConfiguredPriceState =
   | {
       status: "ok";
       sellingPrice: number;
+      // Regular price, set only while a sale is running (sellingPrice is then the sale price).
+      listPrice?: number;
       materialOptionId: string;
       diamondOptionIds: string[];
       calculatorDiamondSpec?: CalculatorDiamondChoice;
@@ -81,6 +83,7 @@ export function ConfigurablePriceSelector({
   diamondOptions,
   offersDiamondPricelist = false,
   initialPrice,
+  initialListPrice,
   onMaterialImageChange,
   onConfiguredChange,
 }: {
@@ -97,6 +100,7 @@ export function ConfigurablePriceSelector({
   // page view. Shown at once, so the price and the buy buttons are ready on first
   // paint instead of waiting for a round trip.
   initialPrice?: number;
+  initialListPrice?: number;
   onMaterialImageChange?: (imageUrl: string | null) => void;
   // Reports the live price/selection up to the product page so the ONE
   // price shown near the title (ProductDetail) — and what actually gets
@@ -121,11 +125,11 @@ export function ConfigurablePriceSelector({
   // switch to "a different diamond" from the same pricelist.
   const usesCalculatorDiamondFallback = diamondOptions.length === 0 && hasPricelist;
   const [priceCache] = useState(() => {
-    const map = new Map<string, { at: number; price: number }>();
+    const map = new Map<string, { at: number; price: number; list?: number }>();
     const m0 = materialOptions.find((m) => m.isDefault) ?? materialOptions[0];
     const d0 = diamondOptions.find((d) => d.isDefault) ?? diamondOptions[0];
     if (initialPrice && m0 && !(diamondOptions.length === 0 && offersDiamondPricelist)) {
-      map.set(`${m0.id}|${d0 ? d0.id : ""}`, { at: Date.now(), price: initialPrice });
+      map.set(`${m0.id}|${d0 ? d0.id : ""}`, { at: Date.now(), price: initialPrice, list: initialListPrice });
     }
     return map;
   });
@@ -174,6 +178,7 @@ export function ConfigurablePriceSelector({
       onConfiguredChange?.({
         status: "ok",
         sellingPrice: cached.price,
+        listPrice: cached.list,
         materialOptionId: material.id,
         diamondOptionIds,
         calculatorDiamondSpec: calculatorDiamondSpec ?? undefined,
@@ -189,12 +194,13 @@ export function ConfigurablePriceSelector({
       calculatorDiamondSpec,
     }).then((res) => {
       if (cancelled) return;
-      if (res.ok) priceCache.set(cacheKey, { at: Date.now(), price: res.sellingPrice });
+      if (res.ok) priceCache.set(cacheKey, { at: Date.now(), price: res.sellingPrice, list: res.listPrice });
       onConfiguredChange?.(
         res.ok
           ? {
               status: "ok",
               sellingPrice: res.sellingPrice,
+              listPrice: res.listPrice,
               materialOptionId: material.id,
               diamondOptionIds,
               calculatorDiamondSpec: calculatorDiamondSpec ?? undefined,

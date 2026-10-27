@@ -3,7 +3,7 @@ import { getLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getProductBySlug, getRelatedProducts } from "@/server/repositories/catalog";
-import { getListingPrices } from "@/server/pricing/listing-prices";
+import { getListingPriceInfo } from "@/server/pricing/listing-prices";
 import { calculateShipping } from "@/server/services/shipping";
 import { t as localize, tMediaAlt, type LocalizedText } from "@/lib/i18n-content";
 import { toCardProduct } from "@/lib/catalog-view";
@@ -90,12 +90,13 @@ export default async function ProductPage({
   const description = localize(product.shortDescription as LocalizedText | null, locale);
   // Independent reads run together instead of one after another.
   const [listingPrices, extras, relatedRaw, tHome] = await Promise.all([
-    getListingPrices(),
+    getListingPriceInfo(),
     getProductExtras(product.id),
     getRelatedProducts(product.id, product.categories[0]?.category.slug),
     getTranslations("Home"),
   ]);
-  const livePrice = listingPrices.get(product.id);
+  const liveInfo = listingPrices.get(product.id);
+  const livePrice = liveInfo?.price;
   const saleOn = isSaleActive(extras);
   const activeSale = saleOn && product.salePrice != null ? Number(product.salePrice) : null;
   const price = livePrice ?? activeSale ?? Number(product.basePrice);
@@ -170,6 +171,7 @@ export default async function ProductPage({
         diamondOptions={product.diamondOptions.map((d) => ({ ...d, caratWeight: Number(d.caratWeight) }))}
         offersDiamondPricelist={offersDiamondPricelist}
         initialPrice={livePrice}
+        initialListPrice={liveInfo?.list}
         slug={product.slug}
         name={name}
         shortDescription={description}

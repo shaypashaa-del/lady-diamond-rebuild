@@ -242,7 +242,12 @@ export function ProductDetail({
             <>
               {configuredPrice?.status === "ok" && (
                 <>
-                  <span className="price font-semibold text-ink">{formatIls(configuredPrice.sellingPrice)} ₪</span>
+                  {configuredPrice.listPrice != null && (
+                    <span className="price text-ink/40 line-through">{formatIls(configuredPrice.listPrice)} ₪</span>
+                  )}
+                  <span className={cn("price font-semibold", configuredPrice.listPrice != null ? "text-clay" : "text-ink")}>
+                    {formatIls(configuredPrice.sellingPrice)} ₪
+                  </span>
                   <span className="text-xs font-normal text-ink/50">{t("vatIncluded")}</span>
                 </>
               )}

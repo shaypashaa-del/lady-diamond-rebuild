@@ -391,18 +391,26 @@ export async function setMaterialOptionManualPrice(
 ): Promise<{ saved: true } | { error: string }> {
   await requireAdminSession();
   const raw = String(formData.get("price") ?? "").trim();
+  const saleRaw = String(formData.get("salePrice") ?? "").trim();
   let price: number | null = null;
   if (raw !== "") {
     price = Number(raw);
     if (!Number.isFinite(price) || price <= 0) {
-      return { error: "יש להזין מחיר גדול מ-0, או להשאיר ריק כדי לחזור לחישוב אוטומטי." };
+      return { error: "יש להזין מחיר מחירון גדול מ-0, או להשאיר ריק כדי לחזור לחישוב אוטומטי." };
     }
+  }
+  let salePrice: number | null = null;
+  if (saleRaw !== "") {
+    salePrice = Number(saleRaw);
+    if (!Number.isFinite(salePrice) || salePrice <= 0) return { error: "מחיר המבצע חייב להיות גדול מ-0, או ריק." };
+    if (price === null) return { error: "כדי להגדיר מחיר מבצע יש להזין קודם מחיר מחירון." };
+    if (salePrice >= price) return { error: "מחיר המבצע חייב להיות נמוך ממחיר המחירון." };
   }
   const option = await prisma.productMaterialOption.findFirst({ where: { id: optionId, productId }, select: { id: true } });
   if (!option) return { error: "האפשרות לא נמצאה." };
 
   try {
-    await setManualOptionPrice(optionId, productId, price);
+    await setManualOptionPrice(optionId, productId, price, salePrice);
   } catch (err) {
     console.error("[admin] setMaterialOptionManualPrice failed", err);
     return { error: "השמירה נכשלה. נסו שוב, ואם זה חוזר פנו אלינו." };

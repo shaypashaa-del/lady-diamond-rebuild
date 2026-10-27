@@ -1,11 +1,11 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { getListingPrices } from "@/server/pricing/listing-prices";
+import { getListingPriceInfo } from "@/server/pricing/listing-prices";
 
 export async function getProductsBySlugs(slugs: string[]) {
   if (slugs.length === 0) return [];
-  const live = await getListingPrices();
+  const live = await getListingPriceInfo();
   const products = await prisma.product.findMany({
     where: { slug: { in: slugs }, status: "PUBLISHED" },
     include: {
@@ -21,8 +21,8 @@ export async function getProductsBySlugs(slugs: string[]) {
     slug: p.slug,
     name: p.name,
     shortDescription: p.shortDescription,
-    basePrice: live.get(p.id) ?? Number(p.basePrice),
-    salePrice: live.has(p.id) ? null : p.salePrice != null ? Number(p.salePrice) : null,
+    basePrice: live.has(p.id) ? (live.get(p.id)!.list ?? live.get(p.id)!.price) : Number(p.basePrice),
+    salePrice: live.has(p.id) ? (live.get(p.id)!.list != null ? live.get(p.id)!.price : null) : p.salePrice != null ? Number(p.salePrice) : null,
     inventory: p.inventory,
     needsOptions: live.has(p.id),
     variants: p.variants.map((v) => ({ id: v.id })),

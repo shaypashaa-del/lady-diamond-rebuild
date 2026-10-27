@@ -4,7 +4,7 @@ import { computeConfiguredPrice, round2 } from "@/lib/pricing/engine";
 import { VAT_RATE } from "@/lib/pricing/constants";
 import { getMetalPrice, refreshGoldPriceIfStale } from "@/server/services/market-prices";
 import { MetalType } from "@/generated/prisma/enums";
-import { getAllManualPrices } from "@/server/pricing/manual-option-prices";
+import { getAllManualPrices, getAllManualSalePrices } from "@/server/pricing/manual-option-prices";
 
 // The price a product's page opens on (default metal, designed diamond if it
 // has one, otherwise no diamond), VAT included — computed live from the same
@@ -14,12 +14,13 @@ import { getAllManualPrices } from "@/server/pricing/manual-option-prices";
 const TTL_MS = 60_000;
 // Held on globalThis so the start-up warm-up (a separate bundle) and the page
 // routes share one copy.
+type Computed = { prices: Map<string, number>; sales: Map<string, number> };
 const shared = globalThis as unknown as {
-  __listingPrices?: { cached: { at: number; value: Map<string, number> } | null; inflight: Promise<Map<string, number>> | null };
+  __listingPrices2?: { cached: { at: number; value: Computed } | null; inflight: Promise<Computed> | null };
 };
-const state = (shared.__listingPrices ??= { cached: null, inflight: null });
+const state = (shared.__listingPrices2 ??= { cached: null, inflight: null });
 
-async function compute(): Promise<Map<string, number>> {
+async function compute(): Promise<Computed> {
   await refreshGoldPriceIfStale();
   const [products, gold, silver, platinum, diamondPriceEntries, diamondBaseCostRanges] = await Promise.all([
     prisma.product.findMany({
@@ -57,14 +58,17 @@ async function compute(): Promise<Map<string, number>> {
     currency: r.currency,
   }));
 
-  const manualPrices = await getAllManualPrices();
+  const [manualPrices, manualSales] = await Promise.all([getAllManualPrices(), getAllManualSalePrices()]);
   const out = new Map<string, number>();
+  const sales = new Map<string, number>();
   for (const p of products) {
     const material = p.materialOptions.find((m) => m.isDefault) ?? p.materialOptions[0];
     if (!material) continue;
     const manual = manualPrices.get(material.id);
     if (manual !== undefined && manual > 0) {
       out.set(p.id, round2(manual));
+      const sale = manualSales.get(material.id);
+      if (sale !== undefined && sale > 0 && sale < manual) sales.set(p.id, round2(sale));
       continue;
     }
     const mp = metalPrices[material.metalType as keyof typeof metalPrices];
@@ -94,14 +98,14 @@ async function compute(): Promise<Map<string, number>> {
     });
     if (r.ok) out.set(p.id, round2(r.sellingPrice * (1 + VAT_RATE)));
   }
-  return out;
+  return { prices: out, sales };
 }
 
 // Stale-while-revalidate: once prices have been computed, every request gets
 // them instantly; when they are older than the TTL they are refreshed in the
 // background. Only the very first request after a restart ever waits for the
 // full computation (all products + metal/diamond tables + a gold price check).
-export async function getListingPrices(): Promise<Map<string, number>> {
+async function getComputed(): Promise<Computed> {
   const stale = !state.cached || Date.now() - state.cached.at >= TTL_MS;
   if (stale) {
     state.inflight ??= compute()
@@ -120,20 +124,41 @@ export async function getListingPrices(): Promise<Map<string, number>> {
   try {
     return await state.inflight!;
   } catch {
-    return new Map();
+    return { prices: new Map(), sales: new Map() };
   }
+}
+
+export type ListingPrice = { price: number; list?: number };
+
+// Price a shopper pays for each configurable product's default selection, plus the
+// regular (list) price when a hand-entered sale is running (respecting the product's
+// scheduled sale window, if any).
+export async function getListingPriceInfo(): Promise<Map<string, ListingPrice>> {
+  const [{ prices, sales }, extras] = await Promise.all([getComputed(), getAllProductExtras()]);
+  const out = new Map<string, ListingPrice>();
+  for (const [id, regular] of prices) {
+    const sale = sales.get(id);
+    out.set(id, sale !== undefined && isSaleActive(extras.get(id)) ? { price: sale, list: regular } : { price: regular });
+  }
+  return out;
+}
+
+// Effective price only (sale applied when active).
+export async function getListingPrices(): Promise<Map<string, number>> {
+  const info = await getListingPriceInfo();
+  return new Map([...info].map(([id, v]) => [id, v.price]));
 }
 
 type Priced = { id: string; basePrice: unknown; salePrice: unknown };
 
-// Swap a configurable product's placeholder price for its live price and drop
-// the placeholder sale price.
+// Swap a configurable product's placeholder price for its live price (and its
+// hand-entered sale, if running).
 export async function applyLivePrices<T extends Priced>(products: T[]): Promise<T[]> {
-  const [prices, extras] = await Promise.all([getListingPrices(), getAllProductExtras()]);
+  const [info, extras] = await Promise.all([getListingPriceInfo(), getAllProductExtras()]);
   return products.map((p) => {
-    const live = prices.get(p.id);
+    const live = info.get(p.id);
     const ex = extras.get(p.id);
-    const base = live == null ? p : { ...p, basePrice: live, salePrice: null };
+    const base = live == null ? p : { ...p, basePrice: live.list ?? live.price, salePrice: live.list != null ? live.price : null };
     const scheduled = base.salePrice != null && !isSaleActive(ex) ? { ...base, salePrice: null } : base;
     // A product that needs a choice before it can be bought (material picker,
     // sizes) must send the shopper to its page, never add straight to the cart.

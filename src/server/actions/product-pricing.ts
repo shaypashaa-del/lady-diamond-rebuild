@@ -21,7 +21,7 @@ export type ConfiguredPriceRequest = {
 // cost, margin, per-component costs). See AGENTS.md step 20: the shopper
 // sees only the selected options and the final price.
 export type ConfiguredPriceResponse =
-  | { ok: true; sellingPrice: number }
+  | { ok: true; sellingPrice: number; listPrice?: number }
   | { ok: false; message: string };
 
 // Called from the product page client component whenever the shopper
@@ -38,7 +38,7 @@ export async function getConfiguredPrice(req: ConfiguredPriceRequest): Promise<C
     calculatorDiamondSpec: req.calculatorDiamondSpec,
   });
   if (!result.ok) return { ok: false, message: result.message };
-  return { ok: true, sellingPrice: result.sellingPrice };
+  return { ok: true, sellingPrice: result.sellingPrice, listPrice: result.listPrice };
 }
 
 // Admin-facing: same computation, but returns the full cost breakdown for

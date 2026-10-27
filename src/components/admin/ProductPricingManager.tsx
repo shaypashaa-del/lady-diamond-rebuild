@@ -8,7 +8,7 @@ import {
   updateProductPricingSettings,
 } from "@/server/actions/pricing";
 import { SavableForm } from "./SavableForm";
-import { getAllManualPrices } from "@/server/pricing/manual-option-prices";
+import { getAllManualPrices, getAllManualSalePrices } from "@/server/pricing/manual-option-prices";
 import { DIAMOND_QUALITY_TIERS, PURITY_LABEL, VALID_PURITIES_FOR_METAL } from "@/lib/pricing/constants";
 import type {
   DiamondCertification,
@@ -75,6 +75,7 @@ export async function ProductPricingManager({
   diamondOptions: DiamondOptionRow[];
 }) {
   const manualPrices = await getAllManualPrices(true);
+  const manualSales = await getAllManualSalePrices(true);
   const missingManual = materialOptions.filter((m) => !manualPrices.has(m.id));
 
   return (
@@ -113,7 +114,7 @@ export async function ProductPricingManager({
               <th className="py-2 font-medium">טוהר</th>
               <th className="py-2 font-medium">גוון</th>
               <th className="py-2 font-medium">ברירת מחדל</th>
-              <th className="py-2 font-medium">מחיר ידני (₪, כולל מע״מ)</th>
+              <th className="py-2 font-medium">מחיר מחירון / מחיר מבצע (₪, כולל מע״מ)</th>
               <th className="py-2 font-medium">תמונה לאפשרות</th>
               <th className="py-2 font-medium"></th>
             </tr>
@@ -138,9 +139,19 @@ export async function ProductPricingManager({
                       step="0.01"
                       min="0"
                       defaultValue={manualPrices.has(m.id) ? manualPrices.get(m.id) : ""}
-                      placeholder="הזן מחיר"
-                      aria-label="מחיר ידני"
-                      className="w-28 rounded border border-neutral-300 px-2 py-1 text-sm"
+                      placeholder="מחירון"
+                      aria-label="מחיר מחירון"
+                      className="w-24 rounded border border-neutral-300 px-2 py-1 text-sm"
+                    />
+                    <input
+                      name="salePrice"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      defaultValue={manualSales.has(m.id) ? manualSales.get(m.id) : ""}
+                      placeholder="מבצע"
+                      aria-label="מחיר מבצע"
+                      className="w-24 rounded border border-rose-300 px-2 py-1 text-sm"
                     />
                   </SavableForm>
                 </td>
@@ -178,7 +189,7 @@ export async function ProductPricingManager({
         </table>
       )}
       <p className="mb-3 text-xs text-neutral-500">
-        הזן לכל אפשרות חומר את המחיר הסופי (כולל מע״מ). הוא המחיר שהלקוח רואה וגם משלם עבור המוצר כפי שהוא (עם היהלום שלו או בלי). אם הלקוח בוחר יהלום אחר מהמחירון, התוספת שלו עדיין מחושבת לפי המחירון.
+        הזן לכל אפשרות חומר את מחיר המחירון (כולל מע״מ), ואם יש מבצע, גם את מחיר המבצע (נמוך יותר). בלי מבצע הלקוח רואה את מחיר המחירון; עם מבצע הוא רואה את מחיר המחירון מחוק ואת מחיר המבצע, ומשלם את מחיר המבצע. מבצע מתוזמן (תאריכים) מוגדר ב&quot;פרטי מסחר נוספים&quot;. המחיר הוא עבור המוצר כפי שהוא (עם היהלום שלו או בלי). אם הלקוח בוחר יהלום אחר מהמחירון, התוספת שלו עדיין מחושבת לפי המחירון.
       </p>
       <form action={addMaterialOption.bind(null, productId)} className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-5">
         <select name="metalType" className="border border-neutral-300 px-2 py-2 text-xs" required>

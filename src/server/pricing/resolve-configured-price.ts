@@ -9,7 +9,8 @@ import {
 } from "@/lib/pricing/engine";
 import { getMetalPrice, refreshGoldPriceIfStale } from "@/server/services/market-prices";
 import { VAT_RATE } from "@/lib/pricing/constants";
-import { getAllManualPrices } from "@/server/pricing/manual-option-prices";
+import { getAllManualPrices, getAllManualSalePrices } from "@/server/pricing/manual-option-prices";
+import { getProductExtras, isSaleActive } from "@/server/product-extras";
 import {
   MetalType,
   type DiamondShape,
@@ -29,6 +30,9 @@ export type ResolveConfiguredPriceResult =
   | {
       ok: true;
       sellingPrice: number;
+      // Set when a hand-entered sale price is active: the regular (list) price,
+      // so the shop can show it struck through. sellingPrice is then the sale price.
+      listPrice?: number;
       materialOptionId: string;
       diamondOptionIds: string[];
       calculatorDiamondSpec?: CalculatorDiamondChoice;
@@ -312,11 +316,19 @@ export async function resolveConfiguredPrice(
       : r.reason !== "MISSING_DIAMOND_SELECTION" && r.reason !== "INVALID_MATERIAL" && r.reason !== "MISSING_PRODUCT");
 
   if (useManual) {
-    const manual = (await getAllManualPrices(params.fresh === true)).get(params.materialOptionId);
+    const fresh = params.fresh === true;
+    const manual = (await getAllManualPrices(fresh)).get(params.materialOptionId);
     if (manual !== undefined && manual > 0) {
+      const list = round2(manual);
+      const saleRaw = (await getAllManualSalePrices(fresh)).get(params.materialOptionId);
+      // A sale applies only when it is below the list price and inside the scheduled
+      // window (if the product has one, see "מבצע מתוזמן" in the product's extras).
+      const onSale =
+        saleRaw !== undefined && saleRaw > 0 && saleRaw < list && isSaleActive(await getProductExtras(params.productId, fresh));
       return {
         ok: true,
-        sellingPrice: round2(manual),
+        sellingPrice: onSale ? round2(saleRaw!) : list,
+        listPrice: onSale ? list : undefined,
         materialOptionId: params.materialOptionId,
         diamondOptionIds: r.ok ? r.diamondOptionIds : [],
         calculatorDiamondSpec: r.ok ? r.calculatorDiamondSpec : spec === "none" ? "none" : undefined,

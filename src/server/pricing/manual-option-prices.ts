@@ -16,6 +16,8 @@ function ensureTable() {
          "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
        )`
     )
+    // Sale price per option (added later): the table is created/extended at runtime.
+    .then(() => prisma.$executeRawUnsafe(`ALTER TABLE "ManualOptionPrice" ADD COLUMN IF NOT EXISTS "salePrice" NUMERIC(12,2)`))
     .then(() => undefined)
     .catch((err) => {
       ready = null;
@@ -25,34 +27,58 @@ function ensureTable() {
 }
 
 const TTL_MS = 30_000;
-let allCache: { at: number; value: Map<string, number> } | null = null;
+type Loaded = { prices: Map<string, number>; sales: Map<string, number> };
+let allCache: { at: number; value: Loaded } | null = null;
 
-// optionId -> manual price, for every product (small table; one query).
-export async function getAllManualPrices(fresh = false): Promise<Map<string, number>> {
+async function loadAll(fresh: boolean): Promise<Loaded> {
   if (!fresh && allCache && Date.now() - allCache.at < TTL_MS) return allCache.value;
   try {
     await ensureTable();
-    const rows = await prisma.$queryRaw<{ optionId: string; price: string }[]>`
-      SELECT "optionId", "price"::text AS "price" FROM "ManualOptionPrice"`;
-    const value = new Map(rows.map((r) => [r.optionId, Number(r.price)]));
+    const rows = await prisma.$queryRaw<{ optionId: string; price: string; salePrice: string | null }[]>`
+      SELECT "optionId", "price"::text AS "price", "salePrice"::text AS "salePrice" FROM "ManualOptionPrice"`;
+    const value: Loaded = {
+      prices: new Map(rows.map((r) => [r.optionId, Number(r.price)])),
+      sales: new Map(rows.filter((r) => r.salePrice != null && Number(r.salePrice) > 0).map((r) => [r.optionId, Number(r.salePrice)])),
+    };
     allCache = { at: Date.now(), value };
     return value;
   } catch (err) {
     // Never let the optional table break pricing: no manual prices instead.
     console.error("[pricing] manual option prices unavailable", err);
-    return new Map();
+    return { prices: new Map(), sales: new Map() };
   }
 }
 
-export async function setManualOptionPrice(optionId: string, productId: string, price: number | null) {
+// optionId -> manual list price, for every product (small table; one query).
+export async function getAllManualPrices(fresh = false): Promise<Map<string, number>> {
+  return (await loadAll(fresh)).prices;
+}
+
+// optionId -> manual sale price (only options that have one).
+export async function getAllManualSalePrices(fresh = false): Promise<Map<string, number>> {
+  return (await loadAll(fresh)).sales;
+}
+
+// `salePrice`: undefined = leave the stored sale price as it is; null = clear it.
+export async function setManualOptionPrice(
+  optionId: string,
+  productId: string,
+  price: number | null,
+  salePrice?: number | null
+) {
   await ensureTable();
   if (price === null) {
     await prisma.$executeRaw`DELETE FROM "ManualOptionPrice" WHERE "optionId" = ${optionId}`;
-  } else {
+  } else if (salePrice === undefined) {
     await prisma.$executeRaw`
       INSERT INTO "ManualOptionPrice" ("optionId", "productId", "price")
       VALUES (${optionId}, ${productId}, ${price})
       ON CONFLICT ("optionId") DO UPDATE SET "price" = EXCLUDED."price", "updatedAt" = now()`;
+  } else {
+    await prisma.$executeRaw`
+      INSERT INTO "ManualOptionPrice" ("optionId", "productId", "price", "salePrice")
+      VALUES (${optionId}, ${productId}, ${price}, ${salePrice})
+      ON CONFLICT ("optionId") DO UPDATE SET "price" = EXCLUDED."price", "salePrice" = EXCLUDED."salePrice", "updatedAt" = now()`;
   }
   allCache = null;
 }

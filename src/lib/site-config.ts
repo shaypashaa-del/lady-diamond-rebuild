@@ -10,7 +10,7 @@ export const BUSINESS_PHONE = "050-3781589";
 // Bank account customers transfer to (shown at checkout and in the order mail). Given by
 // the owner; BANK_HOLDER / BANK_NAME / BANK_BRANCH / BANK_ACCOUNT in the server env override it.
 export const BANK_DETAILS = {
-  holder: "דיאנה",
+  holder: "דיאנה אוריה אירימוב",
   bank: "בנק לאומי",
   branch: "851",
   account: "35498488",

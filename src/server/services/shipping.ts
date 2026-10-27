@@ -1,6 +1,9 @@
 import { ttlMemo } from "@/lib/ttl-memo";
 import { prisma } from "@/lib/prisma";
 
+// Used whenever no admin shipping rule applies to an order.
+export const DEFAULT_SHIPPING_PRICE = 65;
+
 export type ShippingRuleLike = {
   country: string | null;
   minOrderValue: unknown;
@@ -28,7 +31,8 @@ export function pickShippingPrice(
     return true;
   });
 
-  if (applicable.length === 0) return 0; // no shipping configured yet — default free
+  // No matching rule: the default flat shipping price (VAT included).
+  if (applicable.length === 0) return DEFAULT_SHIPPING_PRICE;
 
   const prices = applicable.map((r) => Number(r.price));
   return Math.min(...prices);

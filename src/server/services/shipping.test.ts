@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { pickShippingPrice, type ShippingRuleLike } from "./shipping";
 
 describe("pickShippingPrice", () => {
-  it("returns 0 (free) when no rules are configured", () => {
-    expect(pickShippingPrice([], 100, "Israel")).toBe(0);
+  it("returns the default shipping price (65) when no rule applies", () => {
+    expect(pickShippingPrice([], 100, "Israel")).toBe(65);
   });
 
   it("applies an unscoped flat rate to any country/subtotal", () => {

@@ -38,6 +38,28 @@ export type ProductExtras = {
   saleEnd?: string;
 };
 
+// Default personalisation offered on every product until the admin changes it for that
+// product: engraving 200 ₪ (up to 30 characters) and gift wrap at no extra charge.
+export const PERSONALIZATION_DEFAULTS = {
+  engraving: true,
+  engravingFee: 200,
+  engravingMaxLen: 30,
+  giftWrap: true,
+  giftWrapFee: 0,
+} as const;
+
+export function withPersonalizationDefaults(e: ProductExtras | undefined): ProductExtras {
+  const x = e ?? {};
+  return {
+    ...x,
+    engraving: x.engraving ?? PERSONALIZATION_DEFAULTS.engraving,
+    engravingFee: x.engravingFee ?? PERSONALIZATION_DEFAULTS.engravingFee,
+    engravingMaxLen: x.engravingMaxLen ?? PERSONALIZATION_DEFAULTS.engravingMaxLen,
+    giftWrap: x.giftWrap ?? PERSONALIZATION_DEFAULTS.giftWrap,
+    giftWrapFee: x.giftWrapFee ?? PERSONALIZATION_DEFAULTS.giftWrapFee,
+  };
+}
+
 export function isSaleActive(extras: ProductExtras | undefined, now = new Date()): boolean {
   if (!extras || (!extras.saleStart && !extras.saleEnd)) return true;
   const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jerusalem" }).format(now);
@@ -85,7 +107,7 @@ export async function getAllProductExtras(fresh = false): Promise<Map<string, Pr
 }
 
 export async function getProductExtras(productId: string, fresh = false): Promise<ProductExtras> {
-  return (await getAllProductExtras(fresh)).get(productId) ?? {};
+  return withPersonalizationDefaults((await getAllProductExtras(fresh)).get(productId));
 }
 
 export async function saveProductExtras(productId: string, data: ProductExtras) {

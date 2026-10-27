@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 import { randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { VAT_RATE } from "@/lib/pricing/constants";
-import { getAllProductExtras, isSaleActive } from "@/server/product-extras";
+import { getAllProductExtras, isSaleActive, withPersonalizationDefaults } from "@/server/product-extras";
 import { getSession } from "@/lib/auth/session";
 import { calculateShipping } from "@/server/services/shipping";
 import { calculateCommission } from "@/server/services/commission";
@@ -121,7 +121,7 @@ export async function createOrder(input: CheckoutInput): Promise<CheckoutResult>
 
     // Order rules set per product in the admin (minimum / maximum quantity,
     // pre-order allowed when out of stock). Enforced here, never only in the UI.
-    const extras = extrasByProduct.get(product.id) ?? {};
+    const extras = withPersonalizationDefaults(extrasByProduct.get(product.id));
     const backorder = extras.allowBackorder === true;
     if (extras.minQty && line.quantity < extras.minQty) {
       return { error: `כמות מינימום להזמנה של "${line.name}": ${extras.minQty}.` };

@@ -87,10 +87,11 @@ export async function updateProductExtras(
     heightMm: f.heightMm,
     costPrice: f.costPrice,
     sizes: sizes.length ? Array.from(new Set(sizes)) : undefined,
-    engraving: formData.get("engraving") === "on" || undefined,
+    // Stored explicitly (also when off) so "off" is not mistaken for "default on".
+    engraving: formData.get("engraving") === "on",
     engravingFee: f.engravingFee,
     engravingMaxLen: f.engravingMaxLen,
-    giftWrap: formData.get("giftWrap") === "on" || undefined,
+    giftWrap: formData.get("giftWrap") === "on",
     giftWrapFee: f.giftWrapFee,
     saleStart,
     saleEnd,

@@ -23,5 +23,5 @@ export const PAYPAL_EMAIL = "diana.isra777@gmail.com";
 // PayPal.Me page of the shop owner: opens PayPal with the amount already filled in.
 export const PAYPAL_ME_USER = "dianaOriya";
 export function paypalMeUrl(amount: number): string {
-  return `https://www.paypal.me/${PAYPAL_ME_USER}/${amount.toFixed(2)}ILS`;
+  return `https://www.paypal.com/paypalme/${PAYPAL_ME_USER}/${amount.toFixed(2)}ILS`;
 }

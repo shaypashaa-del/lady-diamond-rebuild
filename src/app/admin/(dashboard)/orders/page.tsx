@@ -90,7 +90,7 @@ export default async function AdminOrdersPage({
       </form>
 
       <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white">
-        <table className="w-full text-sm">
+        <table className="admin-cards w-full text-sm">
           <thead className="border-b border-neutral-200 bg-neutral-50 text-right text-xs text-neutral-500">
             <tr>
               <th className="px-4 py-3 font-medium">מספר הזמנה</th>
@@ -105,17 +105,17 @@ export default async function AdminOrdersPage({
           <tbody>
             {orders.map((o) => (
               <tr key={o.id} className="border-b border-neutral-100 last:border-0">
-                <td className="px-4 py-3 font-medium">
+                <td data-full="" className="px-4 py-3 font-medium">
                   <Link href={`/admin/orders/${o.id}`} className="block hover:underline">
                     {o.orderNumber}
                   </Link>
                 </td>
-                <td className="px-4 py-3">{o.email}</td>
-                <td className="px-4 py-3">{Number(o.total).toFixed(2)} ₪</td>
-                <td className="px-4 py-3">{o.affiliate?.code ?? "—"}</td>
-                <td className="px-4 py-3">{paymentLabels[o.paymentStatus]}</td>
-                <td className="px-4 py-3">{statusLabels[o.status]}</td>
-                <td className="px-4 py-3 text-neutral-500">
+                <td data-label="לקוח" className="px-4 py-3">{o.email}</td>
+                <td data-label="סכום" className="px-4 py-3">{Number(o.total).toFixed(2)} ₪</td>
+                <td data-label="שותף" className="px-4 py-3">{o.affiliate?.code ?? "—"}</td>
+                <td data-label="תשלום" className="px-4 py-3">{paymentLabels[o.paymentStatus]}</td>
+                <td data-label="סטטוס" className="px-4 py-3">{statusLabels[o.status]}</td>
+                <td data-label="תאריך" className="px-4 py-3 text-neutral-500">
                   {o.createdAt.toLocaleDateString("he-IL")}
                 </td>
               </tr>

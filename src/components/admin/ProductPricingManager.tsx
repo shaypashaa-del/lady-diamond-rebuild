@@ -120,7 +120,7 @@ export async function ProductPricingManager({
         </SavableForm>
       )}
       {materialOptions.length > 0 && (
-        <table className="mb-4 w-full text-sm">
+        <table className="admin-cards mb-4 w-full text-sm">
           <thead className="border-b border-neutral-200 text-right text-xs text-neutral-500">
             <tr>
               <th className="py-2 font-medium">מתכת</th>
@@ -135,11 +135,11 @@ export async function ProductPricingManager({
           <tbody>
             {materialOptions.map((m) => (
               <tr key={m.id} className="border-b border-neutral-100 last:border-0">
-                <td className="py-2">{METAL_LABEL[m.metalType]}</td>
-                <td className="py-2">{PURITY_LABEL[m.purity]}</td>
-                <td className="py-2">{m.goldColor ? GOLD_COLOR_LABEL[m.goldColor] : "—"}</td>
-                <td className="py-2">{m.isDefault ? "✓" : ""}</td>
-                <td className="py-2">
+                <td data-label="מתכת" className="py-2">{METAL_LABEL[m.metalType]}</td>
+                <td data-label="טוהר" className="py-2">{PURITY_LABEL[m.purity]}</td>
+                <td data-label="גוון" className="py-2">{m.goldColor ? GOLD_COLOR_LABEL[m.goldColor] : "—"}</td>
+                <td data-label="ברירת מחדל" className="py-2">{m.isDefault ? "✓" : ""}</td>
+                <td data-full="" className="py-2">
                   <div className="flex items-center gap-2">
                     <input
                       name={`price_${m.id}`}
@@ -165,7 +165,7 @@ export async function ProductPricingManager({
                     />
                   </div>
                 </td>
-                <td className="py-2">
+                <td data-full="" className="py-2">
                   {productImages.length === 0 ? (
                     <span className="text-xs text-neutral-400">אין תמונות במוצר</span>
                   ) : (

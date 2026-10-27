@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireAdminSession } from "@/lib/auth/guards";
 import { logout } from "@/server/actions/auth";
+import { AdminMobileNav } from "@/components/admin/AdminMobileNav";
 
 const navItems = [
   { href: "/admin", label: "לוח בקרה" },
@@ -29,8 +30,9 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
   const session = await requireAdminSession();
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="flex w-56 shrink-0 flex-col border-l border-neutral-200 bg-white">
+    <div className="admin-shell flex min-h-screen flex-col md:flex-row">
+      <AdminMobileNav items={navItems} name={session.name} logout={logout} />
+      <aside className="hidden w-56 shrink-0 flex-col border-l border-neutral-200 bg-white md:flex">
         <div className="border-b border-neutral-200 px-5 py-4">
           <p className="text-sm font-semibold tracking-wide">LADY DIAMOND</p>
           <p className="text-xs text-neutral-400">ניהול החנות</p>
@@ -55,7 +57,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
           </form>
         </div>
       </aside>
-      <main className="flex-1 p-8">{children}</main>
+      <main className="min-w-0 flex-1 p-4 pb-24 md:p-8 md:pb-8">{children}</main>
     </div>
   );
 }

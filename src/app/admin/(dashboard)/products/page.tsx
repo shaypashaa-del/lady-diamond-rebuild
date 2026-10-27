@@ -58,7 +58,7 @@ export default async function AdminProductsPage({
       <ResetPricesPanel />
 
       <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white">
-        <table className="w-full text-sm">
+        <table className="admin-cards w-full text-sm">
           <thead className="border-b border-neutral-200 bg-neutral-50 text-right text-xs text-neutral-500">
             <tr>
               <th className="w-20 px-4 py-3 font-medium">תמונה</th>
@@ -74,7 +74,7 @@ export default async function AdminProductsPage({
           <tbody>
             {products.map((p) => (
               <tr key={p.id} className="border-b border-neutral-100 last:border-0">
-                <td className="px-4 py-3">
+                <td data-full="" className="px-4 py-3">
                   <Link href={`/admin/products/${p.id}`} className="block h-16 w-16 overflow-hidden rounded border border-neutral-200 bg-neutral-100">
                     {p.images[0] ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -89,16 +89,16 @@ export default async function AdminProductsPage({
                     )}
                   </Link>
                 </td>
-                <td className="px-4 py-3">
+                <td data-full="" className="px-4 py-3">
                   <Link href={`/admin/products/${p.id}`} className="block font-medium hover:underline">
                     {localize(p.name as LocalizedText, "he")}
                   </Link>
                   <p className="text-xs text-neutral-400">{p.slug}</p>
                 </td>
-                <td className="px-4 py-3 text-neutral-500">
+                <td data-label="קטגוריה" className="px-4 py-3 text-neutral-500">
                   {p.categories[0] ? localize(p.categories[0].category.name as LocalizedText, "he") : "—"}
                 </td>
-                <td className="px-4 py-3">
+                <td data-label="מחיר" className="px-4 py-3">
                   {p.pricingMode === "CONFIGURABLE" ? (
                     <div>
                       <div>{livePrices.has(p.id) ? `${formatIls(livePrices.get(p.id)!)} ₪` : "—"}</div>
@@ -141,10 +141,10 @@ export default async function AdminProductsPage({
                     </SavableForm>
                   )}
                 </td>
-                <td className="px-4 py-3">{p.inventory}</td>
-                <td className="px-4 py-3">{statusLabels[p.status]}</td>
-                <td className="px-4 py-3">{p.isFeatured ? "כן" : "—"}</td>
-                <td className="px-4 py-3">
+                <td data-label="מלאי" className="px-4 py-3">{p.inventory}</td>
+                <td data-label="סטטוס" className="px-4 py-3">{statusLabels[p.status]}</td>
+                <td data-label="מומלץ" className="px-4 py-3">{p.isFeatured ? "כן" : "—"}</td>
+                <td data-full="" className="px-4 py-3">
                   <div className="flex items-center gap-3 text-xs">
                     <Link href={`/admin/products/${p.id}`} className="block text-blue-600 hover:underline">
                       עריכה

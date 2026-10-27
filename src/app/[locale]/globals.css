@@ -543,3 +543,75 @@ html[lang="he"] :where(h1, h2, h3, h4, p, span, a, button, li, label, dt, dd, th
     }
   }
 }
+
+/* =========================================================================
+   Admin on phones: comfortable touch targets, no iOS zoom on focus, and tables
+   that turn into stacked cards (add class "admin-cards" and data-label on cells).
+   ========================================================================= */
+@media (max-width: 767px) {
+  .admin-shell input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  .admin-shell select,
+  .admin-shell textarea {
+    font-size: 16px;
+    min-height: 44px;
+  }
+  .admin-shell button,
+  .admin-shell [type="submit"] {
+    min-height: 44px;
+  }
+  .admin-shell input[type="checkbox"],
+  .admin-shell input[type="radio"] {
+    width: 20px;
+    height: 20px;
+  }
+  .admin-shell h1 {
+    font-size: 1.25rem;
+  }
+  .admin-shell .admin-cards table,
+  .admin-shell table.admin-cards {
+    display: block;
+  }
+  .admin-shell .admin-cards thead,
+  .admin-shell table.admin-cards thead {
+    display: none;
+  }
+  .admin-shell .admin-cards tbody,
+  .admin-shell table.admin-cards tbody,
+  .admin-shell .admin-cards tr,
+  .admin-shell table.admin-cards tr {
+    display: block;
+  }
+  .admin-shell .admin-cards tr,
+  .admin-shell table.admin-cards tr {
+    margin-bottom: 0.75rem;
+    border: 1px solid rgb(229 229 229);
+    border-radius: 0.5rem;
+    background: #fff;
+    padding: 0.5rem 0.75rem;
+  }
+  .admin-shell .admin-cards td,
+  .admin-shell table.admin-cards td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.4rem 0 !important;
+    border: 0 !important;
+    text-align: start;
+  }
+  .admin-shell .admin-cards td[data-label]::before,
+  .admin-shell table.admin-cards td[data-label]::before {
+    content: attr(data-label);
+    flex: none;
+    font-size: 0.7rem;
+    color: rgb(115 115 115);
+  }
+  .admin-shell .admin-cards td[data-full],
+  .admin-shell table.admin-cards td[data-full] {
+    display: block;
+  }
+  .admin-shell .admin-cards td input[type="number"] {
+    width: 100% !important;
+    max-width: 9rem;
+  }
+}

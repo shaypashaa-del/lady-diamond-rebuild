@@ -107,7 +107,7 @@ export default async function AdminDashboard({
   return (
     <div>
       <StudioHome
-        name={session.name?.split(" ")[0] ?? "דיאנה"}
+        name={/[\u0590-\u05FF]/.test(session.name ?? "") ? (session.name ?? "").split(" ")[0] : ""}
         kpis={[
           { label: "הזמנות ממתינות", value: pendingOrders, href: "/admin/orders", tone: "alert" },
           { label: "הכנסות היום", value: Math.round(todayStats.revenue), suffix: "₪", href: "/admin/orders" },

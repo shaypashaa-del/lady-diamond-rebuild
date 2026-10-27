@@ -110,7 +110,7 @@ export function StudioHome({
       <section className="relative overflow-hidden rounded-2xl bg-[#0d0d0d] px-5 py-6 text-[#f4ecd8] shadow-[0_18px_40px_-24px_rgba(0,0,0,0.7)]">
         <div className="st-sheen pointer-events-none absolute inset-y-0 start-0 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-[#d7b46a]/15 to-transparent" />
         <p className="text-[11px] uppercase tracking-[0.35em] text-[#d7b46a]">LADY DIAMOND</p>
-        <h1 className="st-greet mt-2 text-2xl font-light tracking-wide">שלום, {name}</h1>
+        <h1 className="st-greet mt-2 text-2xl font-light tracking-wide">{name ? `שלום, ${name}` : "שלום"}</h1>
         <p className="st-greet mt-1 text-xs text-[#cdbf9c]">מה נערוך היום?</p>
         <span className="st-line mt-4 block h-px w-full bg-gradient-to-r from-transparent via-[#d7b46a] to-transparent" />
       </section>

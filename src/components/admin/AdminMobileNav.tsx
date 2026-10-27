@@ -94,8 +94,12 @@ export function AdminMobileNav({ items, name, logout }: { items: Item[]; name: s
             key={b.href}
             href={b.href}
             className={`flex min-h-14 items-center justify-center px-1 text-center text-xs font-medium ${
-              active(b.href) && b.href !== "/admin/products/new" ? "text-[#d7b46a] underline underline-offset-4" : "text-[#cdbf9c]"
-            } ${b.href === "/admin/products/new" ? "bg-gradient-to-b from-[#d7b46a] to-[#b08d3c] font-semibold text-[#0d0d0d]" : ""}`}
+              b.href === "/admin/products/new"
+                ? "bg-gradient-to-b from-[#d7b46a] to-[#b08d3c] font-semibold text-[#0d0d0d]"
+                : active(b.href)
+                  ? "text-[#d7b46a] underline underline-offset-4"
+                  : "text-[#cdbf9c]"
+            }`}
           >
             {b.label}
           </Link>

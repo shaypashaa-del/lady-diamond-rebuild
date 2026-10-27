@@ -385,6 +385,7 @@
     "paypalLoadFailed": "Не удалось загрузить PayPal. Проверьте соединение и попробуйте снова."
   },
   "OrderConfirmation": {
+    "payWithPaypal": "Оплатить сейчас через PayPal ({amount} ₪)",
     "title": "Спасибо за заказ!",
     "orderNumber": "Номер заказа",
     "total": "Итого",

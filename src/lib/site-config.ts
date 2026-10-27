@@ -19,3 +19,9 @@ export const BANK_DETAILS = {
 // PayPal account customers pay to directly (shown at checkout and in the order mail).
 // PAYPAL_EMAIL in the server env overrides it.
 export const PAYPAL_EMAIL = "diana.isra777@gmail.com";
+
+// PayPal.Me page of the shop owner: opens PayPal with the amount already filled in.
+export const PAYPAL_ME_USER = "dianaOriya";
+export function paypalMeUrl(amount: number): string {
+  return `https://www.paypal.me/${PAYPAL_ME_USER}/${amount.toFixed(2)}ILS`;
+}

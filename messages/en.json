@@ -385,6 +385,7 @@
     "paypalLoadFailed": "Failed to load PayPal. Check your connection and try again."
   },
   "OrderConfirmation": {
+    "payWithPaypal": "Pay now with PayPal ({amount} ₪)",
     "title": "Thank you for your order!",
     "orderNumber": "Order Number",
     "total": "Total",

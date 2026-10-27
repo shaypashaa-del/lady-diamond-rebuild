@@ -1,5 +1,5 @@
 import "server-only";
-import { BANK_DETAILS, BUSINESS_PHONE, PAYPAL_EMAIL } from "@/lib/site-config";
+import { BANK_DETAILS, BUSINESS_PHONE, PAYPAL_EMAIL, paypalMeUrl } from "@/lib/site-config";
 
 // Payment abstraction: the store never talks to a specific gateway directly.
 // Today only manual offline methods exist (matching the live site's actual
@@ -166,7 +166,8 @@ export const paypalProvider: PaymentProvider = {
       return {
         immediatelyPaid: false,
         instructions:
-          `לתשלום ב-PayPal: היכנסו לחשבון ה-PayPal שלכם ושלחו ${amount} ₪ לכתובת ${email} (בחרו באפשרות תשלום עבור מוצרים ושירותים). ` +
+          `לתשלום ב-PayPal לחצו על הקישור (נפתח עם הסכום ${amount} ₪ כבר מוזן): ${paypalMeUrl(orderTotal)} ` +
+          `או שלחו ${amount} ₪ לכתובת ${email} (בחרו באפשרות תשלום עבור מוצרים ושירותים). ` +
           `בהערה לתשלום כתבו את מספר ההזמנה ${orderNumber}. ` +
           `ההזמנה תישלח לאחר שנאשר את קבלת התשלום (בדרך כלל באותו יום עסקים).`,
       };

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
+import { paypalMeUrl } from "@/lib/site-config";
 
 const DiamondMark = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
@@ -52,6 +53,16 @@ export default async function OrderConfirmationPage({
             {t("instructions")}
           </h2>
           <p className="text-sm text-ink/70">{order.paymentInstructions}</p>
+          {order.paymentMethod === "paypal" && order.paymentStatus !== "PAID" && (
+            <a
+              href={paypalMeUrl(Number(order.total))}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 block border border-gold-bright bg-ink px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-paper hover:bg-gold-bright hover:text-ink"
+            >
+              {t("payWithPaypal", { amount: Number(order.total).toFixed(2) })}
+            </a>
+          )}
         </div>
       )}
 

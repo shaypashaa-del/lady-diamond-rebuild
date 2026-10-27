@@ -385,6 +385,7 @@
     "paypalLoadFailed": "טעינת PayPal נכשלה. בדקו את החיבור ונסו שוב."
   },
   "OrderConfirmation": {
+    "payWithPaypal": "לתשלום עכשיו ב-PayPal ({amount} ₪)",
     "title": "תודה על ההזמנה!",
     "orderNumber": "מספר הזמנה",
     "total": "סה\"כ",

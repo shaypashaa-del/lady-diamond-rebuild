@@ -1,5 +1,5 @@
 import "server-only";
-import { BUSINESS_PHONE } from "@/lib/site-config";
+import { BANK_DETAILS, BUSINESS_PHONE } from "@/lib/site-config";
 
 // Payment abstraction: the store never talks to a specific gateway directly.
 // Today only manual offline methods exist (matching the live site's actual
@@ -26,14 +26,13 @@ export interface PaymentProvider {
   init(orderTotal: number, orderNumber: string, meta?: Record<string, string>): Promise<PaymentInitResult>;
 }
 
-// Bank details shown to customers come from server env (BANK_HOLDER, BANK_NAME,
-// BANK_BRANCH, BANK_ACCOUNT) so they can be changed without a code change. Until
-// they are set, customers are told they will receive the details from the shop.
+// Bank details shown to customers: the shop's account from site-config, overridable by
+// server env (BANK_HOLDER, BANK_NAME, BANK_BRANCH, BANK_ACCOUNT) without a code change.
 function bankDetailsText(): string {
-  const holder = process.env.BANK_HOLDER?.trim();
-  const bank = process.env.BANK_NAME?.trim();
-  const branch = process.env.BANK_BRANCH?.trim();
-  const account = process.env.BANK_ACCOUNT?.trim();
+  const holder = process.env.BANK_HOLDER?.trim() || BANK_DETAILS.holder;
+  const bank = process.env.BANK_NAME?.trim() || BANK_DETAILS.bank;
+  const branch = process.env.BANK_BRANCH?.trim() || BANK_DETAILS.branch;
+  const account = process.env.BANK_ACCOUNT?.trim() || BANK_DETAILS.account;
   if (!holder || !bank || !branch || !account) return "";
   return `פרטי החשבון: ${holder}, ${bank}, סניף ${branch}, חשבון ${account}. `;
 }

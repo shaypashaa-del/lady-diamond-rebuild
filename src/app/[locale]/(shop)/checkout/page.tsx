@@ -1,6 +1,6 @@
 "use client";
 
-import { BUSINESS_PHONE } from "@/lib/site-config";
+import { BANK_DETAILS, BUSINESS_PHONE } from "@/lib/site-config";
 import { describeOptions } from "@/lib/line-options";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -305,6 +305,24 @@ function CheckoutForm() {
               PayPal
             </label>
           </div>
+
+          {paymentMethod === "bank_transfer" && (
+            <div className="mt-4 border border-gold-bright/60 bg-gold-soft/20 p-4 text-sm text-ink">
+              <p className="font-semibold">{t("bankTitle")}</p>
+              <p className="mt-2 text-ink/80">{t("bankHint", { amount: total.toFixed(2) })}</p>
+              <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
+                <dt className="text-ink/60">{t("bankHolder")}</dt>
+                <dd>{BANK_DETAILS.holder}</dd>
+                <dt className="text-ink/60">{t("bankName")}</dt>
+                <dd>{BANK_DETAILS.bank}</dd>
+                <dt className="text-ink/60">{t("bankBranch")}</dt>
+                <dd dir="ltr" className="text-end">{BANK_DETAILS.branch}</dd>
+                <dt className="text-ink/60">{t("bankAccount")}</dt>
+                <dd dir="ltr" className="text-end font-semibold">{BANK_DETAILS.account}</dd>
+              </dl>
+              <p className="mt-3 text-xs text-ink/60">{t("orderNumberAfterBank")}</p>
+            </div>
+          )}
 
           {(paymentMethod === "paybox" || paymentMethod === "bit") && (
             <div className="mt-4 border border-gold-bright/60 bg-gold-soft/20 p-4 text-sm text-ink">

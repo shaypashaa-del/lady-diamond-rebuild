@@ -6,3 +6,12 @@ export const SITE_NAME = "Lady Diamond Jewels";
 // The shop's public business phone (shown on the site). Bit and PayBox payments
 // are sent to this number unless BIT_PHONE / PAYBOX_PHONE override it on the server.
 export const BUSINESS_PHONE = "050-3781589";
+
+// Bank account customers transfer to (shown at checkout and in the order mail). Given by
+// the owner; BANK_HOLDER / BANK_NAME / BANK_BRANCH / BANK_ACCOUNT in the server env override it.
+export const BANK_DETAILS = {
+  holder: "דיאנה",
+  bank: "בנק לאומי",
+  branch: "851",
+  account: "35498488",
+} as const;

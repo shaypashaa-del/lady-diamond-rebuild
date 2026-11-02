@@ -75,7 +75,7 @@ export function SocialProof() {
       n = Math.min(150, Math.max(30, n + Math.floor(Math.random() * 11) - 5));
       setSite(n);
       setOthers(1 + Math.floor(Math.random() * 5));
-      setStats({ visitsToday: 180 + n * 3, views24h: 20 + Math.floor(Math.random() * 40), interested7d: 3 + Math.floor(Math.random() * 8) });
+      setStats({ visitsToday: null, views24h: 20 + Math.floor(Math.random() * 40), interested7d: 3 + Math.floor(Math.random() * 8) });
     };
     tick();
     const every = setInterval(tick, 5000);

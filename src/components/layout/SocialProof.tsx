@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { useFloatingAvoid } from "@/lib/use-floating-avoid";
+import { gsap } from "gsap";
 import { visitorId } from "@/lib/track-activity";
 
 type Sale = { city: string; product: string; at: string };
@@ -30,7 +30,6 @@ export function SocialProof() {
   const t = useTranslations("SocialProof");
   const locale = useLocale();
   const pathname = usePathname();
-  const avoid = useFloatingAvoid();
   const idRef = useRef<string>("");
   const demoRef = useRef(false);
   const [site, setSite] = useState<number | null>(null);
@@ -172,7 +171,6 @@ export function SocialProof() {
     };
   }, [notices, closed, locale, demo]);
 
-  if (pathname.startsWith("/admin")) return null;
 
   const onProduct = /\/product\//.test(pathname);
   // On the home page the live counter is always shown (it is the real number, you included).
@@ -194,25 +192,126 @@ export function SocialProof() {
         ? t("visitors", { count: site })
         : null;
 
-  const hidden = avoid ? "pointer-events-none opacity-0 translate-y-3" : "opacity-100";
+  const isAdmin = pathname.startsWith("/admin");
+  const pillRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLSpanElement>(null);
+  const sheenRef = useRef<HTMLSpanElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [top, setTop] = useState(12);
+  const shown = !isAdmin && pill != null;
+
+  // Dock just under the header, then stay at the top of the screen while scrolling.
+  useEffect(() => {
+    if (isAdmin) return;
+    let raf = 0;
+    const place = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const header = document.querySelector("header");
+        const bottom = header ? header.getBoundingClientRect().bottom : 0;
+        setTop(Math.max(12, Math.round(bottom + 12)));
+      });
+    };
+    place();
+    window.addEventListener("scroll", place, { passive: true });
+    window.addEventListener("resize", place);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", place);
+      window.removeEventListener("resize", place);
+    };
+  }, [isAdmin, pathname]);
+
+  const still = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Capsule: 3D flip-in from above, then a slow gold sheen.
+  useEffect(() => {
+    const el = pillRef.current;
+    if (!shown || !el || still()) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        el,
+        { rotateX: -95, y: -18, opacity: 0, transformPerspective: 700, transformOrigin: "50% 0%" },
+        { rotateX: 0, y: 0, opacity: 1, duration: 1.1, ease: "back.out(1.7)" }
+      );
+      if (sheenRef.current) {
+        gsap.fromTo(sheenRef.current, { xPercent: -160 }, { xPercent: 260, duration: 2.2, ease: "power2.inOut", repeat: -1, repeatDelay: 3.5, delay: 1.2 });
+      }
+    });
+    return () => ctx.revert();
+  }, [shown]);
+
+  // Every new number rolls over like a flip clock.
+  useEffect(() => {
+    const el = textRef.current;
+    if (!el || still()) return;
+    gsap.fromTo(el, { rotateX: 90, opacity: 0, transformPerspective: 400 }, { rotateX: 0, opacity: 1, duration: 0.6, ease: "power3.out" });
+  }, [pill]);
+
+  // Notice card: swings in on a 3D hinge, follows the pointer, swings away.
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!toast || !el) return;
+    if (still()) return;
+    const tl = gsap.timeline();
+    tl.fromTo(
+      el,
+      { rotateX: -70, rotateY: 18, z: -160, y: -24, opacity: 0, transformPerspective: 900, transformOrigin: "50% 0%" },
+      { rotateX: 0, rotateY: 0, z: 0, y: 0, opacity: 1, duration: 1, ease: "expo.out" }
+    ).to(el, { rotateX: 55, y: -16, opacity: 0, duration: 0.55, ease: "power2.in" }, "+=4.3");
+    const move = (e: PointerEvent) => {
+      const r = el.getBoundingClientRect();
+      const dx = (e.clientX - r.left) / r.width - 0.5;
+      const dy = (e.clientY - r.top) / r.height - 0.5;
+      gsap.to(el, { rotateY: dx * 14, rotateX: -dy * 12, duration: 0.4, ease: "power2.out" });
+    };
+    const leave = () => gsap.to(el, { rotateY: 0, rotateX: 0, duration: 0.6, ease: "power3.out" });
+    el.addEventListener("pointermove", move);
+    el.addEventListener("pointerleave", leave);
+    return () => {
+      tl.kill();
+      el.removeEventListener("pointermove", move);
+      el.removeEventListener("pointerleave", leave);
+    };
+  }, [toast]);
+
+  if (isAdmin) return null;
 
   return (
     <>
       {demo && (
         <a
           href="?sp_demo=0"
-          className="fixed top-2 left-1/2 z-50 -translate-x-1/2 rounded-full bg-amber-400 px-3 py-1 text-[11px] font-semibold text-ink shadow"
+          className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full bg-amber-400 px-3 py-1 text-[11px] font-semibold text-ink shadow"
         >
           תצוגה לדוגמה לצוות · מספרים לא אמיתיים · יציאה ✕
         </a>
       )}
       {pill && (
         <div
+          ref={pillRef}
           role="status"
-          className={`fixed bottom-5 left-1/2 z-30 -translate-x-1/2 rounded-full border border-gold-bright/50 bg-ink/90 px-3.5 py-1.5 text-[11px] tracking-wide text-paper shadow-lg backdrop-blur transition-all duration-500 ${hidden}`}
+          style={{
+            top,
+            background: "linear-gradient(135deg, rgba(12,11,10,0.94) 0%, rgba(38,30,18,0.94) 100%)",
+            boxShadow: "0 18px 40px -18px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 0 1px rgba(212,175,95,0.55)",
+          }}
+          className="pointer-events-none fixed left-1/2 z-30 flex -translate-x-1/2 items-center gap-2.5 overflow-hidden rounded-full px-4 py-2 text-[12px] tracking-[0.06em] text-paper backdrop-blur-md transition-[top] duration-300 ease-out"
         >
-          <span className="me-1.5 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400 align-middle" aria-hidden />
-          {pill}
+          <span className="relative flex h-2 w-2" aria-hidden>
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+          </span>
+          <span className="h-3 w-px bg-gold-bright/50" aria-hidden />
+          <span ref={textRef} key={pill} className="inline-block whitespace-nowrap">
+            {pill}
+          </span>
+          <span
+            ref={sheenRef}
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 left-0 w-1/3 -skew-x-12"
+            style={{ background: "linear-gradient(90deg, transparent, rgba(240,214,150,0.28), transparent)" }}
+          />
         </div>
       )}
 
@@ -220,25 +319,48 @@ export function SocialProof() {
         <div
           role="status"
           aria-live="polite"
-          className={`fixed bottom-20 start-4 z-30 w-[min(20rem,calc(100vw-2rem))] rounded-lg border border-gold-soft bg-paper p-3 pe-8 text-start text-ink shadow-[0_14px_34px_-18px_rgba(0,0,0,0.45)] transition-all duration-500 sm:bottom-24 ${hidden}`}
+          style={{ top: top + 52, perspective: 900 }}
+          className="fixed start-1/2 z-30 w-[min(21rem,calc(100vw-2rem))] -translate-x-1/2 rtl:translate-x-1/2 transition-[top] duration-300 ease-out sm:start-auto sm:end-5 sm:translate-x-0 sm:rtl:translate-x-0"
         >
-          <button
-            type="button"
-            onClick={() => {
-              setToast(null);
-              setClosed(true);
+          <div
+            ref={cardRef}
+            className="rounded-xl p-px [transform-style:preserve-3d]"
+            style={{
+              background: "linear-gradient(135deg, #f0d696 0%, #b8893b 45%, #f6e7bf 70%, #9c7430 100%)",
+              boxShadow: "0 30px 60px -28px rgba(0,0,0,0.55), 0 10px 22px -16px rgba(156,116,48,0.6)",
             }}
-            aria-label={t("close")}
-            className="absolute end-1 top-1 flex h-8 w-8 items-center justify-center text-ink/40 hover:text-ink"
           >
-            ×
-          </button>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-deep">
-            {toast.kind === "sale" ? `✓ ${t("verified")}` : t("interestTitle")}
-          </p>
-          <p className="mt-1 text-sm">{toast.kind === "sale" ? t("purchasedFrom", { city: toast.city ?? "" }) : t("addedToCart")}</p>
-          <p className="truncate text-sm font-medium">{toast.product}</p>
-          <p className="mt-0.5 text-[11px] text-ink/50">{toast.ago}</p>
+            <div className="relative flex items-center gap-3 rounded-[11px] bg-paper p-3 pe-9 text-start text-ink">
+              <span
+                aria-hidden
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-lg text-paper"
+                style={{ background: "radial-gradient(circle at 30% 25%, #f6e7bf, #b8893b 55%, #6e5020)" }}
+              >
+                {toast.kind === "sale" ? "◆" : "✦"}
+              </span>
+              <div className="min-w-0">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-gold-deep">
+                  {toast.kind === "sale" ? `✓ ${t("verified")}` : t("interestTitle")}
+                </p>
+                <p className="mt-0.5 text-[13px] text-ink/80">
+                  {toast.kind === "sale" ? t("purchasedFrom", { city: toast.city ?? "" }) : t("addedToCart")}
+                </p>
+                <p className="truncate font-serif text-[15px] leading-snug">{toast.product}</p>
+                <p className="mt-0.5 text-[11px] text-ink/45">{toast.ago}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setToast(null);
+                  setClosed(true);
+                }}
+                aria-label={t("close")}
+                className="absolute end-1 top-1 flex h-8 w-8 items-center justify-center text-ink/35 hover:text-ink"
+              >
+                ×
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </>

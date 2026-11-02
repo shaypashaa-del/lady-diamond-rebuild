@@ -585,7 +585,7 @@
     "privacy": "Privacy Policy"
   },
   "SocialProof": {
-    "visitors": "{count} people on the site now",
+    "visitors": "{count, plural, one {1 person on the site now} other {# people on the site now}}",
     "viewers": "{count, plural, one {1 other person is viewing this item now} other {# other people are viewing this item now}}",
     "verified": "Verified purchase",
     "purchasedFrom": "New order from {city}",

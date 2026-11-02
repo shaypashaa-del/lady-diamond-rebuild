@@ -114,10 +114,12 @@ export function SocialProof() {
   if (pathname.startsWith("/admin")) return null;
 
   const onProduct = /\/product\//.test(pathname);
+  // On the home page the live counter is always shown (it is the real number, you included).
+  const isHome = stripLocale(pathname) === "/";
   const pill =
     onProduct && others != null && others >= 1
       ? t("viewers", { count: others })
-      : site != null && site >= 2
+      : site != null && (site >= 2 || (isHome && site >= 1))
         ? t("visitors", { count: site })
         : null;
 

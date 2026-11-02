@@ -32,6 +32,7 @@ export function SocialProof() {
   const pathname = usePathname();
   const avoid = useFloatingAvoid();
   const idRef = useRef<string>("");
+  const demoRef = useRef(false);
   const [site, setSite] = useState<number | null>(null);
   const [others, setOthers] = useState<number | null>(null);
   const [stats, setStats] = useState<{ visitsToday: number | null; views24h: number | null; interested7d: number | null }>({
@@ -42,6 +43,57 @@ export function SocialProof() {
   const [notices, setNotices] = useState<Notice[]>([]);
   const [toast, setToast] = useState<(Notice & { ago: string }) | null>(null);
   const [closed, setClosed] = useState(false);
+  // Staff preview (?sp_demo=1, logged-in admin only): sample numbers, clearly labelled.
+  const [demo, setDemo] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    let flag = false;
+    try {
+      const q = new URLSearchParams(window.location.search).get("sp_demo");
+      if (q === "1") window.sessionStorage.setItem("sp_demo", "1");
+      if (q === "0") window.sessionStorage.removeItem("sp_demo");
+      flag = window.sessionStorage.getItem("sp_demo") === "1";
+    } catch {
+      flag = false;
+    }
+    if (!flag) return;
+    fetch(`/api/social-proof/demo?l=${locale}`, { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { ok: boolean; products: string[] } | null) => {
+        if (d?.ok) setDemo(d.products.length ? d.products : ["LADY DIAMOND"]);
+      })
+      .catch(() => undefined);
+  }, [locale]);
+
+  useEffect(() => {
+    demoRef.current = demo != null;
+    if (!demo) return;
+    const cities = ["תל אביב", "חיפה", "ירושלים", "ראשון לציון", "נתניה", "באר שבע"];
+    const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
+    let n = 30 + Math.floor(Math.random() * 121);
+    const tick = () => {
+      n = Math.min(150, Math.max(30, n + Math.floor(Math.random() * 11) - 5));
+      setSite(n);
+      setOthers(1 + Math.floor(Math.random() * 5));
+      setStats({ visitsToday: 180 + n * 3, views24h: 20 + Math.floor(Math.random() * 40), interested7d: 3 + Math.floor(Math.random() * 8) });
+    };
+    tick();
+    const every = setInterval(tick, 5000);
+    const notice = () => {
+      const sale = Math.random() < 0.4;
+      const mins = 1 + Math.floor(Math.random() * 50);
+      const at = new Date(Date.now() - mins * 60_000).toISOString();
+      setToast({ kind: sale ? "sale" : "cart", city: sale ? pick(cities) : undefined, product: pick(demo), at, ago: agoText(at, locale) });
+      setTimeout(() => setToast(null), 6000);
+    };
+    const first = setTimeout(notice, 3000);
+    const toasts = setInterval(notice, 12_000);
+    return () => {
+      clearInterval(every);
+      clearTimeout(first);
+      clearInterval(toasts);
+    };
+  }, [demo, locale]);
 
   // Heartbeat: on every page and every 30 s while the tab is visible.
   useEffect(() => {
@@ -65,6 +117,7 @@ export function SocialProof() {
           views24h?: number | null;
           interested7d?: number | null;
         };
+        if (demoRef.current) return;
         setSite(d.site);
         setOthers(d.othersOnPage);
         setStats({ visitsToday: d.visitsToday ?? null, views24h: d.views24h ?? null, interested7d: d.interested7d ?? null });
@@ -98,7 +151,7 @@ export function SocialProof() {
   }, [locale]);
 
   useEffect(() => {
-    if (notices.length === 0 || closed) return;
+    if (notices.length === 0 || closed || demo) return;
     let i = 0;
     let shown = 0;
     let hideTimer: ReturnType<typeof setTimeout> | undefined;
@@ -117,7 +170,7 @@ export function SocialProof() {
       clearInterval(every);
       if (hideTimer) clearTimeout(hideTimer);
     };
-  }, [notices, closed, locale]);
+  }, [notices, closed, locale, demo]);
 
   if (pathname.startsWith("/admin")) return null;
 
@@ -145,6 +198,14 @@ export function SocialProof() {
 
   return (
     <>
+      {demo && (
+        <a
+          href="?sp_demo=0"
+          className="fixed top-2 left-1/2 z-50 -translate-x-1/2 rounded-full bg-amber-400 px-3 py-1 text-[11px] font-semibold text-ink shadow"
+        >
+          תצוגה לדוגמה לצוות · מספרים לא אמיתיים · יציאה ✕
+        </a>
+      )}
       {pill && (
         <div
           role="status"

@@ -44,6 +44,9 @@ export default async function AdminSettingsPage() {
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" name="interest" defaultChecked={social.interest} /> ביקורים היום, צפיות ומתעניינים במוצרים, תגית &quot;פופולרי השבוע&quot; והתראות &quot;נוסף לעגלה&quot;
         </label>
+        <a href="/?sp_demo=1" target="_blank" rel="noopener" className="inline-block text-sm text-gold-deep underline">
+          פתיחת תצוגה לדוגמה לצוות (מספרים לדוגמה, רק למי שמחובר לניהול)
+        </a>
       </SavableForm>
       <EmailTestForm />
     </div>

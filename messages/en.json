@@ -205,7 +205,8 @@
     "backorderNote": "Available to pre-order · ships within {days} days",
     "backorderNoteNoDays": "Available to pre-order",
     "minQtyNote": "Minimum order quantity: {count}",
-    "maxQtyNote": "Maximum {count} per order"
+    "maxQtyNote": "Maximum {count} per order",
+    "badge_POPULAR": "Popular this week"
   },
   "Category": {
     "kicker": "LADY DIAMOND",
@@ -589,6 +590,11 @@
     "viewers": "{count, plural, one {1 other person is viewing this item now} other {# other people are viewing this item now}}",
     "verified": "Verified purchase",
     "purchasedFrom": "New order from {city}",
-    "close": "Close"
+    "close": "Close",
+    "visitsToday": "{count, plural, one {1 visit today} other {# visits today}}",
+    "views24h": "Viewed {count} times in the last 24 hours",
+    "interested": "{count, plural, one {1 person added this to cart or wishlist this week} other {# people added this to cart or wishlist this week}}",
+    "addedToCart": "Someone added to cart",
+    "interestTitle": "Trending now"
   }
 }

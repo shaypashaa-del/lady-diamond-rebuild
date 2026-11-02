@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSocialProofSettings, presenceCounts, recordPresence } from "@/server/social-proof";
+import { getActivitySummary, recordActivity } from "@/server/activity";
 
 // Heartbeat from an open page: { v: anonymous visitor id, p: path }. Answers with the
 // real number of people on the site and on the same page right now.
@@ -15,12 +16,19 @@ export async function POST(req: Request) {
   if (!v || !p || p.startsWith("/admin")) return NextResponse.json({ error: "bad request" }, { status: 400 });
 
   recordPresence(v, p);
+  const slug = /^\/product\/([a-z0-9-]{1,120})$/i.exec(p)?.[1] ?? "";
+  void recordActivity("visit", v);
+  if (slug) void recordActivity("view", v, slug);
   const settings = await getSocialProofSettings();
   const counts = presenceCounts(p, v);
+  const activity = settings.interest ? await getActivitySummary() : null;
   return NextResponse.json(
     {
       site: settings.visitors ? counts.site : null,
       othersOnPage: settings.viewers ? counts.othersOnPage : null,
+      visitsToday: activity ? activity.visitsToday : null,
+      views24h: activity && slug ? (activity.views24h[slug] ?? 0) : null,
+      interested7d: activity && slug ? (activity.interested7d[slug] ?? 0) : null,
     },
     { headers: { "Cache-Control": "no-store" } }
   );

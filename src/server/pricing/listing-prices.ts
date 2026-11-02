@@ -2,6 +2,8 @@ import { getAllProductExtras, isSaleActive } from "@/server/product-extras";
 import { prisma } from "@/lib/prisma";
 import { round2 } from "@/lib/pricing/engine";
 import { getAllManualPrices, getAllManualSalePrices } from "@/server/pricing/manual-option-prices";
+import { getActivitySummary } from "@/server/activity";
+import { getSocialProofSettings } from "@/server/social-proof";
 
 // The price a product's page opens on (default metal, designed diamond if it
 // has one, otherwise no diamond), VAT included — computed live from the same
@@ -94,12 +96,17 @@ export async function getListingPrices(): Promise<Map<string, number>> {
   return new Map([...info].map(([id, v]) => [id, v.price]));
 }
 
-type Priced = { id: string; basePrice: unknown; salePrice: unknown; pricingMode?: string };
+async function getPopularSlugs(): Promise<Set<string>> {
+  const [settings, activity] = await Promise.all([getSocialProofSettings(), getActivitySummary()]);
+  return new Set(settings.interest ? activity.popular : []);
+}
+
+type Priced = { id: string; slug?: string; basePrice: unknown; salePrice: unknown; pricingMode?: string };
 
 // Swap a configurable product's placeholder price for its live price (and its
 // hand-entered sale, if running).
 export async function applyLivePrices<T extends Priced>(products: T[]): Promise<T[]> {
-  const [info, extras] = await Promise.all([getListingPriceInfo(), getAllProductExtras()]);
+  const [info, extras, popular] = await Promise.all([getListingPriceInfo(), getAllProductExtras(), getPopularSlugs()]);
   return products.map((p) => {
     const live = info.get(p.id);
     const ex = extras.get(p.id);
@@ -114,6 +121,8 @@ export async function applyLivePrices<T extends Priced>(products: T[]): Promise<
     // A product that needs a choice before it can be bought (material picker,
     // sizes) must send the shopper to its page, never add straight to the cart.
     const needsOptions = live != null || (ex?.sizes?.length ?? 0) > 0;
-    return { ...scheduled, ...(ex?.badge ? { extrasBadge: ex.badge } : {}), ...(needsOptions || noPrice ? { needsOptions: true } : {}), ...(noPrice ? { priceOnRequest: true } : {}) };
+    // Diana's own badge wins; otherwise a real "popular this week" (most viewed).
+    const tag = ex?.badge ?? (p.slug && popular.has(p.slug) ? ("POPULAR" as const) : undefined);
+    return { ...scheduled, ...(tag ? { extrasBadge: tag } : {}), ...(needsOptions || noPrice ? { needsOptions: true } : {}), ...(noPrice ? { priceOnRequest: true } : {}) };
   });
 }

@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { trackActivity } from "@/lib/track-activity";
 
 type WishlistState = {
   slugs: string[];
@@ -13,12 +14,14 @@ export const useWishlistStore = create<WishlistState>()(
   persist(
     (set, get) => ({
       slugs: [],
-      toggle: (slug) =>
+      toggle: (slug) => {
+        if (!get().slugs.includes(slug)) trackActivity("wish", slug);
         set((state) => ({
           slugs: state.slugs.includes(slug)
             ? state.slugs.filter((s) => s !== slug)
             : [...state.slugs, slug],
-        })),
+        }));
+      },
       has: (slug) => get().slugs.includes(slug),
     }),
     { name: "lady-diamond-wishlist" }

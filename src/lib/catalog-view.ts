@@ -14,7 +14,7 @@ type ProductWithRelations = {
   categories: { category: { name: unknown } }[];
   needsOptions?: boolean;
   priceOnRequest?: boolean;
-  extrasBadge?: "NEW" | "BESTSELLER" | "LIMITED";
+  extrasBadge?: "NEW" | "BESTSELLER" | "LIMITED" | "POPULAR";
   images?: { media: { url: string; altText: unknown } }[];
 };
 

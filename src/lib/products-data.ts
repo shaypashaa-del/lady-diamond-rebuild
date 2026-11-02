@@ -8,7 +8,7 @@ export type SampleProduct = {
   priceOnRequest?: boolean;
   hasVariants?: boolean;
   badge?: "New" | "Sale" | "Sold";
-  tag?: "NEW" | "BESTSELLER" | "LIMITED";
+  tag?: "NEW" | "BESTSELLER" | "LIMITED" | "POPULAR";
   blurb: string;
   imageUrl?: string;
   imageAlt?: string;

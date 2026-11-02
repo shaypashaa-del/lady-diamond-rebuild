@@ -41,6 +41,9 @@ export default async function AdminSettingsPage() {
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" name="sales" defaultChecked={social.sales} /> התראות על רכישות אחרונות (14 הימים האחרונים)
         </label>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="interest" defaultChecked={social.interest} /> ביקורים היום, צפיות ומתעניינים במוצרים, תגית &quot;פופולרי השבוע&quot; והתראות &quot;נוסף לעגלה&quot;
+        </label>
       </SavableForm>
       <EmailTestForm />
     </div>

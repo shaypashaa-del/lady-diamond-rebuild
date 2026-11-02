@@ -4,26 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useFloatingAvoid } from "@/lib/use-floating-avoid";
+import { visitorId } from "@/lib/track-activity";
 
 type Sale = { city: string; product: string; at: string };
+type Notice = { kind: "sale" | "cart"; city?: string; product: string; at: string };
 
 // Real-activity social proof: live visitor count, other people on this product right
-// now, and recent real purchases (city + product, never names). Everything comes from
-// the server's real data; when there is none, nothing is shown.
-function visitorId(): string {
-  try {
-    const k = "ld_vid";
-    let v = window.localStorage.getItem(k);
-    if (!v) {
-      v = (crypto.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`).toLowerCase();
-      window.localStorage.setItem(k, v);
-    }
-    return v;
-  } catch {
-    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
-  }
-}
-
+// now, today's visits, a product's real views and cart/wishlist adds, recent real
+// purchases (city + product, never names) and recent real cart adds (anonymous).
+// Everything comes from the server's real data; when there is none, nothing is shown.
 function agoText(iso: string, locale: string) {
   const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
   const mins = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60_000));
@@ -45,8 +34,13 @@ export function SocialProof() {
   const idRef = useRef<string>("");
   const [site, setSite] = useState<number | null>(null);
   const [others, setOthers] = useState<number | null>(null);
-  const [sales, setSales] = useState<Sale[]>([]);
-  const [toast, setToast] = useState<(Sale & { ago: string }) | null>(null);
+  const [stats, setStats] = useState<{ visitsToday: number | null; views24h: number | null; interested7d: number | null }>({
+    visitsToday: null,
+    views24h: null,
+    interested7d: null,
+  });
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const [toast, setToast] = useState<(Notice & { ago: string }) | null>(null);
   const [closed, setClosed] = useState(false);
 
   // Heartbeat: on every page and every 30 s while the tab is visible.
@@ -64,9 +58,16 @@ export function SocialProof() {
           keepalive: true,
         });
         if (!res.ok || stop) return;
-        const d = (await res.json()) as { site: number | null; othersOnPage: number | null };
+        const d = (await res.json()) as {
+          site: number | null;
+          othersOnPage: number | null;
+          visitsToday?: number | null;
+          views24h?: number | null;
+          interested7d?: number | null;
+        };
         setSite(d.site);
         setOthers(d.othersOnPage);
+        setStats({ visitsToday: d.visitsToday ?? null, views24h: d.views24h ?? null, interested7d: d.interested7d ?? null });
       } catch {
         // offline: show nothing
       }
@@ -81,23 +82,30 @@ export function SocialProof() {
     };
   }, [pathname]);
 
-  // Recent real purchases, shown one at a time.
+  // Recent real purchases and cart adds, newest first, shown one at a time.
   useEffect(() => {
-    fetch("/api/social-proof")
-      .then((r) => (r.ok ? r.json() : { sales: [] }))
-      .then((d: { sales: Sale[] }) => setSales(d.sales ?? []))
+    fetch(`/api/social-proof?l=${locale}`)
+      .then((r) => (r.ok ? r.json() : { sales: [], interest: [] }))
+      .then((d: { sales?: Sale[]; interest?: { product: string; at: string }[] }) => {
+        const all: Notice[] = [
+          ...(d.sales ?? []).map((s) => ({ kind: "sale" as const, ...s })),
+          ...(d.interest ?? []).map((c) => ({ kind: "cart" as const, ...c })),
+        ];
+        all.sort((x, y) => (x.at < y.at ? 1 : -1));
+        setNotices(all);
+      })
       .catch(() => undefined);
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
-    if (sales.length === 0 || closed) return;
+    if (notices.length === 0 || closed) return;
     let i = 0;
     let shown = 0;
     let hideTimer: ReturnType<typeof setTimeout> | undefined;
     const show = () => {
       if (shown >= 3 || document.visibilityState !== "visible") return;
-      const sale = sales[i % sales.length];
-      setToast({ ...sale, ago: agoText(sale.at, locale) });
+      const n = notices[i % notices.length];
+      setToast({ ...n, ago: agoText(n.at, locale) });
       i += 1;
       shown += 1;
       hideTimer = setTimeout(() => setToast(null), 6500);
@@ -109,16 +117,26 @@ export function SocialProof() {
       clearInterval(every);
       if (hideTimer) clearTimeout(hideTimer);
     };
-  }, [sales, closed, locale]);
+  }, [notices, closed, locale]);
 
   if (pathname.startsWith("/admin")) return null;
 
   const onProduct = /\/product\//.test(pathname);
   // On the home page the live counter is always shown (it is the real number, you included).
   const isHome = stripLocale(pathname) === "/";
-  const pill =
-    onProduct && others != null && others >= 1
+  const { visitsToday, views24h, interested7d } = stats;
+  const pill = onProduct
+    ? others != null && others >= 1
       ? t("viewers", { count: others })
+      : interested7d != null && interested7d >= 2
+        ? t("interested", { count: interested7d })
+        : views24h != null && views24h >= 3
+          ? t("views24h", { count: views24h })
+          : site != null && site >= 2
+            ? t("visitors", { count: site })
+            : null
+    : isHome && visitsToday != null && visitsToday >= 10
+      ? t("visitsToday", { count: visitsToday })
       : site != null && (site >= 2 || (isHome && site >= 1))
         ? t("visitors", { count: site })
         : null;
@@ -154,8 +172,10 @@ export function SocialProof() {
           >
             ×
           </button>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-deep">✓ {t("verified")}</p>
-          <p className="mt-1 text-sm">{t("purchasedFrom", { city: toast.city })}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-deep">
+            {toast.kind === "sale" ? `✓ ${t("verified")}` : t("interestTitle")}
+          </p>
+          <p className="mt-1 text-sm">{toast.kind === "sale" ? t("purchasedFrom", { city: toast.city ?? "" }) : t("addedToCart")}</p>
           <p className="truncate text-sm font-medium">{toast.product}</p>
           <p className="mt-0.5 text-[11px] text-ink/50">{toast.ago}</p>
         </div>

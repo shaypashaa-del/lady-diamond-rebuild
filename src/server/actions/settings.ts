@@ -56,6 +56,7 @@ export async function updateSocialProofSettings(formData: FormData): Promise<{ s
     visitors: formData.get("visitors") === "on",
     viewers: formData.get("viewers") === "on",
     sales: formData.get("sales") === "on",
+    interest: formData.get("interest") === "on",
   };
   try {
     await prisma.setting.upsert({

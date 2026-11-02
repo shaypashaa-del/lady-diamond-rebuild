@@ -205,7 +205,8 @@
     "backorderNote": "זמין בהזמנה מראש · אספקה תוך {days} ימים",
     "backorderNoteNoDays": "זמין בהזמנה מראש",
     "minQtyNote": "כמות מינימום להזמנה: {count}",
-    "maxQtyNote": "מקסימום {count} יחידות להזמנה"
+    "maxQtyNote": "מקסימום {count} יחידות להזמנה",
+    "badge_POPULAR": "פופולרי השבוע"
   },
   "Category": {
     "kicker": "LADY DIAMOND",
@@ -589,6 +590,11 @@
     "viewers": "{count, plural, one {עוד אדם אחד צופה במוצר הזה כרגע} other {עוד # אנשים צופים במוצר הזה כרגע}}",
     "verified": "רכישה מאומתת",
     "purchasedFrom": "הזמנה חדשה מ{city}",
-    "close": "סגירה"
+    "close": "סגירה",
+    "visitsToday": "{count, plural, one {ביקור אחד באתר היום} other {# ביקורים באתר היום}}",
+    "views24h": "נצפה {count} פעמים ב-24 השעות האחרונות",
+    "interested": "{count, plural, one {אדם אחד הוסיף לעגלה או למועדפים השבוע} other {# אנשים הוסיפו לעגלה או למועדפים השבוע}}",
+    "addedToCart": "מישהו הוסיף לעגלה",
+    "interestTitle": "מתעניינים עכשיו"
   }
 }

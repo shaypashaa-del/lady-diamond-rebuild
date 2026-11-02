@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { trackActivity } from "@/lib/track-activity";
 import type { CalculatorDiamondChoice } from "@/lib/pricing/engine";
 
 export type CartLine = {
@@ -44,7 +45,8 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       lines: [],
-      addLine: (line, quantity = 1) =>
+      addLine: (line, quantity = 1) => {
+        trackActivity("cart", line.slug);
         set((state) => {
           const existing = state.lines.find((l) => l.key === line.key);
           if (existing) {
@@ -55,7 +57,8 @@ export const useCartStore = create<CartState>()(
             };
           }
           return { lines: [...state.lines, { ...line, quantity }] };
-        }),
+        });
+      },
       removeLine: (key) => set((state) => ({ lines: state.lines.filter((l) => l.key !== key) })),
       setQuantity: (key, quantity) =>
         set((state) => ({

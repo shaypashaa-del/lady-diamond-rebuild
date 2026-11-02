@@ -8,8 +8,8 @@ import { ttlMemo } from "@/lib/ttl-memo";
 // Nothing is invented; with no real activity nothing is shown. No customer names are
 // ever shown (city and product only).
 
-export type SocialProofSettings = { visitors: boolean; viewers: boolean; sales: boolean };
-export const SOCIAL_PROOF_DEFAULTS: SocialProofSettings = { visitors: true, viewers: true, sales: true };
+export type SocialProofSettings = { visitors: boolean; viewers: boolean; sales: boolean; interest: boolean };
+export const SOCIAL_PROOF_DEFAULTS: SocialProofSettings = { visitors: true, viewers: true, sales: true, interest: true };
 
 export const getSocialProofSettings = ttlMemo(
   "social-proof-settings",

@@ -213,10 +213,19 @@ export function SocialProof() {
       });
     };
     place();
+    // The header grows once fonts and the announcement bar settle; follow it.
+    const header = document.querySelector("header");
+    const ro = typeof ResizeObserver !== "undefined" && header ? new ResizeObserver(place) : null;
+    if (ro && header) ro.observe(header);
+    const late = [setTimeout(place, 400), setTimeout(place, 1500)];
     window.addEventListener("scroll", place, { passive: true });
     window.addEventListener("resize", place);
+    window.addEventListener("load", place);
     return () => {
       cancelAnimationFrame(raf);
+      ro?.disconnect();
+      late.forEach(clearTimeout);
+      window.removeEventListener("load", place);
       window.removeEventListener("scroll", place);
       window.removeEventListener("resize", place);
     };
@@ -296,7 +305,7 @@ export function SocialProof() {
             background: "linear-gradient(135deg, rgba(12,11,10,0.94) 0%, rgba(38,30,18,0.94) 100%)",
             boxShadow: "0 18px 40px -18px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 0 1px rgba(212,175,95,0.55)",
           }}
-          className="pointer-events-none fixed left-1/2 z-30 flex -translate-x-1/2 items-center gap-2.5 overflow-hidden rounded-full px-4 py-2 text-[12px] tracking-[0.06em] text-paper backdrop-blur-md transition-[top] duration-300 ease-out"
+          className="pointer-events-none fixed left-1/2 z-[45] flex -translate-x-1/2 items-center gap-2.5 overflow-hidden rounded-full px-4 py-2 text-[12px] tracking-[0.06em] text-paper backdrop-blur-md transition-[top] duration-300 ease-out"
         >
           <span className="relative flex h-2 w-2" aria-hidden>
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70" />
@@ -320,7 +329,7 @@ export function SocialProof() {
           role="status"
           aria-live="polite"
           style={{ top: top + 52, perspective: 900 }}
-          className="fixed start-1/2 z-30 w-[min(21rem,calc(100vw-2rem))] -translate-x-1/2 rtl:translate-x-1/2 transition-[top] duration-300 ease-out sm:start-auto sm:end-5 sm:translate-x-0 sm:rtl:translate-x-0"
+          className="fixed left-1/2 z-[45] w-[min(22rem,calc(100vw-2rem))] -translate-x-1/2 transition-[top] duration-300 ease-out"
         >
           <div
             ref={cardRef}

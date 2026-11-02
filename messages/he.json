@@ -583,5 +583,12 @@
     "terms": "תקנון האתר",
     "and": "ול",
     "privacy": "מדיניות הפרטיות"
+  },
+  "SocialProof": {
+    "visitors": "{count} גולשים באתר עכשיו",
+    "viewers": "{count, plural, one {עוד אדם אחד צופה במוצר הזה כרגע} other {עוד # אנשים צופים במוצר הזה כרגע}}",
+    "verified": "רכישה מאומתת",
+    "purchasedFrom": "הזמנה חדשה מ{city}",
+    "close": "סגירה"
   }
 }

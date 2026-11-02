@@ -7,6 +7,7 @@ import "./globals.css";
 import { routing, rtlLocales, type Locale } from "@/i18n/routing";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { getNavCategories } from "@/server/nav-categories";
+import { SocialProof } from "@/components/layout/SocialProof";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ReferralCapture } from "@/components/ReferralCapture";
@@ -156,6 +157,7 @@ export default async function LocaleLayout({
           <main className="flex-1">{children}</main>
           <Footer categories={navCategories} />
           <WhatsappButton />
+          <SocialProof />
           <SparkleCursor />
           <AccessibilityWidget />
           <CookieConsentBanner />

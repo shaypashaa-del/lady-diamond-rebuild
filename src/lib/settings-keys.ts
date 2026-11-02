@@ -3,4 +3,5 @@ export const SETTINGS_KEYS = {
   attributionDays: "affiliate_attribution_days",
   autoApproveAffiliates: "affiliate_auto_approve",
   preventSelfReferral: "affiliate_prevent_self_referral",
+  socialProof: "social_proof",
 } as const;

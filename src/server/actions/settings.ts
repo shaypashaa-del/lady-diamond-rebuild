@@ -48,3 +48,25 @@ export async function updateSettings(
   revalidatePath("/admin/settings");
   return { saved: true };
 }
+
+// Social proof switches (live visitors, viewers on a product, recent real purchases).
+export async function updateSocialProofSettings(formData: FormData): Promise<{ saved: true } | { error: string }> {
+  await requireAdminSession();
+  const value = {
+    visitors: formData.get("visitors") === "on",
+    viewers: formData.get("viewers") === "on",
+    sales: formData.get("sales") === "on",
+  };
+  try {
+    await prisma.setting.upsert({
+      where: { key: SETTINGS_KEYS.socialProof },
+      update: { value },
+      create: { key: SETTINGS_KEYS.socialProof, value },
+    });
+  } catch (err) {
+    console.error("[admin] updateSocialProofSettings failed", err);
+    return { error: "השמירה נכשלה." };
+  }
+  revalidatePath("/admin/settings");
+  return { saved: true };
+}

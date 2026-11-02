@@ -586,7 +586,7 @@
     "privacy": "מדיניות הפרטיות"
   },
   "SocialProof": {
-    "visitors": "{count, plural, one {גולש אחד באתר כרגע} other {# גולשים באתר כרגע}}",
+    "visitors": "{count, plural, one {צופה אחד באתר כעת} other {# צופים באתר כעת}}",
     "viewers": "{count, plural, one {עוד אדם אחד צופה במוצר הזה כרגע} other {עוד # אנשים צופים במוצר הזה כרגע}}",
     "verified": "רכישה מאומתת",
     "purchasedFrom": "הזמנה חדשה מ{city}",

@@ -586,12 +586,11 @@
     "privacy": "מדיניות הפרטיות"
   },
   "SocialProof": {
-    "visitors": "{count, plural, one {גולש אחד באתר עכשיו} other {# גולשים באתר עכשיו}}",
+    "visitors": "{count, plural, one {גולש אחד באתר כרגע} other {# גולשים באתר כרגע}}",
     "viewers": "{count, plural, one {עוד אדם אחד צופה במוצר הזה כרגע} other {עוד # אנשים צופים במוצר הזה כרגע}}",
     "verified": "רכישה מאומתת",
     "purchasedFrom": "הזמנה חדשה מ{city}",
     "close": "סגירה",
-    "visitsToday": "{count, plural, one {ביקור אחד באתר היום} other {# ביקורים באתר היום}}",
     "views24h": "נצפה {count} פעמים ב-24 השעות האחרונות",
     "interested": "{count, plural, one {אדם אחד הוסיף לעגלה או למועדפים השבוע} other {# אנשים הוסיפו לעגלה או למועדפים השבוע}}",
     "addedToCart": "מישהו הוסיף לעגלה",

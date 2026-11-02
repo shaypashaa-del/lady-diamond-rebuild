@@ -175,7 +175,7 @@ export function SocialProof() {
   const onProduct = /\/product\//.test(pathname);
   // On the home page the live counter is always shown (it is the real number, you included).
   const isHome = stripLocale(pathname) === "/";
-  const { visitsToday, views24h, interested7d } = stats;
+  const { views24h, interested7d } = stats;
   const pill = onProduct
     ? others != null && others >= 1
       ? t("viewers", { count: others })
@@ -186,9 +186,7 @@ export function SocialProof() {
           : site != null && site >= 2
             ? t("visitors", { count: site })
             : null
-    : isHome && visitsToday != null && visitsToday >= 10
-      ? t("visitsToday", { count: visitsToday })
-      : site != null && (site >= 2 || (isHome && site >= 1))
+    : site != null && (site >= 2 || (isHome && site >= 1))
         ? t("visitors", { count: site })
         : null;
 

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { Link, useRouter, usePathname } from "@/i18n/navigation";
 import { primaryNav } from "@/lib/nav-data";
@@ -11,6 +11,7 @@ import { useCartStore } from "@/lib/cart-store";
 import { useWishlistStore } from "@/lib/wishlist-store";
 import { useMounted } from "@/lib/use-mounted";
 import { LocaleSwitcher } from "./LocaleSwitcher";
+import { rtlLocales, type Locale } from "@/i18n/routing";
 
 const DrawerDiamondMark = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
@@ -39,6 +40,42 @@ export function Header({ categories = [] }: { categories?: { slug: string; label
   const mounted = useMounted();
   const itemCount = useCartStore((s) => s.totalItems());
   const wishlistCount = useWishlistStore((s) => s.slugs.length);
+  const dir = rtlLocales.includes(useLocale() as Locale) ? "rtl" : "ltr";
+  const headerRef = useRef<HTMLElement>(null);
+  // Once the full header has scrolled away, a compact glass capsule floats in its place.
+  const [floating, setFloating] = useState(false);
+  // Over a dark section the capsule switches to dark glass, so it never reads as a grey bar.
+  const [onDark, setOnDark] = useState(false);
+
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setFloating(!e.isIntersecting), { rootMargin: "-1px 0px 0px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const dark = Array.from(document.querySelectorAll<HTMLElement>(".diamond-act, [data-nav-dark]"));
+    if (dark.length === 0) return;
+    const under = new Set<Element>();
+    // A thin band where the capsule sits.
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) under.add(e.target);
+          else under.delete(e.target);
+        }
+        setOnDark(under.size > 0);
+      },
+      { rootMargin: "-36px 0px -92% 0px" }
+    );
+    dark.forEach((d) => io.observe(d));
+    return () => {
+      io.disconnect();
+      setOnDark(false);
+    };
+  }, [pathname]);
 
   function submitSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -48,7 +85,7 @@ export function Header({ categories = [] }: { categories?: { slug: string; label
   }
 
   return (
-    <header className="relative z-40 border-b border-gold-soft bg-paper">
+    <header ref={headerRef} className="relative z-40 border-b border-gold-soft bg-paper">
       <div className="relative mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-8" dir="ltr">
         {/* Small mark: just the logo image (icon + brand text baked into
             the artwork itself) — always physically on the left, in every
@@ -171,6 +208,55 @@ export function Header({ categories = [] }: { categories?: { slug: string; label
           </form>
         </div>
       )}
+
+      <div
+        className={`nav-capsule ${onDark ? "glass-dark nav-capsule-dark" : "glass"} ${floating ? "nav-capsule-on" : ""}`}
+        aria-hidden={!floating}
+        inert={!floating}
+        dir="ltr"
+      >
+        <Link href="/" aria-label="Lady Diamond" className="relative z-10 flex shrink-0 items-center">
+          <Image src="/brand/logo.png" alt="" width={54} height={44} className="h-9 w-auto" />
+        </Link>
+        <Link href="/" tabIndex={-1} aria-hidden className="font-display pointer-events-none absolute inset-x-0 text-center text-[17px] tracking-[0.14em] text-ink lg:hidden">
+          LADY DIAMOND
+        </Link>
+        <ul dir={dir} className="hidden items-center gap-7 lg:flex">
+          {primaryNav.map((item) => {
+            const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+            return (
+              <li key={item.key}>
+                <Link href={item.href} className={`nav-capsule-link ${isActive ? "text-gold-deep" : "text-ink/80 hover:text-ink"}`}>
+                  {tNav(item.key)}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+        <div className="relative z-10 flex items-center gap-1">
+          <button
+            aria-label={t("search")}
+            onClick={() => {
+              setSearchOpen(true);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            className="nav-capsule-btn hidden lg:flex"
+          >
+            <Search size={17} />
+          </button>
+          <Link href="/wishlist" aria-label={tProduct("wishlist")} className="nav-capsule-btn relative hidden sm:flex">
+            <Heart size={17} />
+            {mounted && wishlistCount > 0 && <span className="nav-capsule-count">{wishlistCount}</span>}
+          </Link>
+          <Link href="/cart" aria-label={t("cart")} className="nav-capsule-btn relative flex">
+            <ShoppingBag size={17} />
+            {mounted && itemCount > 0 && <span className="nav-capsule-count">{itemCount}</span>}
+          </Link>
+          <button aria-label={t("openMenu")} onClick={() => setOpen(true)} className="nav-capsule-btn flex lg:hidden">
+            <Menu size={20} />
+          </button>
+        </div>
+      </div>
 
       {/* Rendered via a portal straight into <body> — nesting this overlay
           inside <header> (which itself has `relative z-40`) capped its

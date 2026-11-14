@@ -110,7 +110,7 @@ export function AccessibilityWidget() {
           ref={panelRef}
           role="dialog"
           aria-label={t("panelTitle")}
-          className="fixed bottom-20 left-4 z-40 w-[calc(100vw-2rem)] max-w-xs border border-gold-soft bg-paper p-4 shadow-[0_12px_32px_-8px_rgba(0,0,0,0.25)] sm:bottom-24 sm:left-5"
+          className="glass fixed bottom-20 left-4 z-40 w-[calc(100vw-2rem)] max-w-xs rounded-[26px] p-5 sm:bottom-24 sm:left-5"
         >
           <div className="mb-3 flex items-center justify-between border-b border-gold-soft pb-2">
             <h2 className="text-sm font-semibold uppercase tracking-wide">{t("panelTitle")}</h2>

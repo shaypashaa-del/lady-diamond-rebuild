@@ -39,6 +39,44 @@ export function Hero({
     : DEFAULT_SLIDES;
   const [active, setActive] = useState(0);
   const imageRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const sectionRef = useRef<HTMLElement>(null);
+  const backRef = useRef<HTMLDivElement>(null);
+  const frontRef = useRef<HTMLDivElement>(null);
+  const copyRef = useRef<HTMLDivElement>(null);
+
+  // Depth: three planes leave at three speeds as the page scrolls. The photograph
+  // lags, the copy leads, the specks of light in front lead most.
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0;
+    let on = true;
+    const paint = () => {
+      raf = 0;
+      const h = section.offsetHeight;
+      const p = Math.min(1, Math.max(0, window.scrollY / h));
+      if (backRef.current) backRef.current.style.transform = `translate3d(0, ${(p * h * 0.22).toFixed(1)}px, 0) scale(${(1.06 + p * 0.05).toFixed(4)})`;
+      if (frontRef.current) frontRef.current.style.transform = `translate3d(0, ${(-p * h * 0.3).toFixed(1)}px, 0)`;
+      if (copyRef.current) {
+        copyRef.current.style.transform = `translate3d(0, ${(-p * h * 0.1).toFixed(1)}px, 0)`;
+        copyRef.current.style.opacity = (1 - Math.min(1, p * 1.5)).toFixed(3);
+      }
+    };
+    const onScroll = () => {
+      if (on && !raf) raf = requestAnimationFrame(paint);
+    };
+    const io = new IntersectionObserver(([e]) => {
+      on = e.isIntersecting;
+    });
+    io.observe(section);
+    paint();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(raf);
+      io.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -61,7 +99,8 @@ export function Hero({
   }, [active]);
 
   return (
-    <section className="relative flex min-h-[80vh] items-center overflow-hidden bg-ink text-paper">
+    <section ref={sectionRef} className="relative flex min-h-[86svh] items-center overflow-hidden bg-ink text-paper">
+      <div ref={backRef} className="absolute inset-0 will-change-transform" style={{ transform: "scale(1.06)" }}>
       {SLIDES.map((slide, i) => (
         <div
           key={slide.src}
@@ -82,6 +121,7 @@ export function Hero({
           />
         </div>
       ))}
+      </div>
       {/* These source photos are lower-resolution than the full-bleed hero
           renders them at, which shows as softness on large screens. A
           faint film-grain layer (a standard editorial-photography trick)
@@ -89,6 +129,7 @@ export function Hero({
           like a blurry upscale. */}
       <div className="hero-grain pointer-events-none absolute inset-0 z-[1]" />
       <div className="hero-scrim absolute inset-0" />
+      <div ref={frontRef} className="hero-bokeh pointer-events-none absolute inset-x-0 -bottom-[30%] top-0 z-[2] will-change-transform" aria-hidden />
 
       {SLIDES.length > 1 && (
         <div className="absolute bottom-2 start-1/2 z-10 flex -translate-x-1/2 gap-2 rtl:translate-x-1/2">
@@ -112,13 +153,13 @@ export function Hero({
       )}
 
       <div className="relative mx-auto w-full max-w-7xl px-4 py-24 sm:px-8">
-        <div className="max-w-lg">
+        <div ref={copyRef} className="max-w-lg will-change-transform">
           <p className="rise-in text-xs uppercase tracking-[0.4em] text-gold-bright" style={{ animationDuration: "1.4s" }}>
             {kicker ?? t("heroKicker")}
           </p>
           <span className="gold-rule-start rise-in mt-4" style={{ animationDuration: "1.4s", animationDelay: "0.1s" }} />
           <h1
-            className="rise-in mt-6 text-5xl font-semibold leading-[1.1] sm:text-7xl"
+            className="hero-title rise-in mt-6 font-semibold"
             style={{ animationDuration: "1.4s", animationDelay: "0.2s" }}
           >
             {title ?? t("heroTitle")}
@@ -128,7 +169,7 @@ export function Hero({
           </p>
           <Link
             href={ctaHref ?? "/category/all"}
-            className="rise-in link-underline mt-9 inline-block border border-gold-bright px-10 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-paper transition-colors hover:bg-gold-bright hover:text-ink"
+            className="rise-in glass-pill mt-9 px-9"
             style={{ animationDuration: "1.4s", animationDelay: "0.4s" }}
           >
             {ctaLabel ?? t("heroCta")}

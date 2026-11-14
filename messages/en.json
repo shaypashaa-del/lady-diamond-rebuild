@@ -101,7 +101,17 @@
     "value2Title": "Recycled Gold",
     "value2Copy": "Select pieces are cast in recycled gold, responsibly.",
     "value3Title": "Passed Down",
-    "value3Copy": "Everyday pieces built to last, and to be passed on."
+    "value3Copy": "Everyday pieces built to last, and to be passed on.",
+    "diamondKicker": "The art of the cut",
+    "diamondCue1Title": "Light enters.",
+    "diamondCue1Body": "Fifty-seven facets catch every ray and send it back to you.",
+    "diamondCue2Title": "Fire is born.",
+    "diamondCue2Body": "Inside the stone, light breaks into colour. Jewellers call it fire.",
+    "diamondCue3Title": "Now it's yours.",
+    "diamondCue3Body": "Turn the diamond with your finger. Then choose your piece.",
+    "diamondCta": "Explore the collection",
+    "diamondHint": "Drag to turn",
+    "diamondCue3BodyStill": "Choose your piece."
   },
   "Product": {
     "selectOptions": "Select Options",

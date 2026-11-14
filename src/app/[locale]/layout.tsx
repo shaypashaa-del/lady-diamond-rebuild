@@ -142,7 +142,7 @@ export default async function LocaleLayout({
       dir={dir}
       className={`${bodyFont.variable} ${geistMono.variable} ${displayFont.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="shop min-h-full flex flex-col">
         <IntroReveal />
         <ShootingStar />
         <JsonLd data={[organizationSchema(), websiteSchema()]} />

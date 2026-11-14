@@ -187,7 +187,7 @@ export function ProductDetail({
 
       <div className="grid grid-cols-1 gap-10 pb-12 sm:grid-cols-2">
       <div>
-        <div className="relative aspect-square placeholder-gradient">
+        <div className="relative aspect-square overflow-hidden rounded-[28px] placeholder-gradient">
           {colorImageOverride ? (
             <Image
               key={colorImageOverride}

@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import { getLocale } from "next-intl/server";
 import { Hero } from "@/components/home/Hero";
+import { DiamondAct } from "@/components/home/DiamondAct";
 import { ProductSection } from "@/components/home/ProductSection";
 import { CategoryBanners } from "@/components/home/CategoryBanners";
 import { NewCollection, EuphoriaSpotlight } from "@/components/home/NewCollection";
@@ -50,6 +51,7 @@ function HomeView({
         ctaHref={hero?.ctaHref}
         images={hero?.images}
       />
+      <DiamondAct />
       <ProductSection kicker={t("latestBeautyKicker")} title={t("latestBeauty")} products={cards.slice(0, half)} />
       <CategoryBanners
         overrides={(banners?.tiles ?? []).map((b) =>

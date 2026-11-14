@@ -34,8 +34,8 @@ export function CookieConsentBanner() {
   }
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-gold-soft bg-paper p-4 shadow-lg sm:p-6">
-      <div className="mx-auto max-w-4xl">
+    <div className="cookie-card glass fixed inset-x-3 bottom-3 z-50 mx-auto max-w-2xl rounded-[28px] p-5 sm:inset-x-6 sm:bottom-6 sm:p-6">
+      <div>
         <p className="mb-3 text-sm text-ink/70">
           {t("message")}{" "}
           <Link href="/policies/privacy" className="underline hover:text-ink">

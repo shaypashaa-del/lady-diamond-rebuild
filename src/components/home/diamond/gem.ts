@@ -10,7 +10,7 @@
 const DEG = Math.PI / 180;
 export const FACETS = 57;
 
-function facetPlanes(): Float32Array {
+function facetPlanes(stretch = 1): Float32Array {
   const out: number[] = [];
   const table = 0.56; // table width as a share of the diameter
   const crown = 34.5 * DEG;
@@ -33,6 +33,18 @@ function facetPlanes(): Float32Array {
     side(lower, az + 11.25 * DEG, true, Math.sin(lower));
     side(lower, az - 11.25 * DEG, true, Math.sin(lower));
   }
+  // An oval is the same cut pulled along one axis: scaling the solid by `stretch`
+  // in x turns each plane n.p <= d into (n.x / stretch, n.y, n.z).p <= d.
+  if (stretch !== 1) {
+    for (let i = 0; i < out.length; i += 4) {
+      const nx = out[i] / stretch;
+      const len = Math.hypot(nx, out[i + 1], out[i + 2]);
+      out[i] = nx / len;
+      out[i + 1] /= len;
+      out[i + 2] /= len;
+      out[i + 3] /= len;
+    }
+  }
   return new Float32Array(out);
 }
 
@@ -44,6 +56,7 @@ uniform mat3 uRot;
 uniform vec4 uP[${FACETS}];
 uniform vec3 uLight;
 uniform float uZoom;
+uniform vec3 uAbsorb;
 const float IOR=2.42;
 const float F0=0.172;
 
@@ -101,7 +114,7 @@ vec4 shade(vec2 frag){
   float F=F0+(1.-F0)*pow(1.-c0,5.);
   vec3 col=F*envG(reflect(rd,n));
   vec3 d=refract(rd,n,1./IOR);
-  float thr=1.-F;
+  vec3 thr=vec3(1.-F);
 
   for(int b=0;b<${bounces};b++){
     float t=1e9;vec3 m=vec3(0.,1.,0.);
@@ -111,6 +124,8 @@ vec4 shade(vec2 frag){
       if(dn>1e-5){float tt=(q.w-dot(q.xyz,p))/dn;if(tt<t){t=tt;m=q.xyz;}}
     }
     p+=d*t;
+    // Coloured stones: the body absorbs light along the path travelled inside.
+    thr*=exp(-uAbsorb*t);
     float ci=dot(d,m);
     float s2=IOR*IOR*(1.-ci*ci);
     if(s2<1.){
@@ -137,6 +152,15 @@ void main(){
   gl_FragColor=vec4(c.rgb,c.a);
 }`;
 
+export type GemOptions = {
+  /** Body colour as absorption per unit length (0,0,0 is a colourless diamond). */
+  absorb?: [number, number, number];
+  /** 1 is round; above 1 pulls the outline into an oval. */
+  stretch?: number;
+  /** Internal reflections to follow (6 by default; 4 is plenty for a small accent). */
+  bounces?: number;
+};
+
 export type Gem = {
   /** yaw and pitch in radians; light is a unit vector in room space. */
   draw(yaw: number, pitch: number, light: [number, number, number], zoom: number): void;
@@ -148,7 +172,7 @@ export type Gem = {
 };
 
 /** `fine` asks for 3 samples per pixel (smooth facet edges); phones use 1 at high density. */
-export function createGem(canvas: HTMLCanvasElement, fine = false): Gem | null {
+export function createGem(canvas: HTMLCanvasElement, fine = false, options: GemOptions = {}): Gem | null {
   const opts: WebGLContextAttributes = { alpha: true, antialias: false, depth: false, stencil: false, premultipliedAlpha: true, powerPreference: "high-performance" };
   const gl = (canvas.getContext("webgl", opts) ?? canvas.getContext("experimental-webgl", opts)) as WebGLRenderingContext | null;
   if (!gl) return null;
@@ -179,14 +203,16 @@ export function createGem(canvas: HTMLCanvasElement, fine = false): Gem | null {
       planes: gl.getUniformLocation(prog, "uP"),
       light: gl.getUniformLocation(prog, "uLight"),
       zoom: gl.getUniformLocation(prog, "uZoom"),
+      absorb: gl.getUniformLocation(prog, "uAbsorb"),
     };
   };
 
-  let program = link(6, fine ? 3 : 1);
+  let program = link(options.bounces ?? 6, fine ? 3 : 1);
   if (!program) return null;
   let light = 0;
   const steps: [number, number][] = fine ? [[6, 1], [4, 1]] : [[4, 1]];
-  const planes = facetPlanes();
+  const planes = facetPlanes(options.stretch ?? 1);
+  const absorb = options.absorb ?? [0, 0, 0];
   const buf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buf);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
@@ -209,6 +235,7 @@ export function createGem(canvas: HTMLCanvasElement, fine = false): Gem | null {
       gl.uniform4fv(program.planes, planes);
       gl.uniform3f(program.light, l[0], l[1], l[2]);
       gl.uniform1f(program.zoom, zoom);
+      gl.uniform3f(program.absorb, absorb[0], absorb[1], absorb[2]);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     },
     resize(scale) {

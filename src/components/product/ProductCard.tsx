@@ -12,6 +12,7 @@ import { useCartStore } from "@/lib/cart-store";
 import { useWishlistStore } from "@/lib/wishlist-store";
 import { useMounted } from "@/lib/use-mounted";
 import { QuickViewModal } from "./QuickViewModal";
+import { useTilt } from "@/lib/use-tilt";
 
 export function ProductCard({ product }: { product: SampleProduct }) {
   const t = useTranslations("Product");
@@ -21,6 +22,7 @@ export function ProductCard({ product }: { product: SampleProduct }) {
   const mounted = useMounted();
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const isSold = product.badge === "Sold";
+  const tiltRef = useTilt<HTMLDivElement>(4);
 
   function handleAddToCart() {
     addLine({
@@ -35,7 +37,7 @@ export function ProductCard({ product }: { product: SampleProduct }) {
 
   return (
     <div className="reveal-on-view group relative flex min-w-0 flex-col">
-      <div className="relative aspect-[3/4] w-full overflow-hidden placeholder-gradient">
+      <div ref={tiltRef} className="tilt relative aspect-[3/4] w-full overflow-hidden placeholder-gradient">
         {product.badge && (
           <span
             className={cn(

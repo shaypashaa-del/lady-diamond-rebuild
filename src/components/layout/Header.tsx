@@ -55,6 +55,14 @@ export function Header({ categories = [] }: { categories?: { slug: string; label
     return () => io.disconnect();
   }, []);
 
+  // The cart answers an "added" with a quick pop, on the same frame as the button.
+  const [bump, setBump] = useState(0);
+  useEffect(() => {
+    const on = () => setBump((n) => n + 1);
+    window.addEventListener("ld:cart-add", on);
+    return () => window.removeEventListener("ld:cart-add", on);
+  }, []);
+
   useEffect(() => {
     const dark = Array.from(document.querySelectorAll<HTMLElement>(".diamond-act, [data-nav-dark]"));
     if (dark.length === 0) return;
@@ -134,7 +142,7 @@ export function Header({ categories = [] }: { categories?: { slug: string; label
               </span>
             )}
           </Link>
-          <Link href="/cart" aria-label={t("cart")} className="relative -m-3 p-3 text-ink/80 transition-colors hover:text-gold-deep">
+          <Link key={`h${bump}`} href="/cart" aria-label={t("cart")} className={`relative -m-3 p-3 text-ink/80 transition-colors hover:text-gold-deep ${bump ? "cart-pop" : ""}`}>
             <ShoppingBag size={18} />
             {mounted && itemCount > 0 && (
               <span className="absolute -end-2 -top-2 flex h-4 w-4 items-center justify-center border border-gold bg-gold text-[10px] text-white">
@@ -248,7 +256,7 @@ export function Header({ categories = [] }: { categories?: { slug: string; label
             <Heart size={17} />
             {mounted && wishlistCount > 0 && <span className="nav-capsule-count">{wishlistCount}</span>}
           </Link>
-          <Link href="/cart" aria-label={t("cart")} className="nav-capsule-btn relative flex">
+          <Link key={`c${bump}`} href="/cart" aria-label={t("cart")} className={`nav-capsule-btn relative flex ${bump ? "cart-pop" : ""}`}>
             <ShoppingBag size={17} />
             {mounted && itemCount > 0 && <span className="nav-capsule-count">{itemCount}</span>}
           </Link>

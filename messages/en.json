@@ -111,7 +111,17 @@
     "diamondCue3Body": "Turn the diamond with your finger. Then choose your piece.",
     "diamondCta": "Explore the collection",
     "diamondHint": "Drag to turn",
-    "diamondCue3BodyStill": "Choose your piece."
+    "diamondCue3BodyStill": "Choose your piece.",
+    "stonesTitle": "Choose your stone",
+    "stonesCta": "See the pieces",
+    "stoneDiamond": "Diamond",
+    "stoneSapphire": "Sapphire",
+    "stoneEmerald": "Emerald",
+    "stoneRuby": "Ruby",
+    "stoneDiamondQuery": "diamond",
+    "stoneSapphireQuery": "sapphire",
+    "stoneEmeraldQuery": "emerald",
+    "stoneRubyQuery": "ruby"
   },
   "Product": {
     "selectOptions": "Select Options",
@@ -216,7 +226,9 @@
     "backorderNoteNoDays": "Available to pre-order",
     "minQtyNote": "Minimum order quantity: {count}",
     "maxQtyNote": "Maximum {count} per order",
-    "badge_POPULAR": "Popular this week"
+    "badge_POPULAR": "Popular this week",
+    "stickyAdd": "Add to cart",
+    "added": "Added to cart"
   },
   "Category": {
     "kicker": "LADY DIAMOND",

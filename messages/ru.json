@@ -111,7 +111,17 @@
     "diamondCue3Body": "Поверните бриллиант пальцем. Затем выберите своё украшение.",
     "diamondCta": "Смотреть коллекцию",
     "diamondHint": "Потяните, чтобы повернуть",
-    "diamondCue3BodyStill": "Выберите своё украшение."
+    "diamondCue3BodyStill": "Выберите своё украшение.",
+    "stonesTitle": "Выберите свой камень",
+    "stonesCta": "К украшениям",
+    "stoneDiamond": "Бриллиант",
+    "stoneSapphire": "Сапфир",
+    "stoneEmerald": "Изумруд",
+    "stoneRuby": "Рубин",
+    "stoneDiamondQuery": "бриллиант",
+    "stoneSapphireQuery": "сапфир",
+    "stoneEmeraldQuery": "изумруд",
+    "stoneRubyQuery": "рубин"
   },
   "Product": {
     "selectOptions": "Выбрать опции",
@@ -216,7 +226,9 @@
     "backorderNoteNoDays": "Доступно по предзаказу",
     "minQtyNote": "Минимальное количество: {count}",
     "maxQtyNote": "Не более {count} шт. в заказе",
-    "badge_POPULAR": "Популярно на этой неделе"
+    "badge_POPULAR": "Популярно на этой неделе",
+    "stickyAdd": "В корзину",
+    "added": "Добавлено в корзину"
   },
   "Category": {
     "kicker": "Lady Diamond",

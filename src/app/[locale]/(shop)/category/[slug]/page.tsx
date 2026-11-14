@@ -19,6 +19,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbSchema, itemListSchema } from "@/lib/schema";
 import { SITE_URL } from "@/lib/site-config";
 import { routing, type Locale } from "@/i18n/routing";
+import { GemAccent, type Stone } from "@/components/gem/GemAccent";
+
+const CATEGORY_STONE: Record<string, Stone> = { rings: "diamond", earrings: "sapphire", necklaces: "emerald", bracelets: "ruby" };
 
 function pathFor(locale: string, path: string) {
   const prefix = locale === routing.defaultLocale ? "" : `/${locale}`;
@@ -146,7 +149,7 @@ export default async function CategoryPage({
 
       {/* A dark jewel-box band, matching the rest of the site's hero
           treatment, rather than a bare title on plain white. */}
-      <div className="relative overflow-hidden bg-ink py-14 text-center sm:py-20">
+      <div data-nav-dark className="relative overflow-hidden bg-ink py-10 text-center sm:py-14">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute left-1/2 top-1/2 h-[28rem] w-[28rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(221,170,93,0.16)_0%,transparent_65%)]"
@@ -154,6 +157,7 @@ export default async function CategoryPage({
         <DiamondMark className="pointer-events-none absolute -top-14 -end-14 h-56 w-56 text-paper/[0.05]" />
         <DiamondMark className="pointer-events-none absolute -bottom-12 -start-12 h-44 w-44 text-paper/[0.04]" />
         <div className="relative">
+          <GemAccent stone={CATEGORY_STONE[slug] ?? "diamond"} className="mx-auto mb-3 w-28 sm:w-36" />
           <p className="text-xs uppercase tracking-[0.4em] text-gold-bright">{tCat("kicker")}</p>
           <span className="gold-rule mt-4 w-16" />
           <h1 className="mt-4 text-2xl font-semibold uppercase tracking-[0.2em] text-paper sm:text-4xl">{title}</h1>

@@ -111,7 +111,17 @@
     "diamondCue3Body": "סובבו את היהלום באצבע. ואז בחרו את התכשיט שלכם.",
     "diamondCta": "לקולקציה",
     "diamondHint": "גררו כדי לסובב",
-    "diamondCue3BodyStill": "בחרו את התכשיט שלכם."
+    "diamondCue3BodyStill": "בחרו את התכשיט שלכם.",
+    "stonesTitle": "בחרו את האבן שלכם",
+    "stonesCta": "לתכשיטים",
+    "stoneDiamond": "יהלום",
+    "stoneSapphire": "ספיר",
+    "stoneEmerald": "אמרלד",
+    "stoneRuby": "רובי",
+    "stoneDiamondQuery": "יהלום",
+    "stoneSapphireQuery": "ספיר",
+    "stoneEmeraldQuery": "אמרלד",
+    "stoneRubyQuery": "רובי"
   },
   "Product": {
     "selectOptions": "בחירת אפשרויות",
@@ -216,7 +226,9 @@
     "backorderNoteNoDays": "זמין בהזמנה מראש",
     "minQtyNote": "כמות מינימום להזמנה: {count}",
     "maxQtyNote": "מקסימום {count} יחידות להזמנה",
-    "badge_POPULAR": "פופולרי השבוע"
+    "badge_POPULAR": "פופולרי השבוע",
+    "stickyAdd": "הוספה לעגלה",
+    "added": "נוסף לעגלה"
   },
   "Category": {
     "kicker": "LADY DIAMOND",

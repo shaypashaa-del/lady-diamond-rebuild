@@ -32,9 +32,11 @@ function CategoryTile({
   return (
     <Link
       href={href}
-      className={`zoom-on-hover-trigger group relative flex w-full flex-col items-center justify-center overflow-hidden text-center ${className}`}
+      className={`zoom-on-hover-trigger wipe-on-view group relative flex w-full flex-col items-center justify-center overflow-hidden text-center ${className}`}
     >
-      <Image src={image} alt={title} fill sizes="(min-width: 640px) 45vw, 100vw" className="zoom-on-hover object-cover" />
+      <div className="drift-on-view absolute inset-0">
+        <Image src={image} alt={title} fill sizes="(min-width: 640px) 45vw, 100vw" className="zoom-on-hover object-cover" />
+      </div>
       <div className="hero-scrim absolute inset-0" />
       <CircleOverlay className="pointer-events-none absolute inset-0 h-full w-full text-paper/50 mix-blend-screen" />
       <div className="relative px-6 text-paper">

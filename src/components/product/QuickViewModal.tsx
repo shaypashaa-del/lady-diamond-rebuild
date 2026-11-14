@@ -52,7 +52,7 @@ export function QuickViewModal({ product, onClose }: { product: SampleProduct; o
         role="dialog"
         aria-modal="true"
         aria-label={product.name}
-        className="relative grid w-full max-w-2xl grid-cols-1 gap-6 bg-paper p-6 shadow-xl sm:grid-cols-2"
+        className="sheet-in relative grid w-full max-w-2xl grid-cols-1 gap-6 rounded-[28px] bg-paper p-6 shadow-[0_40px_90px_-30px_rgba(0,0,0,0.55)] sm:grid-cols-2"
       >
         <button
           ref={closeButtonRef}
@@ -63,7 +63,7 @@ export function QuickViewModal({ product, onClose }: { product: SampleProduct; o
           <X size={20} />
         </button>
 
-        <div className="relative aspect-square placeholder-gradient">
+        <div className="relative aspect-square overflow-hidden rounded-[20px] placeholder-gradient">
           {product.imageUrl && (
             <Image
               src={product.imageUrl}

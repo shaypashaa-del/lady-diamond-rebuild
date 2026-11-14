@@ -101,7 +101,27 @@
     "value2Title": "Recycled Gold",
     "value2Copy": "Select pieces are cast in recycled gold, responsibly.",
     "value3Title": "Passed Down",
-    "value3Copy": "Everyday pieces built to last, and to be passed on."
+    "value3Copy": "Everyday pieces built to last, and to be passed on.",
+    "diamondKicker": "The art of the cut",
+    "diamondCue1Title": "Light enters.",
+    "diamondCue1Body": "Fifty-seven facets catch every ray and send it back to you.",
+    "diamondCue2Title": "Fire is born.",
+    "diamondCue2Body": "Inside the stone, light breaks into colour. Jewellers call it fire.",
+    "diamondCue3Title": "Now it's yours.",
+    "diamondCue3Body": "Turn the diamond with your finger. Then choose your piece.",
+    "diamondCta": "Explore the collection",
+    "diamondHint": "Drag to turn",
+    "diamondCue3BodyStill": "Choose your piece.",
+    "stonesTitle": "Choose your stone",
+    "stonesCta": "See the pieces",
+    "stoneDiamond": "Diamond",
+    "stoneSapphire": "Sapphire",
+    "stoneEmerald": "Emerald",
+    "stoneRuby": "Ruby",
+    "stoneDiamondQuery": "diamond",
+    "stoneSapphireQuery": "sapphire",
+    "stoneEmeraldQuery": "emerald",
+    "stoneRubyQuery": "ruby"
   },
   "Product": {
     "selectOptions": "Select Options",
@@ -206,7 +226,9 @@
     "backorderNoteNoDays": "Available to pre-order",
     "minQtyNote": "Minimum order quantity: {count}",
     "maxQtyNote": "Maximum {count} per order",
-    "badge_POPULAR": "Popular this week"
+    "badge_POPULAR": "Popular this week",
+    "stickyAdd": "Add to cart",
+    "added": "Added to cart"
   },
   "Category": {
     "kicker": "LADY DIAMOND",

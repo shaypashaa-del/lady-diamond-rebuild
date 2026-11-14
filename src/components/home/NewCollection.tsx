@@ -38,15 +38,17 @@ export function EuphoriaSpotlight() {
   const t = useTranslations("Home");
   return (
     <section className="mx-auto max-w-7xl px-4 pb-14 sm:px-8">
-      <ScrollReveal className="relative overflow-hidden">
+      <ScrollReveal className="relative overflow-hidden rounded-[28px]">
         <div className="relative aspect-[16/9] w-full sm:aspect-[21/9]">
-          <Image
-            src="/brand/collection/v2-rings-emerald-collage.jpeg"
-            alt="טבעות Lady Diamond משובצות אמרלד על משי זהוב"
-            fill
-            sizes="100vw"
-            className="object-cover"
-          />
+          <div className="drift-on-view absolute inset-0">
+            <Image
+              src="/brand/collection/v2-rings-emerald-collage.jpeg"
+              alt="טבעות Lady Diamond משובצות אמרלד על משי זהוב"
+              fill
+              sizes="100vw"
+              className="object-cover"
+            />
+          </div>
           <div className="hero-scrim absolute inset-0" />
         </div>
         <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center text-paper">
@@ -55,7 +57,7 @@ export function EuphoriaSpotlight() {
           <p className="mx-auto mt-4 max-w-md text-sm text-paper/80">{t("euphoriaCopy")}</p>
           <Link
             href="/category/rings"
-            className="mt-6 inline-block border border-gold-bright px-8 py-3 text-xs font-semibold uppercase tracking-wide text-paper transition-colors duration-300 hover:bg-gold-bright hover:text-ink"
+            className="glass-pill mt-6 px-9"
           >
             {t("shopMore")}
           </Link>

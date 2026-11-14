@@ -1,7 +1,7 @@
 "use client";
 
 import { formatIls } from "@/lib/format-price";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Heart, ChevronLeft, Truck } from "lucide-react";
@@ -10,6 +10,7 @@ import { useCartStore } from "@/lib/cart-store";
 import { useWishlistStore } from "@/lib/wishlist-store";
 import { useMounted } from "@/lib/use-mounted";
 import { cn } from "@/lib/cn";
+import { useTilt } from "@/lib/use-tilt";
 import { PriceDropAlert } from "./PriceDropAlert";
 import type { ConfiguredPriceState } from "./ConfigurablePriceSelector";
 
@@ -158,8 +159,34 @@ export function ProductDetail({
     if (!canAdd) return;
     addLine(currentLine(), quantity);
     setAdded(true);
+    // The cart icon answers on the same frame as the button.
+    window.dispatchEvent(new Event("ld:cart-add"));
+    navigator.vibrate?.(12);
     setTimeout(() => setAdded(false), 2000);
   }
+
+  const tiltRef = useTilt<HTMLDivElement>(5);
+  const buyRef = useRef<HTMLDivElement>(null);
+  // Once the buy buttons scroll away, a glass bar keeps the purchase one tap away.
+  const [barOn, setBarOn] = useState(false);
+  useEffect(() => {
+    const el = buyRef.current;
+    if (!el) return;
+    // Two questions, so a jump straight past the buttons is still noticed: has the page
+    // reached them (top edge stretched far upward), and are they on screen right now.
+    let reached = false;
+    let inView = true;
+    const sync = () => setBarOn(reached && !inView);
+    const passed = new IntersectionObserver(([e]) => { reached = e.isIntersecting; sync(); }, { rootMargin: "100000px 0px 0px 0px" });
+    const seen = new IntersectionObserver(([e]) => { inView = e.isIntersecting; sync(); });
+    passed.observe(el);
+    seen.observe(el);
+    return () => {
+      passed.disconnect();
+      seen.disconnect();
+    };
+  }, []);
+  const barPrice = configurable ? (configuredPrice?.status === "ok" ? configuredPrice.sellingPrice : null) : displayPrice;
 
   function handleBuyNow(method: "bit" | "paybox" | "credit_card" | "paypal") {
     if (!canAdd) return;
@@ -187,7 +214,7 @@ export function ProductDetail({
 
       <div className="grid grid-cols-1 gap-10 pb-12 sm:grid-cols-2">
       <div>
-        <div className="relative aspect-square placeholder-gradient">
+        <div ref={tiltRef} className="tilt relative aspect-square overflow-hidden rounded-[28px] placeholder-gradient shadow-[0_40px_80px_-45px_rgba(20,17,14,0.55)]">
           {colorImageOverride ? (
             <Image
               key={colorImageOverride}
@@ -217,8 +244,8 @@ export function ProductDetail({
               <button
                 key={img.url}
                 onClick={() => setActiveImage(i)}
-                className={`relative h-16 w-16 overflow-hidden border ${
-                  i === activeImage ? "border-gold" : "border-gold-soft"
+                className={`relative h-16 w-16 overflow-hidden rounded-2xl border-2 transition-colors ${
+                  i === activeImage ? "border-gold" : "border-transparent opacity-70 hover:opacity-100"
                 }`}
               >
                 <Image src={img.url} alt={img.alt ?? name} fill sizes="64px" className="object-cover" />
@@ -235,9 +262,9 @@ export function ProductDetail({
           </span>
         )}
         <p className="text-xs uppercase tracking-wide text-gold-deep">{categoryName}</p>
-        <h1 className="mt-1 text-2xl font-semibold uppercase tracking-wide text-ink">{name}</h1>
+        <h1 className="pd-title mt-1 font-semibold text-ink">{name}</h1>
         <span className="gold-rule-start mt-3 w-8" />
-        <div className="mt-3 flex items-center gap-2 text-lg" aria-live="polite">
+        <div className="mt-4 flex items-center gap-2 text-2xl" aria-live="polite">
           {configurable ? (
             <>
               {configuredPrice?.status === "ok" && (
@@ -348,9 +375,9 @@ export function ProductDetail({
           </ul>
         )}
 
-        <div data-fab-avoid>
-        <div className="mt-6 flex items-center gap-4">
-          <div className="flex items-center border border-gold-soft">
+        <div data-fab-avoid ref={buyRef}>
+        <div className="mt-6 flex items-center gap-3">
+          <div className="flex items-center overflow-hidden rounded-full border border-gold-soft">
             <button
               onClick={() => setQuantity((q) => Math.max(minQty, q - 1))}
               className="px-3 py-2 text-sm text-ink hover:text-gold-deep"
@@ -371,9 +398,9 @@ export function ProductDetail({
           <button
             onClick={handleAddToCart}
             disabled={!canAdd}
-            className="flex-1 border border-gold-bright py-3 text-xs font-semibold uppercase tracking-wide text-ink transition-colors hover:bg-gold-bright hover:text-ink disabled:cursor-not-allowed disabled:border-gold-soft disabled:text-ink/40"
+            className={cn("buy-main flex-1 py-3.5 text-[13px] font-semibold tracking-wide disabled:cursor-not-allowed", added && "buy-main-done")}
           >
-            {added ? "✓" : t("addToCart")}
+            {added ? `✓ ${t("added")}` : t("addToCart")}
           </button>
           <button
             onClick={() => toggleWishlist(slug)}
@@ -453,6 +480,24 @@ export function ProductDetail({
           </div>
         ))}
       </div>
+      </div>
+
+      <div className={cn("buy-bar glass", barOn && "buy-bar-on")} aria-hidden={!barOn} inert={!barOn}>
+        {images[0] && (
+          <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl">
+            <Image src={images[0].url} alt="" fill sizes="44px" className="object-cover" />
+          </span>
+        )}
+        <span className="min-w-0 flex-1 text-start">
+          <span className="block truncate text-[13px] font-medium text-ink">{name}</span>
+          {barPrice != null && <span className="price block text-[13px] font-semibold text-ink/80">{formatIls(barPrice)} ₪</span>}
+        </span>
+        <button
+          onClick={() => (canAdd ? handleAddToCart() : buyRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }))}
+          className={cn("buy-main shrink-0 px-5 py-2.5 text-[13px] font-semibold", added && "buy-main-done")}
+        >
+          {added ? "✓" : canAdd ? t("stickyAdd") : t("selectOptions")}
+        </button>
       </div>
     </div>
   );

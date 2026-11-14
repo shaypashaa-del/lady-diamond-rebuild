@@ -12,6 +12,7 @@ import { useCartStore } from "@/lib/cart-store";
 import { useWishlistStore } from "@/lib/wishlist-store";
 import { useMounted } from "@/lib/use-mounted";
 import { QuickViewModal } from "./QuickViewModal";
+import { useTilt } from "@/lib/use-tilt";
 
 export function ProductCard({ product }: { product: SampleProduct }) {
   const t = useTranslations("Product");
@@ -21,6 +22,7 @@ export function ProductCard({ product }: { product: SampleProduct }) {
   const mounted = useMounted();
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const isSold = product.badge === "Sold";
+  const tiltRef = useTilt<HTMLDivElement>(4);
 
   function handleAddToCart() {
     addLine({
@@ -35,11 +37,11 @@ export function ProductCard({ product }: { product: SampleProduct }) {
 
   return (
     <div className="reveal-on-view group relative flex min-w-0 flex-col">
-      <div className="relative aspect-[3/4] w-full overflow-hidden placeholder-gradient">
+      <div ref={tiltRef} className="tilt relative aspect-[3/4] w-full overflow-hidden placeholder-gradient">
         {product.badge && (
           <span
             className={cn(
-              "absolute start-2 top-2 z-10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-paper",
+              "absolute start-2.5 top-2.5 z-10 rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-paper",
               product.badge === "Sale" && "bg-clay",
               product.badge === "New" && "bg-ink",
               product.badge === "Sold" && "bg-ink/40"
@@ -51,8 +53,8 @@ export function ProductCard({ product }: { product: SampleProduct }) {
         {product.tag && (
           <span
             className={cn(
-              "absolute start-2 z-10 bg-gold-deep px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-paper",
-              product.badge ? "top-8" : "top-2"
+              "absolute start-2.5 z-10 rounded-full bg-gold-deep px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-paper",
+              product.badge ? "top-9" : "top-2.5"
             )}
           >
             {t(`badge_${product.tag}`)}
@@ -61,11 +63,11 @@ export function ProductCard({ product }: { product: SampleProduct }) {
         {/* Visible by default on touch devices (phones, tablets), which
             have no real hover state to reveal these — only fades in on
             hover for true pointer/desktop screens (lg+). */}
-        <div className="absolute end-2 top-2 z-10 flex w-fit flex-col gap-2 opacity-100 transition-opacity max-lg:opacity-100 lg:opacity-0 lg:group-hover:opacity-100">
+        <div className="absolute end-2.5 top-2.5 z-10 flex w-fit flex-col gap-2 opacity-100 transition-opacity max-lg:opacity-100 lg:opacity-0 lg:group-hover:opacity-100">
           <button
             aria-label={t("quickView")}
             onClick={() => setQuickViewOpen(true)}
-            className="border border-gold-soft bg-paper p-2 text-ink shadow transition-colors hover:border-gold hover:bg-gold-bright hover:text-ink"
+            className="glass rounded-full p-2.5 text-ink transition-colors hover:bg-gold-bright hover:text-ink"
           >
             <Eye size={14} />
           </button>
@@ -73,7 +75,7 @@ export function ProductCard({ product }: { product: SampleProduct }) {
             aria-label={t("wishlist")}
             onClick={() => toggleWishlist(product.slug)}
             className={cn(
-              "border border-gold-soft bg-paper p-2 text-ink shadow transition-colors hover:border-gold hover:bg-gold-bright hover:text-ink",
+              "glass rounded-full p-2.5 text-ink transition-colors hover:bg-gold-bright hover:text-ink",
               mounted && isWishlisted && "border-clay bg-clay text-paper"
             )}
           >

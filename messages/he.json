@@ -101,7 +101,27 @@
     "value2Title": "זהב ממוחזר",
     "value2Copy": "פריטים נבחרים יוצקים מזהב ממוחזר, באחריות.",
     "value3Title": "להעברה מדור לדור",
-    "value3Copy": "פריטי יומיום שנבנים להישאר, ולעבור הלאה."
+    "value3Copy": "פריטי יומיום שנבנים להישאר, ולעבור הלאה.",
+    "diamondKicker": "אמנות הליטוש",
+    "diamondCue1Title": "האור נכנס.",
+    "diamondCue1Body": "חמישים ושבע פאות לוכדות כל קרן אור ומחזירות אותה אליכם.",
+    "diamondCue2Title": "האש נולדת.",
+    "diamondCue2Body": "בתוך האבן האור נשבר לצבעי הקשת. הצורפים קוראים לזה האש של היהלום.",
+    "diamondCue3Title": "ועכשיו הוא שלכם.",
+    "diamondCue3Body": "סובבו את היהלום באצבע. ואז בחרו את התכשיט שלכם.",
+    "diamondCta": "לקולקציה",
+    "diamondHint": "גררו כדי לסובב",
+    "diamondCue3BodyStill": "בחרו את התכשיט שלכם.",
+    "stonesTitle": "בחרו את האבן שלכם",
+    "stonesCta": "לתכשיטים",
+    "stoneDiamond": "יהלום",
+    "stoneSapphire": "ספיר",
+    "stoneEmerald": "אמרלד",
+    "stoneRuby": "רובי",
+    "stoneDiamondQuery": "יהלום",
+    "stoneSapphireQuery": "ספיר",
+    "stoneEmeraldQuery": "אמרלד",
+    "stoneRubyQuery": "רובי"
   },
   "Product": {
     "selectOptions": "בחירת אפשרויות",
@@ -206,7 +226,9 @@
     "backorderNoteNoDays": "זמין בהזמנה מראש",
     "minQtyNote": "כמות מינימום להזמנה: {count}",
     "maxQtyNote": "מקסימום {count} יחידות להזמנה",
-    "badge_POPULAR": "פופולרי השבוע"
+    "badge_POPULAR": "פופולרי השבוע",
+    "stickyAdd": "הוספה לעגלה",
+    "added": "נוסף לעגלה"
   },
   "Category": {
     "kicker": "LADY DIAMOND",

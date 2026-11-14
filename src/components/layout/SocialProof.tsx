@@ -207,7 +207,8 @@ export function SocialProof() {
       raf = requestAnimationFrame(() => {
         const header = document.querySelector("header");
         const bottom = header ? header.getBoundingClientRect().bottom : 0;
-        setTop(Math.max(12, Math.round(bottom + 12)));
+        // Never above the floating nav capsule (12px gap + 56px capsule + 8px).
+        setTop(Math.max(76, Math.round(bottom + 12)));
       });
     };
     place();

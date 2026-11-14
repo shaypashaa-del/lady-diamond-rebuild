@@ -653,3 +653,530 @@ html[lang="he"] :where(h1, h2, h3, h4, p, span, a, button, li, label, dt, dd, th
     animation: rise-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 }
+
+/* =========================================================================
+   Materials, motion and shape (Apple-style): glass layers, soft radii, instant
+   press feedback. Shop only; the admin keeps its own look.
+   ========================================================================= */
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-edge: rgba(255, 255, 255, 0.7);
+  --glass-line: rgba(20, 17, 14, 0.08);
+  --glass-shadow: 0 18px 44px -20px rgba(20, 17, 14, 0.35), 0 2px 6px -2px rgba(20, 17, 14, 0.12);
+  --glass-dark-bg: rgba(20, 18, 16, 0.55);
+}
+
+.glass,
+.glass-dark,
+.glass-pill {
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+}
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-line);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-edge);
+}
+.glass-dark {
+  background: var(--glass-dark-bg);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 50px -22px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  color: var(--paper);
+}
+.glass-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.9rem;
+  padding: 0.7rem 1.7rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--paper);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 12px 30px -16px rgba(0, 0, 0, 0.6);
+  transition: background-color 0.25s var(--ease-out), border-color 0.25s var(--ease-out), transform 0.12s ease-out;
+}
+.glass-pill:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+.glass-pill-gold {
+  background: linear-gradient(180deg, rgba(240, 214, 150, 0.95), rgba(203, 158, 84, 0.95));
+  border-color: rgba(255, 240, 205, 0.7);
+  color: #1c1710;
+}
+.glass-pill-gold:hover {
+  background: linear-gradient(180deg, rgba(247, 226, 172, 1), rgba(214, 170, 95, 1));
+}
+.glass-pill:active {
+  transform: scale(0.97);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: rgba(255, 255, 255, 0.96);
+  }
+  .glass-dark {
+    background: rgba(20, 18, 16, 0.94);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background: #fff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .glass-dark {
+    background: #14120f;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+@media (prefers-contrast: more) {
+  .glass {
+    background: #fff;
+    border-color: var(--ink);
+  }
+  .glass-dark {
+    background: #000;
+    border-color: #fff;
+  }
+}
+
+/* ---- The diamond act --------------------------------------------------- */
+.diamond-act {
+  background: #0b0a09;
+}
+.diamond-glow {
+  background:
+    radial-gradient(42% 36% at 50% 52%, rgba(221, 170, 93, 0.16), transparent 70%),
+    radial-gradient(70% 55% at 50% 108%, rgba(221, 170, 93, 0.1), transparent 70%),
+    radial-gradient(120% 90% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+}
+.diamond-stone {
+  width: min(72svh, 92vw);
+  aspect-ratio: 1;
+  will-change: transform;
+}
+.diamond-title {
+  font-size: clamp(2rem, 5.4vw, 4.25rem);
+  font-weight: 600;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+}
+html[lang="he"] .diamond-title {
+  line-height: 1.14;
+  letter-spacing: 0;
+}
+.diamond-cue {
+  will-change: opacity, transform;
+  text-align: start;
+}
+/* Phones and tablets: the stone sits high, every line lands in the lower third. */
+.diamond-cue-a,
+.diamond-cue-b,
+.diamond-cue-c {
+  inset-inline: 1.5rem;
+  bottom: 11svh;
+}
+@media (max-width: 1099px) {
+  .diamond-stone {
+    margin-bottom: 26svh;
+    width: min(46svh, 86vw);
+  }
+}
+/* Wide screens: the lines flank the stone, never cross it. */
+@media (min-width: 1100px) {
+  .diamond-cue-a,
+  .diamond-cue-b {
+    bottom: auto;
+    top: 50%;
+    margin-top: -5.5rem;
+    max-width: min(24rem, calc(50vw - 36svh - 4vw - 1.5rem));
+  }
+  .diamond-cue-a {
+    inset-inline: max(2.5rem, 4vw) auto;
+  }
+  .diamond-cue-b {
+    inset-inline: auto max(2.5rem, 4vw);
+  }
+  .diamond-cue-c {
+    inset-inline: 2.5rem;
+    bottom: 6vh;
+    text-align: center;
+  }
+  .diamond-cue-c p {
+    margin-inline: auto;
+    max-width: 34rem;
+  }
+  /* The closing line shares the screen with the whole stone: keep it compact. */
+  .diamond-cue-c .diamond-title {
+    font-size: clamp(1.9rem, min(4.4vw, 7svh), 3.6rem);
+  }
+}
+
+/* ---- Floating nav capsule ---------------------------------------------- */
+.nav-capsule {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  width: min(68rem, calc(100vw - 1.5rem));
+  height: 56px;
+  padding: 0 0.6rem 0 1.1rem;
+  border-radius: 999px;
+  /* Materialise: it arrives as a surface (scale + blur clearing), not a plain fade. */
+  opacity: 0;
+  transform: translate3d(-50%, -14px, 0) scale(0.96);
+  filter: blur(6px);
+  pointer-events: none;
+  transition: opacity 0.38s var(--ease-out), transform 0.5s var(--ease-out), filter 0.38s var(--ease-out);
+}
+.nav-capsule-on {
+  opacity: 1;
+  transform: translate3d(-50%, 0, 0) scale(1);
+  filter: none;
+  pointer-events: auto;
+}
+.nav-capsule-link {
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 0.5rem 0;
+  transition: color 0.2s ease;
+}
+.nav-capsule-btn {
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: var(--ink);
+  transition: background-color 0.2s ease, transform 0.12s ease-out;
+}
+.nav-capsule-btn:hover {
+  background: rgba(20, 17, 14, 0.07);
+}
+.nav-capsule-btn:active {
+  transform: scale(0.92);
+}
+.nav-capsule-count {
+  position: absolute;
+  top: 4px;
+  inset-inline-end: 2px;
+  display: flex;
+  min-width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--gold-deep);
+  padding: 0 4px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-capsule {
+    transform: translate3d(-50%, 0, 0);
+    filter: none;
+    transition: opacity 0.2s ease;
+  }
+}
+
+/* ---- Shape: soft radii and pill buttons across the shop ------------------
+   Unlayered on purpose, so these win over the square Tailwind utilities that
+   are written into every page without touching each file. */
+.shop :where(a, button, input[type="submit"])[class*="uppercase"]:where(
+    [class*="border-gold-bright"],
+    [class*="border-gold-soft"],
+    [class*="border-ink"],
+    [class*="bg-ink"],
+    [class*="bg-gold"],
+    [class*="bg-clay"]
+  ):not([class*="border-b"]):not([class*="rounded"]) {
+  border-radius: 999px;
+}
+.shop :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="submit"]), select, textarea):not([class*="rounded"]) {
+  border-radius: 14px;
+}
+.shop main :where(div, section, aside, form, article, li, details, fieldset, table)[class~="border"]:where([class*="border-gold-soft"], [class*="border-gold-bright"]):not([class*="rounded"]) {
+  border-radius: 22px;
+}
+.shop main :where(a, div, figure)[class*="aspect-"][class*="overflow-hidden"]:not([class*="rounded"]) {
+  border-radius: 24px;
+}
+@media (max-width: 639px) {
+  .shop main :where(a, div, figure)[class*="aspect-"][class*="overflow-hidden"]:not([class*="rounded"]) {
+    border-radius: 18px;
+  }
+}
+
+/* ---- Response: feedback on pointer-down, not on release -------------------- */
+.shop :where(button, [role="button"], a[class*="uppercase"], a[class*="border"], summary):active {
+  transform: scale(0.97);
+}
+.shop :where(a, button, input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--gold-deep);
+  outline-offset: 3px;
+}
+@media (hover: none) {
+  .shop :where(a, button) {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ---- Page arrival: every navigation settles in the same quiet way ---------- */
+@keyframes page-arrive {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* "backwards", not "both": once the animation ends nothing must stay applied, or the
+   leftover identity transform turns this wrapper into the containing block for every
+   fixed element inside the page (purchase bar, quick-view dialog). */
+.page-arrive {
+  animation: page-arrive 0.55s var(--ease-out) backwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-arrive {
+    animation: none;
+  }
+}
+
+/* ---- Hero depth ---------------------------------------------------------- */
+.hero-title {
+  font-size: clamp(2.75rem, 7.2vw, 5.25rem);
+  line-height: 1.04;
+  letter-spacing: -0.022em;
+}
+html[lang="he"] .hero-title {
+  line-height: 1.12;
+  letter-spacing: 0;
+}
+/* Out-of-focus points of light in front of the photograph: the nearest plane. */
+.hero-bokeh {
+  background:
+    radial-gradient(9rem 9rem at 12% 78%, rgba(255, 226, 170, 0.22), transparent 70%),
+    radial-gradient(5rem 5rem at 30% 92%, rgba(255, 240, 210, 0.2), transparent 70%),
+    radial-gradient(12rem 12rem at 84% 66%, rgba(221, 170, 93, 0.16), transparent 70%),
+    radial-gradient(4rem 4rem at 68% 88%, rgba(255, 244, 220, 0.24), transparent 70%),
+    radial-gradient(7rem 7rem at 52% 104%, rgba(255, 226, 170, 0.18), transparent 70%),
+    radial-gradient(3rem 3rem at 92% 96%, rgba(255, 255, 255, 0.22), transparent 70%);
+  mix-blend-mode: screen;
+}
+
+/* A sheet or dialog arriving: scale and blur clear together. */
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0) scale(0.97);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+.sheet-in,
+.cookie-card {
+  animation: sheet-in 0.5s var(--ease-out) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet-in,
+  .cookie-card {
+    animation: none;
+  }
+}
+
+/* ---- Scroll-driven wipes and drift (compositor only, no JavaScript) --------
+   Where the browser cannot link an animation to the scroll, the content is
+   simply there. */
+@keyframes wipe-open {
+  from {
+    clip-path: inset(14% 10% 14% 10% round 24px);
+    opacity: 0.4;
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 24px);
+    opacity: 1;
+  }
+}
+@keyframes drift {
+  from {
+    transform: translate3d(0, -5%, 0) scale(1.12);
+  }
+  to {
+    transform: translate3d(0, 5%, 0) scale(1.12);
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .wipe-on-view {
+      animation: wipe-open linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+    .drift-on-view {
+      animation: drift linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+
+/* The capsule over a dark section. */
+.nav-capsule {
+  transition: opacity 0.38s var(--ease-out), transform 0.5s var(--ease-out), filter 0.38s var(--ease-out), background-color 0.35s ease, border-color 0.35s ease;
+}
+.nav-capsule-dark :is(.nav-capsule-link, .nav-capsule-btn, .font-display) {
+  color: rgba(255, 255, 255, 0.86);
+}
+.nav-capsule-dark .nav-capsule-link:hover {
+  color: #fff;
+}
+.nav-capsule-dark .nav-capsule-link.text-gold-deep {
+  color: var(--gold-bright);
+}
+.nav-capsule-dark .nav-capsule-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+.nav-capsule-dark img {
+  filter: brightness(0) invert(1);
+  opacity: 0.92;
+}
+
+/* ---- Purchase area ------------------------------------------------------- */
+/* A photograph that leans to the pointer (see use-tilt.ts) and catches a highlight. */
+.tilt {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.tilt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255, 255, 255, 0.42), transparent 42%);
+  mix-blend-mode: soft-light;
+  opacity: var(--go, 0);
+  transition: opacity 0.35s ease;
+}
+.pd-title {
+  font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+}
+html[lang="he"] .pd-title {
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+/* The one primary action on the page: solid, gold-lit, answers the press at once. */
+.buy-main {
+  position: relative;
+  overflow: hidden;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(180deg, #34302b, #171512);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 14px 30px -16px rgba(20, 17, 14, 0.7);
+  transition: background 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+}
+.buy-main::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(240, 214, 150, 0.35) 50%, transparent 65%);
+  transform: translateX(-120%);
+}
+.buy-main:hover::before {
+  transform: translateX(120%);
+  transition: transform 0.9s var(--ease-out);
+}
+.buy-main:disabled {
+  background: #e9e6e0;
+  color: rgba(45, 45, 45, 0.45);
+  box-shadow: none;
+}
+.buy-main-done {
+  background: linear-gradient(180deg, #f0d696, #cb9e54);
+  color: #1c1710;
+}
+/* Floating purchase bar. */
+.buy-bar {
+  position: fixed;
+  bottom: 14px;
+  left: 50%;
+  z-index: 44;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: min(34rem, calc(100vw - 9.5rem));
+  padding: 0.5rem 0.5rem 0.5rem 0.6rem;
+  border-radius: 999px;
+  opacity: 0;
+  transform: translate3d(-50%, 18px, 0) scale(0.96);
+  filter: blur(6px);
+  pointer-events: none;
+  transition: opacity 0.35s var(--ease-out), transform 0.5s var(--ease-out), filter 0.35s var(--ease-out);
+}
+.buy-bar-on {
+  opacity: 1;
+  transform: translate3d(-50%, 0, 0) scale(1);
+  filter: none;
+  pointer-events: auto;
+}
+@media (max-width: 639px) {
+  /* Phones: full width, lifted clear of the two round floating buttons. */
+  .buy-bar {
+    bottom: 76px;
+    width: calc(100vw - 1.5rem);
+  }
+}
+@keyframes cart-pop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.32);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.cart-pop {
+  animation: cart-pop 0.45s var(--ease-out);
+}
+/* Dark stage for a live stone. */
+.stone-tile {
+  background:
+    radial-gradient(60% 50% at 50% 38%, rgba(221, 170, 93, 0.18), transparent 70%),
+    #0c0b0a;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 30px 60px -36px rgba(20, 17, 14, 0.7);
+}
+@media (prefers-reduced-motion: reduce) {
+  .buy-bar {
+    transform: translate3d(-50%, 0, 0);
+    filter: none;
+    transition: opacity 0.2s ease;
+  }
+  .cart-pop {
+    animation: none;
+  }
+  .buy-main::before {
+    display: none;
+  }
+}

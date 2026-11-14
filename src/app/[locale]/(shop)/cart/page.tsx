@@ -9,6 +9,7 @@ import { useCartStore } from "@/lib/cart-store";
 import { useMounted } from "@/lib/use-mounted";
 import { getMyAddress } from "@/server/actions/address";
 import { getCheckoutPreview } from "@/server/actions/checkout-preview";
+import { GemAccent } from "@/components/gem/GemAccent";
 
 export default function CartPage() {
   const t = useTranslations("Cart");
@@ -32,8 +33,11 @@ export default function CartPage() {
 
   if (lines.length === 0) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-8">
-        <p className="text-sm text-ink/60">{t("empty")}</p>
+      <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-8">
+        <div className="stone-tile mx-auto mb-8 flex h-44 w-44 items-center justify-center rounded-full">
+          <GemAccent className="w-36" />
+        </div>
+        <p className="text-base text-ink/70">{t("empty")}</p>
         <Link
           href="/category/all"
           className="mt-6 inline-block border border-gold-bright px-8 py-3 text-xs font-semibold uppercase tracking-wide text-ink transition-colors hover:bg-gold-bright hover:text-ink"
@@ -53,7 +57,7 @@ export default function CartPage() {
         <div className="space-y-6 sm:col-span-2">
           {lines.map((line) => (
             <div key={line.key} className="flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-gold-soft pb-6">
-              <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden placeholder-gradient">
+              <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-2xl placeholder-gradient">
                 {line.imageUrl && (
                   <Image src={line.imageUrl} alt={line.name} fill sizes="80px" className="object-cover" />
                 )}
@@ -67,7 +71,7 @@ export default function CartPage() {
                 <p className="mt-1 text-sm text-ink">{line.price.toFixed(2)} ₪</p>
               </div>
               <div className="flex w-full items-center justify-between gap-4 ps-24 sm:w-auto sm:justify-start sm:ps-0">
-                <div className="flex items-center border border-gold-soft">
+                <div className="flex items-center overflow-hidden rounded-full border border-gold-soft">
                   <button
                     onClick={() => setQuantity(line.key, line.quantity - 1)}
                     className="px-2 py-1 text-sm text-ink hover:text-gold-deep"
@@ -99,7 +103,7 @@ export default function CartPage() {
           ))}
         </div>
 
-        <div className="border border-gold-soft p-6">
+        <div className="glass self-start rounded-[28px] p-6 sm:sticky sm:top-24">
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-ink">{t("cartTotals")}</h2>
           <div className="flex justify-between border-t border-gold-soft py-3 text-sm text-ink">
             <span>{t("shipping")}</span>

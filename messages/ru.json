@@ -101,7 +101,27 @@
     "value2Title": "Переработанное золото",
     "value2Copy": "Отдельные изделия отливаются из переработанного золота.",
     "value3Title": "Передаётся по наследству",
-    "value3Copy": "Повседневные украшения, созданные, чтобы остаться и передаваться дальше."
+    "value3Copy": "Повседневные украшения, созданные, чтобы остаться и передаваться дальше.",
+    "diamondKicker": "Искусство огранки",
+    "diamondCue1Title": "Свет входит.",
+    "diamondCue1Body": "Пятьдесят семь граней ловят каждый луч и возвращают его вам.",
+    "diamondCue2Title": "Рождается огонь.",
+    "diamondCue2Body": "Внутри камня свет распадается на цвета. Ювелиры называют это огнём.",
+    "diamondCue3Title": "Теперь он ваш.",
+    "diamondCue3Body": "Поверните бриллиант пальцем. Затем выберите своё украшение.",
+    "diamondCta": "Смотреть коллекцию",
+    "diamondHint": "Потяните, чтобы повернуть",
+    "diamondCue3BodyStill": "Выберите своё украшение.",
+    "stonesTitle": "Выберите свой камень",
+    "stonesCta": "К украшениям",
+    "stoneDiamond": "Бриллиант",
+    "stoneSapphire": "Сапфир",
+    "stoneEmerald": "Изумруд",
+    "stoneRuby": "Рубин",
+    "stoneDiamondQuery": "бриллиант",
+    "stoneSapphireQuery": "сапфир",
+    "stoneEmeraldQuery": "изумруд",
+    "stoneRubyQuery": "рубин"
   },
   "Product": {
     "selectOptions": "Выбрать опции",
@@ -206,7 +226,9 @@
     "backorderNoteNoDays": "Доступно по предзаказу",
     "minQtyNote": "Минимальное количество: {count}",
     "maxQtyNote": "Не более {count} шт. в заказе",
-    "badge_POPULAR": "Популярно на этой неделе"
+    "badge_POPULAR": "Популярно на этой неделе",
+    "stickyAdd": "В корзину",
+    "added": "Добавлено в корзину"
   },
   "Category": {
     "kicker": "Lady Diamond",

@@ -26,20 +26,22 @@ export function ScrollReveal({
     if (!el) return;
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      gsap.set(el, { opacity: 1, y: 0 });
+      gsap.set(el, { opacity: 1, y: 0, rotateX: 0 });
       return;
     }
 
-    gsap.set(el, { opacity: 0, y });
+    gsap.set(el, { opacity: 0, y, rotateX: 9, transformPerspective: 900, transformOrigin: "50% 100%" });
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           gsap.to(el, {
             opacity: 1,
             y: 0,
-            duration: 0.9,
+            rotateX: 0,
+            duration: 1,
             delay,
             ease: "power3.out",
+            clearProps: "transform",
           });
           observer.disconnect();
         }

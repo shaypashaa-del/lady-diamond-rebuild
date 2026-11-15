@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { GemAccent } from "@/components/gem/GemAccent";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { footerColumns } from "@/lib/nav-data";
@@ -35,6 +36,7 @@ export function Footer({ categories = [] }: { categories?: { slug: string; label
       <ScrollReveal>
         <div className="relative mx-auto grid max-w-7xl grid-cols-2 gap-10 px-4 py-16 sm:grid-cols-4 sm:gap-8 sm:px-8 sm:py-20">
           <div className="col-span-2 sm:col-span-1">
+            <GemAccent stone="diamond" className="mb-4 w-24" />
             <Image src="/brand/logo.png" alt={t("brand")} width={72} height={58} className="h-14 w-auto brightness-0 invert" />
             <p className="mt-5 max-w-[26ch] text-sm leading-6 text-paper/60">{t("tagline")}</p>
             <p className="mt-4 text-sm text-paper/50">{t("address")}</p>

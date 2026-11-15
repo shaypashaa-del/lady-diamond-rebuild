@@ -47,7 +47,7 @@ export function InstagramSection() {
               href={post.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative block aspect-square overflow-hidden"
+              className="ig-tile group relative block aspect-square overflow-hidden"
             >
               <Image
                 src={post.image}

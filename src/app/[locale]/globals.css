@@ -1255,3 +1255,14 @@ html[lang="he"] .pd-title {
 @media (min-width: 640px) {
   .auth-card { padding: 2.5rem 2.25rem; }
 }
+
+/* Instagram tiles lift and glow, like the product cards. */
+.ig-tile {
+  transition: transform 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out);
+}
+@media (hover: hover) {
+  .ig-tile:hover {
+    transform: translateY(-4px) scale(1.015);
+    box-shadow: 0 22px 40px -22px rgba(20, 17, 14, 0.55), 0 0 0 1px rgba(203, 158, 84, 0.45);
+  }
+}

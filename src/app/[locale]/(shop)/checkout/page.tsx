@@ -14,6 +14,7 @@ import { getMyAddress, type AddressData } from "@/server/actions/address";
 import { getCheckoutPreview, type CheckoutPreview } from "@/server/actions/checkout-preview";
 import type { PaymentMethodId } from "@/server/payments/types";
 import { PayPalButton } from "@/components/checkout/PayPalButton";
+import { GemAccent } from "@/components/gem/GemAccent";
 
 function ConsentText() {
   const tc = useTranslations("Consent");
@@ -106,9 +107,10 @@ function CheckoutForm() {
 
   if (lines.length === 0) {
     return (
-      <div className="mx-auto max-w-md px-4 py-24 text-center sm:px-8">
+      <div className="mx-auto flex max-w-md flex-col items-center px-4 py-20 text-center sm:px-8">
+        <GemAccent className="mb-6 w-36" />
         <p className="mb-6 text-sm text-ink/60">{t("emptyCart")}</p>
-        <Link href="/category/all" className="border border-gold-bright px-8 py-3 text-xs font-semibold uppercase tracking-wide hover:bg-gold-bright hover:text-ink">
+        <Link href="/category/all" className="glass-pill glass-pill-gold">
           {t("continueShopping")}
         </Link>
       </div>
@@ -174,7 +176,7 @@ function CheckoutForm() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-8">
-      <h1 className="mb-8 text-center text-2xl font-semibold uppercase tracking-[0.2em]">{t("title")}</h1>
+      <h1 className="mb-8 text-center text-2xl font-semibold uppercase tracking-[0.2em] sm:text-3xl">{t("title")}</h1>
 
       <button
         type="button"
@@ -190,7 +192,7 @@ function CheckoutForm() {
             onChange={(e) => setCouponCode(e.target.value)}
             placeholder={t("couponCode")}
             aria-label={t("couponCode")}
-            className="flex-1 border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none"
+            className="field flex-1"
             dir="ltr"
           />
         </div>
@@ -199,13 +201,13 @@ function CheckoutForm() {
         <p className="mb-6 text-sm text-clay">{t("couponInvalid")}</p>
       )}
 
-      <form ref={formRef} action={handleSubmit} className="grid grid-cols-1 gap-10 sm:grid-cols-2">
-        <div>
+      <form ref={formRef} action={handleSubmit} className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1.1fr_1fr] lg:gap-8">
+        <div className="glass rounded-[28px] p-5 sm:p-7">
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide">{t("billingDetails")}</h2>
-          <div className="space-y-4">
-            <input name="fullName" autoComplete="name" placeholder={t("fullName")} aria-label={t("fullName")} defaultValue={savedAddress?.fullName} required className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
-            <input name="email" type="email" inputMode="email" autoComplete="email" placeholder={t("email")} aria-label={t("email")} required className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
-            <input name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder={t("phone")} aria-label={t("phone")} defaultValue={savedAddress?.phone} required className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
+          <div className="space-y-3">
+            <input name="fullName" autoComplete="name" placeholder={t("fullName")} aria-label={t("fullName")} defaultValue={savedAddress?.fullName} required className="field" />
+            <input name="email" type="email" inputMode="email" autoComplete="email" placeholder={t("email")} aria-label={t("email")} required className="field" />
+            <input name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder={t("phone")} aria-label={t("phone")} defaultValue={savedAddress?.phone} required className="field" />
             <input
               name="country"
               placeholder={t("country")}
@@ -213,26 +215,26 @@ function CheckoutForm() {
               required
               value={country}
               onChange={(e) => setCountry(e.target.value)}
-              className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none"
+              className="field"
             />
-            <input name="city" autoComplete="address-level2" placeholder={t("city")} aria-label={t("city")} defaultValue={savedAddress?.city} required className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
-            <input name="street" autoComplete="street-address" placeholder={t("street")} aria-label={t("street")} defaultValue={savedAddress?.street} required className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
-            <input name="apartment" placeholder={t("apartment")} aria-label={t("apartment")} defaultValue={savedAddress?.apartment} className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
-            <input name="zip" inputMode="numeric" autoComplete="postal-code" placeholder={t("zip")} aria-label={t("zip")} defaultValue={savedAddress?.zip} className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
-            <textarea name="orderNotes" placeholder={t("orderNotes")} aria-label={t("orderNotes")} rows={3} className="w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
+            <input name="city" autoComplete="address-level2" placeholder={t("city")} aria-label={t("city")} defaultValue={savedAddress?.city} required className="field" />
+            <input name="street" autoComplete="street-address" placeholder={t("street")} aria-label={t("street")} defaultValue={savedAddress?.street} required className="field" />
+            <input name="apartment" placeholder={t("apartment")} aria-label={t("apartment")} defaultValue={savedAddress?.apartment} className="field" />
+            <input name="zip" inputMode="numeric" autoComplete="postal-code" placeholder={t("zip")} aria-label={t("zip")} defaultValue={savedAddress?.zip} className="field" />
+            <textarea name="orderNotes" placeholder={t("orderNotes")} aria-label={t("orderNotes")} rows={3} className="field" />
           </div>
         </div>
 
-        <div>
+        <div className="glass rounded-[28px] p-5 sm:p-7 lg:sticky lg:top-24">
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide">{t("yourOrder")}</h2>
-          <div className="border border-gold-soft p-5">
+          <div className="rounded-2xl bg-white/60 p-4 ring-1 ring-black/5">
             {lines.map((l) => (
               <div key={l.key} className="flex justify-between py-2 text-sm">
                 <span>{l.name}{l.variantLabel ? ` — ${l.variantLabel}` : ""}{describeOptions(l.options) ? ` (${describeOptions(l.options)})` : ""} × {l.quantity}</span>
                 <span>{(l.price * l.quantity).toFixed(2)} ₪</span>
               </div>
             ))}
-            <div className="flex justify-between border-t border-gold-soft py-2 text-sm">
+            <div className="flex justify-between border-t border-black/10 py-2 text-sm">
               <span>{t("subtotal")}</span>
               <span>{subtotal.toFixed(2)} ₪</span>
             </div>
@@ -246,15 +248,15 @@ function CheckoutForm() {
               <span>{t("shipping")}</span>
               <span>{shippingCost > 0 ? `${shippingCost.toFixed(2)} ₪` : t("free")}</span>
             </div>
-            <div className="flex justify-between border-t border-gold-soft py-2 text-sm font-semibold">
+            <div className="flex justify-between border-t border-black/10 py-2 text-sm font-semibold">
               <span>{t("total")}</span>
               <span>{total.toFixed(2)} ₪</span>
             </div>
           </div>
 
           <h2 className="mb-3 mt-6 text-sm font-semibold uppercase tracking-wide">{t("paymentMethod")}</h2>
-          <div className="space-y-2">
-            <label className="flex items-center gap-2 border border-gold-soft p-3 text-sm">
+          <div className="grid gap-2">
+            <label className="pay-card">
               <input
                 type="radio"
                 name="paymentMethodChoice"
@@ -263,7 +265,7 @@ function CheckoutForm() {
               />
               {t("bankTransfer")}
             </label>
-            <label className="flex items-center gap-2 border border-gold-soft p-3 text-sm">
+            <label className="pay-card">
               <input
                 type="radio"
                 name="paymentMethodChoice"
@@ -272,7 +274,7 @@ function CheckoutForm() {
               />
               {t("cod")}
             </label>
-            <label className="flex items-center gap-2 border border-gold-soft p-3 text-sm">
+            <label className="pay-card">
               <input
                 type="radio"
                 name="paymentMethodChoice"
@@ -281,7 +283,7 @@ function CheckoutForm() {
               />
               {t("bit")}
             </label>
-            <label className="flex items-center gap-2 border border-gold-soft p-3 text-sm">
+            <label className="pay-card">
               <input
                 type="radio"
                 name="paymentMethodChoice"
@@ -290,7 +292,7 @@ function CheckoutForm() {
               />
               {t("paybox")}
             </label>
-            <label className="flex items-center gap-2 border border-gold-soft p-3 text-sm">
+            <label className="pay-card">
               <input
                 type="radio"
                 name="paymentMethodChoice"
@@ -299,7 +301,7 @@ function CheckoutForm() {
               />
               {t("creditCard")}
             </label>
-            <label className="flex items-center gap-2 border border-gold-soft p-3 text-sm">
+            <label className="pay-card">
               <input
                 type="radio"
                 name="paymentMethodChoice"
@@ -311,7 +313,7 @@ function CheckoutForm() {
           </div>
 
           {paymentMethod === "bank_transfer" && (
-            <div className="mt-4 border border-gold-bright/60 bg-gold-soft/20 p-4 text-sm text-ink">
+            <div className="mt-4 rounded-2xl bg-gold-soft/25 p-4 text-sm text-ink ring-1 ring-gold-bright/40">
               <p className="font-semibold">{t("bankTitle")}</p>
               <p className="mt-2 text-ink/80">{t("bankHint", { amount: total.toFixed(2) })}</p>
               <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
@@ -329,7 +331,7 @@ function CheckoutForm() {
           )}
 
           {paymentMethod === "paypal" && !PAYPAL_SDK_ENABLED && (
-            <div className="mt-4 border border-gold-bright/60 bg-gold-soft/20 p-4 text-sm text-ink">
+            <div className="mt-4 rounded-2xl bg-gold-soft/25 p-4 text-sm text-ink ring-1 ring-gold-bright/40">
               <p className="font-semibold">{t("paypalTitle")}</p>
               <p className="mt-2 text-ink/80">{t("paypalHint", { amount: total.toFixed(2) })}</p>
               <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -339,7 +341,7 @@ function CheckoutForm() {
                   onClick={() => {
                     navigator.clipboard?.writeText(PAYPAL_EMAIL).then(() => setCopied(true)).catch(() => undefined);
                   }}
-                  className="border border-gold-bright px-3 py-1.5 text-xs font-semibold hover:bg-gold-bright"
+                  className="glass-pill glass-pill-gold !min-h-0 !px-4 !py-1.5 !text-xs"
                 >
                   {copied ? t("copied") : t("copyEmail")}
                 </button>
@@ -349,7 +351,7 @@ function CheckoutForm() {
           )}
 
           {(paymentMethod === "paybox" || paymentMethod === "bit") && (
-            <div className="mt-4 border border-gold-bright/60 bg-gold-soft/20 p-4 text-sm text-ink">
+            <div className="mt-4 rounded-2xl bg-gold-soft/25 p-4 text-sm text-ink ring-1 ring-gold-bright/40">
               <p className="font-semibold">{paymentMethod === "paybox" ? t("payboxTitle") : t("bitTitle")}</p>
               <p className="mt-2 text-ink/80">{t("phoneTransferHint", { amount: total.toFixed(2) })}</p>
               <div className="mt-3 flex items-center gap-3">
@@ -359,7 +361,7 @@ function CheckoutForm() {
                   onClick={() => {
                     navigator.clipboard?.writeText(BUSINESS_PHONE.replace(/-/g, "")).then(() => setCopied(true)).catch(() => undefined);
                   }}
-                  className="border border-gold-bright px-3 py-1.5 text-xs font-semibold hover:bg-gold-bright"
+                  className="glass-pill glass-pill-gold !min-h-0 !px-4 !py-1.5 !text-xs"
                 >
                   {copied ? t("copied") : t("copyNumber")}
                 </button>
@@ -382,7 +384,7 @@ function CheckoutForm() {
           </label>
 
           {error && (
-            <p ref={errorRef} role="alert" className="mt-4 border border-clay/30 bg-clay/10 px-3 py-2 text-sm text-clay">
+            <p ref={errorRef} role="alert" className="mt-4 rounded-2xl border border-clay/30 bg-clay/10 px-4 py-3 text-sm text-clay">
               {error}
             </p>
           )}
@@ -403,7 +405,7 @@ function CheckoutForm() {
                   showError(t("mustAgree"));
                 }
               }}
-              className="mt-4 w-full border border-gold-bright bg-ink py-3 text-xs font-semibold uppercase tracking-wide text-paper hover:bg-gold-bright disabled:opacity-50"
+              className="buy-main mt-4 w-full py-3.5 text-sm font-semibold tracking-wide"
             >
               {submitting ? t("placing") : t("placeOrder")}
             </button>

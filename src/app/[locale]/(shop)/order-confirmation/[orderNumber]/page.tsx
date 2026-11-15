@@ -3,17 +3,8 @@ import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
+import { Celebrate } from "@/components/gem/Celebrate";
 import { paypalMeUrl } from "@/lib/site-config";
-
-const DiamondMark = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
-    <path d="M12 2 L21 9 L12 22 L3 9 Z" stroke="currentColor" strokeWidth="0.5" />
-    <path d="M3 9 H21" stroke="currentColor" strokeWidth="0.5" />
-    <path d="M12 2 L8 9" stroke="currentColor" strokeWidth="0.35" />
-    <path d="M12 2 L16 9" stroke="currentColor" strokeWidth="0.35" />
-    <path d="M12 2 L12 22" stroke="currentColor" strokeWidth="0.3" />
-  </svg>
-);
 
 export default async function OrderConfirmationPage({
   params,
@@ -32,16 +23,16 @@ export default async function OrderConfirmationPage({
   if (order.userId && session?.userId !== order.userId) notFound();
 
   return (
-    <div className="mx-auto max-w-md px-4 py-20 text-center sm:px-8">
-      <DiamondMark className="mx-auto h-8 w-8 text-gold-bright" />
-      <h1 className="mt-4 mb-6 text-xl font-semibold uppercase tracking-wide">{t("title")}</h1>
+    <div className="mx-auto max-w-md px-4 py-16 text-center sm:px-8 sm:py-20">
+      <Celebrate />
+      <h1 className="mt-2 mb-6 text-2xl font-semibold uppercase tracking-wide">{t("title")}</h1>
 
-      <div className="mb-6 border border-gold-soft p-5 text-start">
+      <div className="glass mb-6 rounded-[24px] p-5 text-start">
         <div className="flex justify-between text-sm">
           <span className="text-ink/60">{t("orderNumber")}</span>
           <span className="font-medium" dir="ltr">{order.orderNumber}</span>
         </div>
-        <div className="flex justify-between border-t border-gold-soft py-2 text-sm font-semibold">
+        <div className="flex justify-between border-t border-black/10 py-2 text-sm font-semibold">
           <span>{t("total")}</span>
           <span>{Number(order.total).toFixed(2)} ₪</span>
         </div>
@@ -58,7 +49,7 @@ export default async function OrderConfirmationPage({
               href={paypalMeUrl(Number(order.total))}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-4 block border border-gold-bright bg-ink px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-paper hover:bg-gold-bright hover:text-ink"
+              className="buy-main mt-4 block px-4 py-3.5 text-center text-sm font-semibold"
             >
               {t("payWithPaypal", { amount: Number(order.total).toFixed(2) })}
             </a>
@@ -66,7 +57,7 @@ export default async function OrderConfirmationPage({
         </div>
       )}
 
-      <Link href="/category/all" className="border border-gold-bright px-8 py-3 text-xs font-semibold uppercase tracking-wide hover:bg-gold-bright hover:text-ink">
+      <Link href="/category/all" className="glass-pill glass-pill-gold">
         {t("continueShopping")}
       </Link>
     </div>

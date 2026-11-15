@@ -7,6 +7,8 @@ import { applyAsAffiliate } from "@/server/actions/affiliate";
 import type { AuthResult } from "@/server/actions/auth";
 import { ConsentCheckbox } from "@/components/ConsentCheckbox";
 
+import { GemBackdrop } from "@/components/gem/GemBackdrop";
+
 const DiamondMark = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
     <path d="M12 2 L21 9 L12 22 L3 9 Z" stroke="currentColor" strokeWidth="0.4" />
@@ -34,13 +36,8 @@ export default function AffiliatePage() {
     <div>
       {/* Same dark jewel-box hero used across the rest of the site. */}
       <div className="relative overflow-hidden bg-ink py-14 text-center sm:py-20">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-1/2 h-[28rem] w-[28rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(221,170,93,0.16)_0%,transparent_65%)]"
-        />
-        <DiamondMark className="pointer-events-none absolute -top-14 -end-14 h-56 w-56 text-paper/[0.05]" />
-        <DiamondMark className="pointer-events-none absolute -bottom-12 -start-12 h-44 w-44 text-paper/[0.04]" />
         <div className="relative">
+          <GemBackdrop stone="diamond" />
           <p className="text-xs uppercase tracking-[0.4em] text-gold-bright">{t("kicker")}</p>
           <span className="gold-rule mt-4 w-16" />
           <h1 className="mt-4 text-3xl font-semibold uppercase tracking-[0.15em] text-paper sm:text-5xl">

@@ -11,6 +11,25 @@ import { useEffect, useRef, useState } from "react";
 //
 // The file itself is only attached when the video comes near the screen, so
 // the home page no longer downloads ~10 MB of video before anything else.
+// Several clips can be on screen at once (the ring gallery shows five side by side).
+// Decoding them all together is what made the bottom of the home page stutter, so at
+// most MAX_PLAYING play at a time: the ones most in view win, the rest hold their
+// poster frame until there is room.
+const MAX_PLAYING = 2;
+const seen = new Map<HTMLVideoElement, number>();
+
+function rebalance() {
+  const ranked = [...seen.entries()].filter(([, r]) => r > 0).sort((a, b) => b[1] - a[1]);
+  const allowed = new Set(ranked.slice(0, MAX_PLAYING).map(([el]) => el));
+  for (const el of seen.keys()) {
+    if (allowed.has(el)) {
+      if (el.paused) el.play().catch(() => {});
+    } else if (!el.paused) {
+      el.pause();
+    }
+  }
+}
+
 export function AutoplayVideo({
   className,
   poster,
@@ -38,19 +57,19 @@ export function AutoplayVideo({
     if (!el || !near) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          el.play().catch(() => {
-            // Autoplay can still be refused (e.g. iOS low-power mode) —
-            // the poster frame remains visible in that case.
-          });
-        } else {
-          el.pause();
-        }
+        // Autoplay can still be refused (e.g. iOS low-power mode) — the poster
+        // frame remains visible in that case.
+        seen.set(el, entry.isIntersecting ? entry.intersectionRatio : 0);
+        rebalance();
       },
-      { threshold: 0.1 }
+      { threshold: [0, 0.25, 0.5, 0.75, 1] }
     );
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      seen.delete(el);
+      rebalance();
+    };
   }, [near]);
 
   return (

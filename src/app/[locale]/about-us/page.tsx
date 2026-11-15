@@ -6,6 +6,8 @@ import { prisma } from "@/lib/prisma";
 import { t as localize, type LocalizedText } from "@/lib/i18n-content";
 import type { Locale } from "@/i18n/routing";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { GemBackdrop } from "@/components/gem/GemBackdrop";
+import { GemAccent } from "@/components/gem/GemAccent";
 
 // This page reads its content from the DB (Page model) via a plain Prisma
 // query in a Server Component — without an explicit revalidate, Next.js
@@ -136,6 +138,7 @@ export default async function AboutUsPage() {
           ))}
         </div>
         <div className="relative">
+          <GemBackdrop stone="diamond" />
           <h1 className="text-4xl font-semibold uppercase tracking-[0.15em] text-paper sm:text-6xl">
             {localize(page.title as LocalizedText, locale)}
           </h1>
@@ -272,6 +275,7 @@ export default async function AboutUsPage() {
         <DiamondMark className="pointer-events-none absolute -top-10 -end-10 h-56 w-56 text-paper/[0.04]" />
         <ScrollReveal>
           <div className="relative mx-auto max-w-xl px-4 text-center sm:px-8">
+            <GemAccent stone="ruby" className="mx-auto mb-4 w-24" />
             <Image
               src="/brand/diana-signature.png"
               alt="Diana Irimov"

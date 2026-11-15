@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { t as localize, type LocalizedText } from "@/lib/i18n-content";
 import type { Locale } from "@/i18n/routing";
+import { GemBackdrop } from "@/components/gem/GemBackdrop";
 
 // This page reads its content from the DB (Page model) via a plain Prisma
 // query in a Server Component — without an explicit revalidate, Next.js
@@ -11,16 +12,6 @@ import type { Locale } from "@/i18n/routing";
 // never show up in production (same class of bug as the shapes-page
 // pricing freeze).
 export const revalidate = 300;
-
-const DiamondMark = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
-    <path d="M12 2 L21 9 L12 22 L3 9 Z" stroke="currentColor" strokeWidth="0.5" />
-    <path d="M3 9 H21" stroke="currentColor" strokeWidth="0.5" />
-    <path d="M12 2 L8 9" stroke="currentColor" strokeWidth="0.35" />
-    <path d="M12 2 L16 9" stroke="currentColor" strokeWidth="0.35" />
-    <path d="M12 2 L12 22" stroke="currentColor" strokeWidth="0.3" />
-  </svg>
-);
 
 export async function generateMetadata({
   params,
@@ -44,14 +35,23 @@ export default async function PolicyPage({
   if (!page) notFound();
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-16 sm:px-8">
-      <DiamondMark className="h-7 w-7 text-gold-bright" />
-      <h1 className="mt-3 mb-6 text-xl font-semibold uppercase tracking-wide">
-        {localize(page.title as LocalizedText, locale)}
-      </h1>
-      <p className="whitespace-pre-line text-sm leading-7 text-ink/70">
-        {localize(page.body as LocalizedText, locale)}
-      </p>
+    <div>
+      <div className="relative overflow-hidden bg-ink py-12 text-center sm:py-16">
+        <div className="relative">
+          <GemBackdrop stone="diamond" />
+          <span className="gold-rule mt-2 w-16" />
+          <h1 className="mx-auto mt-4 max-w-3xl px-4 text-2xl font-semibold uppercase tracking-[0.15em] text-paper sm:text-4xl">
+            {localize(page.title as LocalizedText, locale)}
+          </h1>
+        </div>
+      </div>
+      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-8 sm:py-14">
+        <div className="glass rounded-[28px] p-6 sm:p-10">
+          <p className="whitespace-pre-line text-[0.95rem] leading-8 text-ink/75">
+            {localize(page.body as LocalizedText, locale)}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

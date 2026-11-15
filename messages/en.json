@@ -617,5 +617,10 @@
     "interested": "{count, plural, one {1 person added this to cart or wishlist this week} other {# people added this to cart or wishlist this week}}",
     "addedToCart": "Someone added to cart",
     "interestTitle": "Trending now"
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "text": "The link is wrong or the page was removed.",
+    "home": "Back to home"
   }
 }

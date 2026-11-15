@@ -1,17 +1,8 @@
+import { GemAccent } from "@/components/gem/GemAccent";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { requireCustomerSession } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
-
-const DiamondMark = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
-    <path d="M12 2 L21 9 L12 22 L3 9 Z" stroke="currentColor" strokeWidth="0.5" />
-    <path d="M3 9 H21" stroke="currentColor" strokeWidth="0.5" />
-    <path d="M12 2 L8 9" stroke="currentColor" strokeWidth="0.35" />
-    <path d="M12 2 L16 9" stroke="currentColor" strokeWidth="0.35" />
-    <path d="M12 2 L12 22" stroke="currentColor" strokeWidth="0.3" />
-  </svg>
-);
 
 export default async function CustomerOrderDetailPage({
   params,
@@ -41,9 +32,10 @@ export default async function CustomerOrderDetailPage({
   };
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-16 sm:px-8">
-      <DiamondMark className="h-7 w-7 text-gold-bright" />
-      <h1 className="mt-3 mb-1 text-xl font-semibold uppercase tracking-wide">
+    <div className="mx-auto max-w-2xl px-4 py-12 sm:px-8 sm:py-16">
+     <div className="glass rounded-[28px] p-5 sm:p-8">
+      <GemAccent stone="sapphire" className="mb-2 w-24" />
+      <h1 className="mb-1 text-xl font-semibold uppercase tracking-wide">
         {t("title")} {order.orderNumber}
       </h1>
       <p className="mb-8 text-sm text-ink/60">
@@ -53,7 +45,7 @@ export default async function CustomerOrderDetailPage({
       <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink/70">
         {t("items")}
       </h2>
-      <ul className="mb-6 divide-y divide-gold-soft border-y border-gold-soft">
+      <ul className="mb-6 divide-y divide-black/10">
         {order.items.map((item) => (
           <li key={item.id} className="flex items-center justify-between py-3 text-sm">
             <span>{item.nameSnapshot} × {item.quantity}</span>
@@ -77,7 +69,7 @@ export default async function CustomerOrderDetailPage({
           <span>{t("shipping")}</span>
           <span>{Number(order.shippingTotal).toFixed(2)} ₪</span>
         </div>
-        <div className="flex justify-between border-t border-gold-soft pt-1 font-semibold">
+        <div className="flex justify-between border-t border-black/10 pt-1 font-semibold">
           <span>{t("total")}</span>
           <span>{Number(order.total).toFixed(2)} ₪</span>
         </div>
@@ -97,6 +89,7 @@ export default async function CustomerOrderDetailPage({
           <span className="font-semibold">{t("tracking")}:</span> {order.trackingNumber}
         </p>
       )}
+     </div>
     </div>
   );
 }

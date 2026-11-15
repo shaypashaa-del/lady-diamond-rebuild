@@ -1,5 +1,7 @@
 "use client";
 
+import { GemBackdrop } from "@/components/gem/GemBackdrop";
+
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { circumferenceMmToUsSize, circumferenceMmToIsraeliSize } from "@/lib/ring-size";
@@ -53,6 +55,7 @@ export function CalculatorsClient({
         <DiamondGlyph className="pointer-events-none absolute -top-16 -end-16 h-64 w-64 text-paper/[0.05]" />
         <DiamondGlyph className="pointer-events-none absolute -bottom-14 -start-14 h-48 w-48 text-paper/[0.04]" />
         <div className="relative">
+          <GemBackdrop stone="emerald" />
           <p className="text-xs uppercase tracking-[0.4em] text-gold-bright">{t("kicker")}</p>
           <span className="gold-rule mt-4 w-16" />
           <h1 className="mt-4 text-3xl font-semibold uppercase tracking-[0.15em] text-paper sm:text-5xl">

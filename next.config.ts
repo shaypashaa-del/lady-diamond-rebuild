@@ -43,6 +43,15 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Resized photos are produced by this Node server on first request (~0.4 s each) and
+  // the browser was told to re-check them after 4 hours. A month lets repeat visits and
+  // page-to-page navigation reuse them without asking the server again, and a smaller
+  // set of widths means a phone downloads one of a few shared sizes instead of many.
+  images: {
+    minimumCacheTTL: 60 * 60 * 24 * 30,
+    deviceSizes: [360, 414, 640, 828, 1080, 1200, 1920],
+    formats: ["image/webp"],
+  },
   // Diana's 3D business card is a static page in public/card; /card (and a
   // trailing slash) serve it.
   async redirects() {

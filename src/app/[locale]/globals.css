@@ -1061,20 +1061,25 @@ html[lang="he"] .hero-title {
 
 /* ---- Purchase area ------------------------------------------------------- */
 /* A photograph that leans to the pointer (see use-tilt.ts) and catches a highlight. */
-.tilt {
-  transform-style: preserve-3d;
-  will-change: transform;
-}
-.tilt::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  pointer-events: none;
-  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255, 255, 255, 0.42), transparent 42%);
-  mix-blend-mode: soft-light;
-  opacity: var(--go, 0);
-  transition: opacity 0.35s ease;
+/* Mouse only. iPhone Safari paints a photograph blank when it sits in a rounded,
+   overflow-hidden box that is also preserve-3d / will-change / blended, so none of
+   this applies on touch screens (which have no hover to tilt towards anyway). */
+@media (hover: hover) and (pointer: fine) {
+  .tilt {
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .tilt::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255, 255, 255, 0.42), transparent 42%);
+    mix-blend-mode: soft-light;
+    opacity: var(--go, 0);
+    transition: opacity 0.35s ease;
+  }
 }
 .pd-title {
   font-size: clamp(1.6rem, 3.2vw, 2.4rem);

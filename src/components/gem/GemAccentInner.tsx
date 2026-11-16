@@ -35,7 +35,10 @@ export function GemAccentInner({
     if (!gem) return;
     const reduced =
       window.matchMedia("(prefers-reduced-motion: reduce)").matches || document.documentElement.classList.contains("a11y-stop-animations");
-    const scale = Math.min(window.devicePixelRatio || 1, coarse ? 1.3 : 1.5);
+    // Phones get a smaller buffer and half the frame rate: the stone is small on a phone
+    // screen, and the GPU/battery are better spent on keeping scrolling smooth.
+    const scale = coarse ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
+    const minGap = coarse ? 33 : 0;
     const light: [number, number, number] = [0.25, 0.55, 0.8];
 
     if (reduced) {
@@ -66,6 +69,10 @@ export function GemAccentInner({
     const frame = (now: number) => {
       raf = 0;
       if (!visible) return;
+      if (minGap && last && now - last < minGap) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
       const dt = Math.min(0.05, last ? (now - last) / 1000 : 0.016);
       last = now;
       // The page's own scroll nudges the stone round, like turning it in the hand.

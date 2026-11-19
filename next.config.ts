@@ -49,6 +49,7 @@ const nextConfig: NextConfig = {
   // set of widths means a phone downloads one of a few shared sizes instead of many.
   images: {
     minimumCacheTTL: 60 * 60 * 24 * 30,
+    qualities: [75, 95],
     deviceSizes: [360, 414, 640, 828, 1080, 1200, 1920],
     formats: ["image/webp"],
   },

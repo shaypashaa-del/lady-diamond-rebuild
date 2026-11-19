@@ -1,7 +1,7 @@
 {
   "Meta": {
     "title": "LADY DIAMOND תכשיטים — תכשיטי יוקרה משנת 2010",
-    "description": "תכשיטי יוקרה בזהב, כסף ויהלומים — שרשראות זהב, טבעות יהלומים, עגילי זהב וצמידים, מעוצבים ללבישה יומיומית משנת 2010."
+    "description": "תכשיטי יוקרה בזהב, בציפוי זהב וביהלומים — שרשראות זהב, טבעות יהלומים, עגילי זהב וצמידים, מעוצבים ללבישה יומיומית משנת 2010."
   },
   "Announcement": {
     "text": "משלוח מהיר בישראל | הצטרפו לניוזלטר לעדכונים והנחות",
@@ -62,7 +62,7 @@
   "Home": {
     "heroKicker": "משנת 2010",
     "heroTitle": "Heart Stone",
-    "heroSubtitle": "פריטי זהב וכסף המעוצבים בבית, נבנים ללבישה יומיומית ולהעברה מדור לדור.",
+    "heroSubtitle": "פריטי זהב וציפוי זהב המעוצבים בבית, נבנים ללבישה יומיומית ולהעברה מדור לדור.",
     "heroCta": "לקנייה עכשיו",
     "heroSlideAlt1": "אישה עונדת תכשיטי Lady Diamond בקולקציית Heart Stone",
     "heroSlideAlt2": "שרשרת זהב של Lady Diamond בתקריב",
@@ -73,7 +73,7 @@
     "newEarringsKicker": "מה חדש אצלנו",
     "newEarrings": "עגילים חדשים",
     "sophisticatedTitle": "מתוחכם",
-    "sophisticatedCopy": "שרשראות ותליונים דקים, מושלמים לשכבות, בזהב ובכסף.",
+    "sophisticatedCopy": "שרשראות ותליונים דקים, מושלמים לשכבות, בזהב ובציפוי זהב.",
     "beautyBraceletsTitle": "צמידי יופי",
     "beautyBraceletsCopy": "צמידים עדינים המשתלבים נהדר זה עם זה, ומושלמים ללבישה יומיומית.",
     "newEarringsCopy": "עגילים עדינים ובולטים כאחד, לכל שעה ביום ולכל אירוע.",
@@ -121,7 +121,10 @@
     "stoneDiamondQuery": "יהלום",
     "stoneSapphireQuery": "ספיר",
     "stoneEmeraldQuery": "אמרלד",
-    "stoneRubyQuery": "רובי"
+    "stoneRubyQuery": "רובי",
+    "menTitle": "תכשיטים לגבר",
+    "menCopy": "שרשראות, צמידים וטבעות בעיצוב נקי וגברי, בזהב ובציפוי זהב.",
+    "menCta": "לקולקציית הגברים"
   },
   "Product": {
     "selectOptions": "בחירת אפשרויות",
@@ -153,7 +156,7 @@
     "priceDropSubmit": "עדכנו אותי",
     "priceDropSubscribed": "מעולה! נעדכן אותך במייל אם המחיר ירד.",
     "metal_GOLD": "זהב",
-    "metal_SILVER": "כסף",
+    "metal_SILVER": "ציפוי זהב",
     "metal_PLATINUM": "פלטינה",
     "purity_K9": "9K",
     "purity_K14": "14K",

@@ -7,9 +7,11 @@ import { ProductSection } from "@/components/home/ProductSection";
 import { CategoryBanners } from "@/components/home/CategoryBanners";
 import { NewCollection, EuphoriaSpotlight } from "@/components/home/NewCollection";
 import { BrandVideoSection } from "@/components/home/BrandVideoSection";
+import { MenBanner } from "@/components/home/MenBanner";
 import { RingMotionGallery } from "@/components/home/RingMotionGallery";
 import { InstagramSection } from "@/components/home/InstagramSection";
 import { getFeaturedProducts } from "@/server/repositories/catalog";
+import { prisma } from "@/lib/prisma";
 import { toCardProduct } from "@/lib/catalog-view";
 import type { Locale } from "@/i18n/routing";
 import { getContentBlock, type HeroContent, type HomepageBannersContent } from "@/server/actions/content-blocks";
@@ -24,8 +26,14 @@ export default async function Home() {
     getContentBlock<HomepageBannersContent>(CONTENT_KEYS.homepageBanners),
   ]);
   const cards = featured.map((p) => toCardProduct(p, locale));
+  // The men's banner appears by itself once a category with the slug "men" exists
+  // (created in the admin); until then there would be nothing for it to link to.
+  const hasMen = await prisma.category
+    .findUnique({ where: { slug: "men" }, select: { id: true } })
+    .then((c) => !!c)
+    .catch(() => false);
 
-  return <HomeView cards={cards} hero={hero} banners={banners} locale={locale} />;
+  return <HomeView cards={cards} hero={hero} banners={banners} locale={locale} hasMen={hasMen} />;
 }
 
 function HomeView({
@@ -33,11 +41,13 @@ function HomeView({
   hero,
   banners,
   locale,
+  hasMen,
 }: {
   cards: ReturnType<typeof toCardProduct>[];
   hero: HeroContent | null;
   banners: HomepageBannersContent | null;
   locale: Locale;
+  hasMen: boolean;
 }) {
   const t = useTranslations("Home");
   const half = Math.ceil(cards.length / 2);
@@ -59,6 +69,7 @@ function HomeView({
           b ? { href: b.href, image: b.image, title: tContent(b.title, locale), copy: tContent(b.copy, locale) } : null
         )}
       />
+      {hasMen && <MenBanner />}
       <StoneRow />
       <ProductSection kicker={t("newEarringsKicker")} title={t("newEarrings")} products={cards.slice(half)} />
       <NewCollection />

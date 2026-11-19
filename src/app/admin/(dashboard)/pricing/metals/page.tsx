@@ -2,7 +2,7 @@ import { getAllMetalPrices, refreshGoldPriceIfStale } from "@/server/services/ma
 import { setManualMetalPriceAction } from "@/server/actions/pricing";
 import { PURITY_LABEL, VALID_PURITIES_FOR_METAL } from "@/lib/pricing/constants";
 
-const METAL_LABEL: Record<string, string> = { GOLD: "זהב", SILVER: "כסף", PLATINUM: "פלטינה" };
+const METAL_LABEL: Record<string, string> = { GOLD: "זהב", SILVER: "ציפוי זהב (בסיס כסף)", PLATINUM: "פלטינה" };
 
 export default async function MetalPricesPage() {
   await refreshGoldPriceIfStale();
@@ -13,7 +13,7 @@ export default async function MetalPricesPage() {
     <div>
       <h1 className="mb-2 text-xl font-semibold">מחירי מתכות (ייחוס, 100% טוהר)</h1>
       <p className="mb-6 max-w-2xl text-sm text-neutral-500">
-        זהו מחיר הייחוס למתכת טהורה (24K לזהב / 999 לכסף / 950 לפלטינה) לגרם, ש-Pricing Engine מכפיל
+        זהו מחיר הייחוס למתכת טהורה (24K לזהב / 999 לכסף / 950 לפלטינה) לגרם. &quot;ציפוי זהב&quot; באתר מחושב לפי מחיר הכסף (בסיס כסף 925), כלומר מחיר השורה &quot;ציפוי זהב (בסיס כסף)&quot; כאן, ש-Pricing Engine מכפיל
         באחוז הטוהר של כל אפשרות חומר בפועל. זהב מתעדכן אוטומטית ממקור חי (goldprice.dev). כסף ופלטינה
         אין להם היום מקור חינמי אמין, ולכן יש להזין אותם ידנית — ראו AGENTS.md סעיף 17.
       </p>

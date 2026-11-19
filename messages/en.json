@@ -1,7 +1,7 @@
 {
   "Meta": {
     "title": "LADY DIAMOND Jewels — Fine Jewelry Since 2010",
-    "description": "Fine jewelry in gold, silver and diamonds — gold necklaces, diamond rings, gold earrings and bracelets, designed for everyday wear since 2010."
+    "description": "Fine jewelry in gold, gold plating and diamonds — gold necklaces, diamond rings, gold earrings and bracelets, designed for everyday wear since 2010."
   },
   "Announcement": {
     "text": "Fast shipping across Israel | Join our newsletter for updates and discounts",
@@ -62,7 +62,7 @@
   "Home": {
     "heroKicker": "Since 2010",
     "heroTitle": "Heart Stone",
-    "heroSubtitle": "Gold and silver pieces designed in-house, crafted to be worn every day and passed on.",
+    "heroSubtitle": "Gold and gold-plated pieces designed in-house, crafted to be worn every day and passed on.",
     "heroCta": "Shop Now",
     "heroSlideAlt1": "A woman wearing Lady Diamond jewelry from the Heart Stone collection",
     "heroSlideAlt2": "Close-up of a Lady Diamond gold necklace",
@@ -73,7 +73,7 @@
     "newEarringsKicker": "What's new",
     "newEarrings": "New Earrings",
     "sophisticatedTitle": "Sophisticated",
-    "sophisticatedCopy": "Fine chains and pendants built for layering, in gold and silver.",
+    "sophisticatedCopy": "Fine chains and pendants built for layering, in gold and gold plating.",
     "beautyBraceletsTitle": "Beauty Bracelets",
     "beautyBraceletsCopy": "Delicate bracelets that stack well and wear every day.",
     "newEarringsCopy": "Understated and statement pieces alike, for any hour of the day.",
@@ -121,7 +121,10 @@
     "stoneDiamondQuery": "diamond",
     "stoneSapphireQuery": "sapphire",
     "stoneEmeraldQuery": "emerald",
-    "stoneRubyQuery": "ruby"
+    "stoneRubyQuery": "ruby",
+    "menTitle": "Men's jewelry",
+    "menCopy": "Chains, bracelets and rings with a clean, masculine line, in gold and gold plating.",
+    "menCta": "Shop the men's collection"
   },
   "Product": {
     "selectOptions": "Select Options",
@@ -153,7 +156,7 @@
     "priceDropSubmit": "Notify me",
     "priceDropSubscribed": "Great! We'll email you if the price drops.",
     "metal_GOLD": "Gold",
-    "metal_SILVER": "Silver",
+    "metal_SILVER": "Gold plated",
     "metal_PLATINUM": "Platinum",
     "purity_K9": "9K",
     "purity_K14": "14K",

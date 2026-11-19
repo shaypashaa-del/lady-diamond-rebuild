@@ -21,7 +21,7 @@ import { SITE_URL } from "@/lib/site-config";
 import { routing, type Locale } from "@/i18n/routing";
 import { GemAccent, type Stone } from "@/components/gem/GemAccent";
 
-const CATEGORY_STONE: Record<string, Stone> = { rings: "diamond", earrings: "sapphire", necklaces: "emerald", bracelets: "ruby" };
+const CATEGORY_STONE: Record<string, Stone> = { rings: "diamond", earrings: "sapphire", necklaces: "emerald", bracelets: "ruby", men: "sapphire" };
 
 function pathFor(locale: string, path: string) {
   const prefix = locale === routing.defaultLocale ? "" : `/${locale}`;

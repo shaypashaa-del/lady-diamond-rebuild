@@ -45,7 +45,7 @@ type DiamondOptionRow = {
 };
 
 const GOLD_COLOR_LABEL: Record<GoldColor, string> = { YELLOW: "צהוב", WHITE: "לבן", ROSE: "רוז" };
-const METAL_LABEL: Record<MetalType, string> = { GOLD: "זהב", SILVER: "כסף", PLATINUM: "פלטינה" };
+const METAL_LABEL: Record<MetalType, string> = { GOLD: "זהב", SILVER: "ציפוי זהב", PLATINUM: "פלטינה" };
 const SHAPE_LABEL: Record<DiamondShape, string> = {
   ROUND: "עגול", OVAL: "אובלי", EMERALD: "אמרלד", PRINCESS: "פרינסס", PEAR: "אגס",
   MARQUISE: "מרקיז", CUSHION: "כרית", RADIANT: "רדיאנט", ASSCHER: "אשר", HEART: "לב",
@@ -214,7 +214,7 @@ export async function ProductPricingManager({
         <select name="metalType" className="border border-neutral-300 px-2 py-2 text-xs" required>
           <option value="">מתכת…</option>
           <option value="GOLD">זהב</option>
-          <option value="SILVER">כסף</option>
+          <option value="SILVER">ציפוי זהב (בסיס כסף)</option>
           <option value="PLATINUM">פלטינה</option>
         </select>
         <select name="purity" className="border border-neutral-300 px-2 py-2 text-xs" required>

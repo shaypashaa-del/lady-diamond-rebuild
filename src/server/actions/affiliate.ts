@@ -61,6 +61,11 @@ export async function applyAsAffiliate(
     return { values, error: "כתובת אימייל לא תקינה." };
   }
 
+  // Enforced on the server too, not only by the browser's `required`.
+  if (formData.get("affiliateTerms") !== "on") {
+    return { values, error: "יש לאשר את תנאי תוכנית השותפים." };
+  }
+
   const ipKey = `affiliate-apply-ip:${await getClientIp()}`;
   if (isRateLimited(ipKey, 10)) {
     return { values, error: "יותר מדי ניסיונות. יש לנסות שוב בעוד כמה דקות." };

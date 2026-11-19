@@ -292,7 +292,10 @@ async function main() {
 
   console.log("Seeding super admin user...");
   const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "diana@ladydiamondjewels.com";
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "100200300";
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+  if (!adminPassword || adminPassword.length < 12) {
+    throw new Error("Set SEED_ADMIN_PASSWORD (12+ characters) to seed the super admin — there is no default password.");
+  }
   await prisma.user.upsert({
     where: { email: adminEmail },
     update: {},
@@ -304,8 +307,7 @@ async function main() {
       emailVerified: true,
     },
   });
-  console.log(`Super admin ready — email: ${adminEmail} / password: ${adminPassword}`);
-  console.log("Change this password immediately in a real deployment.");
+  console.log(`Super admin ready — email: ${adminEmail}`);
 }
 
 main()

@@ -28,7 +28,7 @@ export default async function AccountPage() {
 
   return (
     <div>
-      <div className="relative overflow-hidden bg-ink py-12 text-center sm:py-16">
+      <div className="relative overflow-hidden bg-ink pb-12 pt-20 text-center sm:pb-16 sm:pt-24">
         <div className="relative">
           <GemBackdrop stone="sapphire" />
           <span className="gold-rule mt-2 w-16" />

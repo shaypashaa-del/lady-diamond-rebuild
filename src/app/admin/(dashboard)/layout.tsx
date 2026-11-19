@@ -2,6 +2,24 @@ import Link from "next/link";
 import { requireAdminSession } from "@/lib/auth/guards";
 import { logout } from "@/server/actions/auth";
 import { AdminMobileNav } from "@/components/admin/AdminMobileNav";
+import { prisma } from "@/lib/prisma";
+import { verifyPassword } from "@/lib/auth/password";
+
+// The project's seed script used to create the super admin with a published default
+// password. A bcrypt check costs ~0.25s, so the verdict is remembered per password hash.
+const KNOWN_DEFAULT_PASSWORDS = ["100200300"];
+const weakVerdicts = new Map<string, boolean>();
+async function hasDefaultPassword(userId: string): Promise<boolean> {
+  const row = await prisma.user.findUnique({ where: { id: userId }, select: { passwordHash: true } });
+  const hash = row?.passwordHash;
+  if (!hash) return false;
+  const known = weakVerdicts.get(hash);
+  if (known !== undefined) return known;
+  const results = await Promise.all(KNOWN_DEFAULT_PASSWORDS.map((pw) => verifyPassword(pw, hash)));
+  const weak = results.some(Boolean);
+  weakVerdicts.set(hash, weak);
+  return weak;
+}
 
 const navItems = [
   { href: "/admin", label: "לוח בקרה" },
@@ -28,6 +46,7 @@ const navItems = [
 
 export default async function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await requireAdminSession();
+  const weakPassword = await hasDefaultPassword(session.userId).catch(() => false);
 
   return (
     <div className="admin-shell flex min-h-screen flex-col md:flex-row">
@@ -57,7 +76,15 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
           </form>
         </div>
       </aside>
-      <main className="min-w-0 flex-1 p-4 pb-24 md:p-8 md:pb-8">{children}</main>
+      <main className="min-w-0 flex-1 p-4 pb-24 md:p-8 md:pb-8">
+        {weakPassword && (
+          <div role="alert" className="mb-6 rounded-lg border border-rose-300 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+            <strong>אזהרת אבטחה:</strong> סיסמת החשבון שלך היא סיסמת ברירת המחדל של המערכת, שמופיעה בקוד הפרויקט. יש להחליף אותה
+            מיד: <Link href="/reset-password" className="font-semibold underline">איפוס סיסמה במייל</Link>.
+          </div>
+        )}
+        {children}
+      </main>
     </div>
   );
 }

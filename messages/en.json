@@ -358,7 +358,10 @@
     "linkGenerator": "Link generator",
     "homepageOption": "— Homepage —",
     "copyLink": "Copy link",
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "termsConsentPrefix": "I have read and agree to the ",
+    "termsConsentLink": "affiliate program terms",
+    "termsRequired": "Please accept the affiliate program terms."
   },
   "Checkout": {
     "title": "Checkout",
@@ -630,5 +633,32 @@
     "title": "Page not found",
     "text": "The link is wrong or the page was removed.",
     "home": "Back to home"
+  },
+  "AffiliateTerms": {
+    "title": "Affiliate program terms",
+    "updated": "Updated: November 2026",
+    "back": "Affiliate program terms",
+    "s1Title": "Approval and participation",
+    "s1Body": "Joining the program is subject to the company's approval. The company may approve, reject, suspend or cancel an affiliate account at its discretion, including for breach of these terms.",
+    "s2Title": "Personal link and code",
+    "s2Body": "Each approved affiliate receives a personal link and code. An order is attributed to an affiliate if it was placed through the personal link within the attribution window set on the site, or with the affiliate's personal coupon.",
+    "s3Title": "How commission is calculated",
+    "s3Body": "Commission is calculated on the order value after discounts and excluding VAT, at a rate set by the affiliate's tier. The company may change commission rates; a change applies to orders placed after it.",
+    "s4Title": "Commission status",
+    "s4Body": "A commission is recorded as pending, becomes approved after the company reviews it, and paid once it has actually been paid. Eligibility depends on the order being completed.",
+    "s5Title": "Cancellations and refunds",
+    "s5Body": "If an order is cancelled or refunded before its commission is approved, the commission is cancelled. If it is cancelled or refunded after the commission was approved or paid, the matter is settled with the company.",
+    "s6Title": "Own purchases",
+    "s6Body": "A purchase made by the affiliate does not earn commission.",
+    "s7Title": "Prohibited conduct",
+    "s7Body": "Spam, misleading advertising, false statements about the products, prices or the company, use of the company's name or trademarks without approval, artificial purchases and any fraudulent activity are prohibited, and may lead to suspension and cancellation of commissions.",
+    "s8Title": "Payment and taxes",
+    "s8Body": "Approved commissions are paid to the payment details the affiliate provided (bank transfer, PayPal or Bit), on dates set by the company. The affiliate is responsible for reporting and paying taxes and for issuing an invoice or receipt where the law requires one.",
+    "s9Title": "Affiliate status",
+    "s9Body": "The affiliate acts independently. The program creates no employment, agency or business partnership.",
+    "s10Title": "Privacy",
+    "s10Body": "Click and order data is collected for attribution and tracking. More information is in the site's privacy policy.",
+    "s11Title": "Changes and termination",
+    "s11Body": "The company may update these terms, and continued participation means acceptance of the updated version. Either party may end participation at any time."
   }
 }

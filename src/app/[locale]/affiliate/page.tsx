@@ -120,6 +120,16 @@ export default function AffiliatePage() {
             </div>
 
             <ConsentCheckbox id="affiliate-consent" />
+            <label htmlFor="affiliate-terms" className="flex items-start gap-2 text-xs text-ink/70">
+              <input id="affiliate-terms" name="affiliateTerms" type="checkbox" required className="mt-0.5 h-4 w-4 accent-gold-bright" />
+              <span>
+                {t("termsConsentPrefix")}
+                <Link href="/affiliate/terms" target="_blank" className="underline hover:text-ink">
+                  {t("termsConsentLink")}
+                </Link>
+                .
+              </span>
+            </label>
 
             <button
               type="submit"

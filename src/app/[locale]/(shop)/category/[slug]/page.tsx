@@ -173,18 +173,32 @@ export default async function CategoryPage({
             <Image src={imageUrl} alt={title} fill sizes="100vw" className="object-cover" />
           </div>
         )}
+        {(cards.length > 0 || (filters.minPrice != null || filters.maxPrice != null || filters.inStockOnly)) && (
+          <>
         <div className="mb-6">
           <FilterBar minPrice={filters.minPrice} maxPrice={filters.maxPrice} inStockOnly={filters.inStockOnly} />
         </div>
         <div className="mb-10 flex justify-end">
           <SortSelect value={sort} slug={slug} />
         </div>
+          </>
+        )}
         {cards.length === 0 ? (
-          <p className="text-center text-ink/60">
-            {filters.minPrice != null || filters.maxPrice != null || filters.inStockOnly
-              ? tCat("noProductsMatchFilters")
-              : tCat("noProducts")}
-          </p>
+          <div className="flex flex-col items-center py-10 text-center">
+            {!(filters.minPrice != null || filters.maxPrice != null || filters.inStockOnly) && (
+              <GemAccent stone={CATEGORY_STONE[slug] ?? "diamond"} className="mb-4 w-28" />
+            )}
+            <p className="text-ink/60">
+              {filters.minPrice != null || filters.maxPrice != null || filters.inStockOnly
+                ? tCat("noProductsMatchFilters")
+                : tCat("noProducts")}
+            </p>
+            {!(filters.minPrice != null || filters.maxPrice != null || filters.inStockOnly) && (
+              <Link href="/category/all" className="glass-pill glass-pill-gold mt-6">
+                {tCat("browseAll")}
+              </Link>
+            )}
+          </div>
         ) : (
           <>
             <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">

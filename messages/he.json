@@ -246,7 +246,8 @@
     "filterMaxPrice": "מחיר עד",
     "filterInStockOnly": "במלאי בלבד",
     "filterClear": "נקה סינון",
-    "noProductsMatchFilters": "אין מוצרים התואמים לסינון שבחרת."
+    "noProductsMatchFilters": "אין מוצרים התואמים לסינון שבחרת.",
+    "browseAll": "לכל התכשיטים"
   },
   "Cart": {
     "title": "עגלה",

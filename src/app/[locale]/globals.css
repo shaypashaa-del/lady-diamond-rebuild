@@ -1280,3 +1280,9 @@ html[lang="he"] .pd-title {
   paint-order: stroke fill;
   text-shadow: 0 0 0.5px rgba(20, 17, 14, 0.6);
 }
+
+/* The brand logo itself, unchanged. It is a 900px image shown ~48px high, where its
+   hairline gold strokes wash out; a little contrast and saturation deepen them. */
+.logo-crisp {
+  filter: contrast(1.18) saturate(1.55) brightness(0.94);
+}

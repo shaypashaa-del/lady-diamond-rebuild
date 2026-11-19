@@ -99,7 +99,18 @@ export function Header({ categories = [] }: { categories?: { slug: string; label
             the artwork itself) — always physically on the left, in every
             language. No separate live text alongside it. */}
         <Link href="/" className="group relative z-10 flex items-center">
-          <Image src="/brand/logo.png" alt="Lady Diamond" width={54} height={44} className="h-12 w-auto transition-transform duration-500 group-hover:scale-105 sm:h-16" priority />
+          <Image src="/brand/logo.png" alt="Lady Diamond" width={54} height={44} className="logo-crisp h-14 w-auto transition-transform duration-500 group-hover:scale-105 sm:h-16" priority />
+        </Link>
+
+        {/* Phones: the large wordmark below is hidden under 640px, so the white header
+            showed only the small logo. Show the name in the centre of the row too. */}
+        <Link
+          href="/"
+          tabIndex={-1}
+          aria-hidden
+          className="absolute inset-x-0 top-1/2 z-0 flex -translate-y-1/2 flex-col items-center whitespace-nowrap sm:hidden"
+        >
+          <span className="font-display wordmark-bold text-[clamp(14px,4.6vw,20px)] tracking-[0.1em] text-ink">LADY DIAMOND</span>
         </Link>
 
         {/* Large wordmark: "Lady Diamond" + gold rule + "Since 2010" — pinned
@@ -224,7 +235,7 @@ export function Header({ categories = [] }: { categories?: { slug: string; label
         dir="ltr"
       >
         <Link href="/" aria-label="Lady Diamond" className="relative z-10 flex shrink-0 items-center">
-          <Image src="/brand/logo.png" alt="" width={54} height={44} className="h-9 w-auto" />
+          <Image src="/brand/logo.png" alt="" width={54} height={44} className="logo-crisp h-10 w-auto" />
         </Link>
         <Link href="/" tabIndex={-1} aria-hidden className="font-display wordmark-bold pointer-events-none absolute inset-x-0 text-center text-[20px] tracking-[0.12em] text-ink lg:hidden">
           LADY DIAMOND

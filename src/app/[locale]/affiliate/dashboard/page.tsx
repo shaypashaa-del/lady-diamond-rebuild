@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { requireAffiliateSession } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { logout } from "@/server/actions/auth";
@@ -120,6 +121,12 @@ export default async function AffiliateDashboardPage() {
           </div>
         ))}
       </div>
+      <p className="-mt-4 mb-8 text-xs text-ink/50">
+        {t("payNote")}{" "}
+        <Link href="/affiliate/terms" className="underline hover:text-ink">
+          {t("termsConsentLink")}
+        </Link>
+      </p>
 
       <AffiliateLinkGenerator code={affiliate.code} products={products} />
 

@@ -33,6 +33,11 @@ export default async function AffiliateTermsPage() {
                   {n}. {t(`s${n}Title`)}
                 </h2>
                 <p className="mt-1.5 text-[0.95rem] leading-8 text-ink/75">{t(`s${n}Body`)}</p>
+                {n === 8 && (
+                  <Link href="/policies/shipping" className="link-underline mt-1 inline-block text-sm font-medium text-ink">
+                    {t("returnsLink")}
+                  </Link>
+                )}
               </li>
             ))}
           </ol>

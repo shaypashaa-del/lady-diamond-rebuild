@@ -361,7 +361,8 @@
     "copied": "Copied!",
     "termsConsentPrefix": "I have read and agree to the ",
     "termsConsentLink": "affiliate program terms",
-    "termsRequired": "Please accept the affiliate program terms."
+    "termsRequired": "Please accept the affiliate program terms.",
+    "payNote": "Commissions are paid subject to the products' returns policy, after the return period ends. Details:"
   },
   "Checkout": {
     "title": "Checkout",
@@ -645,7 +646,7 @@
     "s3Title": "How commission is calculated",
     "s3Body": "Commission is calculated on the order value after discounts and excluding VAT, at a rate set by the affiliate's tier. The company may change commission rates; a change applies to orders placed after it.",
     "s4Title": "Commission status",
-    "s4Body": "A commission is recorded as pending, becomes approved after the company reviews it, and paid once it has actually been paid. Eligibility depends on the order being completed.",
+    "s4Body": "A commission is recorded as pending, becomes approved after the company reviews it, subject to the returns policy, and paid once it has actually been paid. Eligibility depends on the order being completed.",
     "s5Title": "Cancellations and refunds",
     "s5Body": "If an order is cancelled or refunded before its commission is approved, the commission is cancelled. If it is cancelled or refunded after the commission was approved or paid, the matter is settled with the company.",
     "s6Title": "Own purchases",
@@ -653,12 +654,13 @@
     "s7Title": "Prohibited conduct",
     "s7Body": "Spam, misleading advertising, false statements about the products, prices or the company, use of the company's name or trademarks without approval, artificial purchases and any fraudulent activity are prohibited, and may lead to suspension and cancellation of commissions.",
     "s8Title": "Payment and taxes",
-    "s8Body": "Approved commissions are paid to the payment details the affiliate provided (bank transfer, PayPal or Bit), on dates set by the company. The affiliate is responsible for reporting and paying taxes and for issuing an invoice or receipt where the law requires one.",
+    "s8Body": "Payment of commissions is subject to the products' returns policy: a commission is paid only after the order's return period has passed, and provided the order was not cancelled or returned. Approved commissions are paid to the payment details the affiliate provided (bank transfer, PayPal or Bit), on dates set by the company. The affiliate is responsible for reporting and paying taxes and for issuing an invoice or receipt where the law requires one.",
     "s9Title": "Affiliate status",
     "s9Body": "The affiliate acts independently. The program creates no employment, agency or business partnership.",
     "s10Title": "Privacy",
     "s10Body": "Click and order data is collected for attribution and tracking. More information is in the site's privacy policy.",
     "s11Title": "Changes and termination",
-    "s11Body": "The company may update these terms, and continued participation means acceptance of the updated version. Either party may end participation at any time."
+    "s11Body": "The company may update these terms, and continued participation means acceptance of the updated version. Either party may end participation at any time.",
+    "returnsLink": "Shipping and returns policy"
   }
 }

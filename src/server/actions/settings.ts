@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { SETTINGS_KEYS } from "@/lib/settings-keys";
+import { SETTINGS_KEYS, DEFAULT_PAYOUT_HOLD_DAYS } from "@/lib/settings-keys";
 import { requireAdminSession } from "@/lib/auth/guards";
 
 export async function getSetting<T>(key: string, fallback: T): Promise<T> {
@@ -19,6 +19,8 @@ export async function updateSettings(
   await requireAdminSession();
   const globalCommissionPercent = Number(formData.get("globalCommissionPercent") ?? 10);
   const attributionDays = Number(formData.get("attributionDays") ?? 30);
+  const payoutHoldDaysRaw = Number(formData.get("payoutHoldDays") ?? DEFAULT_PAYOUT_HOLD_DAYS);
+  const payoutHoldDays = Number.isFinite(payoutHoldDaysRaw) ? Math.min(365, Math.max(0, Math.round(payoutHoldDaysRaw))) : DEFAULT_PAYOUT_HOLD_DAYS;
   const autoApproveAffiliates = formData.get("autoApproveAffiliates") === "on";
   const preventSelfReferral = formData.get("preventSelfReferral") === "on";
 
@@ -32,6 +34,11 @@ export async function updateSettings(
       where: { key: SETTINGS_KEYS.attributionDays },
       update: { value: attributionDays },
       create: { key: SETTINGS_KEYS.attributionDays, value: attributionDays },
+    }),
+    prisma.setting.upsert({
+      where: { key: SETTINGS_KEYS.payoutHoldDays },
+      update: { value: payoutHoldDays },
+      create: { key: SETTINGS_KEYS.payoutHoldDays, value: payoutHoldDays },
     }),
     prisma.setting.upsert({
       where: { key: SETTINGS_KEYS.autoApproveAffiliates },

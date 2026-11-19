@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/auth/guards";
+import { getEligibleFromDates, getPayoutHoldDays } from "@/server/payout-eligibility";
 
 export async function approveCommission(id: string) {
   await requireAdminSession();
@@ -22,6 +23,24 @@ export async function rejectCommission(id: string) {
 // Commission כ-Paid... שמור Payment History".
 export async function payoutAffiliate(affiliateId: string) {
   await requireAdminSession();
+  // Only commissions whose order was delivered (COMPLETED) and whose hold
+  // period (the customer's return window) has passed may be paid.
+  const approved = await prisma.commission.findMany({
+    where: { affiliateId, status: "APPROVED", payoutId: null, order: { status: "COMPLETED" } },
+    select: { id: true, orderId: true },
+  });
+  const eligibleDates = await getEligibleFromDates(approved.map((c) => c.orderId), await getPayoutHoldDays());
+  const now = new Date();
+  const eligibleIds = approved
+    .filter((c) => {
+      const d = eligibleDates.get(c.orderId);
+      return d && d <= now;
+    })
+    .map((c) => c.id);
+  if (eligibleIds.length === 0) {
+    revalidatePath("/admin/commissions");
+    return;
+  }
   // One transaction that claims the commissions first: a double click or two
   // admins paying at once cannot pay the same commission twice (the second
   // claim matches zero rows and creates no payout).
@@ -30,7 +49,7 @@ export async function payoutAffiliate(affiliateId: string) {
       data: { affiliateId, amount: 0, status: "PAID", paidAt: new Date() },
     });
     const claimed = await tx.commission.updateMany({
-      where: { affiliateId, status: "APPROVED", payoutId: null },
+      where: { id: { in: eligibleIds }, affiliateId, status: "APPROVED", payoutId: null },
       data: { status: "PAID", payoutId: payout.id },
     });
     if (claimed.count === 0) {

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { approveCommission, rejectCommission, payoutAffiliate } from "@/server/actions/commissions";
+import { getEligibleFromDates, getPayoutHoldDays } from "@/server/payout-eligibility";
 import type { AffiliatePaymentDetails } from "@/server/actions/affiliate";
 
 const paymentMethodLabels: Record<string, string> = {
@@ -35,16 +36,28 @@ export default async function AdminCommissionsPage() {
     }),
   ]);
 
+  const holdDays = await getPayoutHoldDays();
+  const eligibleFrom = await getEligibleFromDates(commissions.map((c) => c.orderId), holdDays);
+  const now = new Date();
+  const isPayable = (c: (typeof commissions)[number]) => {
+    const d = eligibleFrom.get(c.orderId);
+    return c.status === "APPROVED" && c.order.status === "COMPLETED" && !!d && d <= now;
+  };
+  const fmtDate = (d: Date) => d.toLocaleDateString("he-IL");
+
   // Group approved-but-unpaid commissions by affiliate so admin can pay out per-affiliate.
-  const approvedByAffiliate = new Map<string, { name: string; total: number; paymentDetails: unknown }>();
+  // Only commissions past the hold period count as ready; the rest are shown as waiting.
+  const approvedByAffiliate = new Map<string, { name: string; total: number; waiting: number; paymentDetails: unknown }>();
   for (const c of commissions) {
     if (c.status !== "APPROVED") continue;
     const existing = approvedByAffiliate.get(c.affiliateId) ?? {
       name: c.affiliate.user.name,
       total: 0,
+      waiting: 0,
       paymentDetails: c.affiliate.paymentDetails,
     };
-    existing.total += Number(c.amount);
+    if (isPayable(c)) existing.total += Number(c.amount);
+    else existing.waiting += Number(c.amount);
     approvedByAffiliate.set(c.affiliateId, existing);
   }
 
@@ -57,17 +70,27 @@ export default async function AdminCommissionsPage() {
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-700">
             מוכן לתשלום
           </h2>
+          <p className="mb-3 text-xs text-neutral-500">
+            עמלה זכאית לתשלום רק לאחר שההזמנה סומנה &quot;הושלמה&quot; ועברו {holdDays} ימים (תקופת ההחזרה). ניתן לשנות בהגדרות.
+          </p>
           <div className="flex flex-wrap gap-3">
             {[...approvedByAffiliate.entries()].map(([affiliateId, info]) => (
               <form key={affiliateId} action={payoutAffiliate.bind(null, affiliateId)} className="flex flex-col gap-2 rounded-lg border border-neutral-200 bg-white p-3">
                 <span className="text-sm">
                   {info.name}: <span className="font-semibold">{info.total.toFixed(2)} ₪</span>
+                  {info.waiting > 0 && (
+                    <span className="ms-2 text-xs text-amber-700">+ {info.waiting.toFixed(2)} ₪ ממתין לסיום תקופת ההחזרה</span>
+                  )}
                 </span>
                 <span className="text-xs text-neutral-500" dir="ltr">
                   {formatPaymentDetails(info.paymentDetails)}
                 </span>
-                <button type="submit" className="self-start rounded bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-800">
-                  סמן כשולם
+                <button
+                  type="submit"
+                  disabled={info.total <= 0}
+                  className="self-start rounded bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {info.total > 0 ? "סמן כשולם" : "אין עדיין סכום זכאי"}
                 </button>
               </form>
             ))}
@@ -84,6 +107,7 @@ export default async function AdminCommissionsPage() {
               <th className="px-4 py-3 font-medium">הזמנה</th>
               <th className="px-4 py-3 font-medium">סכום</th>
               <th className="px-4 py-3 font-medium">סטטוס</th>
+              <th className="px-4 py-3 font-medium">זכאית לתשלום מתאריך</th>
               <th className="px-4 py-3 font-medium"></th>
             </tr>
           </thead>
@@ -101,6 +125,15 @@ export default async function AdminCommissionsPage() {
                         ⚠ ההזמנה {c.order.status === "CANCELLED" ? "בוטלה" : "זוכתה"}
                       </span>
                     )}
+                </td>
+                <td className="px-4 py-3 text-xs text-neutral-600">
+                  {c.status === "PAID" || c.status === "REJECTED"
+                    ? "—"
+                    : c.order.status === "CANCELLED" || c.order.status === "REFUNDED"
+                      ? "—"
+                      : eligibleFrom.get(c.orderId)
+                        ? fmtDate(eligibleFrom.get(c.orderId)!)
+                        : "אחרי סימון ההזמנה כהושלמה"}
                 </td>
                 <td className="px-4 py-3">
                   {c.status === "PENDING" && (
@@ -122,7 +155,7 @@ export default async function AdminCommissionsPage() {
             ))}
             {commissions.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-neutral-400">
+                <td colSpan={6} className="px-4 py-8 text-center text-neutral-400">
                   אין עמלות עדיין.
                 </td>
               </tr>

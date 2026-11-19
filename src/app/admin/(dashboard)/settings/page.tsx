@@ -1,14 +1,15 @@
 import { getSetting, updateSocialProofSettings } from "@/server/actions/settings";
 import { SavableForm } from "@/components/admin/SavableForm";
 import { SOCIAL_PROOF_DEFAULTS, type SocialProofSettings } from "@/server/social-proof";
-import { SETTINGS_KEYS } from "@/lib/settings-keys";
+import { SETTINGS_KEYS, DEFAULT_PAYOUT_HOLD_DAYS } from "@/lib/settings-keys";
 import { EmailTestForm } from "@/components/admin/EmailTestForm";
 import { SettingsForm } from "@/components/admin/SettingsForm";
 
 export default async function AdminSettingsPage() {
-  const [globalCommissionPercent, attributionDays, autoApprove, preventSelfReferral] = await Promise.all([
+  const [globalCommissionPercent, attributionDays, payoutHoldDays, autoApprove, preventSelfReferral] = await Promise.all([
     getSetting(SETTINGS_KEYS.globalCommissionPercent, 10),
     getSetting(SETTINGS_KEYS.attributionDays, 30),
+    getSetting(SETTINGS_KEYS.payoutHoldDays, DEFAULT_PAYOUT_HOLD_DAYS),
     getSetting(SETTINGS_KEYS.autoApproveAffiliates, false),
     getSetting(SETTINGS_KEYS.preventSelfReferral, true),
   ]);
@@ -20,6 +21,7 @@ export default async function AdminSettingsPage() {
       <SettingsForm
         globalCommissionPercent={globalCommissionPercent}
         attributionDays={attributionDays}
+        payoutHoldDays={payoutHoldDays}
         autoApprove={autoApprove}
         preventSelfReferral={preventSelfReferral}
       />

@@ -6,11 +6,13 @@ import { updateSettings } from "@/server/actions/settings";
 export function SettingsForm({
   globalCommissionPercent,
   attributionDays,
+  payoutHoldDays,
   autoApprove,
   preventSelfReferral,
 }: {
   globalCommissionPercent: number;
   attributionDays: number;
+  payoutHoldDays: number;
   autoApprove: boolean;
   preventSelfReferral: boolean;
 }) {
@@ -52,6 +54,20 @@ export function SettingsForm({
               defaultValue={attributionDays}
               className="w-32 border border-neutral-300 px-3 py-2 text-sm"
             />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-neutral-500">
+              ימי המתנה לתשלום עמלה אחרי מסירת ההזמנה (תקופת ההחזרה)
+            </label>
+            <input
+              name="payoutHoldDays"
+              type="number"
+              min={0}
+              max={365}
+              defaultValue={payoutHoldDays}
+              className="w-32 border border-neutral-300 px-3 py-2 text-sm"
+            />
+            <p className="mt-1 text-xs text-neutral-500">עמלה תהיה זכאית לתשלום רק כשההזמנה סומנה &quot;הושלמה&quot; ועברו הימים האלה.</p>
           </div>
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" name="autoApproveAffiliates" defaultChecked={autoApprove} />

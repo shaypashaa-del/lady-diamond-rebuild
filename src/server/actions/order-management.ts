@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import type { OrderStatus, PaymentStatus } from "@/generated/prisma/enums";
+import { deliveredAtKey } from "@/lib/settings-keys";
 import { requireAdminSession } from "@/lib/auth/guards";
 import { emailProvider } from "@/server/email/types";
 
@@ -76,6 +77,19 @@ export async function updateOrderFulfillment(
         where: { id },
         data: { status, paymentStatus, trackingNumber },
       });
+
+      // Delivery date drives when an affiliate commission becomes payable
+      // (hold period after delivery = the customer's return window).
+      if (status === "COMPLETED" && existing.status !== "COMPLETED") {
+        const value = new Date().toISOString();
+        await tx.setting.upsert({
+          where: { key: deliveredAtKey(id) },
+          update: { value },
+          create: { key: deliveredAtKey(id), value },
+        });
+      } else if (status !== "COMPLETED" && existing.status === "COMPLETED") {
+        await tx.setting.deleteMany({ where: { key: deliveredAtKey(id) } });
+      }
 
       // Mirror the same reversal for commission: cancelling/refunding rejects
       // a pending commission (spec: "Refund מבטל או מתאים Commission");

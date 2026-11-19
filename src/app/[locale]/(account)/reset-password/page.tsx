@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, startTransition } from "react";
 import { useTranslations } from "next-intl";
 import { GemAccent } from "@/components/gem/GemAccent";
 import { Link } from "@/i18n/navigation";
@@ -37,7 +37,11 @@ export default function RequestResetPage() {
           )}
         </div>
       ) : (
-        <form action={action}>
+        <form onSubmit={(e) => {
+          // Not a form `action`: React would clear every field (and the consent tick) after a failed submit.
+          e.preventDefault();
+          startTransition(() => action(new FormData(e.currentTarget)));
+        }}>
           <div className="mb-6">
             <label className="mb-1 block text-xs font-medium text-ink/60">{t("email")}</label>
             <input

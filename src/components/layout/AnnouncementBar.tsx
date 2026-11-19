@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, startTransition } from "react";
 import { useTranslations } from "next-intl";
 import { subscribeToNewsletter, type NewsletterResult } from "@/server/actions/newsletter";
 
@@ -34,7 +34,11 @@ export function AnnouncementBar({
         <p>✓ נרשמת בהצלחה!</p>
       ) : showForm ? (
         <div className="flex flex-col items-center gap-1">
-          <form action={action} className="flex items-center gap-2">
+          <form onSubmit={(e) => {
+          // Not a form `action`: React would clear every field (and the consent tick) after a failed submit.
+          e.preventDefault();
+          startTransition(() => action(new FormData(e.currentTarget)));
+        }} className="flex items-center gap-2">
             <input
               name="email"
               type="email"

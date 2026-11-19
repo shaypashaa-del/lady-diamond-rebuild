@@ -309,7 +309,7 @@
     "heroTitle": "Become a LADY DIAMOND Affiliate",
     "heroCopy": "Share your unique link, earn commission on every sale you bring.",
     "benefit1Title": "Commission on every sale",
-    "benefit1Copy": "Starting at 10% commission on every order you bring in — forever, not just the first one.",
+    "benefit1Copy": "Commission on every order placed through your personal link or coupon, calculated on the order value excluding VAT. The rate depends on your affiliate tier.",
     "benefit2Title": "An instant personal link",
     "benefit2Copy": "Your own unique code and link, ready seconds after approval.",
     "benefit3Title": "Transparent tracking",
@@ -354,7 +354,11 @@
     "bankName": "Bank Name",
     "branchNumber": "Branch Number",
     "accountNumber": "Account Number",
-    "saveDetails": "Save Details"
+    "saveDetails": "Save Details",
+    "linkGenerator": "Link generator",
+    "homepageOption": "— Homepage —",
+    "copyLink": "Copy link",
+    "copied": "Copied!"
   },
   "Checkout": {
     "title": "Checkout",

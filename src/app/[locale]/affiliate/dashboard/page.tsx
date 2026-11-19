@@ -20,6 +20,7 @@ const inputClass = "w-full border border-gold-soft bg-paper px-3 py-2.5 text-sm 
 export default async function AffiliateDashboardPage() {
   const session = await requireAffiliateSession();
   const t = await getTranslations("Affiliate");
+  const tOrder = await getTranslations("OrderDetail");
 
   const affiliate = await prisma.affiliate.findUniqueOrThrow({
     where: { userId: session.userId },
@@ -179,7 +180,7 @@ export default async function AffiliateDashboardPage() {
           {affiliate.orders.map((o) => (
             <li key={o.id} className="flex items-center justify-between py-3 text-sm">
               <span className="font-medium">{o.orderNumber}</span>
-              <span className="text-ink/60">{o.status}</span>
+              <span className="text-ink/60">{tOrder(`status_${o.status}`)}</span>
               <span>{Number(o.total).toFixed(2)} ₪</span>
             </li>
           ))}

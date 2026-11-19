@@ -7,7 +7,8 @@ import { createSession, destroySession } from "@/lib/auth/session";
 import { getClientIp, isRateLimited, recordAttempt } from "@/lib/auth/rate-limit";
 import { isValidEmail, truncate } from "@/lib/validation";
 
-export type AuthResult = { error: string } | void;
+// `values` echoes the non-secret fields back so a failed submit does not wipe the form.
+export type AuthResult = { error: string; values?: Record<string, string> } | void;
 
 export async function registerCustomer(
   _prevState: AuthResult,
@@ -20,16 +21,17 @@ export async function registerCustomer(
   const phone = truncate(String(formData.get("phone") ?? "").trim(), 50) || null;
   const password = String(formData.get("password") ?? "");
 
+  const values = { name, email, phone: phone ?? "" };
   if (!name || !email || password.length < 8) {
-    return { error: "נא למלא שם, אימייל וסיסמה בת 8 תווים לפחות." };
+    return { values, error: "נא למלא שם, אימייל וסיסמה בת 8 תווים לפחות." };
   }
   if (!isValidEmail(email)) {
-    return { error: "כתובת אימייל לא תקינה." };
+    return { values, error: "כתובת אימייל לא תקינה." };
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
-    return { error: "כתובת האימייל כבר רשומה במערכת." };
+    return { values, error: "כתובת האימייל כבר רשומה במערכת." };
   }
 
   const user = await prisma.user.create({
@@ -58,8 +60,9 @@ export async function loginCustomer(
   const rateLimitKey = `login:${email}`;
   // Also per client IP, so one source cannot spray many different emails.
   const ipKey = `login-ip:${await getClientIp()}`;
+  const values = { email };
   if (isRateLimited(rateLimitKey) || isRateLimited(ipKey, 20)) {
-    return { error: "יותר מדי ניסיונות התחברות. יש לנסות שוב בעוד כמה דקות." };
+    return { values, error: "יותר מדי ניסיונות התחברות. יש לנסות שוב בעוד כמה דקות." };
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
@@ -67,7 +70,7 @@ export async function loginCustomer(
   if (!user || !passwordOk) {
     recordAttempt(rateLimitKey);
     recordAttempt(ipKey);
-    return { error: "אימייל או סיסמה שגויים." };
+    return { values, error: "אימייל או סיסמה שגויים." };
   }
 
   await createSession({ userId: user.id, role: user.role, name: user.name, email: user.email });

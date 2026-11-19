@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, startTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { applyAsAffiliate } from "@/server/actions/affiliate";
@@ -74,19 +74,23 @@ export default function AffiliatePage() {
             <p className="mt-6 border border-clay/30 bg-clay/10 px-3 py-2 text-sm text-clay">{state.error}</p>
           )}
 
-          <form action={action} className="mt-8 space-y-5">
+          <form onSubmit={(e) => {
+          // Not a form `action`: React would clear every field (and the consent tick) after a failed submit.
+          e.preventDefault();
+          startTransition(() => action(new FormData(e.currentTarget)));
+        }} className="mt-8 space-y-5">
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <div>
                 <label className={labelClass}>{t("name")}</label>
-                <input name="name" required className={inputClass} />
+                <input name="name" defaultValue={state?.values?.name} required className={inputClass} />
               </div>
               <div>
                 <label className={labelClass}>{t("email")}</label>
-                <input name="email" type="email" required className={inputClass} />
+                <input name="email" defaultValue={state?.values?.email} type="email" required className={inputClass} />
               </div>
               <div>
                 <label className={labelClass}>{t("phone")}</label>
-                <input name="phone" className={inputClass} />
+                <input name="phone" defaultValue={state?.values?.phone} className={inputClass} />
               </div>
               <div>
                 <label className={labelClass}>{t("password")}</label>
@@ -94,25 +98,25 @@ export default function AffiliatePage() {
               </div>
               <div>
                 <label className={labelClass}>{t("website")}</label>
-                <input name="website" className={inputClass} />
+                <input name="website" defaultValue={state?.values?.website} className={inputClass} />
               </div>
               <div>
                 <label className={labelClass}>{t("instagram")}</label>
-                <input name="socialInstagram" className={inputClass} />
+                <input name="socialInstagram" defaultValue={state?.values?.socialInstagram} className={inputClass} />
               </div>
               <div>
                 <label className={labelClass}>{t("tiktok")}</label>
-                <input name="socialTiktok" className={inputClass} />
+                <input name="socialTiktok" defaultValue={state?.values?.socialTiktok} className={inputClass} />
               </div>
               <div>
                 <label className={labelClass}>{t("facebook")}</label>
-                <input name="socialFacebook" className={inputClass} />
+                <input name="socialFacebook" defaultValue={state?.values?.socialFacebook} className={inputClass} />
               </div>
             </div>
 
             <div>
               <label className={labelClass}>{t("promotionMethod")}</label>
-              <textarea name="promotionMethod" rows={3} className={inputClass} />
+              <textarea name="promotionMethod" defaultValue={state?.values?.promotionMethod} rows={3} className={inputClass} />
             </div>
 
             <ConsentCheckbox id="affiliate-consent" />

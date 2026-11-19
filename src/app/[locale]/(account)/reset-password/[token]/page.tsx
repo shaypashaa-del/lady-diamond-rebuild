@@ -1,7 +1,7 @@
 "use client";
 
 import { GemAccent } from "@/components/gem/GemAccent";
-import { use } from "react";
+import { use, startTransition } from "react";
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { resetPassword, type ResetPasswordResult } from "@/server/actions/password-reset";
@@ -29,7 +29,11 @@ export default function ResetPasswordTokenPage({
         <p className="mb-4 rounded-2xl border border-clay/30 bg-clay/10 px-4 py-3 text-sm text-clay">{state.error}</p>
       )}
 
-      <form action={formAction}>
+      <form onSubmit={(e) => {
+          // Not a form `action`: React would clear every field (and the consent tick) after a failed submit.
+          e.preventDefault();
+          startTransition(() => formAction(new FormData(e.currentTarget)));
+        }}>
         <div className="mb-6">
           <label className="mb-1 block text-xs font-medium text-ink/60">{t("newPassword")}</label>
           <input

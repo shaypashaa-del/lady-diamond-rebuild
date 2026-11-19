@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, startTransition } from "react";
 import { useTranslations } from "next-intl";
 import { submitContactForm, type ContactResult } from "@/server/actions/contact";
 import { ConsentCheckbox } from "@/components/ConsentCheckbox";
@@ -17,7 +17,11 @@ export function ContactForm() {
   }
 
   return (
-    <form action={action} className="space-y-4">
+    <form onSubmit={(e) => {
+          // Not a form `action`: React would clear every field (and the consent tick) after a failed submit.
+          e.preventDefault();
+          startTransition(() => action(new FormData(e.currentTarget)));
+        }} className="space-y-4">
       {state?.error && (
         <p className="border border-clay/30 bg-clay/10 px-3 py-2 text-sm text-clay">{state.error}</p>
       )}

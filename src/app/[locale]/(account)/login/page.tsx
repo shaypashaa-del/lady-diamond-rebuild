@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, startTransition } from "react";
 import { useTranslations } from "next-intl";
 import { GemAccent } from "@/components/gem/GemAccent";
 import { Link } from "@/i18n/navigation";
@@ -21,11 +21,15 @@ export default function LoginPage() {
         <p className="mb-4 rounded-2xl border border-clay/30 bg-clay/10 px-4 py-3 text-sm text-clay">{state.error}</p>
       )}
 
-      <form action={action}>
+      <form onSubmit={(e) => {
+          // Not a form `action`: React would clear every field (and the consent tick) after a failed submit.
+          e.preventDefault();
+          startTransition(() => action(new FormData(e.currentTarget)));
+        }}>
         <div className="mb-4">
           <label className="mb-1 block text-xs font-medium text-ink/60">{t("email")}</label>
           <input
-            name="email"
+            name="email" defaultValue={state?.values?.email}
             type="email"
             required
             className="field"

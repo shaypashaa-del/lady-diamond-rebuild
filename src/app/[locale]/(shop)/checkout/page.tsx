@@ -165,10 +165,6 @@ function CheckoutForm() {
     router.push(`/order-confirmation/${result.orderNumber}`);
   }
 
-  async function handleSubmit(formData: FormData) {
-    await submitOrder(formData);
-  }
-
   async function handlePaypalApproved(paypalOrderId: string) {
     if (!formRef.current?.reportValidity()) return;
     await submitOrder(new FormData(formRef.current), { paypalOrderId });
@@ -201,7 +197,14 @@ function CheckoutForm() {
         <p className="mb-6 text-sm text-clay">{t("couponInvalid")}</p>
       )}
 
-      <form ref={formRef} action={handleSubmit} className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1.1fr_1fr] lg:gap-8">
+      <form
+        ref={formRef}
+        onSubmit={(e) => {
+          // A function `action` makes React clear every field after it finishes, so a failed
+          // order (out of stock, bad coupon) would wipe the address the customer just typed.
+          e.preventDefault();
+          void submitOrder(new FormData(e.currentTarget));
+        }} className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1.1fr_1fr] lg:gap-8">
         <div className="glass rounded-[28px] p-5 sm:p-7">
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide">{t("billingDetails")}</h2>
           <div className="space-y-3">

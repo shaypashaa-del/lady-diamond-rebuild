@@ -329,7 +329,7 @@ html.sparkle-cursor-active * {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: shimmer-sweep 11s ease-in-out infinite;
+  animation: shimmer-sweep 6.5s ease-in-out infinite;
 }
 @keyframes shimmer-sweep {
   0% {
@@ -366,7 +366,7 @@ html.sparkle-cursor-active * {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: shimmer-sweep 11s ease-in-out infinite;
+  animation: shimmer-sweep 6.5s ease-in-out infinite;
 }
 @media (prefers-reduced-motion: reduce) {
   .shimmer-text-gold {
@@ -1285,4 +1285,32 @@ html[lang="he"] .pd-title {
    hairline gold strokes wash out; a little contrast and saturation deepen them. */
 .logo-crisp {
   filter: contrast(1.18) saturate(1.55) brightness(0.94);
+}
+
+/* A band of light that keeps crossing the bold phone wordmark. The letters themselves
+   stay solid; a copy of the text, clipped to the letter shapes and painted with a
+   moving glint, is laid over them, so the sweep never thins or hides the strokes. */
+.wordmark-glint {
+  position: relative;
+  display: inline-block;
+}
+.wordmark-glint::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+  background: linear-gradient(100deg, transparent 38%, #fff3d0 47%, #e6b255 50%, #fff3d0 53%, transparent 62%);
+  background-size: 250% 100%;
+  background-position: 200% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer-sweep 6.5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .wordmark-glint::after { display: none; }
 }

@@ -226,7 +226,7 @@ export function Header({ categories = [] }: { categories?: { slug: string; label
         <Link href="/" aria-label="Lady Diamond" className="relative z-10 flex shrink-0 items-center">
           <Image src="/brand/logo.png" alt="" width={54} height={44} className="h-9 w-auto" />
         </Link>
-        <Link href="/" tabIndex={-1} aria-hidden className="font-display pointer-events-none absolute inset-x-0 text-center text-[17px] tracking-[0.14em] text-ink lg:hidden">
+        <Link href="/" tabIndex={-1} aria-hidden className="font-display wordmark-bold pointer-events-none absolute inset-x-0 text-center text-[20px] tracking-[0.12em] text-ink lg:hidden">
           LADY DIAMOND
         </Link>
         <ul dir={dir} className="hidden items-center gap-7 lg:flex">

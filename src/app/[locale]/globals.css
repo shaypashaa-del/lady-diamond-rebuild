@@ -1271,3 +1271,12 @@ html[lang="he"] .pd-title {
     box-shadow: 0 22px 40px -22px rgba(20, 17, 14, 0.55), 0 0 0 1px rgba(203, 158, 84, 0.45);
   }
 }
+
+/* The wordmark's typeface only comes in one hairline weight; on a phone it reads faint.
+   A thin outline in the same ink thickens the strokes without changing the letterforms. */
+.wordmark-bold {
+  color: #14110e;
+  -webkit-text-stroke: 0.55px #14110e;
+  paint-order: stroke fill;
+  text-shadow: 0 0 0.5px rgba(20, 17, 14, 0.6);
+}

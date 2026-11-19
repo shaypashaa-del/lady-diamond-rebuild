@@ -386,37 +386,18 @@
     .actions { gap: 6px; }
   }
 
-  /* iPHONE LOOK: crisp type, frosted-glass cards, continuous rounded corners, system font, pill controls */
-  :root { --body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Heebo", system-ui, sans-serif; --mist: #cfc8ba; }
-  html { -webkit-text-size-adjust: 100%; }
+  /* LUXURY, CRISP: onyx and engraved gold, hairline borders, sharper type (no blur, no glass) */
+  :root { --mist: #cdc5b4; }
   body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; font-synthesis: none; }
-  #dust { opacity: .55; }
-  .face {
-    border-radius: 28px; border: 1px solid rgba(255,255,255,.14);
-    background: linear-gradient(160deg, rgba(255,255,255,.10), rgba(255,255,255,.03) 45%, rgba(255,255,255,.05)), rgba(22,19,26,.72);
-    -webkit-backdrop-filter: blur(28px) saturate(180%); backdrop-filter: blur(28px) saturate(180%);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.28), inset 0 0 0 .5px rgba(255,255,255,.08), 0 24px 60px -20px rgba(0,0,0,.7), 0 2px 6px rgba(0,0,0,.4);
-  }
-  .face.back { background: linear-gradient(160deg, rgba(255,255,255,.10), rgba(255,255,255,.03) 45%, rgba(255,255,255,.05)), rgba(22,19,26,.72); }
-  .mono { display: none; }
-  .brand .word, .b-name, .shine { filter: none; }
-  .b-name, .who .name { color: #fff; -webkit-text-fill-color: #fff; background: none; font-weight: 600; letter-spacing: .01em; }
-  .item { background: rgba(255,255,255,.06); border-radius: 16px; padding: 11px 14px; box-shadow: inset 0 .5px 0 rgba(255,255,255,.14); }
-  .item::before { display: none; }
-  .item dt { color: var(--mist); letter-spacing: .06em; font-size: 11px; text-transform: none; opacity: 1; }
-  .item dd { color: #fff; font-weight: 400; font-size: clamp(14px, 3.8vw, 16px); }
-  .copy { border: 0; background: rgba(215,180,106,.18); color: var(--gold-hi); border-radius: 999px; padding: 6px 13px; font-weight: 500; }
-  .status { background: rgba(255,255,255,.08); border: 0; color: #fff; }
-  .vcf { border-radius: 999px; padding: 9px 18px; font-weight: 600; font-size: 13px; }
-  .qr .plate { border-radius: 18px; }
-  .actions a { color: var(--gold-hi); }
-  .actions svg { border: 0; background: rgba(255,255,255,.09); box-shadow: inset 0 .5px 0 rgba(255,255,255,.2); stroke-width: 1.7; }
-  .actions span { color: var(--mist); }
-  .b-head { border-image: none; border-bottom: .5px solid rgba(255,255,255,.14); }
-  .under .links a, .under .btn, .lang-dd .lang-btn { border-radius: 16px; font-weight: 600; letter-spacing: 0; }
-  .under .links a.ghost, .under .btn.ghost, .lang-dd .lang-btn { background: rgba(255,255,255,.08); border: 0; color: var(--gold-hi); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
-  .lang-seg { -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%); background: rgba(255,255,255,.08); border: 0; }
-  @media (prefers-reduced-transparency: reduce) { .face, .face.back { background: #1b1820; -webkit-backdrop-filter: none; backdrop-filter: none; } }
+  #dust { opacity: .6; }
+  .face { border-radius: 18px; border: 1px solid rgba(215,180,106,.7); box-shadow: inset 0 0 0 7px var(--onyx), inset 0 0 0 8px rgba(215,180,106,.35), 0 26px 60px -22px rgba(0,0,0,.85); }
+  .face.front { background: radial-gradient(ellipse 80% 90% at 85% 10%, rgba(215,180,106,.14), transparent 60%), linear-gradient(135deg, rgba(246,227,176,.05), transparent 45%), var(--onyx); }
+  .item dd { color: #fff6e0; font-weight: 400; }
+  .item dt { color: var(--gold); opacity: 1; font-weight: 600; }
+  .b-sub, .brand .est, .who .role { color: var(--mist); font-weight: 400; }
+  .copy { border-color: rgba(215,180,106,.6); font-weight: 500; }
+  .b-head { padding-bottom: 14px; }
+  .info { gap: 14px; }
   </style>
 
 </head>

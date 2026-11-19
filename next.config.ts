@@ -54,9 +54,10 @@ const nextConfig: NextConfig = {
     formats: ["image/webp"],
   },
   // Diana's 3D business card is a static page in public/card; /card (and a
-  // trailing slash) serve it.
+  // trailing slash) serve it. The ?v= forces browsers (iPhone Safari) past a
+  // stale cached copy of the page; bump it whenever the card changes.
   async redirects() {
-    return [{ source: "/card", destination: "/card/index.html", permanent: false }];
+    return [{ source: "/card", destination: "/card/index.html?v=4", permanent: false }];
   },
   // The local Postgres dev server (`prisma dev`) accepts far fewer concurrent
   // connections than a real deployment target; capping build worker count keeps

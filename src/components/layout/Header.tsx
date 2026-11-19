@@ -99,7 +99,7 @@ export function Header({ categories = [] }: { categories?: { slug: string; label
             the artwork itself) — always physically on the left, in every
             language. No separate live text alongside it. */}
         <Link href="/" className="group relative z-10 flex items-center">
-          <Image src="/brand/logo.png" alt="Lady Diamond" width={54} height={44} className="logo-crisp h-14 w-auto transition-transform duration-500 group-hover:scale-105 sm:h-20 lg:h-24" priority />
+          <Image src="/brand/logo.png" alt="Lady Diamond" width={54} height={44} className="logo-crisp h-14 w-auto transition-transform duration-500 group-hover:scale-105 sm:-my-2 sm:h-20 lg:h-20" priority />
         </Link>
 
         {/* Phones: the large wordmark below is hidden under 640px, so the white header

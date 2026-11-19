@@ -99,7 +99,7 @@ export function Header({ categories = [] }: { categories?: { slug: string; label
             the artwork itself) — always physically on the left, in every
             language. No separate live text alongside it. */}
         <Link href="/" className="group relative z-10 flex items-center">
-          <Image src="/brand/logo.png" alt="Lady Diamond" width={54} height={44} className="logo-crisp h-14 w-auto transition-transform duration-500 group-hover:scale-105 sm:-my-2 sm:h-20 lg:h-20" priority />
+          <Image src="/brand/logo.png" alt="Lady Diamond" width={54} height={44} className="logo-crisp -my-1.5 h-[68px] w-auto transition-transform duration-500 group-hover:scale-105 sm:-my-2 sm:h-20 lg:h-20" priority />
         </Link>
 
         {/* Phones: the large wordmark below is hidden under 640px, so the white header
@@ -235,9 +235,9 @@ export function Header({ categories = [] }: { categories?: { slug: string; label
         dir="ltr"
       >
         <Link href="/" aria-label="Lady Diamond" className="relative z-10 flex shrink-0 items-center">
-          <Image src="/brand/logo.png" alt="" width={54} height={44} className="logo-crisp h-10 w-auto" />
+          <Image src="/brand/logo.png" alt="" width={54} height={44} className="logo-crisp h-11 w-auto" />
         </Link>
-        <Link href="/" tabIndex={-1} aria-hidden className="font-display wordmark-bold pointer-events-none absolute inset-x-0 text-center text-[20px] tracking-[0.12em] text-ink lg:hidden">
+        <Link href="/" tabIndex={-1} aria-hidden className="font-display wordmark-bold pointer-events-none absolute inset-x-0 text-center text-[clamp(13px,4.3vw,20px)] tracking-[0.08em] text-ink lg:hidden">
           <span className="wordmark-glint" data-text="LADY DIAMOND">LADY DIAMOND</span>
         </Link>
         <ul dir={dir} className="hidden items-center gap-7 lg:flex">

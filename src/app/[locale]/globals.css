@@ -1293,6 +1293,7 @@ html[lang="he"] .pd-title {
 .wordmark-glint {
   position: relative;
   display: inline-block;
+  white-space: nowrap;
 }
 .wordmark-glint::after {
   content: attr(data-text);

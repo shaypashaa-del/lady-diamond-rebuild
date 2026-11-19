@@ -364,6 +364,27 @@
     .under .links a, .under .btn { font-size: 15px; height: 48px; }
     .under .hint { font-size: 13px; }
   }
+
+  /* FLAT LAYOUT: the card opens straight, nothing turns or tilts. Front (identity) and back (details) are stacked and both visible. */
+  .stage { perspective: none; }
+  .tilt { transform-style: flat; will-change: auto; }
+  .card { aspect-ratio: auto !important; transform: none !important; transform-style: flat; cursor: default; display: flex; flex-direction: column; gap: clamp(12px, 3vw, 18px); }
+  .card .edge, .sheen, #flip, #hint { display: none !important; }
+  .face { position: relative; inset: auto; backface-visibility: visible; -webkit-backface-visibility: visible; transform: none !important; box-shadow: inset 0 0 0 6px var(--onyx), inset 0 0 0 7px rgba(215,180,106,.28), 0 18px 40px rgba(0,0,0,.45); }
+  .face.front { aspect-ratio: auto; min-height: clamp(210px, 56vw, 300px); }
+  .front-inner { height: auto; min-height: clamp(150px, 42vw, 230px); }
+  .face.back { padding: clamp(20px, 5.4%, 32px); }
+  .back-inner { height: auto; gap: clamp(14px, 3.6vw, 20px); }
+  .qr { display: flex !important; }
+  .b-body { align-items: center; }
+  @media (max-width: 559px) {
+    .b-body { grid-template-columns: 1fr; }
+    .qr { flex-direction: row; justify-content: center; gap: 14px; }
+    .qr .plate { width: 92px; }
+    .item dd { font-size: 14.5px; }
+    .item .copy { padding: 6px 12px; }
+    .actions { gap: 6px; }
+  }
   </style>
 
 </head>
@@ -377,7 +398,7 @@
 </div>
 <main class="stage">
   <div class="tilt" id="tilt">
-    <div class="card" id="card" role="button" tabindex="0" aria-label="כרטיס ביקור של דיאנה, לחצו כדי להפוך" data-i18n-aria="aCard">
+    <div class="card" id="card" role="group" aria-label="כרטיס ביקור של דיאנה">
       <div class="edge" style="transform: translateZ(-1px)"></div>
       <div class="edge" style="transform: translateZ(-2px)"></div>
       <div class="edge" style="transform: translateZ(-3px)"></div>
@@ -516,23 +537,7 @@
   }
   dust();
 
-  function setFlip(v, instant) {
-    flipped = v;
-    var target = v ? 180 : 0;
-    /* the buttons under the card slide behind it when it is turned, and come back when it returns */
-    if (hasG) {
-      var sr = stageEl.getBoundingClientRect(), ur = under.getBoundingClientRect();
-      var dy = (sr.top + sr.height / 2) - (ur.top + ur.height / 2) + (gsap.getProperty(under, 'y') || 0);
-      under.style.pointerEvents = v ? 'none' : '';
-      gsap.to(under, { y: v ? dy : 0, scale: v ? .55 : 1, opacity: v ? 0 : 1, duration: v ? .9 : .8, ease: v ? 'power3.in' : 'power3.out', overwrite: 'auto' });
-    } else { under.style.display = v ? 'none' : ''; }
-    if (hasG && !instant) { gsap.to(card, { rotationY: target, duration: 1.1, ease: 'power3.inOut' }); if (v && !reduce) gsap.fromTo('.b-head, .item, .qr, .actions a', { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: .6, stagger: .05, delay: .45, ease: 'power2.out', clearProps: 'opacity,transform' }); }
-    else if (hasG) gsap.set(card, { rotationY: target });
-    else card.style.transform = 'rotateY(' + target + 'deg)';
-  }
-  card.addEventListener('click', function (e) { if (e.target.closest('.copy') || e.target.closest('.actions') || e.target.closest('.qr') || e.target.closest('a')) return; setFlip(!flipped); });
-  card.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setFlip(!flipped); } });
-  document.getElementById('flip').addEventListener('click', function () { setFlip(!flipped); });
+  function setFlip() {} /* flat card: nothing flips */
 
   /* copy buttons */
   var timer;
@@ -578,9 +583,8 @@
     var pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
     var need = Math.max(fi.offsetHeight, bi.offsetHeight) + pad + 6;
     fi.style.height = ''; bi.style.height = '';
-    if (need > css) { card.style.aspectRatio = 'auto'; card.style.height = Math.ceil(need) + 'px'; }
     /* big screens: scale card + controls up so the whole piece still fits one screen (between 0.68 and 1.5) */
-    if (innerWidth >= 1000) {
+    if (false) {
       var last = zs[2].getBoundingClientRect(), bottomPad = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
       var natural = last.bottom + (window.scrollY || 0) + bottomPad;
       var z = Math.max(0.68, Math.min(1.5, (innerHeight / natural) * 0.93, (innerWidth - 48) / (card.offsetWidth || 580)));
@@ -691,36 +695,16 @@
   var facets = gem.querySelectorAll('.f');
   if (!reduce) {
     var tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-    tl.from(tilt, { y: -120, rotationX: 38, rotationZ: -6, opacity: 0, duration: 1.4, ease: 'expo.out' })
+    tl.from(tilt, { y: 14, opacity: 0, duration: .8, ease: 'power2.out', clearProps: 'transform,opacity' })
       .from(facets, { opacity: 0, scale: .6, transformOrigin: '50% 50%', stagger: .09, duration: .7 }, '-=.8')
       .fromTo('#word', { backgroundPosition: '120% 0' }, { backgroundPosition: '-20% 0', duration: 2.2, ease: 'power2.inOut' }, '-=.9')
       .from('.who', { y: 14, opacity: 0, duration: .8 }, '-=1.6')
       .from('.under > *', { y: 18, opacity: 0, stagger: .1, duration: .7 }, '-=.8');
 
     /* idle: slow float and a turning gem so the card never looks static */
-    gsap.to(tilt, { y: -8, duration: 3.4, yoyo: true, repeat: -1, ease: 'sine.inOut', delay: 2 });
-    gsap.to(gem, { rotationY: 360, duration: 14, repeat: -1, ease: 'none' });
     gsap.to('#word', { backgroundPosition: '-20% 0', duration: 6, yoyo: true, repeat: -1, ease: 'sine.inOut', delay: 3.5 });
   }
 
-  /* pointer tilt with a gold sheen that follows the light */
-  var rx = gsap.quickTo(tilt, 'rotationX', { duration: .6, ease: 'power3.out' });
-  var ry = gsap.quickTo(tilt, 'rotationY', { duration: .6, ease: 'power3.out' });
-  var stage = document.querySelector('.stage');
-  function move(e) {
-    var b = stage.getBoundingClientRect();
-    var px = (e.clientX - b.left) / b.width, py = (e.clientY - b.top) / b.height;
-    var cxn = Math.max(-1, Math.min(1, (px - .5) * 2)), cyn = Math.max(-1, Math.min(1, (py - .5) * 2));
-    ry(cxn * 9); rx(-cyn * 7);
-    sheens.forEach(function (s) { s.style.setProperty('--sx', (px * 100) + '%'); s.style.setProperty('--sy', (py * 100) + '%'); });
-  }
-  function enter() { if (!reduce) gsap.to(sheens, { opacity: .55, duration: .4 }); }
-  function leave() { rx(0); ry(0); gsap.to(sheens, { opacity: 0, duration: .6 }); }
-  if (!reduce) {
-    stage.addEventListener('pointermove', move);
-    stage.addEventListener('pointerenter', enter);
-    stage.addEventListener('pointerleave', leave);
-  }
 })();
 </script>
 

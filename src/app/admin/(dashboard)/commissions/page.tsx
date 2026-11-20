@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { approveCommission, rejectCommission, payoutAffiliate } from "@/server/actions/commissions";
+import { approveCommission, rejectCommission, payoutAffiliate, setOrderDeliveredAt } from "@/server/actions/commissions";
 import { getEligibleFromDates, getPayoutHoldDays } from "@/server/payout-eligibility";
 import type { AffiliatePaymentDetails } from "@/server/actions/affiliate";
 
@@ -133,7 +133,17 @@ export default async function AdminCommissionsPage() {
                       ? "—"
                       : eligibleFrom.get(c.orderId)
                         ? fmtDate(eligibleFrom.get(c.orderId)!)
-                        : "אחרי סימון ההזמנה כהושלמה"}
+                        : c.order.status === "COMPLETED"
+                          ? (
+                            <form action={setOrderDeliveredAt.bind(null, c.orderId)} className="flex flex-col gap-1">
+                              <span className="text-amber-700">חסר תאריך מסירה</span>
+                              <span className="flex items-center gap-1">
+                                <input type="date" name="deliveredAt" required max={new Date().toISOString().slice(0, 10)} className="rounded border border-neutral-300 px-1 py-0.5 text-xs" />
+                                <button type="submit" className="rounded bg-neutral-900 px-2 py-0.5 text-[11px] text-white">שמירה</button>
+                              </span>
+                            </form>
+                          )
+                          : "אחרי סימון ההזמנה כהושלמה"}
                 </td>
                 <td className="px-4 py-3">
                   {c.status === "PENDING" && (

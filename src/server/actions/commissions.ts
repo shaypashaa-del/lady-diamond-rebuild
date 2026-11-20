@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { deliveredAtKey } from "@/lib/settings-keys";
 import { requireAdminSession } from "@/lib/auth/guards";
 import { getEligibleFromDates, getPayoutHoldDays } from "@/server/payout-eligibility";
 
@@ -63,5 +64,25 @@ export async function payoutAffiliate(affiliateId: string) {
     });
   });
 
+  revalidatePath("/admin/commissions");
+}
+
+// Lets the owner fill in the delivery date of an order that was completed
+// before delivery dates were recorded (or correct one). Only COMPLETED orders,
+// never a future date.
+export async function setOrderDeliveredAt(orderId: string, formData: FormData) {
+  await requireAdminSession();
+  const raw = String(formData.get("deliveredAt") ?? "");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return;
+  const date = new Date(`${raw}T12:00:00.000Z`);
+  if (Number.isNaN(date.getTime()) || date.getTime() > Date.now()) return;
+  const order = await prisma.order.findUnique({ where: { id: orderId }, select: { status: true } });
+  if (!order || order.status !== "COMPLETED") return;
+  const value = date.toISOString();
+  await prisma.setting.upsert({
+    where: { key: deliveredAtKey(orderId) },
+    update: { value },
+    create: { key: deliveredAtKey(orderId), value },
+  });
   revalidatePath("/admin/commissions");
 }

@@ -17,7 +17,7 @@ const isBuild = process.env.NEXT_PHASE === "phase-production-build";
 const isRuntimeProd = process.env.NODE_ENV === "production" && !isBuild;
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
-  max: isRuntimeProd ? 10 : 3,
+  max: isRuntimeProd ? 6 : 3,
   ...(isRuntimeProd ? { idleTimeoutMillis: 10 * 60_000, connectionTimeoutMillis: 15_000, keepAlive: true } : {}),
 });
 
@@ -29,8 +29,8 @@ if (process.env.NODE_ENV !== "production") {
 
 // Keep a few connections warm in production (a tiny query every 20 s).
 if (isRuntimeProd && !globalForPrisma.prisma) {
-  const keepWarm = () => void Promise.all([1, 2, 3].map(() => prisma.$queryRaw`SELECT 1`)).catch(() => undefined);
+  const keepWarm = () => void Promise.all([1, 2].map(() => prisma.$queryRaw`SELECT 1`)).catch(() => undefined);
   keepWarm();
-  setInterval(keepWarm, 20_000).unref();
+  setInterval(keepWarm, 30_000).unref();
   globalForPrisma.prisma = prisma;
 }

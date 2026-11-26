@@ -64,6 +64,12 @@ const nextConfig: NextConfig = {
   // total Prisma pool connections (workers × adapter `max`) under that ceiling.
   experimental: {
     cpus: 2,
+    // The hosting plan caps the whole account at 120 processes/threads and 100% CPU
+    // (shared with other sites). Resizing photos with sharp defaults to one libvips
+    // thread per CPU core, and a burst of first-time image requests (after every
+    // deploy the image cache is empty) spikes threads and CPU until the host kills
+    // the app. One thread per resize keeps the spike small; results are cached.
+    imgOptConcurrency: 1,
     // Server Actions reject request bodies over 1 MB by default, which made
     // every photo upload above 1 MB fail before the action even ran. The
     // upload action itself enforces the real 8 MB image limit.
